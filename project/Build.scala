@@ -26,6 +26,9 @@ object ProjectBuild extends Build {
     ),
 
     libraryDependencies ++= Seq(
+      "com.github.nscala-time"        %% "nscala-time"        % "0.4.0",
+      "io.spray"                      %% "spray-json"         % "1.2.3",
+      "com.twmacinta"                  % "fast-md5"           % "2.7.1",
       "org.specs2"                    %% "specs2"             % "1.14" % "test",
       "junit"                          % "junit"              % "4.11" % "test"
     ),
