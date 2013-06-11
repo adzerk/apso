@@ -4,7 +4,7 @@ import spray.json._
 
 object Implicits {
 
-  final implicit class RichJsValue(val jsValue: JsValue) extends AnyVal {
+  final implicit class ApsoJsonJsValue(val jsValue: JsValue) extends AnyVal {
     def toValue: Any = jsValue match {
       case JsString(str) => str
       case JsNumber(num) => num

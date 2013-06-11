@@ -4,7 +4,7 @@ import scala.compat.Platform
 
 object Implicits {
 
-  final implicit class RichString(val s: String) extends AnyVal {
+  final implicit class ApsoString(val s: String) extends AnyVal {
     /**
      * Enumerates all strings of given length using this string as alphabet
      */
@@ -28,7 +28,7 @@ object Implicits {
     }
   }
 
-  final implicit class RichSeq[T](val seq: Seq[T]) extends AnyVal {
+  final implicit class ApsoSeq[T](val seq: Seq[T]) extends AnyVal {
     def split(n: Int): IndexedSeq[Seq[T]] = {
       val q = seq.length / n
       val r = seq.length % n
@@ -42,14 +42,14 @@ object Implicits {
       seq.take((seq.length * percentage).toInt)
   }
 
-  final implicit class RichMap[A, B](val map: Map[A, B]) extends AnyVal {
+  final implicit class ApsoMap[A, B](val map: Map[A, B]) extends AnyVal {
     def merge(that: Map[A, B])(f: (B, B) => B): Map[A, B] =
       map.foldLeft(map) { case (acc, (key, value)) =>
         if (that.contains(key)) acc + (key -> f(value, that(key))) else acc
       }
   }
 
-  final implicit class RichListMap[K, V](val list: Seq[Map[K, V]]) extends AnyVal {
+  final implicit class ApsoListMap[K, V](val list: Seq[Map[K, V]]) extends AnyVal {
     def sequenceOnMap(zero: Option[V] = None): Map[K, List[V]] = {
       val default = zero.toList // TODO make this a lazy val once Scala allows them in value classes
 
@@ -71,7 +71,7 @@ object Implicits {
     }
   }
 
-  final implicit class RichCloseable[U <: AutoCloseable](val res: U) extends AnyVal {
+  final implicit class ApsoCloseable[U <: AutoCloseable](val res: U) extends AnyVal {
     def use[T](f: U => T): T =
       try { f(res) } finally { res.close() }
   }
