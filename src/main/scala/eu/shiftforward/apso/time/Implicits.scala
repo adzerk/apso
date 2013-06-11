@@ -4,6 +4,9 @@ import org.joda.time.ReadableInterval
 import com.github.nscala_time.time.Imports._
 
 object Implicits {
+  implicit class ApsoTimeLocalDate(val d1: LocalDate) extends AnyVal {
+    def utcDateTime: DateTime = d1.toDateTime(new LocalTime(0, 0), DateTimeZone.UTC)
+  }
 
   final implicit class ApsoTimeDateTime(val d1: DateTime) extends AnyVal {
     def utcLocalDate: LocalDate = d1.withZone(DateTimeZone.UTC).toLocalDate
