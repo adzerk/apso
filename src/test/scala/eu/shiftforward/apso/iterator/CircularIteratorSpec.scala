@@ -1,4 +1,4 @@
-package eu.shiftforward.apso
+package eu.shiftforward.apso.iterator
 
 import org.specs2.mutable._
 

@@ -1,4 +1,4 @@
-package eu.shiftforward.apso
+package eu.shiftforward.apso.iterator
 
 class CircularIterator[A](it: => Iterator[A]) extends Iterator[A] {
   var currentIt = it
