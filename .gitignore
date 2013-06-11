@@ -1,0 +1,8 @@
+# project output directory
+target/
+
+# system and IDE setting files
+.DS_Store
+.idea
+.idea_modules
+.ensime
