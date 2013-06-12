@@ -10,7 +10,7 @@ object ProjectBuild extends Build {
                             .settings(
     organization := "eu.shiftforward",
     version := "0.1-SNAPSHOT",
-    scalaVersion := "2.10.1",
+    scalaVersion := "2.10.2",
 
     publishSetting,
     credentialsSetting,
@@ -26,7 +26,7 @@ object ProjectBuild extends Build {
     ),
 
     libraryDependencies ++= Seq(
-      "com.github.nscala-time"        %% "nscala-time"        % "0.4.0",
+      "com.github.nscala-time"        %% "nscala-time"        % "0.4.2",
       "io.spray"                      %% "spray-json"         % "1.2.3",
       "com.twmacinta"                  % "fast-md5"           % "2.7.1",
       "org.specs2"                    %% "specs2"             % "1.14" % "test",
