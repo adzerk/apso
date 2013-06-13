@@ -18,6 +18,7 @@ object ProjectBuild extends Build {
     resolvers ++= Seq(
       "Sonatype Repository"           at "http://oss.sonatype.org/content/repositories/releases",
       "Sonatype Snapshots Repository" at "http://oss.sonatype.org/content/repositories/snapshots",
+      "Spray Repository"              at "http://repo.spray.io/",
       "Typesafe Repository"           at "http://repo.typesafe.com/typesafe/releases/",
       "SF Nexus Releases"             at "http://NEXUS_URL/content/repositories/releases",
       "SF Nexus Snapshots"            at "http://NEXUS_URL/content/repositories/snapshots",
@@ -26,11 +27,14 @@ object ProjectBuild extends Build {
     ),
 
     libraryDependencies ++= Seq(
-      "com.github.nscala-time"        %% "nscala-time"        % "0.4.2",
-      "io.spray"                      %% "spray-json"         % "1.2.3",
-      "com.twmacinta"                  % "fast-md5"           % "2.7.1",
-      "org.specs2"                    %% "specs2"             % "1.14" % "test",
-      "junit"                          % "junit"              % "4.11" % "test"
+      "com.github.nscala-time"        %% "nscala-time"        % "0.4.2"  % "provided",
+      "com.typesafe.akka"             %% "akka-actor"         % "2.1.4"  % "provided",
+      "com.twmacinta"                  % "fast-md5"           % "2.7.1"  % "provided",
+      "io.spray"                      %% "spray-json"         % "1.2.3"  % "provided",
+      "io.spray"                       % "spray-httpx"        % "1.1-M8" % "provided",
+      "org.scalaz"                    %% "scalaz-core"        % "7.0.0"  % "provided",
+      "org.specs2"                    %% "specs2"             % "1.14"   % "test",
+      "junit"                          % "junit"              % "4.11"   % "test"
     ),
 
     testOptions in Test += Tests.Argument(TestFrameworks.Specs2, "junitxml", "console"),
