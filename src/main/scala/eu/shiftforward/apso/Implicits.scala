@@ -1,6 +1,8 @@
 package eu.shiftforward.apso
 
 import scala.compat.Platform
+import scala.util.{Failure => TFailure, Try, Success => TSuccess}
+import scalaz.{Failure, Success, Validation}
 
 object Implicits {
 
@@ -74,5 +76,14 @@ object Implicits {
   final implicit class ApsoCloseable[U <: AutoCloseable](val res: U) extends AnyVal {
     def use[T](f: U => T): T =
       try { f(res) } finally { res.close() }
+  }
+
+  final implicit class ApsoTry[T](val t: Try[T]) extends AnyVal {
+    def toValidation: Validation[Throwable, T] = t
+  }
+
+  implicit def try2validation[T](t: Try[T]): Validation[Throwable, T] = t match {
+    case TSuccess(t) => Success(t)
+    case TFailure(t) => Failure(t)
   }
 }
