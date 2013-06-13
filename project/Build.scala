@@ -29,7 +29,7 @@ object ProjectBuild extends Build {
     libraryDependencies ++= Seq(
       "com.github.nscala-time"        %% "nscala-time"        % "0.4.2"  % "provided",
       "com.typesafe.akka"             %% "akka-actor"         % "2.1.4"  % "provided",
-      "com.twmacinta"                  % "fast-md5"           % "2.7.1"  % "provided",
+      "com.twmacinta"                  % "fast-md5"           % "2.7.1",
       "io.spray"                      %% "spray-json"         % "1.2.3"  % "provided",
       "io.spray"                       % "spray-httpx"        % "1.1-M8" % "provided",
       "org.scalaz"                    %% "scalaz-core"        % "7.0.0"  % "provided",
