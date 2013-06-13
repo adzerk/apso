@@ -191,6 +191,23 @@ final class DeboxMap[
     loop(i, i)
   }
 
+  final def getOrElse(key: A, default: B): B = {
+    @inline
+    @tailrec def loop(i: Int, perturbation: Int): B = {
+      val j = i & mask
+      val status = buckets(j)
+      if (status == 0) {
+        default
+      } else if (status == 3 && keys(j) == key) {
+        vals(j)
+      } else {
+        loop((i << 2) + i + perturbation + 1, perturbation >> 5)
+      }
+    }
+    val i = key.## & 0x7fffffff
+    loop(i, i)
+  }
+
   final def foreach(f: (A, B) => Unit) {
     @inline
     @tailrec
@@ -204,6 +221,27 @@ final class DeboxMap[
       if (c <= limit) loop(i + 1, c, limit)
     }
     loop(0, 0, length - 1)
+  }
+
+  final def map[C](f: (A, B) => C): List[C] = {
+    @inline
+    @tailrec
+    def loop(i: Int, count: Int, limit: Int, acc: List[C]): List[C] = {
+      if (buckets(i) == 3) {
+        val newAcc = f(keys(i), vals(i)) :: acc
+        val c = count + 1
+        if (c <= limit) {
+          loop(i + 1, c, limit, newAcc)
+        } else {
+          newAcc
+        }
+      } else if (count <= limit) {
+        loop(i + 1, count, limit, acc)
+      } else {
+        acc
+      }
+    }
+    loop(0, 0, length - 1, Nil)
   }
 
   final override def equals(that: Any) = {
