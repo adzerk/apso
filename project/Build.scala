@@ -1,12 +1,16 @@
 import sbt._
 import sbt.Keys._
 
+import com.typesafe.sbt.SbtScalariform
+import com.typesafe.sbt.SbtScalariform.ScalariformKeys
+import scalariform.formatter.preferences._
+
 object ProjectBuild extends Build {
   lazy val project = "apso"
 
   lazy val root = Project(id = project,
                           base = file("."),
-                          settings = Project.defaultSettings)
+                          settings = Project.defaultSettings ++ formatSettings)
                             .settings(
     organization := "eu.shiftforward",
     version := "0.1-SNAPSHOT",
@@ -41,6 +45,17 @@ object ProjectBuild extends Build {
 
     scalacOptions ++= Seq("-deprecation", "-unchecked")
   )
+
+  lazy val formatSettings = SbtScalariform.scalariformSettings ++ Seq(
+    ScalariformKeys.preferences in Compile := formattingPreferences,
+    ScalariformKeys.preferences in Test := formattingPreferences
+  )
+
+  def formattingPreferences =
+    FormattingPreferences()
+      .setPreference(AlignParameters, true)
+      .setPreference(CompactControlReadability, true)
+      .setPreference(DoubleIndentClassDeclaration, true)
 
   lazy val publishSetting = publishTo <<= version { (v: String) =>
     val sf = "http://NEXUS_URL/content/repositories/"

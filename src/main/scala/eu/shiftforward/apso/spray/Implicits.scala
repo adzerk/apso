@@ -1,6 +1,6 @@
 package eu.shiftforward.apso.spray
 
-import scalaz.{Failure, Success, Validation}
+import scalaz.{ Failure, Success, Validation }
 import spray.httpx.marshalling.Marshaller
 
 object Implicits {

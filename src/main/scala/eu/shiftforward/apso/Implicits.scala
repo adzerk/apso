@@ -44,8 +44,9 @@ object Implicits {
 
   final implicit class ApsoMap[A, B](val map: Map[A, B]) extends AnyVal {
     def merge(that: Map[A, B])(f: (B, B) => B): Map[A, B] =
-      map.foldLeft(map) { case (acc, (key, value)) =>
-        if (that.contains(key)) acc + (key -> f(value, that(key))) else acc
+      map.foldLeft(map) {
+        case (acc, (key, value)) =>
+          if (that.contains(key)) acc + (key -> f(value, that(key))) else acc
       }
 
     def twoWayMerge(that: Map[A, B])(f: (B, B) => B): Map[A, B] =
@@ -69,8 +70,9 @@ object Implicits {
 
       keysOpt.map { keys =>
         list.foldLeft(Map[K, List[V]]()) { (acc, innerMap) =>
-          keys.foldLeft(acc) { case (acc, key) =>
-            acc + (key -> (acc.getOrElse(key, Nil) ::: construct(innerMap.get(key))))
+          keys.foldLeft(acc) {
+            case (acc, key) =>
+              acc + (key -> (acc.getOrElse(key, Nil) ::: construct(innerMap.get(key))))
           }
         }
       } getOrElse {
