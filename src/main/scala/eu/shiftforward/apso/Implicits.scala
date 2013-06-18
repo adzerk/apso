@@ -16,8 +16,8 @@ object Implicits {
 
     def padLeft(length: Int, ch: Char) = {
       val sb = new StringBuilder(length)
-      (1 to (length - s.length)).foreach { i => sb.append(ch) }
-      sb.append(s).toString
+      (1 to length - s.length).foreach { i => sb.append(ch) }
+      sb.append(s).toString()
     }
 
     def getBytesWithNullTerminator: Array[Byte] = {
@@ -46,6 +46,14 @@ object Implicits {
     def merge(that: Map[A, B])(f: (B, B) => B): Map[A, B] =
       map.foldLeft(map) { case (acc, (key, value)) =>
         if (that.contains(key)) acc + (key -> f(value, that(key))) else acc
+      }
+
+    def twoWayMerge(that: Map[A, B])(f: (B, B) => B): Map[A, B] =
+      map.foldLeft(that) { case (thatMap, (key, mapValue)) =>
+        thatMap.get(key) match {
+          case Some(thatValue) => thatMap.updated(key, f(mapValue, thatValue))
+          case None => thatMap.updated(key, mapValue)
+        }
       }
   }
 
