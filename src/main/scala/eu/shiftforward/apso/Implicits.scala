@@ -108,7 +108,7 @@ object Implicits {
 
   final implicit class ApsoListMap[K, V](val list: Seq[Map[K, V]]) extends AnyVal {
     def sequenceOnMap(zero: Option[V] = None): Map[K, List[V]] = {
-      val default = zero.toList // TODO make this a lazy val once Scala allows them in value classes
+      lazy val default = zero.toList
 
       def construct(value: Option[V]) = value match {
         case None => default
