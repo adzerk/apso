@@ -107,6 +107,16 @@ object Implicits {
   }
 
   final implicit class ApsoListMap[K, V](val list: Seq[Map[K, V]]) extends AnyVal {
+
+    /**
+     * Converts this list of maps into a map of lists. The order of the elements is kept between
+     * structures. If a zero element is given, maps which do not contain certain keys are filled with
+     * the zero element, which effectively implies that all the lists in the given map will have the
+     * same length, corresponding to the size of the set of all keys. If a zero element is not given,
+     * only the elements present in this map are packed into the lists of the resulting map.
+     * @param zero the zero element, used as described above
+     * @return the map of lists converted from this map.
+     */
     def sequenceOnMap(zero: Option[V] = None): Map[K, List[V]] = {
       lazy val default = zero.toList
 
@@ -130,6 +140,13 @@ object Implicits {
   }
 
   final implicit class ApsoCloseable[U <: AutoCloseable](val res: U) extends AnyVal {
+
+    /**
+     * Uses this resouce and closes it afterwards.
+     * @param f the block of code to execute using this resource
+     * @tparam T the return type of the code block.
+     * @return the value returned by the code block.
+     */
     def use[T](f: U => T): T =
       try { f(res) } finally { res.close() }
   }
