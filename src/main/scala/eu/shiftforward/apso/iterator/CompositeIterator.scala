@@ -17,7 +17,8 @@ class CompositeIterator[A](private[apso] var queue: List[() => Iterator[A]]) ext
     currentHead != null && currentHead.hasNext
   }
 
-  def next(): A = if (hasNext) currentHead.next
+  def next(): A =
+    if (hasNext) currentHead.next
     else throw new NoSuchElementException("empty iterator")
 
   override def ++[B >: A](that: => GenTraversableOnce[B]): CompositeIterator[B] =
@@ -34,13 +35,15 @@ object CompositeIterator {
         if (head.isInstanceOf[CompositeIterator[_]]) head.asInstanceOf[CompositeIterator[A]]
         else CompositeIterator(() => head)
 
-      its.tail.foldLeft(zero) { case (acc, it) =>
-        if (it.isInstanceOf[CompositeIterator[_]]) {
-          val composite = it.asInstanceOf[CompositeIterator[A]]
-          CompositeIterator((acc.queue ++ composite.queue): _*)
-        } else {
-          acc ++ it
-        }
+      its.tail.foldLeft(zero) {
+        case (acc, it) =>
+          if (it.isInstanceOf[CompositeIterator[_]]) {
+            val composite = it.asInstanceOf[CompositeIterator[A]]
+            CompositeIterator((acc.queue ++ composite.queue): _*)
+          }
+          else {
+            acc ++ it
+          }
       }
     }
 }

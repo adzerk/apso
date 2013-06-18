@@ -53,9 +53,9 @@ class IterableIntervalSpec extends Specification with NoTimeConversions {
       (new DateTime("2012-01-01") until new DateTime("2012-01-03") by 2.days).toSeq mustEqual
         Seq(new DateTime("2012-01-01"))
 
-      (new DateTime(2012,1,29,1,0) until new DateTime(2012,1,29,1,10) by 2.minutes).toSeq mustEqual
-        Seq(new DateTime(2012,1,29,1,0), new DateTime(2012,1,29,1,2), new DateTime(2012,1,29,1,4),
-          new DateTime(2012,1,29,1,6), new DateTime(2012,1,29,1,8))
+      (new DateTime(2012, 1, 29, 1, 0) until new DateTime(2012, 1, 29, 1, 10) by 2.minutes).toSeq mustEqual
+        Seq(new DateTime(2012, 1, 29, 1, 0), new DateTime(2012, 1, 29, 1, 2), new DateTime(2012, 1, 29, 1, 4),
+          new DateTime(2012, 1, 29, 1, 6), new DateTime(2012, 1, 29, 1, 8))
     }
   }
 }

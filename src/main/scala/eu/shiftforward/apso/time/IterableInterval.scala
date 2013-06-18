@@ -9,15 +9,16 @@ trait IterableInterval extends IndexedSeq[DateTime] {
 }
 
 case class SteppedInterval(interval: ReadableInterval, step: Period)
-  extends IterableInterval {
+    extends IterableInterval {
 
   lazy val length: Int = {
     var i = (interval.toDurationMillis / step.toDurationFrom(interval.getStart).millis).toInt
-    if(apply(i) < interval.getEnd) {
-      while(apply(i) <= interval.getEnd) { i += 1 }
+    if (apply(i) < interval.getEnd) {
+      while (apply(i) <= interval.getEnd) { i += 1 }
       i
-    } else {
-      while(apply(i) > interval.getEnd) { i -= 1 }
+    }
+    else {
+      while (apply(i) > interval.getEnd) { i -= 1 }
       i + 1
     } // FIXME more intelligent code for this?
   }
@@ -28,7 +29,7 @@ case class SteppedInterval(interval: ReadableInterval, step: Period)
 }
 
 case class EmptySteppedInterval(step: Period)
-  extends IterableInterval {
+    extends IterableInterval {
 
   def length = 0
   def apply(idx: Int) = throw new IndexOutOfBoundsException
@@ -37,7 +38,7 @@ case class EmptySteppedInterval(step: Period)
 
 object IterableInterval {
   def apply(interval: ReadableInterval, step: Period, lastInclusive: Boolean = true): IterableInterval =
-    if(lastInclusive) SteppedInterval(interval, step)
-    else if(interval.millis == 0) EmptySteppedInterval(step)
+    if (lastInclusive) SteppedInterval(interval, step)
+    else if (interval.millis == 0) EmptySteppedInterval(step)
     else SteppedInterval(interval.getStart to (interval.getEnd - 1.millis), step)
 }

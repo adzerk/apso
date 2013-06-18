@@ -2,9 +2,9 @@ package eu.shiftforward.apso.collection
 
 import scala.annotation.tailrec
 import scala.reflect.ClassTag
-import scala.{specialized => spec}
+import scala.{ specialized => spec }
 
-class InvalidSizes(k: Int, v: Int) extends Exception("%s, %s" format(k, v))
+class InvalidSizes(k: Int, v: Int) extends Exception("%s, %s" format (k, v))
 
 class MapOverflow(n: Int) extends Exception("size %s exceeds max" format n)
 
@@ -14,10 +14,8 @@ object DeboxMap {
   /**
    * Create an empty DeboxMap.
    */
-  def empty[
-  @spec(Int, Long, Double, AnyRef) A: ClassTag,
-  @spec(Int, Long, Double, AnyRef) B: ClassTag
-  ] = new DeboxMap(new Array[A](8), new Array[B](8), new Array[Byte](8), 0, 0)
+  def empty[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Long, Double, AnyRef) B: ClassTag] =
+    new DeboxMap(new Array[A](8), new Array[B](8), new Array[Byte](8), 0, 0)
 
   /**
    * Create a DeboxMap preallocated to a particular size.
@@ -26,10 +24,7 @@ object DeboxMap {
    * requested to satisfy the requirements of internal alignment. DeboxMap uses
    * arrays whose lengths are powers of two.
    */
-  def ofDim[
-  @spec(Int, Long, Double, AnyRef) A: ClassTag,
-  @spec(Int, Long, Double, AnyRef) B: ClassTag
-  ](n: Int) = {
+  def ofDim[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Long, Double, AnyRef) B: ClassTag](n: Int) = {
     val sz = nextPowerOfTwo(n)
     if (sz < 1) throw new MapOverflow(n)
     new DeboxMap(new Array[A](sz), new Array[B](sz), new Array[Byte](sz), 0, 0)
@@ -38,18 +33,15 @@ object DeboxMap {
   /**
    * Create an empty DeboxMap.
    */
-  def apply[
-  @spec(Int, Long, Double, AnyRef) A: ClassTag,
-  @spec(Int, Long, Double, AnyRef) B: ClassTag
-  ]() = empty[A, B]
+  def apply[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Long, Double, AnyRef) B: ClassTag]() = empty[A, B]
 
   /**
    * Create a map from an array of keys and another array of values.
    */
-  def apply[
-  @spec(Int, Long, Double, AnyRef) A: ClassTag,
-  @spec(Int, Long, Double, AnyRef) B: ClassTag
-  ](ks: Array[A], vs: Array[B]) = {
+  def apply[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Long, Double, AnyRef) B: ClassTag](
+    ks: Array[A],
+    vs: Array[B]) = {
+
     if (ks.length != vs.length) throw new InvalidSizes(ks.length, vs.length)
     val map = ofDim[A, B](ks.length)
     val limit = ks.length - 1
@@ -68,10 +60,13 @@ object DeboxMap {
   }
 }
 
-final class DeboxMap[
-@spec(Int, Long, Double, AnyRef) A: ClassTag,
-@spec(Int, Long, Double, AnyRef) B: ClassTag
-] protected[apso](ks: Array[A], vs: Array[B], bs: Array[Byte], n: Int, u: Int) extends (A => B) with Serializable {
+final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Long, Double, AnyRef) B: ClassTag] protected[apso] (
+  ks: Array[A],
+  vs: Array[B],
+  bs: Array[Byte],
+  n: Int,
+  u: Int)
+    extends (A => B) with Serializable {
 
   // set internals
   var keys: Array[A] = ks
@@ -105,14 +100,17 @@ final class DeboxMap[
         len += 1
         used += 1
         if (used > limit) resize()
-      } else if (status == 2) {
+      }
+      else if (status == 2) {
         keys(j) = key
         vals(j) = value
         buckets(j) = 3
         len += 1
-      } else if (keys(j) == key) {
+      }
+      else if (keys(j) == key) {
         vals(j) = value
-      } else {
+      }
+      else {
         loop((i << 2) + i + perturbation + 1, perturbation >> 5)
       }
     }
@@ -128,8 +126,10 @@ final class DeboxMap[
       if (status == 3 && keys(j) == key) {
         buckets(j) = 2
         len -= 1
-      } else if (status == 0) {
-      } else {
+      }
+      else if (status == 0) {
+      }
+      else {
         loop((i << 2) + i + perturbation + 1, perturbation >> 5)
       }
     }
@@ -147,9 +147,11 @@ final class DeboxMap[
       val status = buckets(j)
       if (status == 0) {
         false
-      } else if (status == 3 && keys(j) == key) {
+      }
+      else if (status == 3 && keys(j) == key) {
         true
-      } else {
+      }
+      else {
         loop((i << 2) + i + perturbation + 1, perturbation >> 5)
       }
     }
@@ -164,9 +166,11 @@ final class DeboxMap[
       val status = buckets(j)
       if (status == 0) {
         throw new NotFound(key.toString)
-      } else if (status == 3 && keys(j) == key) {
+      }
+      else if (status == 3 && keys(j) == key) {
         vals(j)
-      } else {
+      }
+      else {
         loop((i << 2) + i + perturbation + 1, perturbation >> 5)
       }
     }
@@ -181,9 +185,11 @@ final class DeboxMap[
       val status = buckets(j)
       if (status == 0) {
         None
-      } else if (status == 3 && keys(j) == key) {
+      }
+      else if (status == 3 && keys(j) == key) {
         Some(vals(j))
-      } else {
+      }
+      else {
         loop((i << 2) + i + perturbation + 1, perturbation >> 5)
       }
     }
@@ -198,9 +204,11 @@ final class DeboxMap[
       val status = buckets(j)
       if (status == 0) {
         default
-      } else if (status == 3 && keys(j) == key) {
+      }
+      else if (status == 3 && keys(j) == key) {
         vals(j)
-      } else {
+      }
+      else {
         loop((i << 2) + i + perturbation + 1, perturbation >> 5)
       }
     }
@@ -215,7 +223,8 @@ final class DeboxMap[
       val c = if (buckets(i) == 3) {
         f(keys(i), vals(i))
         count + 1
-      } else {
+      }
+      else {
         count
       }
       if (c <= limit) loop(i + 1, c, limit)
@@ -232,12 +241,15 @@ final class DeboxMap[
         val c = count + 1
         if (c <= limit) {
           loop(i + 1, c, limit, newAcc)
-        } else {
+        }
+        else {
           newAcc
         }
-      } else if (count <= limit) {
+      }
+      else if (count <= limit) {
         loop(i + 1, count, limit, acc)
-      } else {
+      }
+      else {
         acc
       }
     }

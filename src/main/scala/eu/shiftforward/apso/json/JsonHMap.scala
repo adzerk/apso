@@ -1,8 +1,8 @@
 package eu.shiftforward.apso.json
 
 import eu.shiftforward.apso.collection.HMap
-import spray.json.{JsValue, RootJsonFormat}
-import scala.collection.mutable.{Map => MutableMap, ListBuffer}
+import spray.json.{ JsValue, RootJsonFormat }
+import scala.collection.mutable.{ Map => MutableMap, ListBuffer }
 import spray.json.DefaultJsonProtocol._
 
 trait JsonKeyRegistry {
@@ -18,10 +18,11 @@ object JsonHMap {
   implicit def caseJsonFormat(implicit reg: JsonKeyRegistry) = new RootJsonFormat[JsonHMap] {
     def read(json: JsValue): JsonHMap = {
       val caseObj = JsonHMap()
-      json.asJsObject.fields.foreach { case (k, v) =>
-        reg.keys.get(Symbol(k)).map { caseKey =>
-          caseObj.put(caseKey.toKey, caseKey.toValue(v))
-        }
+      json.asJsObject.fields.foreach {
+        case (k, v) =>
+          reg.keys.get(Symbol(k)).map { caseKey =>
+            caseObj.put(caseKey.toKey, caseKey.toValue(v))
+          }
       }
       caseObj
     }
