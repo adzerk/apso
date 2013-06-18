@@ -1,7 +1,7 @@
 package eu.shiftforward.apso.scalaz
 
-import scala.util.{Failure => TFailure, Try, Success => TSuccess}
-import scalaz.{Failure, Success, Validation}
+import scala.util.{ Failure => TFailure, Try, Success => TSuccess }
+import scalaz.{ Failure, Success, Validation }
 
 object Implicits {
   final implicit class ApsoTry[T](val t: Try[T]) extends AnyVal {

@@ -26,7 +26,8 @@ trait Loggable {
     if (logger.isDebugEnabled) {
       if (t != null) {
         logger.debug(msg.toString, t)
-      } else {
+      }
+      else {
         logger.debug(msg.toString)
       }
     }
@@ -36,7 +37,8 @@ trait Loggable {
     if (logger.isInfoEnabled) {
       if (t != null) {
         logger.info(msg.toString, t)
-      } else {
+      }
+      else {
         logger.info(msg.toString)
       }
     }
@@ -46,7 +48,8 @@ trait Loggable {
     if (logger.isErrorEnabled) {
       if (t != null) {
         logger.error(msg.toString, t)
-      } else {
+      }
+      else {
         logger.error(msg.toString)
       }
     }
@@ -56,7 +59,8 @@ trait Loggable {
     if (logger.isWarnEnabled) {
       if (t != null) {
         logger.warn(msg.toString, t)
-      } else {
+      }
+      else {
         logger.warn(msg.toString)
       }
     }
