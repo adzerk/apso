@@ -4,25 +4,47 @@ import scala.annotation.tailrec
 import scala.reflect.ClassTag
 import scala.{ specialized => spec }
 
+/**
+ * Exception thrown when a `DeboxMap` factory is called with a different number of keys and values.
+ * @param k the number of keys
+ * @param v the number of values
+ */
 class InvalidSizes(k: Int, v: Int) extends Exception("%s, %s" format (k, v))
 
+/**
+ * Exception thrown when a `DeboxMap` factory is called requiring an invalid preallocated size.
+ * @param n the requested size
+ */
 class MapOverflow(n: Int) extends Exception("size %s exceeds max" format n)
 
+/**
+ * Exception thrown when trying to access a non-existent key in a `DeboxMap`.
+ * @param k the non-existent key
+ */
 class NotFound(k: String) extends Exception("key %s was not found" format k)
 
+/**
+ * Object containing factory methods for `DeboxMaps`.
+ */
 object DeboxMap {
+
   /**
-   * Create an empty DeboxMap.
+   * Creates an empty `DeboxMap`.
+   * @tparam A the type of the keys of the new map
+   * @tparam B the type of the values of the new map
+   * @return a new, empty `DeboxMap`.
    */
   def empty[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Long, Double, AnyRef) B: ClassTag] =
     new DeboxMap(new Array[A](8), new Array[B](8), new Array[Byte](8), 0, 0)
 
   /**
-   * Create a DeboxMap preallocated to a particular size.
-   *
-   * Note that the internal representation may allocate more space than
-   * requested to satisfy the requirements of internal alignment. DeboxMap uses
-   * arrays whose lengths are powers of two.
+   * Create a DeboxMap preallocated to a particular size. Note that the internal representation may allocate
+   * more space than requested to satisfy the requirements of internal alignment. DeboxMap uses arrays whose
+   * lengths are powers of two.
+   * @param n the minimum number of elements to allocate space for
+   * @tparam A the type of the keys of the new map
+   * @tparam B the type of the values of the new map
+   * @return a new `DeboxMap` with the required preallocated space.
    */
   def ofDim[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Long, Double, AnyRef) B: ClassTag](n: Int) = {
     val sz = nextPowerOfTwo(n)
@@ -31,12 +53,20 @@ object DeboxMap {
   }
 
   /**
-   * Create an empty DeboxMap.
+   * Creates an empty DeboxMap.
+   * @tparam A the type of the keys of the new map
+   * @tparam B the type of the values of the new map
+   * @return a new, empty `DeboxMap`.
    */
   def apply[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Long, Double, AnyRef) B: ClassTag]() = empty[A, B]
 
   /**
-   * Create a map from an array of keys and another array of values.
+   * Creates a map from an array of keys and another array of values.
+   * @param ks the array of keys to add to the map
+   * @param vs the array of corresponding values to add to the map
+   * @tparam A the type of the keys of the new map
+   * @tparam B the type of the values of the new map
+   * @return a new `DeboxMap` with the given elements
    */
   def apply[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Long, Double, AnyRef) B: ClassTag](
     ks: Array[A],
@@ -54,12 +84,17 @@ object DeboxMap {
     map
   }
 
-  def nextPowerOfTwo(n: Int): Int = {
+  private def nextPowerOfTwo(n: Int): Int = {
     val x = java.lang.Integer.highestOneBit(n)
     if (x == n) n else x * 2
   }
 }
 
+/**
+ * An hash map optimized for performance, not incurring in boxing while storing primitive values.
+ * @tparam A the type of the keys
+ * @tparam B the type of the values
+ */
 final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Long, Double, AnyRef) B: ClassTag] protected[apso] (
   ks: Array[A],
   vs: Array[B],
@@ -86,8 +121,17 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
   // size - 1, used for hashing
   var limit = (keys.length * 0.65).toInt // point at which we should resize
 
+  /**
+   * Returns the number of entries in this map.
+   * @return the number of entries in this map.
+   */
   final def length: Int = len
 
+  /**
+   * Updates the value of a key. If the key does not exist, it is added to the map.
+   * @param key the key to update
+   * @param value the value to assign to the given key
+   */
   final def update(key: A, value: B) {
     @inline
     @tailrec def loop(i: Int, perturbation: Int) {
@@ -118,6 +162,10 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
     loop(i, i)
   }
 
+  /**
+   * Removes a key from this map. If the key does not exist, this method does nothing.
+   * @param key the key to remove
+   */
   final def remove(key: A) {
     @inline
     @tailrec def loop(i: Int, perturbation: Int) {
@@ -137,9 +185,18 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
     loop(i, i)
   }
 
+  /**
+   * Returns a copy of this map.
+   * @return a copy of this map.
+   */
   final def copy: DeboxMap[A, B] =
-    new DeboxMap(keys.clone, vals.clone, buckets.clone, len, used)
+    new DeboxMap(keys.clone(), vals.clone(), buckets.clone(), len, used)
 
+  /**
+   * Tests if this map contains a given key.
+   * @param key the key to test for membership
+   * @return `true` if the map contains the given key, `false` otherwise.
+   */
   final def contains(key: A): Boolean = {
     @inline
     @tailrec def loop(i: Int, perturbation: Int): Boolean = {
@@ -159,6 +216,11 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
     loop(i, i)
   }
 
+  /**
+   * Returns the value associated with a key. If the key does not exist, a `NotFound` exception is thrown.
+   * @param key the key to lookup
+   * @return the value associated with the given key.
+   */
   final def apply(key: A): B = {
     @inline
     @tailrec def loop(i: Int, perturbation: Int): B = {
@@ -178,6 +240,11 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
     loop(i, i)
   }
 
+  /**
+   * Returns the value associated with a key or `None` if the key does not exist.
+   * @param key the key to lookup
+   * @return the value associated with the given key wrapped in a `Some` if this map contains the key, `None` otherwise.
+   */
   final def get(key: A): Option[B] = {
     @inline
     @tailrec def loop(i: Int, perturbation: Int): Option[B] = {
@@ -197,6 +264,12 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
     loop(i, i)
   }
 
+  /**
+   * Returns the value associated with a key or a default value if the key does not exist.
+   * @param key the key to lookup
+   * @param default the value to return if this map does not contain the given key
+   * @return the value associated with the given key if this map contains the key, `default` otherwise.
+   */
   final def getOrElse(key: A, default: B): B = {
     @inline
     @tailrec def loop(i: Int, perturbation: Int): B = {
@@ -216,6 +289,11 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
     loop(i, i)
   }
 
+  /**
+   * Applies a function `f` to all entries of this map.
+   * @param f the function that is applied for its side-effect to every element. The result of function
+   *          `f` is discarded.
+   */
   final def foreach(f: (A, B) => Unit) {
     @inline
     @tailrec
@@ -232,6 +310,13 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
     loop(0, 0, length - 1)
   }
 
+  /**
+   * Builds a new list by applying a function to all entries of this map.
+   * @param f the function to apply to each element
+   * @tparam C the type of the elements in the returned list
+   * @return a new list resulting from applying the given function `f` to each element of this map and
+   *         collecting the results.
+   */
   final def map[C](f: (A, B) => C): List[C] = {
     @inline
     @tailrec
