@@ -43,7 +43,11 @@ object ProjectBuild extends Build {
 
     testOptions in Test += Tests.Argument(TestFrameworks.Specs2, "junitxml", "console"),
 
-    scalacOptions ++= Seq("-deprecation", "-unchecked")
+    scalacOptions ++= Seq("-deprecation", "-unchecked"),
+
+    scalacOptions in Compile in doc ++= Opts.doc.title("apso"), // TODO define title using sbt keys
+    scalacOptions in Compile in doc ++= Opts.doc.version("1.0-SNAPSHOT"), // TODO define project version using sbt keys
+    scalacOptions in Compile in doc += "-external-urls:scala=http://www.scala-lang.org/api/2.10.2" // TODO define scala version using sbt keys
   )
 
   lazy val formatSettings = SbtScalariform.scalariformSettings ++ Seq(
