@@ -2,8 +2,15 @@ package eu.shiftforward.apso
 
 import scala.compat.Platform
 
+/**
+ * Object containing implicit classes and methods of general purpose.
+ */
 object Implicits {
 
+  /**
+   * Implicit class that provides new methods for strings.
+   * @param s the string to which the new methods are provided.
+   */
   final implicit class ApsoString(val s: String) extends AnyVal {
 
     /**
@@ -41,6 +48,10 @@ object Implicits {
     }
   }
 
+  /**
+   * Implicit class that provides new methods for sequences.
+   * @param seq the sequence to which the new methods are provided.
+   */
   final implicit class ApsoSeq[T](val seq: Seq[T]) extends AnyVal {
 
     /**
@@ -67,6 +78,10 @@ object Implicits {
       seq.take((seq.length * percentage).toInt)
   }
 
+  /**
+   * Implicit class that provides new methods for maps.
+   * @param map the map to which the new methods are provided.
+   */
   final implicit class ApsoMap[A, B](val map: Map[A, B]) extends AnyVal {
 
     /**
@@ -79,6 +94,7 @@ object Implicits {
      * @param that the map to be merged into this map
      * @param f the function used to merge two values with the same key
      * @return the merged map.
+     * @todo check if this method is really useful / needed.
      */
     def merge(that: Map[A, B])(f: (B, B) => B): Map[A, B] =
       map.foldLeft(map) {
@@ -106,6 +122,10 @@ object Implicits {
       }
   }
 
+  /**
+   * Implicit class that provides new methods for sequences of maps.
+   * @param list the sequence of maps to which the new methods are provided.
+   */
   final implicit class ApsoListMap[K, V](val list: Seq[Map[K, V]]) extends AnyVal {
 
     /**
@@ -139,6 +159,10 @@ object Implicits {
     }
   }
 
+  /**
+   * Implicit class that provides new methods for closeable resources.
+   * @param res the closeable resource to which the new methods are provided.
+   */
   final implicit class ApsoCloseable[U <: AutoCloseable](val res: U) extends AnyVal {
 
     /**

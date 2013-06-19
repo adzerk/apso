@@ -20,6 +20,7 @@ object Reflect {
    * @param man a manifest of the object to return
    * @tparam T the type of the object to return
    * @return the companion object with the given name.
+   * @todo use Scala reflection for doing this operation.
    */
   def companion[T](objName: String)(implicit man: Manifest[T]): T =
     Class.forName(objName + "$").getField("MODULE$").get(man.runtimeClass).asInstanceOf[T]
