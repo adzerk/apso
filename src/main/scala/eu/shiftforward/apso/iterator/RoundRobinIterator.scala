@@ -8,9 +8,9 @@ import scala.collection.GenTraversableOnce
  * @tparam A the type of the elements to iterate over
  */
 class RoundRobinIterator[A](iterators: Array[() => Iterator[A]]) extends Iterator[A] {
-  private val its = iterators.map(_())
-  private val nIterators = its.length
-  private var current = 0
+  private[this] val its = iterators.map(_())
+  private[this] val nIterators = its.length
+  private[this] var current = 0
 
   def hasNext: Boolean = {
     if (its.length == 0)

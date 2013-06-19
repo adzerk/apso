@@ -7,13 +7,13 @@ import scala.compat.Platform._
  * @param total the number representing the full progress bar
  */
 case class ProgressBar(total: Int = 100) {
-  private val workchars = List('|', '/', '-', '\\')
-  private val format = "\33[2K\r%3d%% %s %c"
-  private val progress = new StringBuilder(80)
+  private[this] val workchars = List('|', '/', '-', '\\')
+  private[this] val format = "\33[2K\r%3d%% %s %c"
+  private[this] val progress = new StringBuilder(80)
 
-  private var done = 0
-  private var lastTimestamp = currentTime
-  private var lastDone = 0
+  private[this] var done = 0
+  private[this] var lastTimestamp = currentTime
+  private[this] var lastDone = 0
 
   /**
    * Increase the progress by one.

@@ -84,7 +84,7 @@ object DeboxMap {
     map
   }
 
-  private def nextPowerOfTwo(n: Int): Int = {
+  private[this] def nextPowerOfTwo(n: Int): Int = {
     val x = java.lang.Integer.highestOneBit(n)
     if (x == n) n else x * 2
   }

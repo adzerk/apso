@@ -10,7 +10,7 @@ import scala.collection.GenTraversableOnce
  * @tparam A the type of the elements to iterate over
  */
 class CompositeIterator[A](private[iterator] var queue: List[() => Iterator[A]]) extends Iterator[A] {
-  private var currentHead: Iterator[A] = null
+  private[this] var currentHead: Iterator[A] = null
 
   def hasNext: Boolean = {
     if (currentHead == null || !currentHead.hasNext) {
