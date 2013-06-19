@@ -4,6 +4,7 @@ package eu.shiftforward.apso
  * Factory and extractor for packing two numbers in the range of an unsigned short (0 to 65535) in an `Int`.
  */
 object CounterPair {
+
   /**
    * Packs two small numbers into an `Int`. The two given numbers must be in the range of an unsigned
    * short (0 to 65535) in an `Int`. If they are not, the behavior is undefined.

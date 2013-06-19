@@ -2,10 +2,15 @@ package eu.shiftforward.apso.iterator
 
 import scala.collection.GenTraversableOnce
 
+/**
+ * An iterator that wraps an array of other iterators and iterates over its elements in a round-robin way.
+ * @param iterators the array of iterators
+ * @tparam A the type of the elements to iterate over
+ */
 class RoundRobinIterator[A](iterators: Array[() => Iterator[A]]) extends Iterator[A] {
-  val its = iterators.map(_())
-  val nIterators = its.length
-  var current = 0
+  private val its = iterators.map(_())
+  private val nIterators = its.length
+  private var current = 0
 
   def hasNext: Boolean = {
     if (its.length == 0)
