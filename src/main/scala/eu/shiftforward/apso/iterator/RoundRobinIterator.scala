@@ -37,6 +37,9 @@ class RoundRobinIterator[A](iterators: Array[() => Iterator[A]]) extends Iterato
     new RoundRobinIterator[B](this.iterators ++ Array(() => that.toIterator))
 }
 
+/**
+ * Companion object containing a factory for round-robin iterators.
+ */
 object RoundRobinIterator {
   def apply[A](its: () => Iterator[A]*): RoundRobinIterator[A] =
     new RoundRobinIterator[A](Array(its: _*))

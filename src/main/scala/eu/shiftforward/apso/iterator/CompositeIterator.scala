@@ -2,8 +2,15 @@ package eu.shiftforward.apso.iterator
 
 import scala.collection.GenTraversableOnce
 
-class CompositeIterator[A](private[apso] var queue: List[() => Iterator[A]]) extends Iterator[A] {
-  var currentHead: Iterator[A] = null
+/**
+ * An iterator that wraps a list of other iterators and iterates over its elements sequentially. It handles
+ * compositions of a large number of iterators in a more efficient way than simply concatenating them, avoiding
+ * stack overflows in particular. It supports appending of new iterators while keeping its efficiency.
+ * @param queue the list of iterators to compose
+ * @tparam A the type of the elements to iterate over
+ */
+class CompositeIterator[A](private[iterator] var queue: List[() => Iterator[A]]) extends Iterator[A] {
+  private var currentHead: Iterator[A] = null
 
   def hasNext: Boolean = {
     if (currentHead == null || !currentHead.hasNext) {
@@ -18,13 +25,16 @@ class CompositeIterator[A](private[apso] var queue: List[() => Iterator[A]]) ext
   }
 
   def next(): A =
-    if (hasNext) currentHead.next
+    if (hasNext) currentHead.next()
     else throw new NoSuchElementException("empty iterator")
 
   override def ++[B >: A](that: => GenTraversableOnce[B]): CompositeIterator[B] =
     new CompositeIterator[B](CompositeIterator.this.queue ++ List(() => that.toIterator))
 }
 
+/**
+ * Companion object containing a factory for composite iterators.
+ */
 object CompositeIterator {
   def apply[A](its: () => Iterator[A]*): CompositeIterator[A] =
     new CompositeIterator[A](List(its: _*))
