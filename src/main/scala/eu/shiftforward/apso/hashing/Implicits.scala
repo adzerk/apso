@@ -8,8 +8,8 @@ import com.twmacinta.util.MD5
 object Implicits {
 
   /**
-   * Implicit class that provides new methods for strings.
-   * @param s the string to which the new methods are provided.
+   * Implicit class that provides new hashing methods for strings.
+   * @param s the string to which the new hashing methods are provided.
    */
   final implicit class ApsoHashingString(val s: String) extends AnyVal {
 
