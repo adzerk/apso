@@ -25,7 +25,7 @@ object Implicits {
     }
 
     /**
-     * Pads this string to a given length.
+     * Pads this string on the left to a given length.
      * @param length the length to which this string is to be padded
      * @param ch the character used to fill the string
      * @return the padded string.
