@@ -3,7 +3,7 @@ package eu.shiftforward.apso.hashing
 import com.twmacinta.util.MD5
 
 /**
- * Object containing implicit classes and methods related to hasing functions.
+ * Object containing implicit classes and methods related to hashing functions.
  */
 object Implicits {
 
