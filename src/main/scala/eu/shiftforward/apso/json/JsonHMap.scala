@@ -6,8 +6,9 @@ import scala.collection.mutable.{ Map => MutableMap, ListBuffer }
 import spray.json.DefaultJsonProtocol._
 
 /**
- * A class containing a mapping from JSON keys to keys of a `JsonHMap`. A `JsonKeyRegistry` must be present
- * both when a key is created and when a conversion is to be done between a map and JSON.
+ * A class containing a mapping from JSON keys to keys of a `JsonHMap`. A
+ * `JsonKeyRegistry` must be present both when a key is created and when a
+ * conversion is to be done between a map and JSON.
  */
 trait JsonKeyRegistry {
 
@@ -36,7 +37,8 @@ object JsonHMap {
     new HMap(ListBuffer(entries: _*))
 
   /**
-   * Implicit method for creating `JsonFormats` that handle serialization of `JsonHMaps`.
+   * Implicit method for creating `JsonFormats` that handle serialization of
+   * `JsonHMaps`.
    * @param reg the registry used to translate between JSON keys and map keys
    * @return a `JsonFormat` for `JsonHMaps` that uses the specified registry.
    */

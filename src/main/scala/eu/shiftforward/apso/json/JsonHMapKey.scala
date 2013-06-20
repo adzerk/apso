@@ -8,7 +8,8 @@ import spray.json._
  * @constructor creates a new key and adds it to a registry.
  * @param sym the JSON key associated with this map key
  * @param reg the registry with which this key is to be associated
- * @param jsonFormat a `JsonFormat` which enables a key to serialize and deserialize its associated value
+ * @param jsonFormat a `JsonFormat` which enables a key to serialize and
+ * deserialize its associated value
  * @tparam V the type of the value associated with this key
  */
 abstract class JsonHMapKey[V](val sym: Symbol)(implicit val reg: JsonKeyRegistry, val jsonFormat: JsonFormat[V]) extends HMapKey[V] {

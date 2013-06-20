@@ -9,8 +9,9 @@ import spray.httpx.marshalling.Marshaller
 object Implicits {
 
   /**
-   * Implicit method that provides a marshaller for `Validation` objects. It relies on the
-   * existence of marshallers for each of the possible values in this validation.
+   * Implicit method that provides a marshaller for `Validation` objects. It
+   * relies on the existence of marshallers for each of the possible values in
+   * this validation.
    */
   implicit def validationMarshaller[E, A](implicit me: Marshaller[E], ma: Marshaller[A]) =
     Marshaller[Validation[E, A]] { (value, ctx) =>

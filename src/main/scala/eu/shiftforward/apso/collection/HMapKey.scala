@@ -8,8 +8,8 @@ package eu.shiftforward.apso.collection
 class HMapKey[V] {
 
   /**
-   * The type of the value associated with this key. Useful in cases where the type parameter of this
-   * key is lost beacuse of type erasure.
+   * The type of the value associated with this key. Useful in cases where the
+   * type parameter of this key is lost beacuse of type erasure.
    */
   type Value = V
 

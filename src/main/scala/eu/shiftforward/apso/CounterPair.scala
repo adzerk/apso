@@ -1,13 +1,15 @@
 package eu.shiftforward.apso
 
 /**
- * Factory and extractor for packing two numbers in the range of an unsigned short (0 to 65535) in an `Int`.
+ * Factory and extractor for packing two numbers in the range of an unsigned
+ * short (0 to 65535) in an `Int`.
  */
 object CounterPair {
 
   /**
-   * Packs two small numbers into an `Int`. The two given numbers must be in the range of an unsigned
-   * short (0 to 65535) in an `Int`. If they are not, the behavior is undefined.
+   * Packs two small numbers into an `Int`. The two given numbers must be in the
+   * range of an unsigned short (0 to 65535) in an `Int`. If they are not, the
+   * behavior is undefined.
    * @param first the first number to be packed
    * @param second the second number to be packed
    * @return an integer into which the two numbers are packed.

@@ -3,9 +3,11 @@ package eu.shiftforward.apso.iterator
 import scala.collection.GenTraversableOnce
 
 /**
- * An iterator that wraps a list of other iterators and iterates over its elements sequentially. It handles
- * compositions of a large number of iterators in a more efficient way than simply concatenating them, avoiding
- * stack overflows in particular. It supports appending of new iterators while keeping its efficiency.
+ * An iterator that wraps a list of other iterators and iterates over its
+ * elements sequentially. It handles compositions of a large number of iterators
+ * in a more efficient way than simply concatenating them, avoiding stack
+ * overflows in particular. It supports appending of new iterators while keeping
+ * its efficiency.
  * @param queue the list of iterators to compose
  * @tparam A the type of the elements to iterate over
  */

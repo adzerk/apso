@@ -3,7 +3,8 @@ package eu.shiftforward.apso.iterator
 import scala.collection.GenTraversableOnce
 
 /**
- * An iterator that wraps an array of other iterators and iterates over its elements in a round-robin way.
+ * An iterator that wraps an array of other iterators and iterates over its
+ * elements in a round-robin way.
  * @param iterators the array of iterators
  * @tparam A the type of the elements to iterate over
  */

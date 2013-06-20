@@ -3,7 +3,8 @@ package eu.shiftforward.apso.json
 import spray.json._
 
 /**
- * Object containing helpers for converting between JSON values and other structures.
+ * Object containing helpers for converting between JSON values and other
+ * structures.
  */
 object JsonConvert {
 

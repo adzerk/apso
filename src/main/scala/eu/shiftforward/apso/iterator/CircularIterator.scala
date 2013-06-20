@@ -1,7 +1,8 @@
 package eu.shiftforward.apso.iterator
 
 /**
- * A wrapper around an iterator that iterates over its elements in a circular way.
+ * A wrapper around an iterator that iterates over its elements in a circular
+ * way.
  * @param it the inner iterator
  * @tparam A the type of the elements to iterate over
  */

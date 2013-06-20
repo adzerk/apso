@@ -12,12 +12,14 @@ trait Sampler[T] {
   /**
    * Returns the ratio of elements that correspond to the given sampling level.
    * @param level the level of sampling to use
-   * @return the ratio of elements that correspond to the given sampling level, in the range [0.0, 1.0].
+   * @return the ratio of elements that correspond to the given sampling level,
+   * in the range [0.0, 1.0].
    */
   def samplingFor(level: Int): Double
 
   /**
-   * Creates a sampling function capable of extracting a sample from any sequence.
+   * Creates a sampling function capable of extracting a sample from any
+   * sequence.
    * @param level the level of sampling to use
    * @return a function capable of extracting a sample from any sequence.
    */
@@ -27,8 +29,9 @@ trait Sampler[T] {
 }
 
 /**
- * Sampler in which sampling level ratios are distributed in an exponential way. More formally, each
- * sampling level corresponds to a sample with `1.0 / pow(base, level) * 100%` of the original size.
+ * Sampler in which sampling level ratios are distributed in an exponential
+ * way. More formally, each sampling level corresponds to a sample with `1.0 /
+ * pow(base, level) * 100%` of the original size.
  * @param base the base to use for calculating the ratios, as described above
  * @tparam T the type of the elements of the sequence
  */
@@ -37,7 +40,8 @@ case class ExpSampler[T](base: Double = 2.0) extends Sampler[T] {
 }
 
 /**
- * Sampler in which ratios for each sampling level are given explicitly as a list.
+ * Sampler in which ratios for each sampling level are given explicitly as a
+ * list.
  * @param list the sampling ratios to use in which sampling level
  * @tparam T the type of the elements of the sequence
  */
@@ -46,9 +50,9 @@ case class ListSampler[T](list: Double*) extends Sampler[T] {
 }
 
 /**
- * Mixin that modifies an existing sampler by setting a minimum ratio for any sampling level. Mixing this
- * trait in, levels which previously corresponded to a sampling ratio below the minimum defined use that
- * minimum.
+ * Mixin that modifies an existing sampler by setting a minimum ratio for any
+ * sampling level. Mixing this trait in, levels which previously corresponded to
+ * a sampling ratio below the minimum defined use that minimum.
  * @tparam T the type of the elements of the sequence
  */
 trait FallbackToMinimum[T] extends Sampler[T] {

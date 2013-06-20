@@ -1,9 +1,9 @@
 package eu.shiftforward.apso
 
 /**
- * Generic trait for listeners that handle the progress of a process. A process is
- * conceptualized as a sequence of discrete steps (ticks) that notify listeners between
- * each one.
+ * Generic trait for listeners that handle the progress of a process. A process
+ * is conceptualized as a sequence of discrete steps (ticks) that notify
+ * listeners between each one.
  */
 trait ProgressListener {
 
