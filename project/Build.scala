@@ -6,14 +6,16 @@ import scalariform.formatter.preferences._
 
 object ProjectBuild extends Build {
   lazy val project = "apso"
+  lazy val projectVersion = "0.1-SNAPSHOT"
+  lazy val projectScalaVersion = "2.10.2"
 
   lazy val root = Project(id = project,
                           base = file("."),
                           settings = Project.defaultSettings ++ formatSettings)
                             .settings(
     organization := "eu.shiftforward",
-    version := "0.1-SNAPSHOT",
-    scalaVersion := "2.10.2",
+    version := projectVersion,
+    scalaVersion := projectScalaVersion,
 
     publishSetting,
     credentialsSetting,
@@ -44,9 +46,9 @@ object ProjectBuild extends Build {
 
     scalacOptions ++= Seq("-deprecation", "-unchecked"),
 
-    scalacOptions in Compile in doc ++= Opts.doc.title("apso"), // TODO define title using sbt keys
-    scalacOptions in Compile in doc ++= Opts.doc.version("1.0-SNAPSHOT"), // TODO define project version using sbt keys
-    scalacOptions in Compile in doc += "-external-urls:scala=http://www.scala-lang.org/api/2.10.2" // TODO define scala version using sbt keys
+    scalacOptions in Compile in doc ++= Opts.doc.title(project),
+    scalacOptions in Compile in doc ++= Opts.doc.version(projectVersion),
+    scalacOptions in Compile in doc += "-external-urls:scala=http://www.scala-lang.org/api/" + projectScalaVersion
   )
 
   lazy val formatSettings = SbtScalariform.scalariformSettings ++ Seq(
