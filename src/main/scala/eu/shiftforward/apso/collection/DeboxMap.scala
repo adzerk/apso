@@ -38,7 +38,7 @@ object DeboxMap {
     new DeboxMap(new Array[A](8), new Array[B](8), new Array[Byte](8), 0, 0)
 
   /**
-   * Create a DeboxMap preallocated to a particular size. Note that the internal representation may allocate
+   * Creates a DeboxMap preallocated to a particular size. Note that the internal representation may allocate
    * more space than requested to satisfy the requirements of internal alignment. DeboxMap uses arrays whose
    * lengths are powers of two.
    * @param n the minimum number of elements to allocate space for
