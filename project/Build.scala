@@ -6,16 +6,14 @@ import scalariform.formatter.preferences._
 
 object ProjectBuild extends Build {
   lazy val project = "apso"
-  lazy val projectVersion = "0.1-SNAPSHOT"
-  lazy val projectScalaVersion = "2.10.2"
 
   lazy val root = Project(id = project,
                           base = file("."),
                           settings = Project.defaultSettings ++ formatSettings)
                             .settings(
     organization := "eu.shiftforward",
-    version := projectVersion,
-    scalaVersion := projectScalaVersion,
+    version := "0.1-SNAPSHOT",
+    scalaVersion := "2.10.2",
 
     publishSetting,
     credentialsSetting,
@@ -47,8 +45,15 @@ object ProjectBuild extends Build {
     scalacOptions ++= Seq("-deprecation", "-unchecked"),
 
     scalacOptions in Compile in doc ++= Opts.doc.title(project),
-    scalacOptions in Compile in doc ++= Opts.doc.version(projectVersion),
-    scalacOptions in Compile in doc += "-external-urls:scala=http://www.scala-lang.org/api/" + projectScalaVersion
+    scalacOptions in Compile in doc <++= version.map { (v: String) => Opts.doc.version(v) },
+    scalacOptions in Compile in doc <++= scalaVersion.map { (v: String) => Seq("-external-urls:scala=http://www.scala-lang.org/api/" + v) },
+    scalacOptions in Compile in doc <++= (baseDirectory in LocalProject(project)).map {
+      bd => Seq(
+        "-sourcepath",
+        bd.getAbsolutePath,
+        "-doc-source-url",
+        "http://REPOSITORY_URL/apso/blob/master€{FILE_PATH}.scala")
+    }
   )
 
   lazy val formatSettings = SbtScalariform.scalariformSettings ++ Seq(
