@@ -1,6 +1,5 @@
 import sbt._
 import sbt.Keys._
-
 import com.typesafe.sbt.SbtScalariform
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import scalariform.formatter.preferences._
