@@ -12,7 +12,7 @@ object Benchmark {
    * @tparam T the return type of the block
    * @return the value returned by the code block.
    */
-  def apply[T](name: String)(block: => T) {
+  def apply[T](name: String)(block: => T) = {
     val start = System.currentTimeMillis
     try {
       block
@@ -23,4 +23,3 @@ object Benchmark {
     }
   }
 }
-
