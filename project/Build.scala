@@ -1,6 +1,5 @@
 import sbt._
 import sbt.Keys._
-
 import com.typesafe.sbt.SbtScalariform
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import scalariform.formatter.preferences._
@@ -43,7 +42,18 @@ object ProjectBuild extends Build {
 
     testOptions in Test += Tests.Argument(TestFrameworks.Specs2, "junitxml", "console"),
 
-    scalacOptions ++= Seq("-deprecation", "-unchecked")
+    scalacOptions ++= Seq("-deprecation", "-unchecked"),
+
+    scalacOptions in Compile in doc ++= Opts.doc.title(project),
+    scalacOptions in Compile in doc <++= version.map { (v: String) => Opts.doc.version(v) },
+    scalacOptions in Compile in doc <++= scalaVersion.map { (v: String) => Seq("-external-urls:scala=http://www.scala-lang.org/api/" + v) },
+    scalacOptions in Compile in doc <++= (baseDirectory in LocalProject(project)).map {
+      bd => Seq(
+        "-sourcepath",
+        bd.getAbsolutePath,
+        "-doc-source-url",
+        "http://REPOSITORY_URL/apso/blob/master€{FILE_PATH}.scala")
+    }
   )
 
   lazy val formatSettings = SbtScalariform.scalariformSettings ++ Seq(

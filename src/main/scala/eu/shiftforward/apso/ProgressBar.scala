@@ -2,29 +2,40 @@ package eu.shiftforward.apso
 
 import scala.compat.Platform._
 
+/**
+ * A widget for printing a dynamic progress bar in a console.
+ * @param total the number representing the full progress bar
+ */
 case class ProgressBar(total: Int = 100) {
-  val workchars = List('|', '/', '-', '\\')
-  val format = "\33[2K\r%3d%% %s %c"
-  val progress = new StringBuilder(80)
+  private[this] val workchars = List('|', '/', '-', '\\')
+  private[this] val format = "\33[2K\r%3d%% %s %c"
+  private[this] val progress = new StringBuilder(80)
 
-  var done = 0
-  var lastTimestamp = currentTime
-  var lastDone = 0
+  private[this] var done = 0
+  private[this] var lastTimestamp = currentTime
+  private[this] var lastDone = 0
 
+  /**
+   * Increase the progress by one.
+   */
   def tick() {
     tick(1)
   }
 
+  /**
+   * Increase the progress by the given number of units.
+   * @param inc the number of progress units to increase
+   */
   def tick(inc: Int) {
     if (!isFinished) {
       done += inc
 
       val currentTimestamp = currentTime
       val throughput =
-        ((done - lastDone).toDouble / (currentTimestamp - lastTimestamp)) * 1000
+        (done - lastDone).toDouble / (currentTimestamp - lastTimestamp) * 1000
 
-      val percent = (done * 100) / total
-      var extrachars = (percent / 2) - progress.length
+      val percent = done * 100 / total
+      var extrachars = percent / 2 - progress.length
 
       while (extrachars > 0) {
         extrachars -= 1
@@ -44,5 +55,9 @@ case class ProgressBar(total: Int = 100) {
     }
   }
 
+  /**
+   * Returns `true` if this progress bar is full.
+   * @return `true` if this progress bar is full, `false` otherwise.
+   */
   def isFinished = done >= total
 }
