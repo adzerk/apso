@@ -24,7 +24,7 @@ class HMap[KeyType[_] <: HMapKey[_]](val entries: ListBuffer[(KeyType[V], V) for
    * @param key the key to lookup
    * @tparam V the type of the value associated with `key`
    * @return an option value containing the value associated with `key` in this
-   * map, or `None` if none exists.
+   *         map, or `None` if none exists.
    */
   def get[V](key: KeyType[V]): Option[V] = entries.collectFirst { case (k, v) if k == key => v.asInstanceOf[V] }
 
@@ -33,10 +33,10 @@ class HMap[KeyType[_] <: HMapKey[_]](val entries: ListBuffer[(KeyType[V], V) for
    * not contained in the map.
    * @param key the key to lookup
    * @param default a computation that yields a default value in case no binding
-   * for `key` is found in the map
+   *        for `key` is found in the map
    * @tparam V the type of the value associated with `key`
    * @return the value associated with `key` if it exists, otherwise the result
-   * of the `default` computation.
+   *         of the `default` computation.
    */
   def getOrElse[V](key: KeyType[V], default: => V): V = get(key).getOrElse(default)
 
@@ -46,10 +46,10 @@ class HMap[KeyType[_] <: HMapKey[_]](val entries: ListBuffer[(KeyType[V], V) for
    * returns that value.
    * @param key the key to lookup and possibly update
    * @param op the computation yielding the value to associate with `key`, if
-   * `key` is previously unbound
+   *        `key` is previously unbound
    * @tparam V the type of the value associated with `key`
    * @return the value associated with key (either previously or as a result of
-   * executing the method).
+   *         executing the method).
    */
   def getOrElseUpdate[V](key: KeyType[V], op: => V): V = get(key) match {
     case Some(k) => k
@@ -80,7 +80,7 @@ class HMap[KeyType[_] <: HMapKey[_]](val entries: ListBuffer[(KeyType[V], V) for
    * specified `HMap` and all the key/value mappings of this map.
    * @param other the map to append
    * @return a new map containing mappings of this map and those provided by
-   * `other`.
+   *         `other`.
    */
   def ++(other: HMap[KeyType]): HMap[KeyType] = {
     val newCase = HMap(other.entries.toList: _*)
@@ -93,14 +93,14 @@ class HMap[KeyType[_] <: HMapKey[_]](val entries: ListBuffer[(KeyType[V], V) for
    * @param f the function to apply to each element
    * @tparam A the element type of the returned collection
    * @return a new collection resulting from applying the given function `f` to
-   * each element of this map and collecting the results.
+   *         each element of this map and collecting the results.
    */
   def map[A](f: ((KeyType[V], V) forSome { type V }) => A) = entries.map(f)
 
   /**
    * Applies a function `f` to all elements of this map.
    * @param f the function that is applied for its side-effect to every element.
-   * The result of function `f` is discarded.
+   *        The result of function `f` is discarded.
    */
   def foreach(f: ((KeyType[V], V) forSome { type V }) => Unit) { entries.foreach(f) }
 

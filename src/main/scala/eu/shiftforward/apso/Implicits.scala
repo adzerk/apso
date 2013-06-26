@@ -18,7 +18,7 @@ object Implicits {
      * string as alphabet.
      * @param n the number of letters of each returned string
      * @return a sequence of strings of length `n` consisting of characters from
-     * this string.
+     *         this string.
      */
     def enumerate(n: Int): IndexedSeq[String] = {
       val alphabet = s.split("").filterNot(_.isEmpty).toIndexedSeq
@@ -42,7 +42,7 @@ object Implicits {
      * Returns the UTF-8 byte array representation of this string with a
      * trailing zero byte.
      * @return the UTF-8 byte array representation of this string with a
-     * trailing zero byte.
+     *         trailing zero byte.
      */
     def getBytesWithNullTerminator: Array[Byte] = {
       val stringBytes = s.getBytes("UTF-8")
@@ -64,7 +64,7 @@ object Implicits {
      * possible; if the split is uneven, the first `this.length % n`
      * subsequences contain one more element than the remaining ones.
      * @param n the number of subsequences into which this sequence must be
-     * split
+     *        split
      * @return a new sequence of `n` subsequences of this sequence.
      */
     def split(n: Int): IndexedSeq[Seq[T]] = {
@@ -78,9 +78,9 @@ object Implicits {
      * Returns a subsequence of this sequence based on a percentage of the total
      * number of elements.
      * @param percentage the percentage of elements of this sequence that the
-     * returned sequence must contain
+     *        returned sequence must contain
      * @return a subsequence of this sequence based on a percentage of the total
-     * number of elements.
+     *         number of elements.
      */
     def sample(percentage: Double): Seq[T] =
       seq.take((seq.length * percentage).toInt)

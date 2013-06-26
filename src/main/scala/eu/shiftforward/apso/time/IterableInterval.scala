@@ -18,7 +18,7 @@ trait IterableInterval extends IndexedSeq[DateTime] {
    * step.
    * @param step the step of the interval to return
    * @return an iterable interval with the same time range and with the given
-   * step.
+   *         step.
    */
   def by(step: Period): IterableInterval
 }
@@ -27,7 +27,7 @@ trait IterableInterval extends IndexedSeq[DateTime] {
  * A view of a `ReadableInterval` as an indexed sequence of `DateTimes`.
  * @param interval the `ReadableInterval` to view as an indexed sequence
  * @param step the period of time between consecutive `DateTimes` in the
- * sequence
+ *        sequence
  */
 case class SteppedInterval(interval: ReadableInterval, step: Period)
     extends IterableInterval {
@@ -52,7 +52,7 @@ case class SteppedInterval(interval: ReadableInterval, step: Period)
 /**
  * An iterable time interval with no elements.
  * @param step the period of time between consecutive `DateTimes`. Does not
- * affect an empty interval.
+ *        affect an empty interval
  */
 case class EmptySteppedInterval(step: Period)
     extends IterableInterval {
@@ -71,7 +71,7 @@ object IterableInterval {
    * @param interval the `ReadableInterval` to view as an indexed sequence
    * @param step the period of time between consecutive `DateTimes`
    * @param lastInclusive `true` if the upper bound of the interval is to be
-   * included in the sequence
+   *        included in the sequence
    * @return an iterable time interval with the given step.
    */
   def apply(interval: ReadableInterval, step: Period, lastInclusive: Boolean = true): IterableInterval =

@@ -13,7 +13,7 @@ trait Sampler[T] {
    * Returns the ratio of elements that correspond to the given sampling level.
    * @param level the level of sampling to use
    * @return the ratio of elements that correspond to the given sampling level,
-   * in the range [0.0, 1.0].
+   *         in the range [0.0, 1.0].
    */
   def samplingFor(level: Int): Double
 

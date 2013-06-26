@@ -37,7 +37,7 @@ object Implicits {
      * Returns `true` if the given `DateTime` is in the same day as this.
      * @param d2 the second `DateTime`
      * @return `true` if the given `DateTime` is in the same day as this,
-     * `false` othwerwise.
+     *         `false` othwerwise.
      */
     def isSameDay(d2: DateTime) = d1.year == d2.year && d1.dayOfYear == d2.dayOfYear
 
@@ -47,7 +47,7 @@ object Implicits {
      * @param dStart the starting `DateTime`
      * @param dEnd the ending `DateTime`
      * @return `true` if this `DateTime` is in the range between the two given
-     * `DateTimes`, `false` otherwise.
+     *         `DateTimes`, `false` otherwise.
      */
     def between(dStart: DateTime, dEnd: DateTime) = isSameDay(dStart) || isSameDay(dEnd) || dStart < d1 && d1 < dEnd
 
@@ -56,7 +56,7 @@ object Implicits {
      * ending at the given `DateTime` (exclusive), with a 1 day step.
      * @param d2 the ending `DateTime`
      * @return an iterable interval starting at this `DateTime` (inclusive) and
-     * ending at the given `DateTime` (exclusive), with a 1 day step.
+     *         ending at the given `DateTime` (exclusive), with a 1 day step.
      */
     def until(d2: DateTime) = IterableInterval(d1 to d2, 1.day, false)
   }
@@ -71,7 +71,7 @@ object Implicits {
      * Partitions this time interval into a given number of equal subintervals.
      * @param n the number of subintervals to return
      * @return a sequence of time intervals resultant of the division of this
-     * interval in `n` equal parts.
+     *         interval in `n` equal parts.
      */
     def split(n: Int): Seq[ReadableInterval] = {
       val q = (interval.millis / n).toInt

@@ -252,7 +252,7 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
    * exist.
    * @param key the key to lookup
    * @return the value associated with the given key wrapped in a `Some` if this
-   * map contains the key, `None` otherwise.
+   *         map contains the key, `None` otherwise.
    */
   final def get(key: A): Option[B] = {
     @inline
@@ -278,9 +278,9 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
    * not exist.
    * @param key the key to lookup
    * @param default the value to return if this map does not contain the given
-   * key
+   *        key
    * @return the value associated with the given key if this map contains the
-   * key, `default` otherwise.
+   *         key, `default` otherwise.
    */
   final def getOrElse(key: A, default: B): B = {
     @inline
@@ -304,7 +304,7 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
   /**
    * Applies a function `f` to all entries of this map.
    * @param f the function that is applied for its side-effect to every element.
-   * The result of function `f` is discarded.
+   *        The result of function `f` is discarded.
    */
   final def foreach(f: (A, B) => Unit) {
     @inline
@@ -327,7 +327,7 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
    * @param f the function to apply to each element
    * @tparam C the type of the elements in the returned list
    * @return a new list resulting from applying the given function `f` to each
-   * element of this map and collecting the results.
+   *         element of this map and collecting the results.
    */
   final def map[C](f: (A, B) => C): List[C] = {
     @inline
