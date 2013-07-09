@@ -37,6 +37,7 @@ object ProjectBuild extends Build {
       "io.spray"                       % "spray-httpx"        % "1.1-M8" % "provided",
       "org.scalaz"                    %% "scalaz-core"        % "7.0.0"  % "provided",
       "org.specs2"                    %% "specs2"             % "1.14"   % "test",
+      "org.slf4j"                      % "slf4j-api"          % "1.7.+",
       "junit"                          % "junit"              % "4.11"   % "test"
     ),
 
