@@ -5,6 +5,7 @@ import com.github.nscala_time.time.Imports._
 /**
  * Trait representing objects with logging abilities.
  */
+@deprecated("Use the `Logging` trait instead", "0.1")
 trait Loggable {
 
   /**
