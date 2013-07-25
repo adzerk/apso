@@ -12,7 +12,7 @@ import spray.json._
  *        deserialize its associated value
  * @tparam V the type of the value associated with this key
  */
-abstract class JsonHMapKey[V](val sym: Symbol)(implicit val reg: JsonKeyRegistry, val jsonFormat: JsonFormat[V]) extends HMapKey[V] {
+abstract class JsonHMapKey[V](val sym: Symbol)(implicit reg: JsonKeyRegistry, jsonFormat: JsonFormat[V]) extends HMapKey[V] {
   reg.keys += (sym -> this)
 
   override def toKey: JsonHMapKey[Value] = this
@@ -30,4 +30,6 @@ abstract class JsonHMapKey[V](val sym: Symbol)(implicit val reg: JsonKeyRegistry
    * @return the given JSON value as an object.
    */
   def toValue(v: JsValue): Value = jsonFormat.read(v)
+
+  override def toString: String = sym.toString()
 }
