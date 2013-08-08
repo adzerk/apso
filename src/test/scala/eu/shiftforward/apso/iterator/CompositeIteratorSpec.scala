@@ -13,7 +13,7 @@ class CompositeIteratorSpec extends Specification {
     val concatExpected = List(1, 2, 3, 4, 5, 6)
 
     "combine two iterators correctly" in {
-      val cit = CompositeIterator(() => a1, () => a2, () => a3)
+      val cit = CompositeIterator(a1, a2, a3)
       cit.toList mustEqual concatExpected
     }
 
@@ -27,12 +27,12 @@ class CompositeIteratorSpec extends Specification {
 
       "not create a recursive structure" in {
         val cit = CompositeIterator() ++ a1 ++ a2 ++ a3
-        cit.queue.length mustEqual 3
+        cit.iterators.length mustEqual 3
       }
 
       "not encapsulate multiple instances of composite iterators" in {
-        val cit = CompositeIterator(() => a1) ++ CompositeIterator(() => a2) ++ CompositeIterator(() => a3)
-        cit.queue must haveAllElementsLike {
+        val cit = CompositeIterator(a1) ++ CompositeIterator(a2) ++ CompositeIterator(a3)
+        cit.iterators must haveAllElementsLike {
           case it: CompositeIterator[_] => ko
           case _ => ok
         }
