@@ -3,10 +3,10 @@ package eu.shiftforward.apso.pool
 import org.specs2.mutable._
 
 class PoolSpec extends Specification {
-  "SimplePool" should {
+  "UnrestrictedPool" should {
     "acquire & release" in {
       class Foo()
-      val pool = SimplePool(new Foo)
+      val pool = UnrestrictedPool(new Foo)
       val f1 = pool.acquire() // keep the reference
       pool.release(f1)
       pool.acquire() must beTheSameAs(f1) // reference equality
@@ -14,10 +14,10 @@ class PoolSpec extends Specification {
     }
   }
 
-  "SimpleKeyedPool" should {
+  "SimplePool" should {
     "acquire & release" in {
       case class Foo(i: Int)
-      val pool = SimpleKeyedPool[Foo, Int](Foo(_), (f, i) => f.i == i)
+      val pool = SimplePool[Foo, Int](Foo(_), (f, i) => f.i == i)
       val f1 = pool.acquire(1)
       pool.release(f1)
       pool.acquire(1) must beTheSameAs(f1) // reference equality
@@ -26,7 +26,7 @@ class PoolSpec extends Specification {
 
     "respect the key function" in {
       case class Foo(i: Int)
-      val pool = SimpleKeyedPool[Foo, Int](Foo(_), (f, i) => f.i == i)
+      val pool = SimplePool[Foo, Int](Foo(_), (f, i) => f.i == i)
       val f1 = pool.acquire(1)
       f1.i === 1
     }

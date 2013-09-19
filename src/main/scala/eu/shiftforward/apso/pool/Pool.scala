@@ -3,15 +3,18 @@ package eu.shiftforward.apso.pool
 import scala.collection.mutable.Queue
 
 /**
- * A simple object pooling interface.
+ * A object pooling interface.
+ * A pool pools instances with different "specs" (e.g. array size).
+ * Each instance may be accessed using an arbitrary spec.
  * @tparam A the type of the objects to pool
+ * @tparam S the type of specs for object in the pool
  */
-trait Pool[A] {
+trait Pool[A, S] {
   /**
-   * Factory for creating A objects.
+   * Factory for creating A objects with spec B.
    * @return a new A instance.
    */
-  protected def factory(): A
+  protected def factory(s: S): A
 
   /**
    * Resets internal state of object.
@@ -20,10 +23,18 @@ trait Pool[A] {
   protected def reset(a: A): A = a
 
   /**
-   * Obtains an instance from this pool
+   * Returns whether or not an object obeys a given spec.
+   * @param a The object to test
+   * @param spec The spec to test
+   * @return true if, and only if, this object obeys spec `s`.
+   */
+  protected def obeys(a: A, s: S): Boolean
+
+  /**
+   * Obtains an instance from this pool given the specified spec.
    * @return an instance from this pool.
    */
-  def acquire(): A
+  def acquire(s: S): A
 
   /**
    * Return an instance to the pool.
@@ -32,17 +43,22 @@ trait Pool[A] {
 }
 
 /**
- * A simplect object pool. It relies on Java synchronization for thread-safety.
+ * A simple object pool. It relies on Java synchronization for thread-safety.
  */
-class SimplePool[A](_factory: => A, _reset: A => A) extends Pool[A] {
+class SimplePool[A, S](_factory: S => A, _obeys: (A, S) => Boolean, _reset: A => A) extends Pool[A, S] {
   private[this] val items = Queue[A]()
 
-  protected def factory() = _factory
+  protected def factory(s: S) = _factory(s)
   override protected def reset(a: A) = _reset(a)
+  protected def obeys(a: A, s: S) = _obeys(a, s)
 
-  def acquire(): A = synchronized {
-    if (items.isEmpty) factory()
-    else items.dequeue()
+  def acquire(s: S): A = synchronized {
+    if (items.isEmpty) factory(s)
+    else {
+      val a = items.dequeue()
+      if (!obeys(a, s)) factory(s)
+      else a
+    }
   }
 
   def release(a: A): Unit = synchronized {
@@ -54,6 +70,6 @@ class SimplePool[A](_factory: => A, _reset: A => A) extends Pool[A] {
  * Object containing factory methods for `SimplePool`.
  */
 object SimplePool {
-  def apply[A](factory: => A, reset: A => A = identity[A] _) =
-    new SimplePool(factory, reset)
+  def apply[A, S](factory: S => A, obeys: (A, S) => Boolean, reset: A => A = identity[A] _) =
+    new SimplePool(factory, obeys, reset)
 }
