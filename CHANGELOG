@@ -1,5 +1,14 @@
 
+v0.1.2
+  - 2013/09/19: Revert nscala-time version. (Rui Gonçalves)
+  - 2013/09/19: Make the log in Logging a lazy val. (Rui Gonçalves)
+
+v0.1.1
+  - 2013/09/06: Release version 0.1.1. (Rui Gonçalves)
+  - 2013/09/06: Bump dependencies in apso 0.1. (Rui Gonçalves)
+
 v0.1
+  - 2013/08/06: Release version 0.1. (Rui Gonçalves)
   - 2013/08/02: Add utility for running bash expressions. (Rui Gonçalves)
   - 2013/07/25: Update Logging package. (Joao Azevedo)
   - 2013/07/25: Make hmap key implicit parameters private. Add a toString. (Rui Gonçalves)
