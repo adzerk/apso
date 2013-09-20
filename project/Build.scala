@@ -30,6 +30,7 @@ object ProjectBuild extends Build {
     ),
 
     libraryDependencies ++= Seq(
+      "com.amazonaws"                  % "aws-java-sdk"       % "1.5.6"  % "provided",
       "com.github.nscala-time"        %% "nscala-time"        % "0.6.0"  % "provided",
       "com.typesafe.akka"             %% "akka-actor"         % "2.1.4"  % "provided",
       "com.twmacinta"                  % "fast-md5"           % "2.7.1",
