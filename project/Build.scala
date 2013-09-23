@@ -12,7 +12,7 @@ object ProjectBuild extends Build {
                           settings = Project.defaultSettings ++ formatSettings)
                             .settings(
     organization := "eu.shiftforward",
-    version := "0.2-SNAPSHOT",
+    version := "0.2",
     scalaVersion := "2.10.2",
 
     publishSetting,

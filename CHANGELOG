@@ -1,5 +1,21 @@
 
-v0.1
+v0.2
+  - 2013/09/23: OCD (Andre Silva)
+  - 2013/09/23: add missing package documentation (Andre Silva)
+  - 2013/09/20: Useless commit. (Rui Gonçalves)
+  - 2013/09/20: Add a set of wrappers for the AWS Java library. (Rui Gonçalves)
+  - 2013/09/19: Renamed pool classes and variable naming (key -> spec) (Andre Silva)
+  - 2013/09/19: document Pool and KeyedPool (Andre Silva)
+  - 2013/09/19: add pool spec (Andre Silva)
+  - 2013/09/19: implement keyed object pool (Andre Silva)
+  - 2013/09/19: implement simple object pool (Andre Silva)
+  - 2013/09/06: Bump SBT and dependencies versions. (Rui Gonçalves)
+  - 2013/08/08: remove thunks from composite iterator (Andre Silva)
+  - 2013/08/08: remove thunks from round robin iterator (Andre Silva)
+  - 2013/08/07: Update sbt script. (Rui Gonçalves)
+  - 2013/08/06: Bump specs2 version. (Rui Gonçalves)
+  - 2013/08/06: Bump to version 0.2-SNAPSHOT for development. (Rui Gonçalves)
+  - 2013/08/06: Release version 0.1. (Rui Gonçalves)
   - 2013/08/02: Add utility for running bash expressions. (Rui Gonçalves)
   - 2013/07/25: Update Logging package. (Joao Azevedo)
   - 2013/07/25: Make hmap key implicit parameters private. Add a toString. (Rui Gonçalves)
