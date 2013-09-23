@@ -3,7 +3,7 @@ package eu.shiftforward.apso.pool
 import scala.collection.mutable.Queue
 
 /**
- * A object pooling interface.
+ * An object pooling interface.
  * A pool pools instances with different "specs" (e.g. array size).
  * Each instance may be accessed using an arbitrary spec.
  * @tparam A the type of the objects to pool
