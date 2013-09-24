@@ -10,5 +10,5 @@ trait Logging {
    * The `Logger` object. This logger will have the same name as the concrete class
    * into which this trait is mixed-in.
    */
-  val log = LoggerFactory.getLogger(this.getClass.getName)
+  lazy val log = LoggerFactory.getLogger(this.getClass.getName)
 }
