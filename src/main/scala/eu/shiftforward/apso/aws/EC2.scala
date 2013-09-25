@@ -1,7 +1,7 @@
 package eu.shiftforward.apso.aws
 
 import com.amazonaws.auth.AWSCredentials
-import com.amazonaws.services.ec2.{AmazonEC2, AmazonEC2Client}
+import com.amazonaws.services.ec2.{ AmazonEC2, AmazonEC2Client }
 import com.amazonaws.services.ec2.model._
 import eu.shiftforward.apso.Logging
 import scala.collection.convert.WrapAsScala._
