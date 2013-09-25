@@ -12,14 +12,17 @@ import scala.util.control.Breaks._
 import scala.util.Try
 
 /**
- * A representation of an Amazon's S3 bucket. This class wraps an [[com.amazonaws.services.s3.AmazonS3Client]] and
- * provides a higher level interface for pushing and pulling files to and from a bucket.
+ * A representation of an Amazon's S3 bucket. This class wraps an
+ * [[com.amazonaws.services.s3.AmazonS3Client]] and provides a higher level interface for pushing
+ * and pulling files to and from a bucket.
  *
  * @param bucketName the name of the bucket
- * @param credentials optional AWS credentials to use. If the parameter is not supplied, they will be retrieved from
- *                    the [[eu.shiftforward.apso.aws.CredentialStore]].
+ * @param credentials optional AWS credentials to use. If the parameter is not supplied, they will
+ *                    be retrieved from the [[eu.shiftforward.apso.aws.CredentialStore]].
  */
-class S3Bucket(bucketName: String, credentials: AWSCredentials = CredentialStore.getCredentials) extends Logging {
+class S3Bucket(bucketName: String, credentials: AWSCredentials = CredentialStore.getCredentials)
+    extends Logging {
+
   private[this] val config = ConfigFactory.load()
 
   private[this] val configPrefix = "aws.s3"

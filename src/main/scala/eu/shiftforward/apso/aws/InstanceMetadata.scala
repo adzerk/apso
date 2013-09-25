@@ -3,8 +3,8 @@ package eu.shiftforward.apso.aws
 import scala.sys.process._
 
 /**
- * Utilities for obtaining metadata about the EC2 instance this process is running on. The methods in this object are
- * not expected to work if the JVM is not running on an EC2 instance.
+ * Utilities for obtaining metadata about the EC2 instance this process is running on. The methods
+ * in this object are not expected to work if the JVM is not running on an EC2 instance.
  */
 object InstanceMetadata {
 
