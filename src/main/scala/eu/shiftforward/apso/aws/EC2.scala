@@ -1,24 +1,24 @@
 package eu.shiftforward.apso.aws
 
 import com.amazonaws.auth.AWSCredentials
-import com.amazonaws.services.ec2.AmazonEC2Client
+import com.amazonaws.services.ec2.{AmazonEC2, AmazonEC2Client}
 import com.amazonaws.services.ec2.model._
 import eu.shiftforward.apso.Logging
 import scala.collection.convert.WrapAsScala._
 
 /**
  * A representation of Amazon's EC2 service. This class wraps an
- * [[com.amazonaws.services.ec2.AmazonEC2Client]] and provides a higher level interface for querying
- * the currently running instances.
+ * [[com.amazonaws.services.ec2.AmazonEC2]] instance and provides a higher level interface for
+ * querying the currently running instances.
  * @param credentials optional AWS credentials to use. If the parameter is not supplied, they will
  *                    be retrieved from the [[eu.shiftforward.apso.aws.CredentialStore]].
  */
 class EC2(credentials: AWSCredentials = CredentialStore.getCredentials) extends Logging {
 
   /**
-   * The underlying [[com.amazonaws.services.ec2.AmazonEC2Client]] instance.
+   * The underlying [[com.amazonaws.services.ec2.AmazonEC2]] instance.
    */
-  val client = new AmazonEC2Client(credentials)
+  val client: AmazonEC2 = new AmazonEC2Client(credentials)
 
   /**
    * Returns the information about the instance with a given id.
