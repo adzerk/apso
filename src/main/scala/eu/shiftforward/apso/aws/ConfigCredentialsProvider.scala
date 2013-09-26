@@ -9,9 +9,11 @@ import com.typesafe.config.{ Config, ConfigFactory }
  * @param accessKeyPath the path in the configuration that contains the access key
  * @param secretKeyPath the path in the configuration that contains the secret key
  */
-case class ConfigCredentialsProvider(config: Config = ConfigFactory.load(),
-                                     accessKeyPath: String = "aws.access-key",
-                                     secretKeyPath: String = "aws.secret-key") extends AWSCredentialsProvider {
+case class ConfigCredentialsProvider(
+  config: Config = ConfigFactory.load(),
+  accessKeyPath: String = "aws.access-key",
+  secretKeyPath: String = "aws.secret-key")
+    extends AWSCredentialsProvider {
 
   def getCredentials: AWSCredentials =
     new BasicAWSCredentials(
