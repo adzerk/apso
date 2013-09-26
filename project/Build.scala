@@ -66,7 +66,7 @@ object ProjectBuild extends Build {
   def formattingPreferences =
     FormattingPreferences()
       .setPreference(AlignParameters, true)
-      .setPreference(CompactControlReadability, true)
+      .setPreference(CompactControlReadability, false)
       .setPreference(DoubleIndentClassDeclaration, true)
 
   lazy val publishSetting = publishTo <<= version { (v: String) =>
