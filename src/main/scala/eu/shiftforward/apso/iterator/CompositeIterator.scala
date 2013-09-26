@@ -50,8 +50,7 @@ object CompositeIterator {
             val composite = it.asInstanceOf[CompositeIterator[A]]
             new CompositeIterator(acc.iterators ++ composite.iterators)
 
-          }
-          else new CompositeIterator(acc.iterators ++ Seq(it))
+          } else new CompositeIterator(acc.iterators ++ Seq(it))
       }
     }.getOrElse(new CompositeIterator[A])
 }

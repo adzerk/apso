@@ -149,17 +149,14 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
         len += 1
         used += 1
         if (used > limit) resize()
-      }
-      else if (status == 2) {
+      } else if (status == 2) {
         keys(j) = key
         vals(j) = value
         buckets(j) = 3
         len += 1
-      }
-      else if (keys(j) == key) {
+      } else if (keys(j) == key) {
         vals(j) = value
-      }
-      else {
+      } else {
         loop((i << 2) + i + perturbation + 1, perturbation >> 5)
       }
     }
@@ -180,10 +177,8 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
       if (status == 3 && keys(j) == key) {
         buckets(j) = 2
         len -= 1
-      }
-      else if (status == 0) {
-      }
-      else {
+      } else if (status == 0) {
+      } else {
         loop((i << 2) + i + perturbation + 1, perturbation >> 5)
       }
     }
@@ -210,11 +205,9 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
       val status = buckets(j)
       if (status == 0) {
         false
-      }
-      else if (status == 3 && keys(j) == key) {
+      } else if (status == 3 && keys(j) == key) {
         true
-      }
-      else {
+      } else {
         loop((i << 2) + i + perturbation + 1, perturbation >> 5)
       }
     }
@@ -235,11 +228,9 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
       val status = buckets(j)
       if (status == 0) {
         throw new NotFound(key.toString)
-      }
-      else if (status == 3 && keys(j) == key) {
+      } else if (status == 3 && keys(j) == key) {
         vals(j)
-      }
-      else {
+      } else {
         loop((i << 2) + i + perturbation + 1, perturbation >> 5)
       }
     }
@@ -261,11 +252,9 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
       val status = buckets(j)
       if (status == 0) {
         None
-      }
-      else if (status == 3 && keys(j) == key) {
+      } else if (status == 3 && keys(j) == key) {
         Some(vals(j))
-      }
-      else {
+      } else {
         loop((i << 2) + i + perturbation + 1, perturbation >> 5)
       }
     }
@@ -289,11 +278,9 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
       val status = buckets(j)
       if (status == 0) {
         default
-      }
-      else if (status == 3 && keys(j) == key) {
+      } else if (status == 3 && keys(j) == key) {
         vals(j)
-      }
-      else {
+      } else {
         loop((i << 2) + i + perturbation + 1, perturbation >> 5)
       }
     }
@@ -313,8 +300,7 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
       val c = if (buckets(i) == 3) {
         f(keys(i), vals(i))
         count + 1
-      }
-      else {
+      } else {
         count
       }
       if (c <= limit) loop(i + 1, c, limit)
@@ -338,15 +324,12 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
         val c = count + 1
         if (c <= limit) {
           loop(i + 1, c, limit, newAcc)
-        }
-        else {
+        } else {
           newAcc
         }
-      }
-      else if (count <= limit) {
+      } else if (count <= limit) {
         loop(i + 1, count, limit, acc)
-      }
-      else {
+      } else {
         acc
       }
     }

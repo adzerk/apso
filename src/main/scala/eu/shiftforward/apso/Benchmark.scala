@@ -16,8 +16,7 @@ object Benchmark {
     val start = System.currentTimeMillis
     try {
       block
-    }
-    finally {
+    } finally {
       val diff = System.currentTimeMillis - start
       println("# Block \"" + name + "\" completed, time taken: " + diff + " ms (" + diff / 1000.0 + " s)")
     }

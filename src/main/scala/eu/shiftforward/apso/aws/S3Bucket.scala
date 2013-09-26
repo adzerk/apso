@@ -181,8 +181,7 @@ class S3Bucket(bucketName: String, credentials: AWSCredentials = CredentialStore
       while (true) {
         success = try {
           f; true
-        }
-        catch handler
+        } catch handler
 
         if (success) break()
 

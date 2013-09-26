@@ -37,8 +37,7 @@ case class SteppedInterval(interval: ReadableInterval, step: Period)
     if (apply(i) < interval.getEnd) {
       while (apply(i) <= interval.getEnd) { i += 1 }
       i
-    }
-    else {
+    } else {
       while (apply(i) > interval.getEnd) { i -= 1 }
       i + 1
     } // FIXME more intelligent code for this?
