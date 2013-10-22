@@ -1,6 +1,6 @@
 package eu.shiftforward.apso.collection
 
-import collection.mutable.ListBuffer
+import scala.collection.mutable.ListBuffer
 
 /**
  * A map containing keys of heterogeneous values. The keys in this map must
@@ -8,7 +8,8 @@ import collection.mutable.ListBuffer
  * @param entries a list of key-value pairs present in the map
  * @tparam KeyType the type of keys used in this map
  */
-class HMap[KeyType[_] <: HMapKey[_]](val entries: ListBuffer[(KeyType[V], V) forSome { type V }]) {
+class HMap[KeyType[_] <: HMapKey[_]](val entries: ListBuffer[(KeyType[V], V) forSome { type V }])
+    extends Serializable {
 
   /**
    * Retrieves the value which is associated with a given key. If the key does
