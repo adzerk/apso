@@ -98,7 +98,7 @@ class S3Bucket(bucketName: String, credentials: AWSCredentials = CredentialStore
    * @return true if the push was successful, false otherwise.
    */
   def push(key: String, file: File): Boolean = handle {
-    log.info("Pushing '{}' to 's3://{}/{}'", file.getName, bucketName, key)
+    log.info("Pushing '{}' to 's3://{}/{}'", file.getPath, bucketName, key)
     s3.putObject(new PutObjectRequest(bucketName, sanitizeKey(key), file))
   }
 

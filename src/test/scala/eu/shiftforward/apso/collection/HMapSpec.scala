@@ -1,8 +1,9 @@
 package eu.shiftforward.apso.collection
 
+import eu.shiftforward.apso.CustomMatchers
 import org.specs2.mutable.Specification
 
-class HMapSpec extends Specification {
+class HMapSpec extends Specification with CustomMatchers {
 
   "An HMap" should {
 
@@ -68,6 +69,15 @@ class HMapSpec extends Specification {
 
       map.map(_._1).toSet mustEqual Set(Key1, Key2, Key3)
       map.map(_._2).toSet mustEqual Set(4, "s", List(false, true))
+    }
+
+    "be serializable when the values are also serializable" in {
+      HMap[HMapKey]() must beSerializable
+      HMap(Key1 -> 4, Key2 -> "s") must beSerializable
+
+      class NotSer
+      val KeyNS = new HMapKey[NotSer]
+      HMap(Key1 -> 4, Key2 -> "s", KeyNS -> new NotSer) must not(beSerializable)
     }
   }
 }
