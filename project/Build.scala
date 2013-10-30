@@ -13,7 +13,7 @@ object ProjectBuild extends Build {
                             .settings(
     organization := "eu.shiftforward",
     version := "0.2.1-SNAPSHOT",
-    scalaVersion := "2.10.2",
+    scalaVersion := "2.10.3",
 
     publishSetting,
     credentialsSetting,
@@ -26,25 +26,29 @@ object ProjectBuild extends Build {
       "SF Nexus Releases"             at "http://NEXUS_URL/content/repositories/releases",
       "SF Nexus Snapshots"            at "http://NEXUS_URL/content/repositories/snapshots",
       "3rd Party"                     at "http://NEXUS_URL/content/repositories/thirdparty",
-      "3rd Party Snapshots"           at "http://NEXUS_URL/content/repositories/thirdparty-snapshots"
-    ),
+      "3rd Party Snapshots"           at "http://NEXUS_URL/content/repositories/thirdparty-snapshots"),
 
     libraryDependencies ++= Seq(
-      "com.amazonaws"                  % "aws-java-sdk"       % "1.5.6"  % "provided",
-      "com.github.nscala-time"        %% "nscala-time"        % "0.6.0"  % "provided",
-      "com.typesafe.akka"             %% "akka-actor"         % "2.1.4"  % "provided",
+      "com.amazonaws"                  % "aws-java-sdk"       % "1.6.3"   % "provided",
+      "com.github.nscala-time"        %% "nscala-time"        % "0.6.0"   % "provided",
+      "com.typesafe.akka"             %% "akka-actor"         % "2.2.3"   % "provided",
       "com.twmacinta"                  % "fast-md5"           % "2.7.1",
-      "io.spray"                      %% "spray-json"         % "1.2.3"  % "provided",
-      "io.spray"                       % "spray-httpx"        % "1.1-M8" % "provided",
-      "org.scalaz"                    %% "scalaz-core"        % "7.0.0"  % "provided",
-      "org.slf4j"                      % "slf4j-api"          % "1.7.+",
-      "org.specs2"                    %% "specs2"             % "2.2.2"  % "test",
-      "junit"                          % "junit"              % "4.11"   % "test"
-    ),
+      "io.spray"                      %% "spray-json"         % "1.2.5"   % "provided",
+      "io.spray"                       % "spray-httpx"        % "1.2-RC2" % "provided",
+      "org.scalaz"                    %% "scalaz-core"        % "7.0.4"   % "provided",
+      "org.slf4j"                      % "slf4j-api"          % "1.7.5",
+      "org.specs2"                    %% "specs2"             % "2.2.3"   % "test",
+      "junit"                          % "junit"              % "4.11"    % "test"),
 
     testOptions in Test += Tests.Argument(TestFrameworks.Specs2, "junitxml", "console"),
 
-    scalacOptions ++= Seq("-deprecation", "-unchecked"),
+    scalacOptions ++= Seq(
+      "-deprecation",
+      "-unchecked",
+      "-feature",
+      "-language:implicitConversions",
+      "-language:higherKinds",
+      "-language:existentials"),
 
     scalacOptions in Compile in doc ++= Opts.doc.title(project),
     scalacOptions in Compile in doc <++= version.map { (v: String) => Opts.doc.version(v) },
@@ -55,13 +59,11 @@ object ProjectBuild extends Build {
         bd.getAbsolutePath,
         "-doc-source-url",
         "http://REPOSITORY_URL/apso/blob/master€{FILE_PATH}.scala")
-    }
-  )
+    })
 
   lazy val formatSettings = SbtScalariform.scalariformSettings ++ Seq(
     ScalariformKeys.preferences in Compile := formattingPreferences,
-    ScalariformKeys.preferences in Test := formattingPreferences
-  )
+    ScalariformKeys.preferences in Test := formattingPreferences)
 
   def formattingPreferences =
     FormattingPreferences()
