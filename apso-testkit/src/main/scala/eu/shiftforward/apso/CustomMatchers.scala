@@ -19,4 +19,3 @@ trait CustomMatchers extends SpecificationLike {
     //   not(throwA[InvalidClassException]) and not(throwA[StreamCorruptedException])
   }
 }
-
