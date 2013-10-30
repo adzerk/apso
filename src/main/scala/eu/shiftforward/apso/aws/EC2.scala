@@ -39,4 +39,3 @@ class EC2(credentials: AWSCredentials = CredentialStore.getCredentials) extends 
     instanceData.getReservations.flatMap(_.getInstances)
   }
 }
-

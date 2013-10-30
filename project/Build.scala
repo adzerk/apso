@@ -26,8 +26,7 @@ object ProjectBuild extends Build {
       "SF Nexus Releases"             at "http://NEXUS_URL/content/repositories/releases",
       "SF Nexus Snapshots"            at "http://NEXUS_URL/content/repositories/snapshots",
       "3rd Party"                     at "http://NEXUS_URL/content/repositories/thirdparty",
-      "3rd Party Snapshots"           at "http://NEXUS_URL/content/repositories/thirdparty-snapshots"
-    ),
+      "3rd Party Snapshots"           at "http://NEXUS_URL/content/repositories/thirdparty-snapshots"),
 
     libraryDependencies ++= Seq(
       "com.amazonaws"                  % "aws-java-sdk"       % "1.6.3"   % "provided",
@@ -39,8 +38,7 @@ object ProjectBuild extends Build {
       "org.scalaz"                    %% "scalaz-core"        % "7.0.4"   % "provided",
       "org.slf4j"                      % "slf4j-api"          % "1.7.5",
       "org.specs2"                    %% "specs2"             % "2.2.3"   % "test",
-      "junit"                          % "junit"              % "4.11"    % "test"
-    ),
+      "junit"                          % "junit"              % "4.11"    % "test"),
 
     testOptions in Test += Tests.Argument(TestFrameworks.Specs2, "junitxml", "console"),
 
@@ -61,13 +59,11 @@ object ProjectBuild extends Build {
         bd.getAbsolutePath,
         "-doc-source-url",
         "http://REPOSITORY_URL/apso/blob/master€{FILE_PATH}.scala")
-    }
-  )
+    })
 
   lazy val formatSettings = SbtScalariform.scalariformSettings ++ Seq(
     ScalariformKeys.preferences in Compile := formattingPreferences,
-    ScalariformKeys.preferences in Test := formattingPreferences
-  )
+    ScalariformKeys.preferences in Test := formattingPreferences)
 
   def formattingPreferences =
     FormattingPreferences()
