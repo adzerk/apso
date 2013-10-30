@@ -44,7 +44,13 @@ object ProjectBuild extends Build {
 
     testOptions in Test += Tests.Argument(TestFrameworks.Specs2, "junitxml", "console"),
 
-    scalacOptions ++= Seq("-deprecation", "-unchecked"),
+    scalacOptions ++= Seq(
+      "-deprecation",
+      "-unchecked",
+      "-feature",
+      "-language:implicitConversions",
+      "-language:higherKinds",
+      "-language:existentials"),
 
     scalacOptions in Compile in doc ++= Opts.doc.title(project),
     scalacOptions in Compile in doc <++= version.map { (v: String) => Opts.doc.version(v) },

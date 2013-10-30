@@ -1,5 +1,6 @@
 package eu.shiftforward.apso.aws
 
+import scala.language.postfixOps
 import scala.sys.process._
 
 /**
