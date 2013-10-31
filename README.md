@@ -177,7 +177,7 @@ The `ShellRun` object wraps the Scala's process library, facilitating the launch
 
 ```scala
 scala> ShellRun("ls")
-res1: String =
+res0: String =
 "CHANGELOG
 README.md
 apso
@@ -189,7 +189,7 @@ target
 "
 
 scala> ShellRun("ls", "-l")
-res2: String =
+res1: String =
 "total 248
 -rw-r--r--  1 jcazevedo  staff   5190 Oct 30 17:52 CHANGELOG
 -rw-r--r--  1 jcazevedo  staff   6579 Oct 31 11:44 README.md
@@ -200,4 +200,212 @@ drwxr-xr-x  6 jcazevedo  staff    204 Oct 30 18:20 project
 -rwxr-xr-x  1 jcazevedo  staff  16035 Sep 26 14:04 sbt
 drwxr-xr-x  8 jcazevedo  staff    272 Oct 30 18:14 target
 "
+```
+
+## Amazon Web Services
+
+Apso provides a group of classes to ease the interaction with the Amazon Web Services, namely S3 and EC2. Refer to the package `eu.shiftforward.apso.aws` for more details.
+
+## Collections
+
+The `eu.shiftforward.apso.collection` package provides some helpful collections:
+
+* The `DeboxMap` is a `Map` that doesn't box. It is based on the `DeboxMap` at [non/debox](https://github.com/non/debox) but includes a bunch of bugfixes.
+* The `HMap` is an implementation of an heterogeneous `Map`.
+
+```scala
+scala> import eu.shiftforward.apso.collection._
+import eu.shiftforward.apso.collection._
+
+scala> val m = DeboxMap[Int, Int]()
+m: eu.shiftforward.apso.collection.DeboxMap[Int,Int] = <function1>
+
+scala> m(1) = 2
+
+scala> m(2) = 3
+
+scala> m(1)
+res0: Int = 2
+
+scala> m(2)
+res1: Int = 3
+
+scala> val Key1 = new HMapKey[Int]
+Key1: eu.shiftforward.apso.collection.HMapKey[Int] = eu.shiftforward.apso.collection.HMapKey@4eb14055
+
+scala> val Key2 = new HMapKey[String]
+Key2: eu.shiftforward.apso.collection.HMapKey[String] = eu.shiftforward.apso.collection.HMapKey@13590b1e
+
+scala> val Key3 = new HMapKey[List[Boolean]]
+Key3: eu.shiftforward.apso.collection.HMapKey[List[Boolean]] = eu.shiftforward.apso.collection.HMapKey@7e384bb6
+
+scala> val map = HMap(Key1 -> 4, Key2 -> "s", Key3 -> List(false, true))
+map: eu.shiftforward.apso.collection.HMap[eu.shiftforward.apso.collection.HMapKey] = HMap((eu.shiftforward.apso.collection.HMapKey@4eb14055,4), (eu.shiftforward.apso.collection.HMapKey@13590b1e,s), (eu.shiftforward.apso.collection.HMapKey@7e384bb6,List(false, true)))
+
+scala> map(Key1)
+res2: Int = 4
+
+scala> map(Key2)
+res3: String = s
+
+scala> map(Key3)
+res4: List[Boolean] = List(false, true)
+```
+
+## Hashing
+
+Apso provides utilities for various hashing functions.
+
+```scala
+scala> import eu.shiftforward.apso.hashing.Implicits._
+import eu.shiftforward.apso.hashing.Implicits._
+
+scala> "abcd".md5
+res0: String = e2fc714c4727ee9395f324cd2e7f331f
+
+scala> "abcd".murmurHash
+res1: Long = 7785666560123423118
+```
+
+## Iterators
+
+Apso provides some utility iterators.
+
+```scala
+scala> val circularIterator = CircularIterator(List(1, 2, 3).toIterator)
+circularIterator: eu.shiftforward.apso.iterator.CircularIterator[Int] = non-empty iterator
+
+scala> circularIterator.take(10).toList
+res0: List[Int] = List(1, 2, 3, 1, 2, 3, 1, 2, 3, 1)
+
+scala> val compositeIterator = CompositeIterator(List(1, 2, 3).toIterator, List(4, 5, 6).toIterator, List(7, 8, 9).toIterator)
+compositeIterator: eu.shiftforward.apso.iterator.CompositeIterator[Int] = non-empty iterator
+
+scala> compositeIterator.take(9).toList
+res1: List[Int] = List(1, 2, 3, 4, 5, 6, 7, 8, 9)
+
+scala> val roundRobinIterator = RoundRobinIterator(List(1, 2, 3).toIterator, List(4, 5, 6).toIterator, List(7, 8, 9).toIterator)
+roundRobinIterator: eu.shiftforward.apso.iterator.RoundRobinIterator[Int] = non-empty iterator
+
+scala> roundRobinIterator.take(9).toList
+res2: List[Int] = List(1, 4, 7, 2, 5, 8, 3, 6, 9)
+```
+
+## JSON
+
+Apso includes a bunch of utilities to work with JSON serialization and deserialization.
+
+### JsonConvert
+
+```scala
+scala> import eu.shiftforward.apso.json._
+import eu.shiftforward.apso.json._
+
+scala> JsonConvert.toJson("abcd")
+res0: spray.json.JsValue = "abcd"
+
+scala> JsonConvert.toJson(1)
+res1: spray.json.JsValue = 1
+
+scala> JsonConvert.toJson(Map(1 -> 2, 3 -> 4))
+res2: spray.json.JsValue = {"1":2,"3":4}
+```
+
+### JsonHMap
+
+```scala
+scala> import spray.json._
+import spray.json._
+
+scala> import spray.json.DefaultJsonProtocol._
+import spray.json.DefaultJsonProtocol._
+
+scala> import eu.shiftforward.apso.json._
+import eu.shiftforward.apso.json._
+
+scala> import eu.shiftforward.apso.json.JsonHMap._
+import eu.shiftforward.apso.json.JsonHMap._
+
+scala> import eu.shiftforward.apso.collection._
+import eu.shiftforward.apso.collection._
+
+scala> implicit val reg = new JsonKeyRegistry {}
+reg: eu.shiftforward.apso.json.JsonKeyRegistry = $anon$1@4213d40
+
+scala> val Key1 = new JsonHMapKey[Int]('key1) {}
+Key1: eu.shiftforward.apso.json.JsonHMapKey[Int] = 'key1
+
+scala> val Key2 = new JsonHMapKey[String]('key2) {}
+Key2: eu.shiftforward.apso.json.JsonHMapKey[String] = 'key2
+
+scala> val Key3 = new JsonHMapKey[List[Boolean]]('key3) {}
+Key3: eu.shiftforward.apso.json.JsonHMapKey[List[Boolean]] = 'key3
+
+scala> val json =
+         """
+           |{
+           |  "key1": 4,
+           |  "key2": "s",
+           |  "key3": [ false, true ]
+           |}""".stripMargin
+json: String =
+"
+{
+  "key1": 4,
+  "key2": "s",
+  "key3": [ false, true ]
+}"
+
+scala> val map = json.asJson.convertTo[JsonHMap]
+map: eu.shiftforward.apso.json.JsonHMap.JsonHMap = HMap(('key3,List(false, true)), ('key2,s), ('key1,4))
+```
+
+## Pool
+
+The `Pool` trait provides an object pooling interface.
+
+```scala
+scala> import eu.shiftforward.apso.pool._
+import eu.shiftforward.apso.pool._
+
+scala> class Foo()
+defined class Foo
+
+scala> val pool = UnrestrictedPool(new Foo)
+pool: eu.shiftforward.apso.pool.UnrestrictedPool[Foo] = eu.shiftforward.apso.pool.UnrestrictedPool@5ca7751d
+
+scala> val f1 = pool.acquire()
+f1: Foo = Foo@2d3827e2
+
+scala> pool.release(f1)
+
+scala> pool.acquire()
+res0: Foo = Foo@2d3827e2
+
+scala> pool.acquire()
+res1: Foo = Foo@189f417b
+```
+
+## Time
+
+The `eu.shiftforward.apso.time` package provides utilities to work with `DateTime`.
+
+```scala
+scala> import com.github.nscala_time.time.Imports._
+import com.github.nscala_time.time.Imports._
+
+scala> import eu.shiftforward.apso.time._
+import eu.shiftforward.apso.time._
+
+scala> import eu.shiftforward.apso.time.Implicits._
+import eu.shiftforward.apso.time.Implicits._
+
+scala> (new DateTime("2012-01-01") to new DateTime("2012-01-01")).toList
+res0: List[com.github.nscala_time.time.Imports.DateTime] = List(2012-01-01T00:00:00.000Z)
+
+scala> (new DateTime("2012-02-01") until new DateTime("2012-03-01") by 1.day)
+res1: eu.shiftforward.apso.time.IterableInterval = SteppedInterval(2012-02-01T00:00:00.000Z, 2012-02-02T00:00:00.000Z, 2012-02-03T00:00:00.000Z, 2012-02-04T00:00:00.000Z, 2012-02-05T00:00:00.000Z, 2012-02-06T00:00:00.000Z, 2012-02-07T00:00:00.000Z, 2012-02-08T00:00:00.000Z, 2012-02-09T00:00:00.000Z, 2012-02-10T00:00:00.000Z, 2012-02-11T00:00:00.000Z, 2012-02-12T00:00:00.000Z, 2012-02-13T00:00:00.000Z, 2012-02-14T00:00:00.000Z, 2012-02-15T00:00:00.000Z, 2012-02-16T00:00:00.000Z, 2012-02-17T00:00:00.000Z, 2012-02-18T00:00:00.000Z, 2012-02-19T00:00:00.000Z, 2012-02-20T00:00:00.000Z, 2012-02-21T00:00:00.000Z, 2012-02-22T00:00:00.000Z, 2012-02-23T00:00:00.000Z, 2012-02-24T00:00:00.000Z, 2012-02-25T00:00:00.000Z, 2012-02-26T00:00:00.000Z, 2012-02-27T00:00:00.000Z, 2012-02-28T00:00:00.000Z, 20...
+
+scala> (new DateTime("2012-01-01") until new DateTime("2012-02-01") by 2.minutes)
+res2: eu.shiftforward.apso.time.IterableInterval = SteppedInterval(2012-01-01T00:00:00.000Z, 2012-01-01T00:02:00.000Z, 2012-01-01T00:04:00.000Z, 2012-01-01T00:06:00.000Z, 2012-01-01T00:08:00.000Z, 2012-01-01T00:10:00.000Z, 2012-01-01T00:12:00.000Z, 2012-01-01T00:14:00.000Z, 2012-01-01T00:16:00.000Z, 2012-01-01T00:18:00.000Z, 2012-01-01T00:20:00.000Z, 2012-01-01T00:22:00.000Z, 2012-01-01T00:24:00.000Z, 2012-01-01T00:26:00.000Z, 2012-01-01T00:28:00.000Z, 2012-01-01T00:30:00.000Z, 2012-01-01T00:32:00.000Z, 2012-01-01T00:34:00.000Z, 2012-01-01T00:36:00.000Z, 2012-01-01T00:38:00.000Z, 2012-01-01T00:40:00.000Z, 2012-01-01T00:42:00.000Z, 2012-01-01T00:44:00.000Z, 2012-01-01T00:46:00.000Z, 2012-01-01T00:48:00.000Z, 2012-01-01T00:50:00.000Z, 2012-01-01T00:52:00.000Z, 2012-01-01T00:54:00.000Z, 20...
 ```
