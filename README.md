@@ -170,3 +170,34 @@ res8: Seq[Int] = List(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
 scala> listSamplerWithFallback(2)(l)
 res9: Seq[Int] = List(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24)
 ```
+
+## ShellRun
+
+The `ShellRun` object wraps the Scala's process library, facilitating the launching of shell commands.
+
+```scala
+scala> ShellRun("ls")
+res1: String =
+"CHANGELOG
+README.md
+apso
+apso-testkit
+apso.png
+project
+sbt
+target
+"
+
+scala> ShellRun("ls", "-l")
+res2: String =
+"total 248
+-rw-r--r--  1 jcazevedo  staff   5190 Oct 30 17:52 CHANGELOG
+-rw-r--r--  1 jcazevedo  staff   6579 Oct 31 11:44 README.md
+drwxr-xr-x  4 jcazevedo  staff    136 Oct 30 18:14 apso
+drwxr-xr-x  4 jcazevedo  staff    136 Oct 30 18:15 apso-testkit
+-rw-r--r--@ 1 jcazevedo  staff  91715 Oct 30 17:43 apso.png
+drwxr-xr-x  6 jcazevedo  staff    204 Oct 30 18:20 project
+-rwxr-xr-x  1 jcazevedo  staff  16035 Sep 26 14:04 sbt
+drwxr-xr-x  8 jcazevedo  staff    272 Oct 30 18:14 target
+"
+```
