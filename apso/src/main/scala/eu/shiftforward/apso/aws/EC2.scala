@@ -38,4 +38,47 @@ class EC2(credentials: AWSCredentials = CredentialStore.getCredentials) extends 
     val instanceData = client.describeInstances()
     instanceData.getReservations.flatMap(_.getInstances)
   }
+
+  /**
+   * Terminates an instance.
+   * @param instance the instance to terminate
+   */
+  @inline def terminate(instance: Instance) {
+    terminate(instance.getInstanceId)
+  }
+
+  /**
+   * Terminates an instance.
+   * @param instanceId the id of the instance to terminate
+   */
+  def terminate(instanceId: String) {
+    client.terminateInstances(new TerminateInstancesRequest().withInstanceIds(instanceId))
+  }
+}
+
+/**
+ * Object providing extension methods for [[com.amazonaws.services.ec2.AmazonEC2]] related models.
+ */
+object EC2 {
+
+  /**
+   * Extension class for an [[com.amazonaws.services.ec2.model.Instance]].
+   * @param instance the instance to which the extension methods are to be available
+   */
+  implicit class RichEC2Instance(val instance: Instance) extends AnyVal {
+
+    /**
+     * Returns the id of this instance.
+     * @return the id of this instance.
+     */
+    def id = instance.getInstanceId
+
+    /**
+     * Returns the value of a tag.
+     * @param key the key of the tag whose value is to be retrieved
+     * @return the value associated with the given key wrapped in a `Some` if the tag exists, `None`
+     *         otherwise.
+     */
+    def tagValue(key: String) = instance.getTags.find(_.getKey == key).map(_.getValue)
+  }
 }
