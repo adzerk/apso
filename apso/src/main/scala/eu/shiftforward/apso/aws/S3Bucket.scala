@@ -20,7 +20,8 @@ import scala.util.Try
  * @param credentials optional AWS credentials to use. If the parameter is not supplied, they will
  *                    be retrieved from the [[eu.shiftforward.apso.aws.CredentialStore]].
  */
-class S3Bucket(bucketName: String, credentials: AWSCredentials = CredentialStore.getCredentials)
+class S3Bucket(val bucketName: String,
+               private val credentials: AWSCredentials = CredentialStore.getCredentials)
     extends Logging {
 
   private[this] val config = ConfigFactory.load()
@@ -198,5 +199,12 @@ class S3Bucket(bucketName: String, credentials: AWSCredentials = CredentialStore
     }
 
     success
+  }
+
+  override def equals(obj: Any): Boolean = obj match {
+    case b: S3Bucket => b.bucketName == bucketName &&
+      b.credentials.getAWSAccessKeyId == credentials.getAWSAccessKeyId &&
+      b.credentials.getAWSSecretKey == credentials.getAWSSecretKey
+    case _ => false
   }
 }
