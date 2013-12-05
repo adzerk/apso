@@ -24,17 +24,19 @@ class S3Bucket(val bucketName: String,
                private val credentials: AWSCredentials = CredentialStore.getCredentials)
     extends Logging {
 
-  private[this] val config = ConfigFactory.load()
+  private[this] lazy val config = ConfigFactory.load()
 
-  private[this] val configPrefix = "aws.s3"
+  private[this] lazy val configPrefix = "aws.s3"
 
-  private[this] val endpoint = Try(config.getString(configPrefix + ".endpoint")).getOrElse("s3.amazonaws.com")
-  private[this] val region = Try(config.getString(configPrefix + ".region")).getOrElse(null)
+  private[this] lazy val endpoint = Try(config.getString(configPrefix + ".endpoint")).getOrElse("s3.amazonaws.com")
+  private[this] lazy val region = Try(config.getString(configPrefix + ".region")).getOrElse(null)
 
-  private[this] val s3 = new AmazonS3Client(credentials)
-
-  s3.setEndpoint(endpoint)
-  handle { setUpBucket() }
+  private[this] lazy val s3 = {
+    val client = new AmazonS3Client(credentials)
+    client.setEndpoint(endpoint)
+    handle { setUpBucket() }
+    client
+  }
 
   private[this] def setUpBucket() {
     synchronized {
