@@ -34,16 +34,10 @@ class S3Bucket(val bucketName: String,
   private[this] lazy val s3 = {
     val client = new AmazonS3Client(credentials)
     client.setEndpoint(endpoint)
-    handle { setUpBucket() }
-    client
-  }
-
-  private[this] def setUpBucket() {
-    synchronized {
-      if (!s3.doesBucketExist(bucketName)) {
-        s3.createBucket(bucketName, Region.fromValue(region))
-      }
+    if (!client.doesBucketExist(bucketName)) {
+      client.createBucket(bucketName, Region.fromValue(region))
     }
+    client
   }
 
   private[this] def splitKey(key: String) = {
