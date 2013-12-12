@@ -194,8 +194,11 @@ object Implicits {
      */
     def weightedChoice[T](seq: Seq[T], valueFunc: T => Double, r: Double = rand.nextDouble()): Option[T] =
       if (seq.isEmpty) None
-      else if (r < valueFunc(seq.head)) Some(seq.head)
-      else weightedChoice(seq.tail, valueFunc, r - valueFunc(seq.head))
+      else {
+        val v = valueFunc(seq.head)
+        if (r < v) Some(seq.head)
+        else weightedChoice(seq.tail, valueFunc, r - v)
+      }
 
     /**
      * Chooses a random element of a traversable using the reservoir sampling technique, traversing
