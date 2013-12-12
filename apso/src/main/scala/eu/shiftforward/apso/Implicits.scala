@@ -205,10 +205,9 @@ object Implicits {
      * @return the selected element wrapped in a `Some`, or `None` if the traversable is empty.
      */
     def reservoirSample[T](seq: TraversableOnce[T]): Option[T] =
-      seq.foldLeft((None: Option[T], 0)) {
+      seq.foldLeft((None: Option[T], 1)) {
         case ((curr, n), candidate) =>
-          if (n == 0) (Some(candidate), n + 1)
-          else (if (rand.nextDouble() < 1.0 / n) Some(candidate) else curr, n + 1)
+          (if (rand.nextDouble() < 1.0 / n) Some(candidate) else curr, n + 1)
       }._1
   }
 

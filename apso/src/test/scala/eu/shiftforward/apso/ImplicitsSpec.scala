@@ -68,13 +68,14 @@ class ImplicitsSpec extends Specification {
     }
 
     "select a random element using reservoir sampling" in {
-      val rand = new MockRandom(0.2, 0.8, 0.7, 0.3, 0.45, 0.1)
+      val rand = new MockRandom(0.4, 0.2, 0.8, 0.3, 0.7, 0.3, 0.9, 0.45, 0.1, 0.35, 0.9, 0.9)
       val list = List("a", "b", "c")
 
       rand.reservoirSample(Nil) === None
       rand.reservoirSample(list) === Some("b") // 0.2 < 1/2 in (a, b), 0.8 > 1/3 in (b, c)
       rand.reservoirSample(list) === Some("c") // 0.7 > 1/2 in (a, b), 0.3 < 1/3 in (a, c)
       rand.reservoirSample(list) === Some("c") // 0.45 < 1/2 in (a, b), 0.1 < 1/3 in (b, c)
+      rand.reservoirSample(list) === Some("a") // 0.9 > 1/2 in (a, b), 0.9 > 1/3 in (a, c)
     }
   }
 }
