@@ -1,6 +1,7 @@
 package eu.shiftforward.apso
 
 import scala.compat.Platform
+import scala.util.Random
 
 /**
  * Object containing implicit classes and methods of general purpose.
@@ -171,6 +172,44 @@ object Implicits {
         Map()
       }
     }
+  }
+
+  /**
+   * Implicit class that provides new methods for random number generators.
+   * @param rand the `Random` instance to which the new methods are provided.
+   */
+  final implicit class ApsoRandom(val rand: Random) extends AnyVal {
+
+    /**
+     * Chooses an element of a sequence according to a weight function.
+     * @param seq the sequence of elements to choose from
+     * @param valueFunc the function that maps elements to weights
+     * @param r the random value used to select the elements. If the default random value is used,
+     *          the weighted selection uses 1.0 as the sum of all weights. To use another scale of
+     *          weights, a random value between 0.0 and the maximum weight should be passed.
+     * @tparam T the type of the elements in the sequence
+     * @return the selected element wrapped in a `Some` if some element was chosen, `None`
+     *         otherwise. Not choosing any element can happen if the weights of the elements do not
+     *         sum up to the maximum value of `r`.
+     */
+    def weightedChoice[T](seq: Seq[T], valueFunc: T => Double, r: Double = rand.nextDouble()): Option[T] =
+      if (seq.isEmpty) None
+      else if (r < valueFunc(seq.head)) Some(seq.head)
+      else weightedChoice(seq.tail, valueFunc, r - valueFunc(seq.head))
+
+    /**
+     * Chooses a random element of a traversable using the reservoir sampling technique, traversing
+     * only once the given sequence.
+     * @param seq the traversable of elements to choose from
+     * @tparam T the type of the elements in the traversable
+     * @return the selected element wrapped in a `Some`, or `None` if the traversable is empty.
+     */
+    def reservoirSample[T](seq: TraversableOnce[T]): Option[T] =
+      seq.foldLeft((None: Option[T], 0)) {
+        case ((curr, n), candidate) =>
+          if (n == 0) (Some(candidate), n + 1)
+          else (if (rand.nextDouble() < 1.0 / n) Some(candidate) else curr, n + 1)
+      }._1
   }
 
   /**
