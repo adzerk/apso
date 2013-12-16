@@ -25,6 +25,10 @@ class ImplicitsSpec extends Specification {
       List[Double](1, 2).average === 1.5
     }
 
+    "throw an exception when the average is called on an empty traversable" in {
+      List[Int]().average must throwA[IllegalArgumentException]
+    }
+
     "convert correctly a list of maps into a map of lists with a zero value" in {
       List[Map[Int, Int]]().sequenceOnMap(Some(0)) === Map[Int, List[Int]]()
 

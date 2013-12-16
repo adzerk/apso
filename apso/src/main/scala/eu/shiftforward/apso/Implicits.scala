@@ -111,6 +111,8 @@ object Implicits {
       val res = it.foldLeft(num.zero, num.zero) { (acc, e) =>
         (num.plus(acc._1, e), num.plus(acc._2, num.one))
       }
+      if (res._2 == num.zero)
+        throw new IllegalArgumentException("The traversable should not be empty!")
       div(res._1, res._2)
     }
   }
