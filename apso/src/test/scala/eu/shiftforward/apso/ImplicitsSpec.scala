@@ -6,6 +6,39 @@ import scala.util.Random
 
 class ImplicitsSpec extends Specification {
 
+  "An ApsoTraversableOnce" should {
+    "calculate correctly the average of a list of integral values" in {
+      List[Byte](1, 4, 3, 2, 5).average === 3
+      List[Short](2, 8, 6, 4, 10).average === 6
+      List[Int](3, 12, 9, 6, 15).average === 9
+      List[Long](4, 16, 12, 8, 20).average === 12
+      List[Byte](1, 2).average === 1
+      List[Int](1, 2).average === 1
+      List[Short](1, 2).average === 1
+      List[Long](1, 2).average === 1
+    }
+
+    "calculate correctly the average of a list of fractional values" in {
+      List[Float](1, 4, 3, 2, 5).average === 3.0
+      List[Double](2, 8, 6, 4, 10).average === 6.0
+      List[Float](1, 2).average === 1.5
+      List[Double](1, 2).average === 1.5
+    }
+
+    "convert correctly a list of maps into a map of lists with a zero value" in {
+      List[Map[Int, Int]]().sequenceOnMap(Some(0)) === Map[Int, List[Int]]()
+
+      List(Map(1 -> 2), Map(1 -> 3), Map(2 -> 3)).sequenceOnMap(Some(0)) ===
+        Map(1 -> List(2, 3, 0), 2 -> List(0, 0, 3))
+
+      List(Map(1 -> "c", 2 -> "b", 3 -> "a")).sequenceOnMap(Some("")) ===
+        Map(1 -> List("c"), 2 -> List("b"), 3 -> List("a"))
+
+      List(Map(1 -> "c", 2 -> "b", 3 -> "a"), Map(1 -> "c2", 4 -> "aa")).sequenceOnMap(Some("")) ===
+        Map(1 -> List("c", "c2"), 2 -> List("b", ""), 3 -> List("a", ""), 4 -> List("", "aa"))
+    }
+  }
+
   "An ApsoListMap" should {
     "convert correctly a list of maps into a map of lists" in {
       List[Map[Int, Int]]().sequenceOnMap() === Map[Int, List[Int]]()

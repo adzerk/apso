@@ -88,6 +88,34 @@ object Implicits {
   }
 
   /**
+   * Implicit class that provides new methods for traversable-once collections.
+   * @param it the traversable-once collection to which the new methods are provided.
+   */
+  final implicit class ApsoTraversableOnce[T](val it: TraversableOnce[T]) extends AnyVal {
+
+    /**
+     * Returns the average of the elements of this collection.
+     * @param num either an instance of `Numeric` or an instance of `Fractional`, defining a set of
+     *            numeric operations which includes the `+` and the `/` operators to be used in
+     *            forming the average.
+     * @tparam A the result type of the `/` operator
+     * @return the average of all elements of this collection with respect to the `+` and `/`
+     *         operators in `num`.
+     */
+    def average[A >: T](implicit num: Numeric[A]): A = {
+      val div: (A, A) => A = num match {
+        case n: Fractional[A] => n.div
+        case n: Integral[A] => n.quot
+        case _ => sys.error("Numeric does not support division!")
+      }
+      val res = it.foldLeft(num.zero, num.zero) { (acc, e) =>
+        (num.plus(acc._1, e), num.plus(acc._2, num.one))
+      }
+      div(res._1, res._2)
+    }
+  }
+
+  /**
    * Implicit class that provides new methods for maps.
    * @param map the map to which the new methods are provided.
    */
