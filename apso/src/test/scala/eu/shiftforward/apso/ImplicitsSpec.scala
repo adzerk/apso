@@ -6,6 +6,30 @@ import scala.util.Random
 
 class ImplicitsSpec extends Specification {
 
+  "An ApsoTraversableOnce" should {
+    "calculate correctly the average of a list of integral values" in {
+      List[Byte](1, 4, 3, 2, 5).average === 3
+      List[Short](2, 8, 6, 4, 10).average === 6
+      List[Int](3, 12, 9, 6, 15).average === 9
+      List[Long](4, 16, 12, 8, 20).average === 12
+      List[Byte](1, 2).average === 1
+      List[Int](1, 2).average === 1
+      List[Short](1, 2).average === 1
+      List[Long](1, 2).average === 1
+    }
+
+    "calculate correctly the average of a list of fractional values" in {
+      List[Float](1, 4, 3, 2, 5).average === 3.0
+      List[Double](2, 8, 6, 4, 10).average === 6.0
+      List[Float](1, 2).average === 1.5
+      List[Double](1, 2).average === 1.5
+    }
+
+    "throw an exception when the average is called on an empty traversable" in {
+      List[Int]().average must throwA[IllegalArgumentException]
+    }
+  }
+
   "An ApsoListMap" should {
     "convert correctly a list of maps into a map of lists" in {
       List[Map[Int, Int]]().sequenceOnMap() === Map[Int, List[Int]]()
