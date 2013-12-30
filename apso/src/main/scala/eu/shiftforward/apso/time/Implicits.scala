@@ -19,6 +19,14 @@ object Implicits {
      * @return a `DateTime` corresponding to this `LocalDate` at UTC midnight.
      */
     def utcDateTime: DateTime = d1.toDateTime(new LocalTime(0, 0), DateTimeZone.UTC)
+
+    /**
+     * Returns a `DateTime` corresponding to this `LocalDate` at the latest valid
+     * time for the date.
+     * @return a `DateTime` corresponding to this `LocalDate` at the latest valid
+     *         time for the date.
+     */
+    def toDateTimeAtEndOfDay = (d1 + 1.day).toDateTimeAtStartOfDay - 1.millis
   }
 
   /**
