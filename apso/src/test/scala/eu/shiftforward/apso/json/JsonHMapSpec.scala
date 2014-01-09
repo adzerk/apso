@@ -49,6 +49,29 @@ class JsonHMapSpec extends Specification {
       invalidJson.asJson.convertTo[JsonHMap] must throwA[Exception]
     }
 
+    "be correctly created from JSON with unspecified key types" in {
+      implicit val reg = new JsonKeyRegistry {}
+
+      val json =
+        """
+          |{
+          |  "key1": 4,
+          |  "key2": "s",
+          |  "key3": [ false, true ],
+          |  "key4": {
+          |    "key5": true,
+          |    "key6": "hello"
+          |  }
+          |}
+        """.stripMargin
+
+      val map = json.asJson.convertTo[JsonHMap]
+      map(reg.keys('key1)) mustEqual JsNumber(4)
+      map(reg.keys('key2)) mustEqual JsString("s")
+      map(reg.keys('key3)) mustEqual JsArray(JsBoolean(false), JsBoolean(true))
+      map(reg.keys('key4)) mustEqual JsObject("key5" -> JsBoolean(true), "key6" -> JsString("hello"))
+    }
+
     "be correctly converted to JSON" in {
       val map = JsonHMap(Key1 -> 4, Key2 -> "s", Key3 -> List(false, true))
 
