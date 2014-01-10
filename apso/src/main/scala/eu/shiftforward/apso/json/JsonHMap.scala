@@ -48,8 +48,11 @@ object JsonHMap {
       val caseObj = JsonHMap()
       json.asJsObject.fields.foreach {
         case (k, v) =>
-          reg.keys.get(Symbol(k)).map { caseKey =>
-            caseObj.put(caseKey.toKey, caseKey.toValue(v))
+          reg.keys.get(Symbol(k)) match {
+            case Some(caseKey) =>
+              caseObj.put(caseKey.toKey, caseKey.toValue(v))
+            case None =>
+              caseObj.put(new JsonHMapKey[JsValue](Symbol(k)) {}, v)
           }
       }
       caseObj
