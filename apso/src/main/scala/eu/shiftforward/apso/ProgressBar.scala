@@ -59,7 +59,7 @@ case class ProgressBar(
       if (percent < 1.0) res.append(">")
       res.append(spaces.substring((width * percent).toInt))
       res.append("]")
-      res.append(f" [ ${throughputTransformer(throughput)}%2.2f ] $throughputUnit/s")
+      res.append(f" $workChar [ ${throughputTransformer(throughput)}%2.2f ] $throughputUnit/s")
       res.append("  ")
       print(res.mkString)
 
