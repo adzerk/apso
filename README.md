@@ -409,3 +409,18 @@ res1: eu.shiftforward.apso.time.IterableInterval = SteppedInterval(2012-02-01T00
 scala> (new DateTime("2012-01-01") until new DateTime("2012-02-01") by 2.minutes)
 res2: eu.shiftforward.apso.time.IterableInterval = SteppedInterval(2012-01-01T00:00:00.000Z, 2012-01-01T00:02:00.000Z, 2012-01-01T00:04:00.000Z, 2012-01-01T00:06:00.000Z, 2012-01-01T00:08:00.000Z, 2012-01-01T00:10:00.000Z, 2012-01-01T00:12:00.000Z, 2012-01-01T00:14:00.000Z, 2012-01-01T00:16:00.000Z, 2012-01-01T00:18:00.000Z, 2012-01-01T00:20:00.000Z, 2012-01-01T00:22:00.000Z, 2012-01-01T00:24:00.000Z, 2012-01-01T00:26:00.000Z, 2012-01-01T00:28:00.000Z, 2012-01-01T00:30:00.000Z, 2012-01-01T00:32:00.000Z, 2012-01-01T00:34:00.000Z, 2012-01-01T00:36:00.000Z, 2012-01-01T00:38:00.000Z, 2012-01-01T00:40:00.000Z, 2012-01-01T00:42:00.000Z, 2012-01-01T00:44:00.000Z, 2012-01-01T00:46:00.000Z, 2012-01-01T00:48:00.000Z, 2012-01-01T00:50:00.000Z, 2012-01-01T00:52:00.000Z, 2012-01-01T00:54:00.000Z, 20...
 ```
+
+## Memo
+
+The `Memo` trait (and higher arity friends), provide a way to decorate a function so that it becomes memoized.
+
+```scala
+scala> import eu.shiftforward.apso._
+import eu.shiftforward.apso._
+
+scala> val square = Memo { x: Int => x * x }
+square: eu.shiftforward.apso.Memo[Int,Int] = <function1>
+
+scala> square(2)
+res0: Int = 4
+```
