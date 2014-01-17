@@ -17,13 +17,13 @@ object ProjectBuild extends Build {
     .settings(publishSettings: _*)
     .settings(apsoSettings: _*)
     .settings(libraryDependencies ++= Seq(
-      "com.amazonaws"                  % "aws-java-sdk"       % "1.6.3"          % "provided",
+      "com.amazonaws"                  % "aws-java-sdk"       % "1.6.12"         % "provided",
       "com.github.nscala-time"        %% "nscala-time"        % "0.6.0"          % "provided",
       "com.typesafe.akka"             %% "akka-actor"         % "2.2.3"          % "provided",
       "com.twmacinta"                  % "fast-md5"           % "2.7.1",
       "io.spray"                      %% "spray-json"         % "1.2.5"          % "provided",
-      "io.spray"                       % "spray-httpx"        % "1.2-RC2"        % "provided",
-      "org.scalaz"                    %% "scalaz-core"        % "7.0.4"          % "provided",
+      "io.spray"                       % "spray-httpx"        % "1.2.0"          % "provided",
+      "org.scalaz"                    %% "scalaz-core"        % "7.0.5"          % "provided",
       "org.slf4j"                      % "slf4j-api"          % "1.7.5",
       "org.specs2"                    %% "specs2"             % "2.2.3"          % "test",
       "junit"                          % "junit"              % "4.11"           % "test"
