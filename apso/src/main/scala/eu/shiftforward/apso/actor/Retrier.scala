@@ -106,7 +106,7 @@ abstract class Retrier[Req, Msg: ClassTag, Ack: ClassTag, Key](
   private[this] var ackGroups = Map.empty[Long, Set[(Msg, ActorRef)]]
 
   /**
-   * Dispatch a single message. The `onComplete` method will be called once all the message is
+   * Dispatches a single message. The `onComplete` method will be called once all the message is
    * acknowledged. If a timeout occurs, `onFailure` method is fired.
    * @param request the request that triggered this dispatch. Used only for identifying this batch
    *                when the `onComplete` and `onFailure` methods are called.
@@ -116,9 +116,9 @@ abstract class Retrier[Req, Msg: ClassTag, Ack: ClassTag, Key](
   def dispatch(request: Req, msg: Msg, to: ActorRef): Unit = dispatch(request, Set(msg -> to))
 
   /**
-   * Dispatch a set of messages to their destinations as a batch. The `onComplete` method will only
-   * be called once all sent messages are acknowledged. Retries are executed per message; a timeout
-   * ceases all retries in the batch and causes the `onFailure` method to fire.
+   * Dispatches a set of messages to their destinations as a batch. The `onComplete` method will
+   * only be called once all sent messages are acknowledged. Retries are executed per message; a
+   * timeout ceases all retries in the batch and causes the `onFailure` method to fire.
    * @param request the request that triggered this dispatch. Used only for identifying this batch
    *                when the `onComplete` and `onFailure` methods are called.
    * @param msgs the set of messages to sent and respective destinations
