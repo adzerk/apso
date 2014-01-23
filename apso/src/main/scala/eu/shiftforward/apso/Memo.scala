@@ -30,7 +30,8 @@ trait MemoizationStats[-In, +Out] extends Memoization[In, Out] {
   protected[this] override val cache = new HashMap[In, Out] {
     override def getOrElseUpdate(key: In, op: => Out): Out =
       get(key) match {
-        case Some(v) => cacheHit += 1; v
+        case Some(v) =>
+          cacheHit += 1; v
         case None => val d = op; this(key) = d; cacheMiss += 1; d
       }
   }
