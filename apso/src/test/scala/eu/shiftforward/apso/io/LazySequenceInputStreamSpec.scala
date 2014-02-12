@@ -5,23 +5,34 @@ import org.specs2.mutable._
 
 class LazySequenceInputStreamSpec extends Specification {
   "A lazy sequence input stream" should {
-    val streams = List[Byte](0, 1, 2, 3).map { byte =>
-      () => new ByteArrayInputStream(Array[Byte](byte))
-    }
-
-    def isFactory = new LazySequenceInputStream(streams)
-
     "combine input streams correctly (read byte-by-byte)" in {
-      val is = isFactory
+      var open = 0
+
+      val streams = List[Byte](0, 1, 2, 3).map { byte =>
+        () => {
+          open += 1
+          new ByteArrayInputStream(Array[Byte](byte))
+        }
+      }
+
+      val is = new LazySequenceInputStream(streams)
       is.read === 0
+      open === 1
       is.read === 1
+      open === 2
       is.read === 2
+      open === 3
       is.read === 3
+      open === 4
       is.read === -1
     }
 
     "combine input streams correctly (read byte array)" in {
-      val is = isFactory
+      val streams = List[Byte](0, 1, 2, 3).map { byte =>
+        () => new ByteArrayInputStream(Array[Byte](byte))
+      }
+
+      val is = new LazySequenceInputStream(streams)
       val buf = new Array[Byte](4)
 
       is.read(buf, 0, 4)
