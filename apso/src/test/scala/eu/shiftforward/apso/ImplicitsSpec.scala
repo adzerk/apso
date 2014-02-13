@@ -30,6 +30,14 @@ class ImplicitsSpec extends Specification {
     }
   }
 
+  "An ApsoMap" should {
+    "support the mapKeys method" in {
+      val m = Map(1 -> 2, 3 -> 4, 5 -> 6, 7 -> 8)
+      m.mapKeys(_ * 2) ===
+        Map(2 -> 2, 6 -> 4, 10 -> 6, 14 -> 8)
+    }
+  }
+
   "An ApsoListMap" should {
     "convert correctly a list of maps into a map of lists" in {
       List[Map[Int, Int]]().sequenceOnMap() === Map[Int, List[Int]]()
