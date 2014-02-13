@@ -31,6 +31,22 @@ class ImplicitsSpec extends Specification {
   }
 
   "An ApsoMap" should {
+    "support the merge method" in {
+      val m1 = Map(1 -> 1, 2 -> 2, 3 -> 3)
+      val m2 = Map(3 -> 3, 4 -> 4, 5 -> 5)
+
+      m1.merge(m2)(_ + _) ===
+        Map(1 -> 1, 2 -> 2, 3 -> 6)
+    }
+
+    "support the twoWayMerge method" in {
+      val m1 = Map(1 -> 1, 2 -> 2, 3 -> 3)
+      val m2 = Map(3 -> 3, 4 -> 4, 5 -> 5)
+
+      m1.twoWayMerge(m2)(_ + _) ===
+        Map(1 -> 1, 2 -> 2, 3 -> 6, 4 -> 4, 5 -> 5)
+    }
+
     "support the mapKeys method" in {
       val m = Map(1 -> 2, 3 -> 4, 5 -> 6, 7 -> 8)
       m.mapKeys(_ * 2) ===
