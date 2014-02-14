@@ -163,6 +163,15 @@ object Implicits {
             case None => thatMap.updated(key, mapValue)
           }
       }
+
+    /**
+     * Applies a given function to all keys of this map. In case `f` is not
+     * injective, the behaviour is undefined.
+     * @param f the function to apply to all keys of this map
+     * @return the resulting map with the keys mapped with function `f`.
+     */
+    def mapKeys[C](f: A => C): Map[C, B] =
+      map.map({ case (k, v) => f(k) -> v }).toMap
   }
 
   /**
