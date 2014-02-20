@@ -82,7 +82,7 @@ class S3(credentials: AWSCredentials = CredentialStore.getCredentials) extends L
   @inline def headObject(bucketName: String,
                          prefix: String = null,
                          marker: String = null): Option[S3ObjectSummary] =
-    objects(bucketName, prefix, marker).headOption
+    objects(bucketName, prefix, marker).toStream.headOption
 
   /**
    * Returns the objects in a bucket, optionally with a given prefix and after a given marker.
@@ -100,8 +100,15 @@ class S3(credentials: AWSCredentials = CredentialStore.getCredentials) extends L
   def objects(bucketName: String,
               prefix: String = null,
               marker: String = null,
-              maxKeys: Int = 1): Seq[S3ObjectSummary] = {
-    val req: ListObjectsRequest = new ListObjectsRequest(bucketName, prefix, marker, null, maxKeys)
-    client.listObjects(req).getObjectSummaries
+              maxKeys: Int = 1): Iterator[S3ObjectSummary] = {
+
+    def loop(last: String, max: Int): Iterator[S3ObjectSummary] = {
+      val req = new ListObjectsRequest(bucketName, prefix, last, null, max)
+      val objs = client.listObjects(req).getObjectSummaries
+
+      if (objs.length == max || objs.length < 1000) objs.toIterator
+      else objs.toIterator ++ loop(objs.get(objs.length - 1).getKey, max - 1000)
+    }
+    loop(marker, maxKeys)
   }
 }
