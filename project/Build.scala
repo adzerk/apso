@@ -25,7 +25,7 @@ object ProjectBuild extends Build {
       "io.spray"                       % "spray-httpx"        % "1.2.0"          % "provided",
       "org.scalaz"                    %% "scalaz-core"        % "7.0.5"          % "provided",
       "org.slf4j"                      % "slf4j-api"          % "1.7.6",
-      "org.specs2"                    %% "specs2"             % "2.2.3"          % "test",
+      "org.specs2"                    %% "specs2"             % "2.3.8"          % "test",
       "junit"                          % "junit"              % "4.11"           % "test"
     ))
 
@@ -34,7 +34,7 @@ object ProjectBuild extends Build {
     .settings(publishSettings: _*)
     .settings(apsoTestkitSettings: _*)
     .settings(libraryDependencies ++= Seq(
-      "org.specs2"                    %% "specs2"             % "2.2.3"
+      "org.specs2"                    %% "specs2"             % "2.3.8"
     ))
 
   lazy val commonSettings = Project.defaultSettings ++ formatSettings ++ Seq(
