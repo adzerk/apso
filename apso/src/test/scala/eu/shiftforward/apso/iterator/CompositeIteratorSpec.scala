@@ -32,10 +32,7 @@ class CompositeIteratorSpec extends Specification {
 
       "not encapsulate multiple instances of composite iterators" in {
         val cit = CompositeIterator(a1) ++ CompositeIterator(a2) ++ CompositeIterator(a3)
-        cit.iterators must haveAllElementsLike {
-          case it: CompositeIterator[_] => ko
-          case _ => ok
-        }
+        forall(cit.iterators)(_ must not(beAnInstanceOf[CompositeIterator[Int]]))
       }
     }
   }
