@@ -9,6 +9,19 @@ import scala.util.Random
 object Implicits {
 
   /**
+   * Implicit class that provides new methods for any object.
+   * @param obj the object to which the new methods are provided.
+   */
+  final implicit class ApsoAny[T](val obj: T) extends AnyVal {
+
+    /**
+     * Returns this object wrapped in a `Some`.
+     * @return this object wrapped in a `Some`.
+     */
+    def some = Some(obj)
+  }
+
+  /**
    * Implicit class that provides new methods for strings.
    * @param s the string to which the new methods are provided.
    */
