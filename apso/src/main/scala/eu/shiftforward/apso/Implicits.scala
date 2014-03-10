@@ -2,6 +2,7 @@ package eu.shiftforward.apso
 
 import scala.compat.Platform
 import scala.util.Random
+import scala.collection.generic.CanBuildFrom
 
 /**
  * Object containing implicit classes and methods of general purpose.
@@ -98,6 +99,39 @@ object Implicits {
      */
     def sample(percentage: Double): Seq[T] =
       seq.take((seq.length * percentage).toInt)
+  }
+
+  final implicit class ApsoSeqTyped[T, CC[X] <: Seq[X]](val seq: CC[T]) extends AnyVal {
+
+    def mergeSorted[U >: T, That](it: TraversableOnce[U])(implicit bf: CanBuildFrom[CC[T], U, That], ord: Ordering[U]): That = {
+      val b = bf(seq)
+
+      if (seq.isEmpty) b ++= it
+      else {
+        val thisIt = seq.iterator
+        var thisNext: T = thisIt.next()
+        var finished = false
+
+        for (elem <- it) {
+
+          def takeFromThis() {
+            if (!finished && ord.lt(thisNext, elem)) {
+              b += thisNext
+              if (thisIt.hasNext) thisNext = thisIt.next() else finished = true
+              takeFromThis()
+            }
+          }
+          takeFromThis()
+          b += elem
+        }
+
+        if (!finished) {
+          b += thisNext
+          b ++= thisIt
+        }
+      }
+      b.result()
+    }
   }
 
   /**

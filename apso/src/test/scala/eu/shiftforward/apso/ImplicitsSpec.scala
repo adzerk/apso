@@ -6,7 +6,35 @@ import scala.util.Random
 
 class ImplicitsSpec extends Specification {
 
+  "An ApsoSeq" should {
+
+    "merge two sorted collections" in {
+      List(1, 5, 6).mergeSorted[Int, List[Int]](List.empty[Int]) === List(1, 5, 6)
+      List.empty[Int].mergeSorted(List(2, 4)) === List(2, 4)
+      Seq(2).mergeSorted(Seq(5)) === List(2, 5)
+      Seq(5).mergeSorted(Seq(2)) === List(2, 5)
+
+      List(1, 3, 5).mergeSorted(Stream(2, 4)) === List(1, 2, 3, 4, 5)
+      List(1, 3, 5).mergeSorted(Stream(2, 4)) must beAnInstanceOf[List[_]]
+
+      Stream(1, 3, 5).mergeSorted(List(2, 4)) === Stream(1, 2, 3, 4, 5)
+      Stream(1, 3, 5).mergeSorted(List(2, 4)) must beAnInstanceOf[Stream[_]]
+
+      trait Base { val x: Int }
+      case class Impl1(x: Int) extends Base
+      case class Impl2(x: Int) extends Base
+
+      implicit def ord[T <: Base] = new Ordering[T] {
+        override def compare(a: T, b: T): Int = a.x - b.x
+      }
+
+      Seq(Impl1(3)).mergeSorted(Seq(Impl2(5))) === Seq(Impl1(3), Impl2(5))
+      Seq(Impl1(3)).mergeSorted(Seq(Impl2(5))) must beAnInstanceOf[Seq[Base]]
+    }
+  }
+
   "An ApsoTraversableOnce" should {
+
     "calculate correctly the average of a list of integral values" in {
       List[Byte](1, 4, 3, 2, 5).average === 3
       List[Short](2, 8, 6, 4, 10).average === 6
@@ -31,6 +59,7 @@ class ImplicitsSpec extends Specification {
   }
 
   "An ApsoMap" should {
+
     "support the merge method" in {
       val m1 = Map(1 -> 1, 2 -> 2, 3 -> 3)
       val m2 = Map(3 -> 3, 4 -> 4, 5 -> 5)
@@ -55,6 +84,7 @@ class ImplicitsSpec extends Specification {
   }
 
   "An ApsoListMap" should {
+
     "convert correctly a list of maps into a map of lists" in {
       List[Map[Int, Int]]().sequenceOnMap() === Map[Int, List[Int]]()
 
@@ -83,6 +113,7 @@ class ImplicitsSpec extends Specification {
   }
 
   "An ApsoRandom" should {
+
     class MockRandom(elems: Double*) extends Random {
       private[this] var nextElems = elems.toList
       override def nextDouble(): Double = { val e = nextElems.head; nextElems = nextElems.tail; e }
