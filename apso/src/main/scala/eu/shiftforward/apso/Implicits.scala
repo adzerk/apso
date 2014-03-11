@@ -1,8 +1,8 @@
 package eu.shiftforward.apso
 
+import scala.collection.generic.CanBuildFrom
 import scala.compat.Platform
 import scala.util.Random
-import scala.collection.generic.CanBuildFrom
 
 /**
  * Object containing implicit classes and methods of general purpose.
