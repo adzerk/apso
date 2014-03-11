@@ -69,7 +69,7 @@ object Implicits {
 
   /**
    * Implicit class that provides new methods for sequences.
-   * @param seq the sequence to which the new methods are provided.
+   * @param seq the sequence to which the new methods are provided
    */
   final implicit class ApsoSeq[T](val seq: Seq[T]) extends AnyVal {
 
@@ -101,8 +101,27 @@ object Implicits {
       seq.take((seq.length * percentage).toInt)
   }
 
+  /**
+   * Implicit class that provides new methods for sequences for which their concrete type is
+   * important.
+   * @param seq the sequence to which the new methods are provided
+   * @tparam T the type of the elements in the sequence
+   * @tparam CC the concrete type of the sequence
+   */
   final implicit class ApsoSeqTyped[T, CC[X] <: Seq[X]](val seq: CC[T]) extends AnyVal {
 
+    /**
+     * Merges this sequence with another traversable assuming that both collections are already
+     * sorted. This method eagerly evaluates all the elements of both collections, even if they are
+     * lazy collections. For that reason, infinite sequences are not supported.
+     * @param it the traversable collection to merge with this one
+     * @param bf combiner factory which provides a combiner
+     * @param ord the ordering with which the collections are sorted and with which the merged
+     *            collection is to be returned
+     * @tparam U element type of the resulting collection
+     * @tparam That type of the resulting collection
+     * @return this sequence merged with the given traversable
+     */
     def mergeSorted[U >: T, That](it: TraversableOnce[U])(implicit bf: CanBuildFrom[CC[T], U, That], ord: Ordering[U]): That = {
       val b = bf(seq)
 
