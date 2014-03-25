@@ -82,7 +82,7 @@ object IterableInterval {
 /**
  * A view of a time interval as an indexed sequence of `LocalDate`.
  */
-case class LocalDateInterval(val i: IterableInterval) extends IndexedSeq[LocalDate] {
+case class LocalDateInterval(i: IterableInterval) extends IndexedSeq[LocalDate] {
   def apply(idx: Int): LocalDate = i(idx).toLocalDate
   def by(newStep: Period) = LocalDateInterval(i.by(newStep))
   def length = i.length
