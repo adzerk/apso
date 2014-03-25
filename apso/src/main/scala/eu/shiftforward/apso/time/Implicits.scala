@@ -29,32 +29,26 @@ object Implicits {
     def toDateTimeAtEndOfDay = (d1 + 1.day).toDateTimeAtStartOfDay - 1.millis
 
     /**
-     * Returns an `IndexedSeq` containing the interval starting at this `LocalDate`
-     * (inclusive) and ending at the given `LocalDate` (inclusive), with a 1 day
-     * step.
+     * Returns an iterable interval starting at this `LocalDate` (inclusive) and
+     * ending at the given `LocalDate` (inclusive), with a 1 day step.
      * @param d2 the ending `LocalDate`
-     * @return an `IndexedSeq` containing the interval starting at this `LocalDate`
-     *         (inclusive) and ending at the given `LocalDate` (inclusive), with a
-     *         1 day step.
+     * @return an iterable interval starting at this `LocalDate` (inclusive) and
+     *         ending at the given `LocalDate` (inclusive), with a 1 day step.
      */
-    def to(d2: LocalDate) = {
-      def go(c: LocalDate, end: LocalDate, res: IndexedSeq[LocalDate] = IndexedSeq()): IndexedSeq[LocalDate] =
-        if (c > end) res
-        else go(c, end - 1.day, end +: res)
-
-      go(d1, d2)
-    }
+    def to(d2: LocalDate) =
+      LocalDateInterval(
+        IterableInterval(d1.toDateTimeAtStartOfDay to d2.toDateTimeAtStartOfDay, 1.day, true))
 
     /**
-     * Returns an `IndexedSeq` containing the interval starting at this `LocalDate`
-     * (inclusive) and ending at the given `LocalDate` (exclusive), with a 1 day
-     * step.
+     * Returns an iterable interval starting at this `LocalDate` (inclusive) and
+     * ending at the given `LocalDate` (exclusive), with a 1 day step.
      * @param d2 the ending `LocalDate`
-     * @return an `IndexedSeq` containing the interval starting at this `LocalDate`
-     *         (inclusive) and ending at the given `LocalDate` (exclusive), with a
-     *         1 day step.
+     * @return an iterable interval starting at this `LocalDate` (inclusive) and
+     *         ending at the given `LocalDate` (exclusive), with a 1 day step.
      */
-    def until(d2: LocalDate): IndexedSeq[LocalDate] = to(d2 - 1.day)
+    def until(d2: LocalDate) =
+      LocalDateInterval(
+        IterableInterval(d1.toDateTimeAtStartOfDay to d2.toDateTimeAtStartOfDay, 1.day, false))
   }
 
   /**
