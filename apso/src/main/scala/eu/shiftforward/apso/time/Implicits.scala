@@ -27,6 +27,28 @@ object Implicits {
      *         time for the date.
      */
     def toDateTimeAtEndOfDay = (d1 + 1.day).toDateTimeAtStartOfDay - 1.millis
+
+    /**
+     * Returns an iterable interval starting at this `LocalDate` (inclusive) and
+     * ending at the given `LocalDate` (inclusive), with a 1 day step.
+     * @param d2 the ending `LocalDate`
+     * @return an iterable interval starting at this `LocalDate` (inclusive) and
+     *         ending at the given `LocalDate` (inclusive), with a 1 day step.
+     */
+    def to(d2: LocalDate) =
+      LocalDateInterval(
+        IterableInterval(d1.toDateTimeAtStartOfDay to d2.toDateTimeAtStartOfDay, 1.day, true))
+
+    /**
+     * Returns an iterable interval starting at this `LocalDate` (inclusive) and
+     * ending at the given `LocalDate` (exclusive), with a 1 day step.
+     * @param d2 the ending `LocalDate`
+     * @return an iterable interval starting at this `LocalDate` (inclusive) and
+     *         ending at the given `LocalDate` (exclusive), with a 1 day step.
+     */
+    def until(d2: LocalDate) =
+      LocalDateInterval(
+        IterableInterval(d1.toDateTimeAtStartOfDay to d2.toDateTimeAtStartOfDay, 1.day, false))
   }
 
   /**
