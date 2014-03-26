@@ -17,15 +17,15 @@ object ProjectBuild extends Build {
     .settings(publishSettings: _*)
     .settings(apsoSettings: _*)
     .settings(libraryDependencies ++= Seq(
-      "com.amazonaws"                  % "aws-java-sdk"       % "1.6.12"         % "provided",
+      "com.amazonaws"                  % "aws-java-sdk"       % "1.7.5"          % "provided",
       "com.github.nscala-time"        %% "nscala-time"        % "0.8.0"          % "provided",
-      "com.typesafe.akka"             %% "akka-actor"         % "2.2.3"          % "provided",
+      "com.typesafe.akka"             %% "akka-actor"         % "2.3.1"          % "provided",
       "com.twmacinta"                  % "fast-md5"           % "2.7.1",
       "io.spray"                      %% "spray-json"         % "1.2.5"          % "provided",
-      "io.spray"                       % "spray-httpx"        % "1.2.0"          % "provided",
-      "org.scalaz"                    %% "scalaz-core"        % "7.0.5"          % "provided",
+      "io.spray"                       % "spray-httpx"        % "1.3.1"          % "provided",
+      "org.scalaz"                    %% "scalaz-core"        % "7.0.6"          % "provided",
       "org.slf4j"                      % "slf4j-api"          % "1.7.6",
-      "org.specs2"                    %% "specs2"             % "2.3.8"          % "test",
+      "org.specs2"                    %% "specs2"             % "2.3.10"         % "test",
       "junit"                          % "junit"              % "4.11"           % "test"
     ))
 
@@ -34,13 +34,13 @@ object ProjectBuild extends Build {
     .settings(publishSettings: _*)
     .settings(apsoTestkitSettings: _*)
     .settings(libraryDependencies ++= Seq(
-      "org.specs2"                    %% "specs2"             % "2.3.8"
+      "org.specs2"                    %% "specs2"             % "2.3.10"
     ))
 
   lazy val commonSettings = Project.defaultSettings ++ formatSettings ++ Seq(
     organization := "eu.shiftforward",
     version := "0.3-SNAPSHOT",
-    scalaVersion := "2.10.3",
+    scalaVersion := "2.10.4",
 
     resolvers ++= Seq(
       "Sonatype Repository"           at "http://oss.sonatype.org/content/repositories/releases",
