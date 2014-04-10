@@ -170,19 +170,17 @@ class S3Bucket(val bucketName: String,
 
   private[this] def handle[T](f: => T, tries: Int = 3, sleepTime: Int = 5000): Option[T] =
     if (tries == 0) { log.error("Max retries reached. Aborting S3 operation"); None }
-    else {
-      Try(f) match {
-        case Success(res) => Some(res)
-        case Failure(e) if !handler(e) =>
-          if (tries > 1) {
-            log.warn("Error during S3 operation. Retrying in {}ms ({} more times)",
-              sleepTime, tries - 1)
-            Thread.sleep(sleepTime)
-          }
-          handle(f, tries - 1, sleepTime)
+    else Try(f) match {
+      case Success(res) => Some(res)
+      case Failure(e) if !handler(e) =>
+        if (tries > 1) {
+          log.warn("Error during S3 operation. Retrying in {}ms ({} more times)",
+            sleepTime, tries - 1)
+          Thread.sleep(sleepTime)
+        }
+        handle(f, tries - 1, sleepTime)
 
-        case _ => None
-      }
+      case _ => None
     }
 
   override def equals(obj: Any): Boolean = obj match {
