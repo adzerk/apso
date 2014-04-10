@@ -8,8 +8,7 @@ import com.typesafe.config.ConfigFactory
 import eu.shiftforward.apso.Logging
 import java.io.{ File, FileOutputStream }
 import scala.collection.JavaConversions._
-import scala.util.control.Breaks._
-import scala.util.Try
+import scala.util.{ Failure, Success, Try }
 
 /**
  * A representation of an Amazon's S3 bucket. This class wraps an
@@ -97,7 +96,7 @@ class S3Bucket(val bucketName: String,
   def push(key: String, file: File): Boolean = handle {
     log.info("Pushing '{}' to 's3://{}/{}'", file.getPath, bucketName, key)
     s3.putObject(new PutObjectRequest(bucketName, sanitizeKey(key), file))
-  }
+  }.isDefined
 
   /**
    * Backups a remote file with the given `key`. A backup consists in copying the supplied file to a backup folder under
@@ -114,7 +113,7 @@ class S3Bucket(val bucketName: String,
       sanitizedKey,
       bucketName,
       mainKey + "/backup/" + name.substring(mainKey.size + 1) + extension))
-  }
+  }.isDefined
 
   /**
    * Pulls a remote file with the given `key`, to the local storage in the pathname provided by `destination`.
@@ -128,7 +127,7 @@ class S3Bucket(val bucketName: String,
     val s3Object = s3.getObject(new GetObjectRequest(bucketName, sanitizeKey(key)))
     val inputStream = s3Object.getObjectContent
 
-    val f = new File(destination)
+    val f = new File(destination).getCanonicalFile
     f.getParentFile.mkdirs()
     val outputStream = new FileOutputStream(f)
 
@@ -144,12 +143,12 @@ class S3Bucket(val bucketName: String,
     inputStream.close()
     outputStream.flush()
     outputStream.close()
-  }
+  }.isDefined
 
   private[this] def handler: PartialFunction[Throwable, Boolean] = {
     case ase: AmazonServiceException =>
-      log.error("Caught an AmazonServiceException, which means your request made it to Amazon S3, but was rejected " +
-        "with an error response for some reason")
+      log.error("Caught an AmazonServiceException, which means your request made it to Amazon S3," +
+        " but was rejected with an error response for some reason")
       log.error("Error Message:    {}", ase.getMessage)
       log.error("HTTP Status Code: {}", ase.getStatusCode)
       log.error("AWS Error Code:   {}", ase.getErrorCode)
@@ -158,8 +157,9 @@ class S3Bucket(val bucketName: String,
       ase.getStatusCode == 404 // if the file doesn't exist there's no need to retry
 
     case ace: AmazonClientException =>
-      log.error("Caught an AmazonClientException, which means the client encountered a serious internal problem " +
-        "while trying to communicate with S3, such as not being able to access the network")
+      log.error("Caught an AmazonClientException, which means the client encountered a serious " +
+        "internal problem while trying to communicate with S3, such as not being able to access " +
+        "the network")
       log.error("Error Message:    {}", ace.getMessage)
       false
 
@@ -168,34 +168,20 @@ class S3Bucket(val bucketName: String,
       false
   }
 
-  private[this] def handle[T](f: => T): Boolean = {
-    val MAX_TRIES = 3
-    val SLEEP_TIME = 5000
-    var _try = 1
-    var success = false
-
-    breakable {
-      while (true) {
-        success = try {
-          f; true
-        } catch handler
-
-        if (success) break()
-
-        if (_try > MAX_TRIES) {
-          log.error("Max retries reached. Aborting S3 operation")
-          break()
+  private[this] def handle[T](f: => T, tries: Int = 3, sleepTime: Int = 5000): Option[T] =
+    if (tries == 0) { log.error("Max retries reached. Aborting S3 operation"); None }
+    else Try(f) match {
+      case Success(res) => Some(res)
+      case Failure(e) if !handler(e) =>
+        if (tries > 1) {
+          log.warn("Error during S3 operation. Retrying in {}ms ({} more times)",
+            sleepTime, tries - 1)
+          Thread.sleep(sleepTime)
         }
+        handle(f, tries - 1, sleepTime)
 
-        log.warn("Error during S3 operation. Retrying ({})", _try)
-
-        _try += 1
-        Thread.sleep(SLEEP_TIME)
-      }
+      case _ => None
     }
-
-    success
-  }
 
   override def equals(obj: Any): Boolean = obj match {
     case b: S3Bucket => b.bucketName == bucketName &&
