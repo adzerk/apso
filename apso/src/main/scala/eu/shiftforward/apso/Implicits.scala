@@ -286,30 +286,67 @@ object Implicits {
   final implicit class ApsoRandom(val rand: Random) extends AnyVal {
 
     /**
+     * Chooses a random element from a sequence.
+     * @param seq the indexed sequence of elements to choose from
+     * @tparam T the type of the elements
+     * @return the selected element wrapped in a `Some` if `seq` has at least one element, `None`
+     *         otherwise.
+     */
+    def choose[T](seq: IndexedSeq[T]): Option[T] =
+      if (seq.isEmpty) None else Some(seq(rand.nextInt(seq.length)))
+
+    /**
+     * Chooses an element of a sequence according to a weight function.
+     * @param seq the elements to choose from
+     * @param valueFunc the function that maps elements to weights
+     * @param r the random value used to select the elements. If the default random value is used,
+     *          the weighted selection uses 1.0 as the sum of all weights. To use another scale of
+     *          weights, a random value between 0.0 and the maximum weight should be passed.
+     * @tparam T the type of the elements
+     * @return the selected element wrapped in a `Some` if some element was chosen, `None`
+     *         otherwise. Not choosing any element can happen if the weights of the elements do not
+     *         sum up to the maximum value of `r`.
+     */
+    def monteCarlo[T](seq: Traversable[T], valueFunc: T => Double, r: Double = rand.nextDouble()): Option[T] =
+      if (seq.isEmpty) None
+      else {
+        val v = valueFunc(seq.head)
+        if (r < v) Some(seq.head)
+        else monteCarlo(seq.tail, valueFunc, r - v)
+      }
+
+    /**
+     * Chooses an element of a sequence according to a weight function.
+     * @param seq the pairs (element, probability) to choose from
+     * @tparam T the type of the elements in the sequence
+     * @return the selected element wrapped in a `Some` if some element was chosen, `None`
+     *         otherwise. Not choosing any element can happen if the weights of the elements do not
+     *         sum up to the maximum value of `r`.
+     */
+    @inline def monteCarlo[T](seq: Traversable[(T, Double)], r: Double = rand.nextDouble()): Option[T] =
+      monteCarlo(seq, { p: (T, Double) => p._2 }, r).map(_._1)
+
+    /**
      * Chooses an element of a sequence according to a weight function.
      * @param seq the sequence of elements to choose from
      * @param valueFunc the function that maps elements to weights
      * @param r the random value used to select the elements. If the default random value is used,
      *          the weighted selection uses 1.0 as the sum of all weights. To use another scale of
      *          weights, a random value between 0.0 and the maximum weight should be passed.
-     * @tparam T the type of the elements in the sequence
+     * @tparam T the type of the elements
      * @return the selected element wrapped in a `Some` if some element was chosen, `None`
      *         otherwise. Not choosing any element can happen if the weights of the elements do not
      *         sum up to the maximum value of `r`.
      */
-    def weightedChoice[T](seq: Seq[T], valueFunc: T => Double, r: Double = rand.nextDouble()): Option[T] =
-      if (seq.isEmpty) None
-      else {
-        val v = valueFunc(seq.head)
-        if (r < v) Some(seq.head)
-        else weightedChoice(seq.tail, valueFunc, r - v)
-      }
+    @deprecated("Use the equivalent monteCarlo method instead.", "0.4")
+    def weightedChoice[T](seq: Seq[T], valueFunc: T => Double, r: Double = rand.nextDouble()) =
+      monteCarlo(seq, valueFunc, r)
 
     /**
      * Chooses a random element of a traversable using the reservoir sampling technique, traversing
      * only once the given sequence.
-     * @param seq the traversable of elements to choose from
-     * @tparam T the type of the elements in the traversable
+     * @param seq the elements to choose from
+     * @tparam T the type of the elements
      * @return the selected element wrapped in a `Some`, or `None` if the traversable is empty.
      */
     def reservoirSample[T](seq: TraversableOnce[T]): Option[T] =
@@ -317,6 +354,61 @@ object Implicits {
         case ((curr, n), candidate) =>
           (if (rand.nextDouble() < 1.0 / n) Some(candidate) else curr, n + 1)
       }._1
+
+    /**
+     * Returns an infinite stream of weighted samples of a sequence.
+     * @param seq the elements to choose from
+     * @tparam T the type of the elements
+     * @return an infinite stream of weighted samples of a sequence.
+     */
+    def samples[T](seq: Traversable[T], valueFunc: T => Double): Stream[T] = {
+      if (seq.isEmpty) Stream.empty
+      else {
+        val len = seq.size
+        val scale = len / seq.map(valueFunc).sum
+        val scaled = seq.map { e => (e, valueFunc(e) * scale) }.toList
+        val (small, large) = scaled.partition(_._2 < 1.0)
+
+        def alias(small: List[(T, Double)],
+                  large: List[(T, Double)],
+                  rest: List[(T, Double, Option[T])]): List[(T, Double, Option[T])] = {
+
+          (small, large) match {
+            case ((s, ps) :: ss, (l, pl) :: ll) =>
+              val remainder = (l, pl - (1.0 - ps))
+              val newRest = (s, ps, Some(l)) :: rest
+              if (remainder._2 < 1)
+                alias(remainder :: ss, ll, newRest)
+              else
+                alias(ss, remainder :: ll, newRest)
+
+            case (_, (l, _) :: ll) => alias(small, ll, (l, 1.0, None) :: rest)
+            case ((s, _) :: ss, _) => alias(ss, large, (s, 1.0, None) :: rest)
+            case _ => rest
+          }
+        }
+
+        val table = alias(small, large, Nil).toVector
+
+        def select(p1: Double, p2: Double, table: Vector[(T, Double, Option[T])]): T = {
+          table((p1 * len).toInt) match {
+            case (a, _, None) => a
+            case (a, p, Some(b)) => if (p2 <= p) a else b
+          }
+        }
+
+        Stream.continually(select(rand.nextDouble(), rand.nextDouble(), table))
+      }
+    }
+
+    /**
+     * Returns an infinite stream of weighted samples of a sequence.
+     * @param seq the pairs (element, probability) to choose from
+     * @tparam T the type of the elements
+     * @return an infinite stream of weighted samples of a sequence.
+     */
+    @inline def samples[T](seq: Traversable[(T, Double)]): Stream[T] =
+      samples(seq, { p: (T, Double) => p._2 }).map(_._1)
   }
 
   /**
