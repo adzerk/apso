@@ -361,8 +361,8 @@ object Implicits {
      * @tparam T the type of the elements
      * @return an infinite stream of weighted samples of a sequence.
      */
-    def samples[T](seq: Traversable[T], valueFunc: T => Double): Stream[T] = {
-      if (seq.isEmpty) Stream.empty
+    def samples[T](seq: Traversable[T], valueFunc: T => Double): Iterator[T] = {
+      if (seq.isEmpty) Iterator.empty
       else {
         val len = seq.size
         val scale = len / seq.map(valueFunc).sum
@@ -397,7 +397,7 @@ object Implicits {
           }
         }
 
-        Stream.continually(select(rand.nextDouble(), rand.nextDouble(), table))
+        Iterator.continually(select(rand.nextDouble(), rand.nextDouble(), table))
       }
     }
 
@@ -407,7 +407,7 @@ object Implicits {
      * @tparam T the type of the elements
      * @return an infinite stream of weighted samples of a sequence.
      */
-    @inline def samples[T](seq: Traversable[(T, Double)]): Stream[T] =
+    @inline def samples[T](seq: Traversable[(T, Double)]): Iterator[T] =
       samples(seq, { p: (T, Double) => p._2 }).map(_._1)
   }
 
