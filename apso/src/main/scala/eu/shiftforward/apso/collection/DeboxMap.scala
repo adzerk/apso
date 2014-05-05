@@ -289,6 +289,21 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
   }
 
   /**
+   * If given key is already in this map, returns associated value. Otherwise,
+   * stores the given default value with key in map and returns
+   * that value.
+   * @param key the key to lookup
+   * @param default the value to associate with key, if key is previously unbound.
+   * @return the value associated with the given key if this map contains the
+   *         key, `default` otherwise.
+   */
+  final def getOrElseUpdate(key: A, default: B): B =
+    get(key).getOrElse {
+      update(key, default)
+      default
+    }
+
+  /**
    * Applies a function `f` to all entries of this map.
    * @param f the function that is applied for its side-effect to every element.
    *        The result of function `f` is discarded.

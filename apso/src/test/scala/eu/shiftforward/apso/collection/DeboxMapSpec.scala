@@ -50,6 +50,15 @@ class DeboxMapSpec extends Specification {
       m.length === 1
     }
 
+    "have a working getOrElseUpdate" in {
+      val m = DeboxMap.empty[Int, Int]
+      m.getOrElseUpdate(2, 0) === 0
+      m.contains(2) == true
+      m(2) === 0
+
+      m.getOrElseUpdate(2, 1) === 0
+    }
+
     "have a working resize/remove" in {
       val m = DeboxMap.empty[Int, Double]
       m.length === 0
