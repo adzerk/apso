@@ -99,6 +99,16 @@ class S3Bucket(val bucketName: String,
   }.isDefined
 
   /**
+   * Sets an access control list on a given Amazon S3 object.
+   * @param key the remote pathname for the file
+   * @param acl the `CannedAccessControlList` to be applied to the Amazon S3 object
+   */
+  def setAcl(key: String, acl: CannedAccessControlList) {
+    log.info("Setting 's3://{}/{}' permissions to '{}'", bucketName, key, acl)
+    s3.setObjectAcl(bucketName, key, acl)
+  }
+
+  /**
    * Backups a remote file with the given `key`. A backup consists in copying the supplied file to a backup folder under
    * the same bucket and folder the file is currently in.
    * @param key the remote pathname to backup
