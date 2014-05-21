@@ -43,14 +43,14 @@ object ProjectBuild extends Build {
     scalaVersion := "2.10.4",
 
     resolvers ++= Seq(
-      "Sonatype Repository"           at "http://oss.sonatype.org/content/repositories/releases",
-      "Sonatype Snapshots Repository" at "http://oss.sonatype.org/content/repositories/snapshots",
-      "Spray Repository"              at "http://repo.spray.io/",
-      "Typesafe Repository"           at "http://repo.typesafe.com/typesafe/releases/",
       "SF Nexus Releases"             at "http://NEXUS_URL/content/repositories/releases",
       "SF Nexus Snapshots"            at "http://NEXUS_URL/content/repositories/snapshots",
       "3rd Party"                     at "http://NEXUS_URL/content/repositories/thirdparty",
-      "3rd Party Snapshots"           at "http://NEXUS_URL/content/repositories/thirdparty-snapshots"),
+      "3rd Party Snapshots"           at "http://NEXUS_URL/content/repositories/thirdparty-snapshots",
+      "Sonatype Repository"           at "http://oss.sonatype.org/content/repositories/releases",
+      "Sonatype Snapshots Repository" at "http://oss.sonatype.org/content/repositories/snapshots",
+      "Spray Repository"              at "http://repo.spray.io/",
+      "Typesafe Repository"           at "http://repo.typesafe.com/typesafe/releases/"),
 
     testOptions in Test += Tests.Argument(TestFrameworks.Specs2, "junitxml", "console"),
 
