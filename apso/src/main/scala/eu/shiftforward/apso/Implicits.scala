@@ -307,7 +307,7 @@ object Implicits {
      *         otherwise. Not choosing any element can happen if the weights of the elements do not
      *         sum up to the maximum value of `r`.
      */
-    def monteCarlo[T](seq: Traversable[T], valueFunc: T => Double, r: Double = rand.nextDouble()): Option[T] =
+    def monteCarlo[T](seq: Traversable[T], valueFunc: T => Double, r: Double): Option[T] =
       if (seq.isEmpty) None
       else {
         val v = valueFunc(seq.head)
