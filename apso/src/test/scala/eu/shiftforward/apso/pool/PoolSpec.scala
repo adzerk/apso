@@ -7,10 +7,10 @@ class PoolSpec extends Specification {
     "acquire & release" in {
       class Foo()
       val pool = UnrestrictedPool(new Foo)
-      val f1 = pool.acquire() // keep the reference
+      val f1 = pool.acquire(()) // keep the reference
       pool.release(f1)
-      pool.acquire() must beTheSameAs(f1) // reference equality
-      pool.acquire() must not beTheSameAs (f1)
+      pool.acquire(()) must beTheSameAs(f1) // reference equality
+      pool.acquire(()) must not beTheSameAs (f1)
     }
   }
 

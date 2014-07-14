@@ -54,7 +54,14 @@ object ProjectBuild extends Build {
 
     testOptions in Test += Tests.Argument(TestFrameworks.Specs2, "junitxml", "console"),
 
-    scalacOptions ++= Seq("-deprecation", "-unchecked"))
+    scalacOptions ++= Seq(
+      "-deprecation",
+      "-unchecked",
+      "-feature",
+      "-language:existentials",
+      "-language:higherKinds",
+      "-language:implicitConversions",
+      "-language:reflectiveCalls"))
 
   lazy val apsoSettings = Nil
 
