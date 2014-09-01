@@ -16,7 +16,7 @@ class UnrestrictedPool[A](_factory: => A, _reset: A => A) extends Pool[A, Unit] 
   protected def obeys(a: A, s: Unit) = true
 
   def acquire(u: Unit): A = synchronized {
-    if (items.isEmpty) factory()
+    if (items.isEmpty) factory(())
     else items.dequeue()
   }
 

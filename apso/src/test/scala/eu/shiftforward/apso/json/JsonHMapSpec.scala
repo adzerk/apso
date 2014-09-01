@@ -34,7 +34,7 @@ class JsonHMapSpec extends Specification {
           |}
         """.stripMargin
 
-      val map = json.asJson.convertTo[JsonHMap]
+      val map = json.parseJson.convertTo[JsonHMap]
       map.entries.toSet mustEqual Set(Key1 -> 4, Key2 -> "s", Key3 -> List(false, true))
 
       val invalidJson =
@@ -46,7 +46,7 @@ class JsonHMapSpec extends Specification {
           |}
         """.stripMargin
 
-      invalidJson.asJson.convertTo[JsonHMap] must throwA[Exception]
+      invalidJson.parseJson.convertTo[JsonHMap] must throwA[Exception]
     }
 
     "be correctly created from JSON with unspecified key types" in {
@@ -65,7 +65,7 @@ class JsonHMapSpec extends Specification {
           |}
         """.stripMargin
 
-      val map = json.asJson.convertTo[JsonHMap]
+      val map = json.parseJson.convertTo[JsonHMap]
       map(reg.keys('key1)) mustEqual JsNumber(4)
       map(reg.keys('key2)) mustEqual JsString("s")
       map(reg.keys('key3)) mustEqual JsArray(JsBoolean(false), JsBoolean(true))
@@ -84,7 +84,7 @@ class JsonHMapSpec extends Specification {
           |}
         """.stripMargin
 
-      map.toJson.compactPrint mustEqual json.asJson.compactPrint
+      map.toJson.compactPrint mustEqual json.parseJson.compactPrint
     }
   }
 }

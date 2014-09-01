@@ -17,15 +17,15 @@ object ProjectBuild extends Build {
     .settings(publishSettings: _*)
     .settings(apsoSettings: _*)
     .settings(libraryDependencies ++= Seq(
-      "com.amazonaws"                  % "aws-java-sdk"       % "1.7.5"          % "provided",
-      "com.github.nscala-time"        %% "nscala-time"        % "0.8.0"          % "provided",
-      "com.typesafe.akka"             %% "akka-actor"         % "2.3.1"          % "provided",
+      "com.amazonaws"                  % "aws-java-sdk"       % "1.8.9.1"        % "provided",
+      "com.github.nscala-time"        %% "nscala-time"        % "1.4.0"          % "provided",
+      "com.typesafe.akka"             %% "akka-actor"         % "2.3.5"          % "provided",
       "com.twmacinta"                  % "fast-md5"           % "2.7.1",
-      "io.spray"                      %% "spray-json"         % "1.2.5"          % "provided",
-      "io.spray"                       % "spray-httpx"        % "1.3.1"          % "provided",
-      "org.scalaz"                    %% "scalaz-core"        % "7.0.6"          % "provided",
-      "org.slf4j"                      % "slf4j-api"          % "1.7.6",
-      "org.specs2"                    %% "specs2"             % "2.3.10"         % "test",
+      "io.spray"                      %% "spray-json"         % "1.2.6"          % "provided",
+      "io.spray"                      %% "spray-httpx"        % "1.3.1"          % "provided",
+      "org.scalaz"                    %% "scalaz-core"        % "7.1.0"          % "provided",
+      "org.slf4j"                      % "slf4j-api"          % "1.7.7",
+      "org.specs2"                    %% "specs2"             % "2.4.1"          % "test",
       "junit"                          % "junit"              % "4.11"           % "test"
     ))
 
@@ -34,13 +34,13 @@ object ProjectBuild extends Build {
     .settings(publishSettings: _*)
     .settings(apsoTestkitSettings: _*)
     .settings(libraryDependencies ++= Seq(
-      "org.specs2"                    %% "specs2"             % "2.3.10"
+      "org.specs2"                    %% "specs2"             % "2.4.1"
     ))
 
   lazy val commonSettings = Project.defaultSettings ++ formatSettings ++ Seq(
     organization := "eu.shiftforward",
     version := "0.4-SNAPSHOT",
-    scalaVersion := "2.10.4",
+    scalaVersion := "2.11.2",
 
     resolvers ++= Seq(
       "SF Nexus Releases"             at "http://NEXUS_URL/content/repositories/releases",
@@ -54,7 +54,14 @@ object ProjectBuild extends Build {
 
     testOptions in Test += Tests.Argument(TestFrameworks.Specs2, "junitxml", "console"),
 
-    scalacOptions ++= Seq("-deprecation", "-unchecked"))
+    scalacOptions ++= Seq(
+      "-deprecation",
+      "-unchecked",
+      "-feature",
+      "-language:existentials",
+      "-language:higherKinds",
+      "-language:implicitConversions",
+      "-language:reflectiveCalls"))
 
   lazy val apsoSettings = Nil
 
