@@ -12,7 +12,7 @@ object ProjectBuild extends Build {
     .settings(noPublishing: _*)
 
   lazy val apso = Project("apso", file("apso"))
-    .dependsOn(apsoTestkit % "provided")
+    .dependsOn(apsoTestkit % "test")
     .settings(commonSettings: _*)
     .settings(publishSettings: _*)
     .settings(apsoSettings: _*)
@@ -26,18 +26,18 @@ object ProjectBuild extends Build {
       "org.scalaz"                    %% "scalaz-core"        % "7.1.0"          % "provided",
       "org.slf4j"                      % "slf4j-api"          % "1.7.7",
       "org.specs2"                    %% "specs2"             % "2.4.1"          % "test",
-      "junit"                          % "junit"              % "4.11"           % "test"
-    ))
+      "junit"                          % "junit"              % "4.11"           % "test"))
 
   lazy val apsoTestkit = Project("apso-testkit", file("apso-testkit"))
     .settings(commonSettings: _*)
     .settings(publishSettings: _*)
     .settings(apsoTestkitSettings: _*)
     .settings(libraryDependencies ++= Seq(
-      "org.specs2"                    %% "specs2"             % "2.4.1"
-    ))
+      "net.databinder.dispatch"       %% "dispatch-core"      % "0.11.2",
+      "org.slf4j"                      % "slf4j-api"          % "1.7.7",
+      "org.specs2"                    %% "specs2"             % "2.4.1"))
 
-  lazy val commonSettings = Project.defaultSettings ++ formatSettings ++ Seq(
+  lazy val commonSettings = Defaults.coreDefaultSettings ++ formatSettings ++ Seq(
     organization := "eu.shiftforward",
     version := "0.4-SNAPSHOT",
     scalaVersion := "2.11.2",
