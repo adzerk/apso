@@ -33,6 +33,7 @@ object ProjectBuild extends Build {
     .settings(publishSettings: _*)
     .settings(apsoTestkitSettings: _*)
     .settings(libraryDependencies ++= Seq(
+      "com.typesafe.akka"             %% "akka-testkit"       % "2.3.5"          % "provided",
       "net.databinder.dispatch"       %% "dispatch-core"      % "0.11.2",
       "org.slf4j"                      % "slf4j-api"          % "1.7.7",
       "org.specs2"                    %% "specs2"             % "2.4.1"))
