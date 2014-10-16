@@ -7,4 +7,5 @@ target/
 .idea_modules
 .ensime
 .ensime_lucene
+.ensime_cache
 *.iml
