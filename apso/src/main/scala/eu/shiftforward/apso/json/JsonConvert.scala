@@ -1,5 +1,6 @@
 package eu.shiftforward.apso.json
 
+import scala.collection.JavaConverters._
 import spray.json._
 
 /**
@@ -19,7 +20,9 @@ object JsonConvert {
     case n: Int => JsNumber(n)
     case n: Double => JsNumber(n)
     case map: Map[_, _] => JsObject(map.map { case (k, v) => (k.toString, toJson(v)) })
+    case map: java.util.Map[_, _] => JsObject(map.asScala.map({ case (k, v) => (k.toString, toJson(v)) }).toMap)
     case t: TraversableOnce[_] => JsArray(t.map(toJson(_)).toList)
+    case t: java.lang.Iterable[_] => JsArray(t.asScala.map(toJson(_)).toList)
     case n: Long => JsNumber(n)
     case b: Boolean => JsBoolean(b)
     case _ => JsString(obj.toString)
