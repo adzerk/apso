@@ -31,5 +31,12 @@ trait ActorMatchers extends SpecificationLike {
       case _ => false
     } must not(throwAn[Exception])
   }
-}
 
+  def receiveAllOf(max: FiniteDuration, msg: Any*): Matcher[TestKitBase] = { probe: TestKitBase =>
+    probe.expectMsgAllOf(max, msg: _*) must not(throwAn[Exception])
+  }
+
+  def receiveAllOf(msg: Any*): Matcher[TestKitBase] = { probe: TestKitBase =>
+    probe.expectMsgAllOf(msg: _*) must not(throwAn[Exception])
+  }
+}
