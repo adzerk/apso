@@ -17,26 +17,43 @@ trait ActorMatchers extends SpecificationLike {
     probe.expectMsg(max, msg) must not(throwAn[Exception])
   }
 
+  def receiveWhich[R: AsResult](f: Any => R): Matcher[TestKitBase] = { probe: TestKitBase =>
+    probe.expectMsgPF()(PartialFunction(f)) must not(throwAn[Exception])
+  }
+
+  def receiveWhich[R: AsResult](max: FiniteDuration)(f: Any => R): Matcher[TestKitBase] = { probe: TestKitBase =>
+    probe.expectMsgPF(max)(PartialFunction(f)) must not(throwAn[Exception])
+  }
+
   def receiveLike[R: AsResult](pf: PartialFunction[Any, R]): Matcher[TestKitBase] = { probe: TestKitBase =>
     probe.expectMsgPF()(pf)
+  }
+
+  def receiveLike[R: AsResult](max: FiniteDuration)(pf: PartialFunction[Any, R]): Matcher[TestKitBase] = { probe: TestKitBase =>
+    probe.expectMsgPF(max)(pf)
   }
 
   def receiveNoMessage: Matcher[TestKitBase] = { probe: TestKitBase =>
     probe.expectNoMsg() must not(throwAn[Exception])
   }
 
-  def receiveEventually(msg: Any): Matcher[TestKitBase] = { probe: TestKitBase =>
-    probe.fishForMessage() {
-      case `msg` => true
-      case _ => false
-    } must not(throwAn[Exception])
+  def receiveNoMessage(max: FiniteDuration): Matcher[TestKitBase] = { probe: TestKitBase =>
+    probe.expectNoMsg(max) must not(throwAn[Exception])
   }
 
-  def receiveAllOf(max: FiniteDuration, msg: Any*): Matcher[TestKitBase] = { probe: TestKitBase =>
-    probe.expectMsgAllOf(max, msg: _*) must not(throwAn[Exception])
+  def receiveEventually(msg: Any): Matcher[TestKitBase] = { probe: TestKitBase =>
+    probe.fishForMessage()(PartialFunction(_ == msg)) must not(throwAn[Exception])
+  }
+
+  def receiveEventually(max: FiniteDuration, msg: Any): Matcher[TestKitBase] = { probe: TestKitBase =>
+    probe.fishForMessage(max)(PartialFunction(_ == msg)) must not(throwAn[Exception])
   }
 
   def receiveAllOf(msg: Any*): Matcher[TestKitBase] = { probe: TestKitBase =>
     probe.expectMsgAllOf(msg: _*) must not(throwAn[Exception])
+  }
+
+  def receiveAllOf(max: FiniteDuration, msg: Any*): Matcher[TestKitBase] = { probe: TestKitBase =>
+    probe.expectMsgAllOf(max, msg: _*) must not(throwAn[Exception])
   }
 }
