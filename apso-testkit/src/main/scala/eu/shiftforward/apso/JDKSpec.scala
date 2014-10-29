@@ -2,7 +2,7 @@ package eu.shiftforward.apso
 
 import org.specs2.execute.{ AsResult, Result, Skipped }
 
-trait JDKHelper {
+trait JDKSpec {
   def jdk[T](major: Int, minor: Int)(r: => T)(implicit evidence: AsResult[T]): Result = {
     val versionRegexp = """^([\d]+)\.([\d]+).*$""".r
     System.getProperty("java.version") match {
