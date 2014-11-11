@@ -22,4 +22,5 @@ object W {
   def post(req: String, body: String): Response = exec(req.POST.setBody(body))
   def put(req: String, body: String): Response = exec(req.PUT.setBody(body))
   def delete(req: String): Response = exec(req.DELETE)
+  def head(req: String): Response = exec(req.HEAD)
 }
