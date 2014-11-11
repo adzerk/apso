@@ -23,6 +23,7 @@ object ProjectBuild extends Build {
       "com.twmacinta"                  % "fast-md5"           % "2.7.1",
       "io.spray"                      %% "spray-json"         % "1.2.6"          % "provided",
       "io.spray"                      %% "spray-httpx"        % "1.3.1"          % "provided",
+      "net.databinder.dispatch"       %% "dispatch-core"      % "0.11.2",
       "org.scalaz"                    %% "scalaz-core"        % "7.1.0"          % "provided",
       "org.slf4j"                      % "slf4j-api"          % "1.7.7",
       "org.specs2"                    %% "specs2"             % "2.4.1"          % "test",
@@ -34,7 +35,6 @@ object ProjectBuild extends Build {
     .settings(apsoTestkitSettings: _*)
     .settings(libraryDependencies ++= Seq(
       "com.typesafe.akka"             %% "akka-testkit"       % "2.3.5"          % "provided",
-      "net.databinder.dispatch"       %% "dispatch-core"      % "0.11.2",
       "org.slf4j"                      % "slf4j-api"          % "1.7.7",
       "org.specs2"                    %% "specs2"             % "2.4.1"))
 
