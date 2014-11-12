@@ -257,20 +257,36 @@ object Implicits {
      * @param zero the zero element, used as described above
      * @return the map of lists converted from this map.
      */
-    def sequenceOnMap(zero: Option[V] = None): Map[K, List[V]] = {
-      lazy val default = zero.toList
+    def sequenceOnMap(zero: Option[V] = None)(implicit dummy: DummyImplicit): Map[K, List[V]] =
+      sequenceOnMap(zero.map(v => { _: Map[K, V] => v }))
 
-      def construct(value: Option[V]) = value match {
-        case None => default
+    /**
+     * Converts this list of maps into a map of lists. The order of the elements
+     * is kept between structures. If a zero element is given, maps which do not
+     * contain certain keys are filled with the zero element, which is created by passing
+     * the whole original map to the zero function. This implies that all the lists in
+     * the given map will have the same length, corresponding to the size of the set of
+     * all keys. If a zero element is not given, only the elements present in this map
+     * are packed into the lists of the resulting map.
+     *
+     * @param zero a function that creates the zero element, based on the original map
+     *             being processed.
+     * @return the map of lists converted from this map.
+     */
+    def sequenceOnMap(zero: Option[Map[K, V] => V]): Map[K, List[V]] = {
+      def construct(value: Option[V], zero: => Option[V]) = value match {
+        case None => zero.toList
         case Some(v) => List(v)
       }
+
       val keysOpt = list.view.map(_.keys).reduceOption(_ ++ _)
 
       keysOpt.map { keys =>
         list.foldLeft(Map[K, List[V]]()) { (acc, innerMap) =>
           keys.foldLeft(acc) {
             case (acc, key) =>
-              acc + (key -> (acc.getOrElse(key, Nil) ::: construct(innerMap.get(key))))
+              acc + (key -> (acc.getOrElse(key, Nil) :::
+                construct(innerMap.get(key), zero.map(z => z(innerMap)))))
           }
         }
       } getOrElse {
