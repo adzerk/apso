@@ -1,6 +1,6 @@
 package eu.shiftforward.apso.config
 
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{ ConfigException, ConfigFactory }
 import eu.shiftforward.apso.Implicits._
 import org.specs2.mutable.Specification
 
@@ -15,7 +15,14 @@ class ConfigImplicitsSpec extends Specification {
         d = 3.3
         e = vdgf
         f = { f0 = 0 }
+        h = 30.2%
       }""")
+
+    "get a percentage from a config file" in {
+      config.getPercentage("h") mustEqual 0.302
+      config.getPercentage("b") must throwAn[ConfigException.BadValue]
+      config.getPercentage("xkcd") must throwAn[ConfigException.Missing]
+    }
 
     "allow extracting configurations returning an option when they are not present" in {
       config.getBooleanOption("a") must beSome(true)
@@ -37,6 +44,10 @@ class ConfigImplicitsSpec extends Specification {
       config.getStringOption("e") must beSome("vdgf")
       config.getStringOption("e0") must beNone
       config.getStringOption("f") must throwAn[Exception]
+
+      config.getPercentageOption("h") must beSome(0.302)
+      config.getPercentageOption("h0") must beNone
+      config.getPercentageOption("f") must throwAn[Exception]
     }
   }
 }

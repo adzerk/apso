@@ -1,6 +1,7 @@
 package eu.shiftforward.apso.config
 
-import com.typesafe.config.Config
+import com.typesafe.config.{ ConfigException, Config }
+import com.typesafe.config.ConfigException.BadValue
 
 /**
  * Provides useful extension methods for `Config` instances.
@@ -56,5 +57,35 @@ trait ConfigImplicits {
      * @return the value as a string wrapped in a `Some` if one is defined and `None` if not.
      */
     def getStringOption(path: String) = getOption(path, _.getString(_))
+
+    /**
+     * Gets the percentage value as a double wrapped in a `Some` if it is defined and `None` if not.
+     *
+     * @param path the path in the config
+     * @throws ConfigException.BadValue if the percentage does not end with '%'.
+     */
+    def getPercentageOption(path: String): Option[Double] = {
+      getStringOption(path).map { value =>
+        if (value.last != '%')
+          throw new ConfigException.BadValue(conf.origin, path, "A percentage must end with '%'.")
+        else
+          value.dropRight(1).toDouble / 100.0
+      }
+    }
+
+    /**
+     * Gets the value as a double from a percentage.
+     *
+     * @param path the path in the config
+     * @throws ConfigException.Missing if value is absent or null
+     * @throws ConfigException.BadValue if the percentage does not end with '%'.
+     */
+    def getPercentage(path: String): Double = {
+      getPercentageOption(path) match {
+        case None => throw new ConfigException.Missing(path)
+        case Some(value) => value
+      }
+    }
+
   }
 }
