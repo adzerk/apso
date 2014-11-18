@@ -18,7 +18,6 @@ trait ConfigImplicits {
      * exception if the path has a value associated but it is not of the requested type.
      *
      * @param path the path in the config
-     * @return the value as a boolean wrapped in a `Some` if one is defined and `None` if not.
      */
     def getBooleanOption(path: String) = getOption(path, _.getBoolean(_))
 
@@ -27,7 +26,6 @@ trait ConfigImplicits {
      * exception if the path has a value associated but it is not of the requested type.
      *
      * @param path the path in the config
-     * @return the value as a int wrapped in a `Some` if one is defined and `None` if not.
      */
     def getIntOption(path: String) = getOption(path, _.getInt(_))
 
@@ -36,7 +34,6 @@ trait ConfigImplicits {
      * exception if the path has a value associated but it is not of the requested type.
      *
      * @param path the path in the config
-     * @return the value as a long wrapped in a `Some` if one is defined and `None` if not.
      */
     def getLongOption(path: String) = getOption(path, _.getLong(_))
 
@@ -45,7 +42,6 @@ trait ConfigImplicits {
      * exception if the path has a value associated but it is not of the requested type.
      *
      * @param path the path in the config
-     * @return the value as a double wrapped in a `Some` if one is defined and `None` if not.
      */
     def getDoubleOption(path: String) = getOption(path, _.getDouble(_))
 
@@ -54,12 +50,11 @@ trait ConfigImplicits {
      * exception if the path has a value associated but it is not of the requested type.
      *
      * @param path the path in the config
-     * @return the value as a string wrapped in a `Some` if one is defined and `None` if not.
      */
     def getStringOption(path: String) = getOption(path, _.getString(_))
 
     /**
-     * Gets the percentage value as a double wrapped in a `Some` if it is defined and `None` if not.
+     * Gets the percentage value as a double wrapped in a `Some` if one is defined and `None` if not.
      *
      * @param path the path in the config
      * @throws ConfigException.BadValue if the percentage does not end with '%'.
