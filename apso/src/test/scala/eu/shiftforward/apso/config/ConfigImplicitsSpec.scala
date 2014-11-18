@@ -16,11 +16,15 @@ class ConfigImplicitsSpec extends Specification {
         e = vdgf
         f = { f0 = 0 }
         h = 30.2%
+        k = soclose%
       }""")
 
     "get a percentage from a config file" in {
+      config.getPercentage("b") mustEqual 2
+      config.getPercentage("d") mustEqual 3.3
       config.getPercentage("h") mustEqual 0.302
-      config.getPercentage("b") must throwAn[ConfigException.BadValue]
+      config.getPercentage("e") must throwAn[ConfigException.BadValue]
+      config.getPercentage("k") must throwAn[ConfigException.BadValue]
       config.getPercentage("xkcd") must throwAn[ConfigException.Missing]
     }
 
