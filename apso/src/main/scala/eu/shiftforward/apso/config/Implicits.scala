@@ -5,12 +5,12 @@ import com.typesafe.config.{ ConfigException, Config }
 /**
  * Provides useful extension methods for `Config` instances.
  */
-trait ConfigImplicits {
+object Implicits {
 
-  final implicit class ApsoConfig(val conf: Config) {
+  @inline private[this] def getOption[A](conf: Config, path: String, f: (Config, String) => A) =
+    if (conf.hasPath(path)) Some(f(conf, path)) else None
 
-    @inline private[this] def getOption[A](path: String, f: (Config, String) => A) =
-      if (conf.hasPath(path)) Some(f(conf, path)) else None
+  final implicit class ApsoConfig(val conf: Config) extends AnyVal {
 
     /**
      * Gets the value as a boolean wrapped in a `Some` if one is defined and `None` if not. This method throws an
@@ -19,7 +19,7 @@ trait ConfigImplicits {
      * @param path the path in the config
      * @return the value as a boolean wrapped in a `Some` if one is defined and `None` if not.
      */
-    def getBooleanOption(path: String) = getOption(path, _.getBoolean(_))
+    def getBooleanOption(path: String) = getOption(conf, path, _.getBoolean(_))
 
     /**
      * Gets the value as a int wrapped in a `Some` if one is defined and `None` if not. This method throws an
@@ -28,7 +28,7 @@ trait ConfigImplicits {
      * @param path the path in the config
      * @return the value as a int wrapped in a `Some` if one is defined and `None` if not.
      */
-    def getIntOption(path: String) = getOption(path, _.getInt(_))
+    def getIntOption(path: String) = getOption(conf, path, _.getInt(_))
 
     /**
      * Gets the value as a long wrapped in a `Some` if one is defined and `None` if not. This method throws an
@@ -37,7 +37,7 @@ trait ConfigImplicits {
      * @param path the path in the config
      * @return the value as a long wrapped in a `Some` if one is defined and `None` if not.
      */
-    def getLongOption(path: String) = getOption(path, _.getLong(_))
+    def getLongOption(path: String) = getOption(conf, path, _.getLong(_))
 
     /**
      * Gets the value as a double wrapped in a `Some` if one is defined and `None` if not. This method throws an
@@ -46,7 +46,7 @@ trait ConfigImplicits {
      * @param path the path in the config
      * @return the value as a double wrapped in a `Some` if one is defined and `None` if not.
      */
-    def getDoubleOption(path: String) = getOption(path, _.getDouble(_))
+    def getDoubleOption(path: String) = getOption(conf, path, _.getDouble(_))
 
     /**
      * Gets the value as a string wrapped in a `Some` if one is defined and `None` if not. This method throws an
@@ -55,7 +55,7 @@ trait ConfigImplicits {
      * @param path the path in the config
      * @return the value as a string wrapped in a `Some` if one is defined and `None` if not.
      */
-    def getStringOption(path: String) = getOption(path, _.getString(_))
+    def getStringOption(path: String) = getOption(conf, path, _.getString(_))
 
     /**
      * Gets the percentage value as a double wrapped in a `Some` if it is defined and `None` if not.

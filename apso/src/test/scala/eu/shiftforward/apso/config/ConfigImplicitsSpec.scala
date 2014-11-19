@@ -1,7 +1,7 @@
 package eu.shiftforward.apso.config
 
 import com.typesafe.config.{ ConfigException, ConfigFactory }
-import eu.shiftforward.apso.Implicits._
+import eu.shiftforward.apso.config.Implicits._
 import org.specs2.mutable.Specification
 
 class ConfigImplicitsSpec extends Specification {
