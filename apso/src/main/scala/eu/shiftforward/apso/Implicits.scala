@@ -1,7 +1,5 @@
 package eu.shiftforward.apso
 
-import eu.shiftforward.apso.config.ConfigImplicits
-
 import scala.collection.generic.CanBuildFrom
 import scala.compat.Platform
 import scala.util.Random
@@ -9,7 +7,7 @@ import scala.util.Random
 /**
  * Object containing implicit classes and methods of general purpose.
  */
-object Implicits extends ConfigImplicits {
+object Implicits {
 
   /**
    * Implicit class that provides new methods for any object.
