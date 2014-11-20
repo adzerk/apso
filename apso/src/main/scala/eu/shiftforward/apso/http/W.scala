@@ -18,9 +18,14 @@ object W {
     Await.result(Http(req), 3.seconds)
   }
 
-  def get(req: String): Response = exec(req.GET)
-  def post(req: String, body: String): Response = exec(req.POST.setBody(body))
-  def put(req: String, body: String): Response = exec(req.PUT.setBody(body))
-  def delete(req: String): Response = exec(req.DELETE)
-  def head(req: String): Response = exec(req.HEAD)
+  def get(req: String, headers: Map[String, Seq[String]] = Map()): Response =
+    exec(req.GET.setHeaders(headers))
+  def post(req: String, body: String, headers: Map[String, Seq[String]] = Map()): Response =
+    exec(req.POST.setBody(body).setHeaders(headers))
+  def put(req: String, body: String, headers: Map[String, Seq[String]] = Map()): Response =
+    exec(req.PUT.setBody(body).setHeaders(headers))
+  def delete(req: String, headers: Map[String, Seq[String]] = Map()): Response =
+    exec(req.DELETE.setHeaders(headers))
+  def head(req: String, headers: Map[String, Seq[String]] = Map()): Response =
+    exec(req.HEAD.setHeaders(headers))
 }
