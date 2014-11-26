@@ -1,7 +1,5 @@
 package eu.shiftforward.apso.config
 
-import java.lang.Long
-
 import com.typesafe.config.{ ConfigException, Config }
 
 import scala.concurrent.duration._
