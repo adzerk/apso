@@ -2,6 +2,9 @@ package eu.shiftforward.apso.config
 
 import com.typesafe.config.{ ConfigException, Config }
 
+import scala.concurrent.duration._
+import scala.collection.JavaConversions._
+
 /**
  * Provides useful extension methods for `Config` instances.
  */
@@ -56,6 +59,87 @@ object Implicits {
      * @return the value as a string wrapped in a `Some` if one is defined and `None` if not.
      */
     def getStringOption(path: String) = getOption(conf, path, _.getString(_))
+
+    /**
+     * Gets the value as a duration wrapped in a `Some` if one is defined and `None` if not. This method throws an
+     * exception if the path has a value associated but it is not of the requested type.
+     *
+     * @param path the path in the config
+     * @return the value as a duration wrapped in a `Some` if one is defined and `None` if not.
+     */
+    def getDurationOption(path: String) = getOption(conf, path, _.getDuration(_, SECONDS).seconds)
+
+    /**
+     * Gets the value as a list wrapped in a `Some` if one is defined and `None` if not. This method throws an
+     * exception if the path has a value associated but it is not of the requested type.
+     *
+     * @param path the path in the config
+     * @return the value as a list wrapped in a `Some` if one is defined and `None` if not.
+     */
+    def getListOption(path: String) = getOption(conf, path, _.getList(_).toList)
+
+    /**
+     * Gets the value as a boolean list wrapped in a `Some` if one is defined and `None` if not. This method throws an
+     * exception if the path has a value associated but it is not of the requested type.
+     *
+     * @param path the path in the config
+     * @return the value as a boolean list wrapped in a `Some` if one is defined and `None` if not.
+     */
+    def getBooleanListOption(path: String) = getOption(conf, path, _.getBooleanList(_).toList)
+
+    /**
+     * Gets the value as a string list wrapped in a `Some` if one is defined and `None` if not. This method throws an
+     * exception if the path has a value associated but it is not of the requested type.
+     *
+     * @param path the path in the config
+     * @return the value as a string list wrapped in a `Some` if one is defined and `None` if not.
+     */
+    def getStringListOption(path: String) = getOption(conf, path, _.getStringList(_).toList)
+
+    /**
+     * Gets the value as a int list wrapped in a `Some` if one is defined and `None` if not. This method throws an
+     * exception if the path has a value associated but it is not of the requested type.
+     *
+     * @param path the path in the config
+     * @return the value as a int list wrapped in a `Some` if one is defined and `None` if not.
+     */
+    def getIntListOption(path: String) = getOption(conf, path, _.getIntList(_).toList)
+
+    /**
+     * Gets the value as a double list wrapped in a `Some` if one is defined and `None` if not. This method throws an
+     * exception if the path has a value associated but it is not of the requested type.
+     *
+     * @param path the path in the config
+     * @return the value as a double list wrapped in a `Some` if one is defined and `None` if not.
+     */
+    def getDoubleListOption(path: String) = getOption(conf, path, _.getDoubleList(_).toList)
+
+    /**
+     * Gets the value as a long list wrapped in a `Some` if one is defined and `None` if not. This method throws an
+     * exception if the path has a value associated but it is not of the requested type.
+     *
+     * @param path the path in the config
+     * @return the value as a long list wrapped in a `Some` if one is defined and `None` if not.
+     */
+    def getLongListOption(path: String) = getOption(conf, path, _.getLongList(_).toList)
+
+    /**
+     * Gets the value as a duration list wrapped in a `Some` if one is defined and `None` if not. This method throws an
+     * exception if the path has a value associated but it is not of the requested type.
+     *
+     * @param path the path in the config
+     * @return the value as a duration list wrapped in a `Some` if one is defined and `None` if not.
+     */
+    def getDurationListOption(path: String) = getOption(conf, path, _.getDurationList(_, SECONDS).map(_.toLong.seconds).toList)
+
+    /**
+     * Gets the value as a config list wrapped in a `Some` if one is defined and `None` if not. This method throws an
+     * exception if the path has a value associated but it is not of the requested type.
+     *
+     * @param path the path in the config
+     * @return the value as a config list wrapped in a `Some` if one is defined and `None` if not.
+     */
+    def getConfigListOption(path: String) = getOption(conf, path, _.getConfigList(_).toList)
 
     /**
      * Gets the percentage value as a double wrapped in a `Some` if it is defined and `None` if not.
