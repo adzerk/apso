@@ -81,6 +81,15 @@ object Implicits {
     def getListOption(path: String) = getOption(conf, path, _.getList(_).toList)
 
     /**
+     * Gets the value as a boolean list wrapped in a `Some` if one is defined and `None` if not. This method throws an
+     * exception if the path has a value associated but it is not of the requested type.
+     *
+     * @param path the path in the config
+     * @return the value as a boolean list wrapped in a `Some` if one is defined and `None` if not.
+     */
+    def getBooleanListOption(path: String) = getOption(conf, path, _.getBooleanList(_).toList)
+
+    /**
      * Gets the value as a string list wrapped in a `Some` if one is defined and `None` if not. This method throws an
      * exception if the path has a value associated but it is not of the requested type.
      *
