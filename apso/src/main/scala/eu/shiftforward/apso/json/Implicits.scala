@@ -72,7 +72,8 @@ object Implicits {
   }
 
   /**
-   * Creates a JsObject from a sequence of dot-separated paths (eg. `List("root.leaf1","root.leaf2")`
+   * Creates a JsObject from a sequence of pairs of dot-separated paths with the corresponding
+   * leaf values (eg. `List(("root.leaf1", JsString("leafVal1")), ("root.leaf2", JsString("leafVal2")))`
    * @param paths the sequence of dot-separated paths
    * @return the resulting JsObject
    */
