@@ -15,7 +15,7 @@ object W {
 
   implicit def stringAsReq(str: String) = url(str)
 
-  def exec(req: Req, timeout: FiniteDuration) = {
+  def exec(req: Req, timeout: FiniteDuration = defaultTimeout.duration) = {
     log.debug("{} {}", req.toRequest.getMethod, req.toRequest.getUrl, null)
     Await.result(Http(req), timeout)
   }
