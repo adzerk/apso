@@ -43,7 +43,7 @@ object ProjectBuild extends Build {
     organization := "eu.shiftforward",
     version := "0.5-SNAPSHOT",
     scalaVersion := "2.11.4",
-    crossScalaVersions := Seq("2.10.4"),
+    crossScalaVersions := Seq("2.10.4", "2.11.4"),
 
     resolvers ++= Seq(
       "SF Nexus Releases"             at "http://NEXUS_URL/content/repositories/releases",
