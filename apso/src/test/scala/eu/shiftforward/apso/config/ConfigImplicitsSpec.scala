@@ -76,25 +76,25 @@ class ConfigImplicitsSpec extends Specification {
     }
 
     "allow extracting configurations returning an option of a list of int" in {
-      config.getIntListOption("j") must beSome(List(1, 2))
+      config.getIntListOption("j") must beEqualTo(Some(List(1, 2)))
       config.getIntListOption("j0") must beNone
       config.getIntListOption("f") must throwAn[Exception]
     }
 
     "allow extracting configurations returning an option of a list of long" in {
-      config.getLongListOption("k") must beSome(List(12345678901L, 12345678902L))
+      config.getLongListOption("k") must beEqualTo(Some(List(12345678901L, 12345678902L)))
       config.getLongListOption("k0") must beNone
       config.getLongListOption("f") must throwAn[Exception]
     }
 
     "allow extracting configurations returning an option of a list of double" in {
-      config.getDoubleListOption("l") must beSome(List(1.1, 2.2))
+      config.getDoubleListOption("l") must beEqualTo(Some(List(1.1, 2.2)))
       config.getDoubleListOption("l0") must beNone
       config.getDoubleListOption("f") must throwAn[Exception]
     }
 
     "allow extracting configurations returning an option of a list of string" in {
-      config.getStringListOption("m") must beSome(List("a", "b"))
+      config.getStringListOption("m") must beEqualTo(Some(List("a", "b")))
       config.getStringListOption("m0") must beNone
       config.getStringListOption("f") must throwAn[Exception]
     }
