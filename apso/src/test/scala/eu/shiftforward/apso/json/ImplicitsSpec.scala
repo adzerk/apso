@@ -4,7 +4,7 @@ import org.specs2.mutable._
 import spray.json._
 import eu.shiftforward.apso.json.Implicits._
 
-class JsonImplicitsSpec extends Specification {
+class ImplicitsSpec extends Specification {
   "The Apso Json Implicits should" should {
     "provide a method to access json fields from a complete path" in {
       val source =
