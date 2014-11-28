@@ -14,5 +14,9 @@ trait FutureExtraMatchers extends NoTimeConversions { this: SpecificationLike =>
     def await(timeout: Duration) = Await.result(awaitable, timeout)
   }
 
-  def beEventually[T](f: T => MatchResult[_]): Matcher[T] = (f: Matcher[T]).eventually
+  def beEventually[T](f: T => MatchResult[_]): Matcher[T] =
+    (f: Matcher[T]).eventually(40, 200.milliseconds)
+
+  def beEventually[T](retries: Int, sleep: FiniteDuration)(f: T => MatchResult[_]): Matcher[T] =
+    (f: Matcher[T]).eventually(retries, sleep)
 }
