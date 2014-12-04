@@ -70,6 +70,15 @@ object Implicits {
     def getDurationOption(path: String) = getOption(conf, path, _.getDuration(_, SECONDS).seconds)
 
     /**
+     * Gets the value as a `Config` wrapped in a `Some` if one is defined and `None` if not. This method throws an
+     * exception if the path has a value associated but it is not of the requested type.
+     *
+     * @param path the path in the config
+     * @return the value as a `Config` wrapped in a `Some` if one is defined and `None` if not.
+     */
+    def getConfigOption(path: String) = getOption(conf, path, _.getConfig(_))
+
+    /**
      * Gets the value as a list wrapped in a `Some` if one is defined and `None` if not. This method throws an
      * exception if the path has a value associated but it is not of the requested type.
      *
