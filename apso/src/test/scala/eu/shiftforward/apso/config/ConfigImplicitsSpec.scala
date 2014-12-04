@@ -63,6 +63,12 @@ class ConfigImplicitsSpec extends Specification {
       config.getStringOption("f") must throwAn[Exception]
     }
 
+    "allow extracting configurations returning an option of a config" in {
+      config.getConfigOption("f") must beSome.which(_.getInt("f0") mustEqual 0)
+      config.getConfigOption("f0") must beNone
+      config.getConfigOption("e") must throwAn[Exception]
+    }
+
     "allow extracting configurations returning an option of a percentage" in {
       config.getPercentageOption("g") must beSome(0.302)
       config.getPercentageOption("g0") must beNone
