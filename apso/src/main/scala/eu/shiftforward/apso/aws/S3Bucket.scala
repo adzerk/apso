@@ -53,38 +53,20 @@ class S3Bucket(val bucketName: String,
 
   /**
    * Returns a list of filenames in a bucket matching a given prefix.
-   * @param key the prefix to match
+   * @param prefix the prefix to match
    * @return a list of filenames in a bukcet matching a given prefix.
    */
-  def getFilesWithMatchingPrefix(key: String) = {
-    log.info("Finding files matching prefix '{}'...", key)
-    val (mainKey, name, extension) = splitKey(sanitizeKey(key))
+  def getFilesWithMatchingPrefix(prefix: String): Iterator[String] = {
+    log.info("Finding files matching prefix '{}'...", prefix)
 
-    var request = new ListObjectsRequest().withBucketName(bucketName)
-    if (mainKey != "") request = request.withPrefix(mainKey)
-
-    var objectListing = s3.listObjects(request)
-
-    var summaries = objectListing.getObjectSummaries.toList
-
-    while (objectListing.isTruncated) {
-      objectListing = s3.listNextBatchOfObjects(objectListing)
-      summaries :::= objectListing.getObjectSummaries.toList
-      log.info("Asking for another batch of objects...")
+    val listings = Iterator.iterate(s3.listObjects(bucketName, sanitizeKey(prefix))) { listing =>
+      if (listing.isTruncated) {
+        println("Asking for another batch of objects...")
+        s3.listNextBatchOfObjects(listing)
+      } else null
     }
 
-    val files = summaries.foldLeft(List[String]()) {
-      (files, summary) =>
-        val (_, summaryName, _) = splitKey(summary.getKey)
-        if (!summaryName.endsWith("/") &&
-          (name.startsWith(summaryName) || summaryName.startsWith(name)))
-          summary.getKey :: files
-        else
-          files
-    }
-
-    log.info("Found {} matching objects...", files.size)
-    files
+    listings.takeWhile(_ != null).flatMap(_.getObjectSummaries).map(_.getKey).filterNot(_.endsWith("/"))
   }
 
   /**
