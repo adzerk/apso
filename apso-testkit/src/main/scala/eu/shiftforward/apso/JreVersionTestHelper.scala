@@ -13,6 +13,6 @@ trait JreVersionTestHelper {
   }
 }
 
-object JreVersionTestHelper {
+object JreVersionTestHelper extends JreVersionTestHelper {
   val VersionRegex = """^([\d]+)\.([\d]+).*$""".r
 }
