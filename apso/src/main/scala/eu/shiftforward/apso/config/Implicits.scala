@@ -210,14 +210,26 @@ object Implicits {
       ) yield (entry.getKey, entry.getValue.unwrapped().asInstanceOf[T])).toMap
 
     /**
-     * Gets the config as a Map[String, T]
+     * Gets the value as a List[T] wrapped in a `Some` if it is defined and `None` if not
      *
-     * @tparam T the return type of the Map
-     * @return the Map value
+     * @param path the path in the config
+     * @tparam T the return type of the List
+     * @return the List value  wrapped in a `Some` if it is defined and `None` if not
      */
-    def getMap[T]: Map[String, T] =
+    def getTypedListOption[T](path: String): Option[List[T]] =
+      getOption(conf, path, _.getTypedList[T](_))
+
+    /**
+     * Gets the value as a List[T]
+     *
+     * @param path the path in the config
+     * @tparam T the return type of the List
+     * @return the List value
+     */
+    def getTypedList[T](path: String): List[T] =
       (for (
-        entry <- conf.entrySet().asScala
-      ) yield (entry.getKey, entry.getValue.unwrapped().asInstanceOf[T])).toMap
+        entry <- conf.getList(path).asScala
+      ) yield entry.unwrapped().asInstanceOf[T]).toList
+
   }
 }

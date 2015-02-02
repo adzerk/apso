@@ -26,6 +26,10 @@ class ConfigImplicitsSpec extends Specification {
           k1 = "v1"
           k2 = "v2"
         }
+        num-map {
+          k1 = 1
+          k2 = 2
+        }
       }""")
 
     "get a percentage from a config file" in {
@@ -83,34 +87,55 @@ class ConfigImplicitsSpec extends Specification {
       config.getBooleanListOption("i") must beEqualTo(Some(List(true, false)))
       config.getBooleanListOption("i0") must beNone
       config.getBooleanListOption("f") must throwAn[Exception]
+
+      config.getTypedListOption[Boolean]("i") must beEqualTo(Some(List(true, false)))
+      config.getTypedListOption[Boolean]("i0") must beNone
+      config.getTypedListOption[Boolean]("f") must throwAn[Exception]
     }
 
     "allow extracting configurations returning an option of a list of int" in {
-      config.getIntListOption("j") must beEqualTo(Some(List(1, 2)))
-      config.getIntListOption("j0") must beNone
-      config.getIntListOption("f") must throwAn[Exception]
+      config.getTypedListOption("j") must beEqualTo(Some(List(1, 2)))
+      config.getTypedListOption("j0") must beNone
+      config.getTypedListOption("f") must throwAn[Exception]
+
+      config.getTypedListOption[Int]("j") must beEqualTo(Some(List(1, 2)))
+      config.getTypedListOption[Int]("j0") must beNone
+      config.getTypedListOption[Int]("f") must throwAn[Exception]
     }
 
     "allow extracting configurations returning an option of a list of long" in {
       config.getLongListOption("k") must beEqualTo(Some(List(12345678901L, 12345678902L)))
       config.getLongListOption("k0") must beNone
       config.getLongListOption("f") must throwAn[Exception]
+
+      config.getTypedListOption[Long]("k") must beEqualTo(Some(List(12345678901L, 12345678902L)))
+      config.getTypedListOption[Long]("k0") must beNone
+      config.getTypedListOption[Long]("f") must throwAn[Exception]
     }
 
     "allow extracting configurations returning an option of a list of double" in {
       config.getDoubleListOption("l") must beEqualTo(Some(List(1.1, 2.2)))
       config.getDoubleListOption("l0") must beNone
       config.getDoubleListOption("f") must throwAn[Exception]
+
+      config.getTypedListOption[Double]("l") must beEqualTo(Some(List(1.1, 2.2)))
+      config.getTypedListOption[Double]("l0") must beNone
+      config.getTypedListOption[Double]("f") must throwAn[Exception]
     }
 
     "allow extracting configurations returning an option of a list of string" in {
       config.getStringListOption("m") must beEqualTo(Some(List("a", "b")))
       config.getStringListOption("m0") must beNone
       config.getStringListOption("f") must throwAn[Exception]
+
+      config.getTypedListOption[String]("m") must beEqualTo(Some(List("a", "b")))
+      config.getTypedListOption[String]("m0") must beNone
+      config.getTypedListOption[String]("f") must throwAn[Exception]
     }
 
     "allow extracting configurations returning an option of a map" in {
       config.getMapOption[String]("map") must beEqualTo(Some(Map("k1" -> "v1", "k2" -> "v2")))
+      config.getMapOption[Int]("num-map") must beEqualTo(Some(Map("k1" -> 1, "k2" -> 2)))
       config.getMapOption[String]("map0") must beNone
       config.getStringListOption("a") must throwAn[Exception]
     }
