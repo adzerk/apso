@@ -22,6 +22,10 @@ class ConfigImplicitsSpec extends Specification {
         k = [12345678901, 12345678902]
         l = [1.1, 2.2]
         m = ["a", "b"]
+        map {
+          k1 = "v1"
+          k2 = "v2"
+        }
       }""")
 
     "get a percentage from a config file" in {
@@ -103,6 +107,12 @@ class ConfigImplicitsSpec extends Specification {
       config.getStringListOption("m") must beEqualTo(Some(List("a", "b")))
       config.getStringListOption("m0") must beNone
       config.getStringListOption("f") must throwAn[Exception]
+    }
+
+    "allow extracting configurations returning an option of a map" in {
+      config.getMapOption[String]("map") must beEqualTo(Some(Map("k1" -> "v1", "k2" -> "v2")))
+      config.getMapOption[String]("map0") must beNone
+      config.getStringListOption("a") must throwAn[Exception]
     }
 
   }
