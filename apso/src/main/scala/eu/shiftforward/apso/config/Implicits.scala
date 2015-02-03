@@ -194,8 +194,7 @@ object Implicits {
      * @return the Map wrapped in a `Some` if one is defined and `None` if not
      */
     def getMapOption[T](path: String): Option[Map[String, T]] =
-      if (path == "") Some(conf.getMap[T](path))
-      else getOption(conf, path, _.getMap[T](_))
+      getOption(conf, path, _.getMap[T](_))
 
     /**
      * Gets the value as a Map[String, T]
@@ -204,14 +203,7 @@ object Implicits {
      * @tparam T the return type of the Map
      * @return the Map value
      */
-    def getMap[T](path: String): Map[String, T] = {
-      val entrySet =
-        if (path == "") conf.entrySet()
-        else conf.getConfig(path).entrySet()
-      (for (
-        entry <- entrySet
-      ) yield (entry.getKey, entry.getValue.unwrapped().asInstanceOf[T])).toMap
-    }
+    def getMap[T](path: String): Map[String, T] = conf.getConfig(path).toMap[T]
 
     /**
      * Gets the value as a List[T] wrapped in a `Some` if it is defined and `None` if not
@@ -234,6 +226,17 @@ object Implicits {
       (for (
         entry <- conf.getList(path)
       ) yield entry.unwrapped().asInstanceOf[T]).toList
+
+    /**
+     * Converts a config into a Map[String,T]
+     *
+     * @tparam T the return type of the Map
+     * @return the Map value
+     */
+    def toMap[T]: Map[String, T] =
+      (for (
+        entry <- conf.entrySet()
+      ) yield (entry.getKey, entry.getValue.unwrapped().asInstanceOf[T])).toMap
 
   }
 }
