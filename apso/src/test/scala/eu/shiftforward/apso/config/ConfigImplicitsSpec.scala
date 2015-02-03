@@ -136,6 +136,7 @@ class ConfigImplicitsSpec extends Specification {
     "allow extracting configurations returning an option of a map" in {
       config.getMapOption[String]("map") must beEqualTo(Some(Map("k1" -> "v1", "k2" -> "v2")))
       config.getMapOption[Int]("num-map") must beEqualTo(Some(Map("k1" -> 1, "k2" -> 2)))
+      config.getConfig("num-map").toMap[Int] must beEqualTo(Map("k1" -> 1, "k2" -> 2))
       config.getMapOption[String]("map0") must beNone
       config.getStringListOption("a") must throwAn[Exception]
     }
