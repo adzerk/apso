@@ -4,6 +4,7 @@ import com.typesafe.config.{ ConfigException, Config }
 
 import scala.concurrent.duration._
 import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 /**
  * Provides useful extension methods for `Config` instances.
@@ -185,6 +186,50 @@ object Implicits {
         case Some(value) => value
       }
     }
+
+    /**
+     * Gets the value as a Map[String, T] wrapped in a `Some` if it is defined and `None` if not.
+     *
+     * @param path the path in the config
+     * @tparam T the return type of the Map
+     * @return the Map wrapped in a `Some` if one is defined and `None` if not
+     */
+    def getMapOption[T](path: String): Option[Map[String, T]] =
+      getOption(conf, path, _.getMap[T](_))
+
+    /**
+     * Gets the value as a Map[String, T]
+     *
+     * @param path the path in the config
+     * @tparam T the return type of the Map
+     * @return the Map value
+     */
+    def getMap[T](path: String): Map[String, T] =
+      (for (
+        entry <- conf.getConfig(path).entrySet().asScala
+      ) yield (entry.getKey, entry.getValue.unwrapped().asInstanceOf[T])).toMap
+
+    /**
+     * Gets the value as a List[T] wrapped in a `Some` if it is defined and `None` if not
+     *
+     * @param path the path in the config
+     * @tparam T the return type of the List
+     * @return the List value  wrapped in a `Some` if it is defined and `None` if not
+     */
+    def getTypedListOption[T](path: String): Option[List[T]] =
+      getOption(conf, path, _.getTypedList[T](_))
+
+    /**
+     * Gets the value as a List[T]
+     *
+     * @param path the path in the config
+     * @tparam T the return type of the List
+     * @return the List value
+     */
+    def getTypedList[T](path: String): List[T] =
+      (for (
+        entry <- conf.getList(path).asScala
+      ) yield entry.unwrapped().asInstanceOf[T]).toList
 
   }
 }
