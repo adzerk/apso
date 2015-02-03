@@ -4,7 +4,6 @@ import com.typesafe.config.{ ConfigException, Config }
 
 import scala.concurrent.duration._
 import scala.collection.JavaConversions._
-import scala.collection.JavaConverters._
 
 /**
  * Provides useful extension methods for `Config` instances.
@@ -195,7 +194,8 @@ object Implicits {
      * @return the Map wrapped in a `Some` if one is defined and `None` if not
      */
     def getMapOption[T](path: String): Option[Map[String, T]] =
-      getOption(conf, path, _.getMap[T](_))
+      if (path == "") Some(conf.getMap[T](path))
+      else getOption(conf, path, _.getMap[T](_))
 
     /**
      * Gets the value as a Map[String, T]
@@ -204,10 +204,14 @@ object Implicits {
      * @tparam T the return type of the Map
      * @return the Map value
      */
-    def getMap[T](path: String): Map[String, T] =
+    def getMap[T](path: String): Map[String, T] = {
+      val entrySet =
+        if (path == "") conf.entrySet()
+        else conf.getConfig(path).entrySet()
       (for (
-        entry <- conf.getConfig(path).entrySet().asScala
+        entry <- entrySet
       ) yield (entry.getKey, entry.getValue.unwrapped().asInstanceOf[T])).toMap
+    }
 
     /**
      * Gets the value as a List[T] wrapped in a `Some` if it is defined and `None` if not
@@ -228,7 +232,7 @@ object Implicits {
      */
     def getTypedList[T](path: String): List[T] =
       (for (
-        entry <- conf.getList(path).asScala
+        entry <- conf.getList(path)
       ) yield entry.unwrapped().asInstanceOf[T]).toList
 
   }
