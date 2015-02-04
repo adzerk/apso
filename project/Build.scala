@@ -19,6 +19,7 @@ object ProjectBuild extends Build {
     .settings(libraryDependencies ++= Seq(
       "com.amazonaws"                  % "aws-java-sdk"       % "1.9.8"          % "provided",
       "com.github.nscala-time"        %% "nscala-time"        % "1.6.0"          % "provided",
+      "com.j256.simplejmx"             % "simplejmx"          % "1.12",
       "com.typesafe"                   % "config"             % "1.2.1"          % "provided",
       "com.typesafe.akka"             %% "akka-actor"         % "2.3.7"          % "provided",
       "com.twmacinta"                  % "fast-md5"           % "2.7.1",
