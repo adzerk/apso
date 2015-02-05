@@ -1,9 +1,11 @@
-package eu.shiftforward.apso
+package eu.shiftforward.apso.profiling
 
 import java.lang.management.ManagementFactory
+
+import eu.shiftforward.apso.profiling.CpuSampler._
 import org.slf4j.{ Logger, LoggerFactory }
+
 import scala.collection.mutable
-import CpuSampler._
 
 /**
  * A lightweight CPU profiler based on call stack sampling.
