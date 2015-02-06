@@ -12,10 +12,10 @@ import scala.util.{ Failure, Success, Try }
 trait SimpleJmx extends Logging {
   def jmxConfig: Config
 
-  private lazy val jmxHost = jmxConfig.getString("host")
+  private lazy val jmxHost = jmxConfig.getStringOption("host")
   private lazy val jmxPort = jmxConfig.getIntOption("port")
 
-  System.setProperty("java.rmi.server.hostname", jmxHost)
+  jmxHost.foreach(host => System.setProperty("java.rmi.server.hostname", host))
 
   private def startJmx(port: Option[Int] = None) = {
     def randomPort = {
