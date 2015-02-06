@@ -15,7 +15,12 @@ trait SimpleJmx extends Logging {
   private lazy val jmxHost = jmxConfig.getStringOption("host")
   private lazy val jmxPort = jmxConfig.getIntOption("port")
 
-  jmxHost.foreach(host => System.setProperty("java.rmi.server.hostname", host))
+  /**
+   * A handler that is called after the `JmxServer` is successfully started.
+   * By default it sets the JVM's shutdown hook to stop the `JmxServer`.
+   * @param jmx the `JmxServer`
+   */
+  def onJmxStart(jmx: JmxServer) { sys.addShutdownHook(jmx.stop()) }
 
   private def startJmx(port: Option[Int] = None) = {
     def randomPort = {
@@ -37,7 +42,7 @@ trait SimpleJmx extends Logging {
   Try(startJmx(jmxPort)).recover { case _ => startJmx() } match {
     case Success(jmx) =>
       log.info("Bound JMX on port {}", jmx.getServerPort)
-      sys.addShutdownHook(jmx.stop())
+      onJmxStart(jmx)
 
     case Failure(ex) =>
       log.warn("Could not start JMX server", ex)
