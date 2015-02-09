@@ -28,7 +28,7 @@ object ProjectBuild extends Build {
       "net.databinder.dispatch"       %% "dispatch-core"      % "0.11.2",
       "org.scalaz"                    %% "scalaz-core"        % "7.1.0"          % "provided",
       "org.slf4j"                      % "slf4j-api"          % "1.7.7",
-      "org.specs2"                    %% "specs2"             % "2.4.13"         % "test",
+      "org.specs2"                    %% "specs2"             % "2.4.16"         % "test",
       "junit"                          % "junit"              % "4.11"           % "test"))
 
   lazy val apsoTestkit = Project("apso-testkit", file("apso-testkit"))
@@ -38,7 +38,7 @@ object ProjectBuild extends Build {
     .settings(libraryDependencies ++= Seq(
       "com.typesafe.akka"             %% "akka-testkit"       % "2.3.7"          % "provided",
       "org.slf4j"                      % "slf4j-api"          % "1.7.7",
-      "org.specs2"                    %% "specs2"             % "2.4.13"))
+      "org.specs2"                    %% "specs2"             % "2.4.16"))
 
   lazy val commonSettings = Defaults.coreDefaultSettings ++ formatSettings ++ Seq(
     organization := "eu.shiftforward",
