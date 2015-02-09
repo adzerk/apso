@@ -15,13 +15,6 @@ trait SimpleJmx extends Logging {
   private lazy val jmxHost = jmxConfig.getStringOption("host")
   private lazy val jmxPort = jmxConfig.getIntOption("port")
 
-  /**
-   * A handler that is called after the `JmxServer` is successfully started.
-   * By default it sets the JVM's shutdown hook to stop the `JmxServer`.
-   * @param jmx the `JmxServer`
-   */
-  def onJmxStart(jmx: JmxServer) { sys.addShutdownHook(jmx.stop()) }
-
   private def startJmx(port: Option[Int] = None) = {
     def randomPort = {
       val s = new ServerSocket(0)
@@ -39,10 +32,12 @@ trait SimpleJmx extends Logging {
   // registry port) and `jmxPort + 1` (the RMI server port) need to be open. Connections are
   // established through port `jmxPort`.
   // In the event of a binding failure to port `jmxPort`, a retry is performed with a random port.
-  Try(startJmx(jmxPort)).recover { case _ => startJmx() } match {
+  val jmxServer = Try(startJmx(jmxPort)).recover { case _ => startJmx() }
+
+  jmxServer match {
     case Success(jmx) =>
       log.info("Bound JMX on port {}", jmx.getServerPort)
-      onJmxStart(jmx)
+      sys.addShutdownHook(jmx.stop())
 
     case Failure(ex) =>
       log.warn("Could not start JMX server", ex)
