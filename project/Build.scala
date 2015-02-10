@@ -28,7 +28,7 @@ object ProjectBuild extends Build {
       "net.databinder.dispatch"       %% "dispatch-core"      % "0.11.2",
       "org.scalaz"                    %% "scalaz-core"        % "7.1.1"          % "provided",
       "org.slf4j"                      % "slf4j-api"          % "1.7.7",
-      "org.specs2"                    %% "specs2"             % "2.4.13"         % "test",
+      "org.specs2"                    %% "specs2"             % "2.4.16"         % "test",
       "junit"                          % "junit"              % "4.12"           % "test"))
 
   lazy val apsoTestkit = Project("apso-testkit", file("apso-testkit"))
