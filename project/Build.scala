@@ -54,6 +54,7 @@ object ProjectBuild extends Build {
       "Sonatype Repository"           at "http://oss.sonatype.org/content/repositories/releases",
       "Sonatype Snapshots Repository" at "http://oss.sonatype.org/content/repositories/snapshots",
       "Spray Repository"              at "http://repo.spray.io/",
+      "Bintray Scalaz Releases"       at "http://dl.bintray.com/scalaz/releases",
       "Typesafe Repository"           at "http://repo.typesafe.com/typesafe/releases/"),
 
     testOptions in Test += Tests.Argument(TestFrameworks.Specs2, "junitxml", "console"),
