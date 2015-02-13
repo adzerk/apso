@@ -30,6 +30,12 @@ class ConfigImplicitsSpec extends Specification {
           k1 = 1
           k2 = 2
         }
+
+        config {
+          map {
+            kx1 = "vx1"
+          }
+        }
       }""")
 
     "get a percentage from a config file" in {
@@ -139,6 +145,15 @@ class ConfigImplicitsSpec extends Specification {
       config.getConfig("num-map").toMap[Int] must beEqualTo(Map("k1" -> 1, "k2" -> 2))
       config.getMapOption[String]("map0") must beNone
       config.getStringListOption("a") must throwAn[Exception]
+    }
+
+    "allow extracting configurations returning an map of configs" in {
+      val map = config.toConfigMap
+      map("map").getString("k1") === "v1"
+      map("map").getString("k2") === "v2"
+
+      config.getConfigMapOption("map0") must beNone
+      config.getConfigMapOption("config") must beSome.which { _("map").getString("kx1") === "vx1" }
     }
 
   }
