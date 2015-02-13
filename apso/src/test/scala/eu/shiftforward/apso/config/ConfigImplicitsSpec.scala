@@ -30,6 +30,12 @@ class ConfigImplicitsSpec extends Specification {
           k1 = 1
           k2 = 2
         }
+
+        config {
+          map {
+            kx1 = "vx1"
+          }
+        }
       }""")
 
     "get a percentage from a config file" in {
@@ -147,6 +153,7 @@ class ConfigImplicitsSpec extends Specification {
       map("map").getString("k2") === "v2"
 
       config.getConfigMapOption("map0") must beNone
+      config.getConfigMapOption("config") must beSome.which { _("map").getString("kx1") === "vx1" }
     }
 
   }
