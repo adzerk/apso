@@ -4,6 +4,7 @@ import com.typesafe.config.{ ConfigException, Config }
 
 import scala.concurrent.duration._
 import scala.collection.JavaConversions._
+import scala.util.Try
 
 /**
  * Provides useful extension methods for `Config` instances.
@@ -206,6 +207,23 @@ object Implicits {
     def getMap[T](path: String): Map[String, T] = conf.getConfig(path).toMap[T]
 
     /**
+     * Gets the value as a Map[String, Config] wrapped in a `Some` if it is defined and `None` if not.
+     *
+     * @param path the path in the config
+     * @return the Map wrapped in a `Some` if one is defined and `None` if not
+     */
+    def getConfigMapOption(path: String): Option[Map[String, Config]] =
+      getOption(conf, path, _.getConfigMap(_))
+
+    /**
+     * Gets the value as a Map[String, Config]
+     *
+     * @param path the path in the config
+     * @return the Map value
+     */
+    def getConfigMap(path: String): Map[String, Config] = conf.getConfig(path).toConfigMap
+
+    /**
      * Gets the value as a List[T] wrapped in a `Some` if it is defined and `None` if not
      *
      * @param path the path in the config
@@ -237,6 +255,18 @@ object Implicits {
       (for (
         entry <- conf.entrySet()
       ) yield (entry.getKey, entry.getValue.unwrapped().asInstanceOf[T])).toMap
+
+    /**
+     * Converts a config into a Map[String,Config]
+     *
+     * @return the Map value
+     */
+    def toConfigMap: Map[String, Config] =
+      (for {
+        entry <- conf.entrySet()
+        key <- entry.getKey.split("\\.").headOption
+        value <- Try(conf.getConfig(key)).toOption
+      } yield { key -> value }).toMap
 
   }
 }

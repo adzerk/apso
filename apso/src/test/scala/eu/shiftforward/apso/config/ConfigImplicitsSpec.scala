@@ -141,5 +141,13 @@ class ConfigImplicitsSpec extends Specification {
       config.getStringListOption("a") must throwAn[Exception]
     }
 
+    "allow extracting configurations returning an map of configs" in {
+      val map = config.toConfigMap
+      map("map").getString("k1") === "v1"
+      map("map").getString("k2") === "v2"
+
+      config.getConfigMapOption("map0") must beNone
+    }
+
   }
 }
