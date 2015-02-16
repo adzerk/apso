@@ -75,7 +75,7 @@ class S3Bucket(val bucketName: String,
    * @param file the local `File` to push
    * @return true if the push was successful, false otherwise.
    */
-  def push(key: String, file: File): Boolean = handle {
+  def push(key: String, file: File): Boolean = retry {
     log.info("Pushing '{}' to 's3://{}/{}'", file.getPath, bucketName, key)
     s3.putObject(new PutObjectRequest(bucketName, sanitizeKey(key), file))
   }.isDefined
@@ -96,7 +96,7 @@ class S3Bucket(val bucketName: String,
    * @param key the remote pathname to backup
    * @return true if the backup was successful, false otherwise.
    */
-  def backup(key: String): Boolean = handle {
+  def backup(key: String): Boolean = retry {
     val sanitizedKey = sanitizeKey(key)
     val (mainKey, name, extension) = splitKey(sanitizedKey)
 
@@ -113,7 +113,7 @@ class S3Bucket(val bucketName: String,
    * @param destination the local pathname to pull to
    * @return true if the pull was successful, false otherwise
    */
-  def pull(key: String, destination: String): Boolean = handle {
+  def pull(key: String, destination: String): Boolean = retry {
     log.info("Pulling 's3://{}/{}' to '{}'", bucketName, key, destination)
 
     val s3Object = s3.getObject(new GetObjectRequest(bucketName, sanitizeKey(key)))
@@ -138,49 +138,21 @@ class S3Bucket(val bucketName: String,
   }.isDefined
 
   private[this] def handler: PartialFunction[Throwable, Boolean] = {
-    case ase: AmazonServiceException if ase.getStatusCode == 404 =>
-      log.error("Caught an AmazonServiceException, which means your request made it to Amazon S3," +
-        " but was rejected with an 404 because the specified file does not exist")
-      log.error("Error Message:    {}", ase.getMessage)
-      log.error("HTTP Status Code: {}", ase.getStatusCode)
-      log.error("AWS Error Code:   {}", ase.getErrorCode)
-      log.error("Error Type:       {}", ase.getErrorType)
-      log.error("Request ID:       {}", ase.getRequestId)
-      true// if the file doesn't exist there's no need to retry
 
-    case ase: AmazonServiceException if ase.getStatusCode == 403 =>
-      log.error("Caught an AmazonServiceException, which means your request made it to Amazon S3," +
-        " but was rejected with an error 403 because some permissions are missing to access the file")
-      log.error("Error Message:    {}", ase.getMessage)
-      log.error("HTTP Status Code: {}", ase.getStatusCode)
-      log.error("AWS Error Code:   {}", ase.getErrorCode)
-      log.error("Error Type:       {}", ase.getErrorType)
-      log.error("Request ID:       {}", ase.getRequestId)
-      true // if permissions to access the file are missing there's no need to retry
+    case ex: AmazonServiceException => ex.getStatusCode match {
+      case 404 => log.error("The specified file does not exist", ex); true // no need to retry
+      case 403 => log.error("No permission to access the file", ex); true // no need to retry
+      case _   => log.error(ex.getMessage, ex); false
+    }
 
-    case ase: AmazonServiceException =>
-      log.error("Caught an AmazonServiceException, which means your request made it to Amazon S3," +
-        " but was rejected with an error response for some reason")
-      log.error("Error Message:    {}", ase.getMessage)
-      log.error("HTTP Status Code: {}", ase.getStatusCode)
-      log.error("AWS Error Code:   {}", ase.getErrorCode)
-      log.error("Error Type:       {}", ase.getErrorType)
-      log.error("Request ID:       {}", ase.getRequestId)
-      false
+    case ex: AmazonClientException =>
+      log.error("Client error pulling file", ex); false
 
-    case ace: AmazonClientException =>
-      log.error("Caught an AmazonClientException, which means the client encountered a serious " +
-        "internal problem while trying to communicate with S3, such as not being able to access " +
-        "the network")
-      log.error("Error Message:    {}", ace.getMessage)
-      false
-
-    case e: Exception =>
-      log.error("An error occurred", e)
-      false
+    case ex: Exception =>
+      log.error("An error occurred", ex); false
   }
 
-  private[this] def handle[T](f: => T, tries: Int = 3, sleepTime: Int = 5000): Option[T] =
+  private[this] def retry[T](f: => T, tries: Int = 3, sleepTime: Int = 5000): Option[T] =
     if (tries == 0) { log.error("Max retries reached. Aborting S3 operation"); None }
     else Try(f) match {
       case Success(res) => Some(res)
@@ -190,7 +162,7 @@ class S3Bucket(val bucketName: String,
             sleepTime, tries - 1)
           Thread.sleep(sleepTime)
         }
-        handle(f, tries - 1, sleepTime)
+        retry(f, tries - 1, sleepTime)
 
       case _ => None
     }
