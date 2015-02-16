@@ -138,6 +138,26 @@ class S3Bucket(val bucketName: String,
   }.isDefined
 
   private[this] def handler: PartialFunction[Throwable, Boolean] = {
+    case ase: AmazonServiceException if ase.getStatusCode == 404 =>
+      log.error("Caught an AmazonServiceException, which means your request made it to Amazon S3," +
+        " but was rejected with an 404 because the specified file does not exist")
+      log.error("Error Message:    {}", ase.getMessage)
+      log.error("HTTP Status Code: {}", ase.getStatusCode)
+      log.error("AWS Error Code:   {}", ase.getErrorCode)
+      log.error("Error Type:       {}", ase.getErrorType)
+      log.error("Request ID:       {}", ase.getRequestId)
+      true// if the file doesn't exist there's no need to retry
+
+    case ase: AmazonServiceException if ase.getStatusCode == 403 =>
+      log.error("Caught an AmazonServiceException, which means your request made it to Amazon S3," +
+        " but was rejected with an error 403 because some permissions are missing to access the file")
+      log.error("Error Message:    {}", ase.getMessage)
+      log.error("HTTP Status Code: {}", ase.getStatusCode)
+      log.error("AWS Error Code:   {}", ase.getErrorCode)
+      log.error("Error Type:       {}", ase.getErrorType)
+      log.error("Request ID:       {}", ase.getRequestId)
+      true // if permissions to access the file are missing there's no need to retry
+
     case ase: AmazonServiceException =>
       log.error("Caught an AmazonServiceException, which means your request made it to Amazon S3," +
         " but was rejected with an error response for some reason")
@@ -146,7 +166,7 @@ class S3Bucket(val bucketName: String,
       log.error("AWS Error Code:   {}", ase.getErrorCode)
       log.error("Error Type:       {}", ase.getErrorType)
       log.error("Request ID:       {}", ase.getRequestId)
-      ase.getStatusCode == 404 // if the file doesn't exist there's no need to retry
+      false
 
     case ace: AmazonClientException =>
       log.error("Caught an AmazonClientException, which means the client encountered a serious " +
