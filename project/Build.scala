@@ -17,8 +17,8 @@ object ProjectBuild extends Build {
     .settings(publishSettings: _*)
     .settings(apsoSettings: _*)
     .settings(libraryDependencies ++= Seq(
-      "com.amazonaws"                  % "aws-java-sdk-ec2"   % "1.9.19"         % "provided",
-      "com.amazonaws"                  % "aws-java-sdk-s3"    % "1.9.19"         % "provided",
+      "com.amazonaws"                  % "aws-java-sdk-ec2"   % "1.9.20.1"       % "provided",
+      "com.amazonaws"                  % "aws-java-sdk-s3"    % "1.9.20.1"       % "provided",
       "com.github.nscala-time"        %% "nscala-time"        % "1.8.0"          % "provided",
       "com.j256.simplejmx"             % "simplejmx"          % "1.12",
       "com.typesafe"                   % "config"             % "1.2.1"          % "provided",
@@ -28,7 +28,7 @@ object ProjectBuild extends Build {
       "io.spray"                      %% "spray-httpx"        % "1.3.2"          % "provided",
       "net.databinder.dispatch"       %% "dispatch-core"      % "0.11.2",
       "org.scalaz"                    %% "scalaz-core"        % "7.1.1"          % "provided",
-      "org.slf4j"                      % "slf4j-api"          % "1.7.7",
+      "org.slf4j"                      % "slf4j-api"          % "1.7.10",
       "org.specs2"                    %% "specs2"             % "2.4.16"         % "test",
       "junit"                          % "junit"              % "4.12"           % "test"))
 
