@@ -271,7 +271,7 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
    * @return the value associated with the given key if this map contains the
    *         key, `default` otherwise.
    */
-  final def getOrElse(key: A, default: B): B = {
+  final def getOrElse(key: A, default: => B): B = {
     @inline
     @tailrec def loop(i: Int, perturbation: Int): B = {
       val j = i & mask
@@ -297,10 +297,11 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
    * @return the value associated with the given key if this map contains the
    *         key, `default` otherwise.
    */
-  final def getOrElseUpdate(key: A, default: B): B =
+  final def getOrElseUpdate(key: A, default: => B): B =
     get(key).getOrElse {
-      update(key, default)
-      default
+      val res = default
+      update(key, res)
+      res
     }
 
   /**
