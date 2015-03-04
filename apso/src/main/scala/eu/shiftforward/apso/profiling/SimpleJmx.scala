@@ -32,6 +32,7 @@ trait SimpleJmx extends Logging {
   // registry port) and `jmxPort + 1` (the RMI server port) need to be open. Connections are
   // established through port `jmxPort`.
   // In the event of a binding failure to port `jmxPort`, a retry is performed with a random port.
+  jmxHost.foreach { host => System.setProperty("java.rmi.server.hostname", host) }
   val jmxServer = Try(startJmx(jmxPort)).recover { case _ => startJmx() }
 
   jmxServer match {
