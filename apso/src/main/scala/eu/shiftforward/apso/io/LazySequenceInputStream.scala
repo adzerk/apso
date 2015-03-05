@@ -49,12 +49,10 @@ class LazySequenceInputStream(private[this] var streams: Seq[() => InputStream])
     else {
       val n = current.read(b, off, len)
 
-      if (n == len) n
-      else {
+      if (n <= 0) {
         nextStream()
-        if (n < 0) read(b, off, len)
-        else n + read(b, off + n, len - n)
-      }
+        read(b, off, len)
+      } else n
     }
 
   override def close() = if (current != null) current.close()

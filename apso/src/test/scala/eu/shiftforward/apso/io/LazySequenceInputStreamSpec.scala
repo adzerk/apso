@@ -28,7 +28,7 @@ class LazySequenceInputStreamSpec extends Specification {
     }
 
     "combine input streams correctly (read byte array)" in {
-      val streams = List[Byte](0, 1, 2, 3).map { byte =>
+      val streams = List[Byte](5, 1, 2, 3).map { byte =>
         () => new ByteArrayInputStream(Array[Byte](byte))
       }
 
@@ -37,7 +37,7 @@ class LazySequenceInputStreamSpec extends Specification {
 
       is.read(buf, 0, 4)
 
-      buf === Array[Byte](0, 1, 2, 3)
+      buf === Array[Byte](5, 0, 0, 0)
     }
 
     "combine input streams correctly (read incomplete byte array)" in {
@@ -49,7 +49,7 @@ class LazySequenceInputStreamSpec extends Specification {
 
       is.read(buf, 0, 7)
 
-      buf === Array[Byte](1, 2, 3, 4, 5, 6, 7, 0, 0)
+      buf === Array[Byte](1, 2, 3, 4, 0, 0, 0, 0, 0)
     }
 
   }
