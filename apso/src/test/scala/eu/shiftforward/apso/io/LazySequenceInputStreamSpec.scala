@@ -1,6 +1,7 @@
 package eu.shiftforward.apso.io
 
 import java.io.ByteArrayInputStream
+import scala.io.Source
 import org.specs2.mutable._
 
 class LazySequenceInputStreamSpec extends Specification {
@@ -58,6 +59,15 @@ class LazySequenceInputStreamSpec extends Specification {
       is.read(buf, next, 7 - next)
 
       buf === Array[Byte](1, 2, 3, 4, 5, 6, 7, 0, 0)
+    }
+
+    "combine input streams correctly (read interface)" in {
+      val streams = "testqwer".toSeq.map(_.toByte).grouped(4).toList.map {
+        bs => () => new ByteArrayInputStream(bs.toArray)
+      }
+      val is = new LazySequenceInputStream(streams)
+
+      Source.fromInputStream(is).getLines().toList.head === "testqwer"
     }
 
   }
