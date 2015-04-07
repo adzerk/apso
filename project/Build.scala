@@ -17,19 +17,19 @@ object ProjectBuild extends Build {
     .settings(publishSettings: _*)
     .settings(apsoSettings: _*)
     .settings(libraryDependencies ++= Seq(
-      "com.amazonaws"                  % "aws-java-sdk-ec2"   % "1.9.20.1"       % "provided",
-      "com.amazonaws"                  % "aws-java-sdk-s3"    % "1.9.20.1"       % "provided",
+      "com.amazonaws"                  % "aws-java-sdk-ec2"   % "1.9.28.1"       % "provided",
+      "com.amazonaws"                  % "aws-java-sdk-s3"    % "1.9.28.1"       % "provided",
       "com.github.nscala-time"        %% "nscala-time"        % "1.8.0"          % "provided",
       "com.j256.simplejmx"             % "simplejmx"          % "1.12",
       "com.typesafe"                   % "config"             % "1.2.1"          % "provided",
       "com.typesafe.akka"             %% "akka-actor"         % "2.3.9"          % "provided",
       "com.twmacinta"                  % "fast-md5"           % "2.7.1",
       "io.spray"                      %% "spray-json"         % "1.3.1"          % "provided",
-      "io.spray"                      %% "spray-httpx"        % "1.3.2"          % "provided",
+      "io.spray"                      %% "spray-httpx"        % "1.3.3"          % "provided",
       "net.databinder.dispatch"       %% "dispatch-core"      % "0.11.2",
       "org.scalaz"                    %% "scalaz-core"        % "7.1.1"          % "provided",
-      "org.slf4j"                      % "slf4j-api"          % "1.7.10",
-      "org.specs2"                    %% "specs2"             % "2.4.16"         % "test",
+      "org.slf4j"                      % "slf4j-api"          % "1.7.12",
+      "org.specs2"                    %% "specs2"             % "2.4.17"         % "test",
       "junit"                          % "junit"              % "4.12"           % "test"))
 
   lazy val apsoTestkit = Project("apso-testkit", file("apso-testkit"))
@@ -38,14 +38,14 @@ object ProjectBuild extends Build {
     .settings(apsoTestkitSettings: _*)
     .settings(libraryDependencies ++= Seq(
       "com.typesafe.akka"             %% "akka-testkit"       % "2.3.9"          % "provided",
-      "org.slf4j"                      % "slf4j-api"          % "1.7.10",
-      "org.specs2"                    %% "specs2"             % "2.4.16"))
+      "org.slf4j"                      % "slf4j-api"          % "1.7.12",
+      "org.specs2"                    %% "specs2"             % "2.4.17"))
 
   lazy val commonSettings = Defaults.coreDefaultSettings ++ formatSettings ++ Seq(
     organization := "eu.shiftforward",
     version := "0.5-SNAPSHOT",
-    scalaVersion := "2.11.5",
-    crossScalaVersions := Seq("2.10.4", "2.11.5"),
+    scalaVersion := "2.11.6",
+    crossScalaVersions := Seq("2.10.5", "2.11.6"),
 
     resolvers ++= Seq(
       "SF Nexus Releases"             at "http://NEXUS_URL/content/repositories/releases",
