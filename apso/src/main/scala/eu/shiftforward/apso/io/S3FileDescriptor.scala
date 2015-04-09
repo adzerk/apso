@@ -8,7 +8,7 @@ import eu.shiftforward.apso.aws.S3Bucket
 import scala.collection.concurrent.TrieMap
 
 case class S3FileDescriptor(private val bucket: S3Bucket, private val paths: List[String])
-  extends FileDescriptor with Logging {
+    extends FileDescriptor with Logging {
 
   val bucketName = bucket.bucketName
 
@@ -35,6 +35,9 @@ case class S3FileDescriptor(private val bucket: S3Bucket, private val paths: Lis
 
   def addChild(child: String): S3FileDescriptor = this.copy(paths = paths :+ child)
 
+  def addChildren(children: List[String]): S3FileDescriptor =
+    this.copy(paths = paths ++ children)
+
   def cd(pathString: String): S3FileDescriptor = {
     val newPath = pathString.split("/").toList.foldLeft(paths) {
       case (acc, "." | "") => acc
@@ -44,14 +47,16 @@ case class S3FileDescriptor(private val bucket: S3Bucket, private val paths: Lis
     this.copy(paths = newPath)
   }
 
-  override def addChildren(children: List[String]): S3FileDescriptor =
-    this.copy(paths = paths ++ children)
-
   override def toString: String = s"s3://$path"
 }
 
 object S3FileDescriptor {
 
+  /**
+   * Creates an S3FileDescriptor from a path string extracting the bucket and the path
+   * @param path the uri without the protocol, containing the bucket and path
+   * @return a s3 file descriptor
+   */
   def apply(path: String): S3FileDescriptor = {
     path.split('/').toList match {
       case s3bucket :: s3path =>
@@ -62,5 +67,9 @@ object S3FileDescriptor {
     }
   }
 
+  /**
+   * This Map caches S3Buckets so that each S3FileDescriptor does not need to have it's own
+   * internal object to access the bucket.
+   */
   private val s3Buckets = TrieMap.empty[String, S3Bucket]
 }

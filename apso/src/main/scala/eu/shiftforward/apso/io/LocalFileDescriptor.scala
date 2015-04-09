@@ -1,14 +1,14 @@
 package eu.shiftforward.apso.io
 
-import java.nio.file.{Files, Path, Paths}
+import java.nio.file.{ Files, Path, Paths }
 
 import eu.shiftforward.apso.Logging
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{ Failure, Success, Try }
 
-case class LocalFileDescriptor(p: String) extends FileDescriptor with Logging {
+case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with Logging {
 
-  val normalizedPath: Path = Paths.get(p).normalize().toAbsolutePath
+  val normalizedPath: Path = Paths.get(initialPath).normalize().toAbsolutePath
 
   val path: String = normalizedPath.toString
 
