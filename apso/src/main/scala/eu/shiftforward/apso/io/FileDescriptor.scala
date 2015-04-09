@@ -36,6 +36,19 @@ trait FileDescriptor {
   def upload(localTarget: LocalFileDescriptor): Boolean
 
   /**
+   * Lists the files in the current file descriptor directory
+   * @return a iterator of file descriptors
+   */
+  def list(): Iterator[FileDescriptor]
+
+  /**
+   * Lists the files in the current file descriptor directory that match the given prefix
+   * @param prefix the prefix to match the filenames
+   * @return a iterator of file descriptors
+   */
+  def listByPrefix(prefix: String): Iterator[FileDescriptor]
+
+  /**
    * Returns the file descriptor `n` node up in the filesystem path.
    * @param n the number of parent nodes to go back.
    * @return the file descriptor `n` node up in the filesystem path.

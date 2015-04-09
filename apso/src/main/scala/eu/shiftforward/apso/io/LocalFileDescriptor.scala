@@ -1,5 +1,6 @@
 package eu.shiftforward.apso.io
 
+import java.io.File
 import java.nio.file.{ Files, Path, Paths }
 
 import eu.shiftforward.apso.Logging
@@ -61,6 +62,24 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
     Try(Files.copy(localTarget.normalizedPath, localPath)) match {
       case Success(_) => true
       case Failure(ex) => log.warn("File copy failed ({})", ex.toString); false
+    }
+  }
+
+  def list(): Iterator[LocalFileDescriptor] = {
+    if (isDirectory) {
+      new File(path).listFiles.toIterator.map(f => LocalFileDescriptor(f.getAbsolutePath))
+    } else {
+      Iterator()
+    }
+  }
+
+  def listByPrefix(prefix: String): Iterator[FileDescriptor] = {
+    if (isDirectory) {
+      new File(path).listFiles.toIterator.filter(_.getName.startsWith(prefix)).map {
+        f => LocalFileDescriptor(f.getAbsolutePath)
+      }
+    } else {
+      Iterator()
     }
   }
 

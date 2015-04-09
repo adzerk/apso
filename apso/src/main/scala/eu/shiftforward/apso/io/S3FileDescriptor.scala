@@ -47,6 +47,12 @@ case class S3FileDescriptor(private val bucket: S3Bucket, private val paths: Lis
     this.copy(paths = newPath)
   }
 
+  def list(): Iterator[S3FileDescriptor] = listByPrefix("")
+
+  def listByPrefix(prefix: String): Iterator[S3FileDescriptor] = {
+    bucket.getFilesWithMatchingPrefix(prefix).map(f => this.copy(paths = f.split("/").toList))
+  }
+
   override def toString: String = s"s3://$path"
 }
 
