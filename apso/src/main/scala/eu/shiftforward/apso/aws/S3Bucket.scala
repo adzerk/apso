@@ -138,12 +138,19 @@ class S3Bucket(val bucketName: String,
   }.isDefined
 
   private[this] def handler: PartialFunction[Throwable, Boolean] = {
-
-    case ex: AmazonServiceException => ex.getStatusCode match {
-      case 404 => log.error("The specified file does not exist", ex); true // no need to retry
-      case 403 => log.error("No permission to access the file", ex); true // no need to retry
-      case _   => log.error(ex.getMessage, ex); false
+    case ex: AmazonS3Exception => ex.getStatusCode match {
+      case 404 =>
+        log.error("The specified file does not exist", ex); true // no need to retry
+      case 403 =>
+        log.error("No permission to access the file", ex); true // no need to retry
+      case _ =>
+        log.error(s"""|S3 service error: ${ex.getMessage}. Extended request id: ${ex.getExtendedRequestId}
+                      |Additional details: ${ex.getAdditionalDetails}""".stripMargin, ex)
+        false
     }
+
+    case ex: AmazonServiceException =>
+      log.error(s"Service error: ${ex.getMessage}", ex); false
 
     case ex: AmazonClientException =>
       log.error("Client error pulling file", ex); false
