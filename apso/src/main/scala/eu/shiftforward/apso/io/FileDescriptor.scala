@@ -79,6 +79,12 @@ trait FileDescriptor {
    * @return the new file descriptor with the updated path
    */
   def cd(pathString: String): FileDescriptor
+
+  /**
+   * Deletes the file associated to the file descriptor
+   * @return `true` if the delete was successful, `false` otherwise.
+   */
+  def delete(): Boolean
 }
 
 object FileDescriptor {

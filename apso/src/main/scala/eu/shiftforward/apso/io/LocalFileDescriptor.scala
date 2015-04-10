@@ -83,5 +83,9 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
     }
   }
 
+  def delete(): Boolean = {
+    new File(path).delete()
+  }
+
   override def toString: String = s"file://$path"
 }

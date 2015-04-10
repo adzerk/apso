@@ -54,7 +54,7 @@ class S3Bucket(val bucketName: String,
   /**
    * Returns a list of filenames in a bucket matching a given prefix.
    * @param prefix the prefix to match
-   * @return a list of filenames in a bukcet matching a given prefix.
+   * @return a list of filenames in a bucket matching a given prefix.
    */
   def getFilesWithMatchingPrefix(prefix: String): Iterator[String] = {
     log.info("Finding files matching prefix '{}'...", prefix)
@@ -78,6 +78,15 @@ class S3Bucket(val bucketName: String,
   def push(key: String, file: File): Boolean = retry {
     log.info("Pushing '{}' to 's3://{}/{}'", file.getPath, bucketName, key)
     s3.putObject(new PutObjectRequest(bucketName, sanitizeKey(key), file))
+  }.isDefined
+
+  /**
+   * Deletes the file in the location specified by `key` in the bucket.
+   * @param key the remote pathname for the file
+   * @return true if the deletion was successful, false otherwise.
+   */
+  def delete(key: String): Boolean = retry {
+    s3.deleteObject(bucketName, sanitizeKey(key))
   }.isDefined
 
   /**
