@@ -14,6 +14,8 @@ case class S3FileDescriptor(private val bucket: S3Bucket, private val paths: Lis
 
   val path = bucketName + paths.foldLeft("")((acc, p) => s"$acc/$p")
 
+  private def buildPath(p: Seq[String]): String = p.mkString("/")
+
   def download(localTarget: LocalFileDescriptor): Boolean = {
     val localPath = if (localTarget.isDirectory) {
       paths.lastOption match {
@@ -24,11 +26,11 @@ case class S3FileDescriptor(private val bucket: S3Bucket, private val paths: Lis
       localTarget.path
     }
 
-    bucket.pull(paths.mkString("/"), localPath)
+    bucket.pull(buildPath(paths), localPath)
   }
 
   def upload(localTarget: LocalFileDescriptor): Boolean = {
-    bucket.push(paths.mkString("/"), new File(localTarget.path))
+    bucket.push(buildPath(paths), new File(localTarget.path))
   }
 
   def parent(n: Int): S3FileDescriptor = this.copy(paths = paths.dropRight(n))
@@ -50,8 +52,13 @@ case class S3FileDescriptor(private val bucket: S3Bucket, private val paths: Lis
   def list(): Iterator[S3FileDescriptor] = listByPrefix("")
 
   def listByPrefix(prefix: String): Iterator[S3FileDescriptor] = {
-    bucket.getFilesWithMatchingPrefix(prefix).map(f => this.copy(paths = f.split("/").toList))
+    val fullPrefix = if (prefix == "") paths else paths :+ prefix
+    bucket.getFilesWithMatchingPrefix(buildPath(fullPrefix)).map {
+      f => this.copy(paths = f.split("/").toList)
+    }
   }
+
+  def delete(): Boolean = bucket.delete(buildPath(paths))
 
   override def toString: String = s"s3://$path"
 }
