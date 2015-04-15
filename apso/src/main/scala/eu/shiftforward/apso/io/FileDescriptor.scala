@@ -13,6 +13,12 @@ trait FileDescriptor {
   def path: String
 
   /**
+   * The name of the file associated to the file descriptor.
+   * @return the file name.
+   */
+  def name: String
+
+  /**
    * Downloads the file to the given local destination.
    * If the localTarget is a directory, multiple files can be downloaded to that location.
    *
@@ -21,7 +27,7 @@ trait FileDescriptor {
    *             Otherwise, the file will be renamed to the name specified in the file descriptor.
    * @return `true` if the download was successful, `false` otherwise.
    */
-  def download(localTarget: LocalFileDescriptor): Boolean
+  def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean = false): Option[LocalFileDescriptor]
 
   /**
    * Uploads a local file to this file's location.
@@ -33,7 +39,13 @@ trait FileDescriptor {
    *             Otherwise, the file will be renamed to the remote file descriptor name.
    * @return `true` if the upload was successful, `false` otherwise.
    */
-  def upload(localTarget: LocalFileDescriptor): Boolean
+  def upload(localTarget: LocalFileDescriptor): Option[LocalFileDescriptor]
+
+  /**
+   * Returns true if the fd points to a directory
+   * @return true if the fd points to a directory
+   */
+  def isDirectory: Boolean
 
   /**
    * Lists the files in the current file descriptor directory
@@ -63,11 +75,20 @@ trait FileDescriptor {
   def addChild(child: String): FileDescriptor
 
   /**
+   * Adds a new child node to the filesystem path.
+   * @param child the node name.
+   * @return the new file descriptor with the updated path
+   */
+  def /(child: String): FileDescriptor = addChild(child)
+
+  /**
    * Adds multiple new child nodes to the filesystem path.
    * @param children the node names.
    * @return the new file descriptor with the updated path
    */
-  def addChildren(children: List[String]): FileDescriptor
+  def addChildren(children: String*): FileDescriptor = {
+    children.foldLeft(this)((acc, c) => acc.addChild(c))
+  }
 
   /**
    * Changes the path of the file descriptor using unix's cd syntax related to the current directory.
@@ -78,7 +99,33 @@ trait FileDescriptor {
    * @param pathString the cd command
    * @return the new file descriptor with the updated path
    */
-  def cd(pathString: String): FileDescriptor
+  def cd(pathString: String): FileDescriptor = {
+    pathString.split("/").toList.foldLeft(this) {
+      case (acc, "." | "") => acc
+      case (acc, "..") => acc.parent()
+      case (acc, segment) => acc.addChild(segment)
+    }
+  }
+
+  /**
+   * Returns a new file descriptor pointing to a sibling of the current file descriptor
+   * @param name the file name of the new file descriptor
+   * @return a new file descriptor pointing to a sibling of the current file descriptor
+   */
+  def sibling(name: String): FileDescriptor = sibling(_ => name)
+
+  /**
+   * Returns a new file descriptor pointing to a sibling of the current file descriptor
+   * @param f a function that returns a new name from the current name of the file descriptor
+   * @return a new file descriptor pointing to a sibling of the current file descriptor
+   */
+  def sibling(f: String => String): FileDescriptor = parent().addChild(f(name))
+
+  /**
+   * Returns true if the file pointed by the file descriptor exists
+   * @return true if the file pointed by the file descriptor exists
+   */
+  def exists: Boolean
 
   /**
    * Deletes the file associated to the file descriptor
@@ -97,7 +144,7 @@ object FileDescriptor {
   def apply(uri: String): FileDescriptor = protocol(uri) match {
     case ("file", path) => LocalFileDescriptor(path)
     case ("s3", path) => S3FileDescriptor(path)
-    case _ => throw new Exception("Protocol not supported")
+    case _ => throw new UnsupportedOperationException("Protocol not supported")
   }
 
   /**
@@ -107,6 +154,6 @@ object FileDescriptor {
    */
   private def protocol(uri: String) = uri.split("://").toList match {
     case protocol :: path :: Nil => (protocol, path)
-    case _ => throw new Exception("Malformed URI")
+    case _ => throw new IllegalArgumentException("Malformed URI")
   }
 }

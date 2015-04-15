@@ -10,38 +10,63 @@ import scala.collection.concurrent.TrieMap
 case class S3FileDescriptor(private val bucket: S3Bucket, private val paths: List[String])
     extends FileDescriptor with Logging {
 
-  val bucketName = bucket.bucketName
+  lazy val bucketName = bucket.bucketName
 
-  val path = bucketName + paths.foldLeft("")((acc, p) => s"$acc/$p")
+  lazy val path: String = bucketName + paths.foldLeft("")((acc, p) => s"$acc/$p")
 
-  private def buildPath(p: Seq[String]): String = p.mkString("/")
+  lazy val name: String = paths.lastOption.getOrElse(bucketName)
 
-  def download(localTarget: LocalFileDescriptor): Boolean = {
-    val localPath = if (localTarget.isDirectory) {
+  private lazy val builtPath = buildPath(paths)
+
+  @inline private def buildPath(p: Seq[String]): String = p.mkString("/")
+
+  def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean): Option[LocalFileDescriptor] = {
+    if (localTarget.isDirectory) {
       paths.lastOption match {
-        case Some(filename) => localTarget.addChild(filename).path
+        case Some(filename) => download(localTarget.addChild(filename))
         case None => throw new Exception("File not specified")
       }
     } else {
-      localTarget.path
-    }
 
-    bucket.pull(buildPath(paths), localPath)
+      localTarget.mkdirs()
+
+      val result = if (safeDownloading) {
+        val tmpFile = localTarget.sibling(_ + ".tmp")
+        val succeed = bucket.pull(builtPath, tmpFile.path)
+        if (succeed) tmpFile.rename(localTarget)
+        succeed
+      } else {
+        bucket.pull(builtPath, localTarget.path)
+      }
+
+      if (result) Some(localTarget) else None
+    }
   }
 
-  def upload(localTarget: LocalFileDescriptor): Boolean = {
-    bucket.push(buildPath(paths), new File(localTarget.path))
+  def upload(localTarget: LocalFileDescriptor): Option[LocalFileDescriptor] = {
+    if (bucket.push(builtPath, new File(localTarget.path))) {
+      Some(localTarget)
+    } else None
   }
 
   def parent(n: Int): S3FileDescriptor = this.copy(paths = paths.dropRight(n))
 
-  def addChild(child: String): S3FileDescriptor = this.copy(paths = paths :+ child)
+  private def sanitize(segment: String): String = segment.count(_ == '/') match {
+    case 0 => segment
+    case 1 if segment.endsWith("/") => segment.dropRight(1)
+    case _ => throw new IllegalArgumentException("path cannot contain /")
+  }
 
-  def addChildren(children: List[String]): S3FileDescriptor =
-    this.copy(paths = paths ++ children)
+  override def /(child: String): S3FileDescriptor = addChild(child)
 
-  def cd(pathString: String): S3FileDescriptor = {
-    val newPath = pathString.split("/").toList.foldLeft(paths) {
+  def addChild(child: String): S3FileDescriptor =
+    this.copy(paths = paths :+ sanitize(child))
+
+  override def addChildren(children: String*): S3FileDescriptor =
+    this.copy(paths = paths ++ children.map(sanitize))
+
+  override def cd(pathString: String): S3FileDescriptor = {
+    val newPath = pathString.split("/").map(_.trim).toList.foldLeft(paths) {
       case (acc, "." | "") => acc
       case (acc, "..") => acc.dropRight(1)
       case (acc, segment) => acc :+ segment
@@ -58,7 +83,15 @@ case class S3FileDescriptor(private val bucket: S3Bucket, private val paths: Lis
     }
   }
 
-  def delete(): Boolean = bucket.delete(buildPath(paths))
+  override def sibling(f: String => String): S3FileDescriptor = {
+    S3FileDescriptor(bucket, paths.dropRight(1) :+ f(name))
+  }
+
+  def isDirectory: Boolean = bucket.isDirectory(builtPath)
+
+  def exists: Boolean = bucket.exists(builtPath)
+
+  def delete(): Boolean = bucket.delete(builtPath)
 
   override def toString: String = s"s3://$path"
 }
@@ -74,7 +107,7 @@ object S3FileDescriptor {
     path.split('/').toList match {
       case s3bucket :: s3path =>
         val s3BucketRef = s3Buckets.getOrElseUpdate(s3bucket, new S3Bucket(s3bucket))
-        S3FileDescriptor(s3BucketRef, s3path)
+        S3FileDescriptor(s3BucketRef, s3path.filterNot(_.trim == ""))
 
       case _ => throw new Exception("Error parsing S3 URI")
     }
