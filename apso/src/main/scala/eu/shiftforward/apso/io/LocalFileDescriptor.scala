@@ -125,7 +125,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
    */
   def rename(to: LocalFileDescriptor): Option[LocalFileDescriptor] = {
     to.mkdirs()
-    if (file.renameTo(new File(to.path))) Some(to) else None
+    if (file.renameTo(to.file)) Some(to) else None
   }
 
   /**

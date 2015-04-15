@@ -14,7 +14,7 @@ case class S3FileDescriptor(private val bucket: S3Bucket, private val paths: Lis
 
   lazy val path: String = bucketName + paths.foldLeft("")((acc, p) => s"$acc/$p")
 
-  lazy val name: String = paths.lastOption.getOrElse(bucketName)
+  lazy val name: String = paths.lastOption.getOrElse("")
 
   private lazy val builtPath = buildPath(paths)
 
@@ -22,9 +22,10 @@ case class S3FileDescriptor(private val bucket: S3Bucket, private val paths: Lis
 
   def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean): Option[LocalFileDescriptor] = {
     if (localTarget.isDirectory) {
-      paths.lastOption match {
-        case Some(filename) => download(localTarget.addChild(filename))
-        case None => throw new Exception("File not specified")
+      if (name == "") {
+        throw new Exception("s3 file not specified")
+      } else {
+        download(localTarget.addChild(name))
       }
     } else {
 
@@ -43,27 +44,43 @@ case class S3FileDescriptor(private val bucket: S3Bucket, private val paths: Lis
     }
   }
 
-  def upload(localTarget: LocalFileDescriptor): Option[LocalFileDescriptor] = {
-    if (bucket.push(builtPath, new File(localTarget.path))) {
-      Some(localTarget)
-    } else None
+  def upload(localTarget: LocalFileDescriptor): Option[S3FileDescriptor] = {
+
+    if (localTarget.isDirectory) throw new Exception("Specified file descriptor is a directory")
+    else if (isDirectory) {
+      addChild(localTarget.name).upload(localTarget)
+    } else {
+      if (bucket.push(builtPath, localTarget.file)) {
+        Some(this)
+      } else None
+    }
   }
 
   def parent(n: Int): S3FileDescriptor = this.copy(paths = paths.dropRight(n))
 
-  private def sanitize(segment: String): String = segment.count(_ == '/') match {
-    case 0 => segment
-    case 1 if segment.endsWith("/") => segment.dropRight(1)
-    case _ => throw new IllegalArgumentException("path cannot contain /")
+  private def sanitize(segment: String): Option[String] = {
+
+    val whiteSpaceValidated = segment.trim match {
+      case "" => None
+      case str => Some(str)
+    }
+
+    whiteSpaceValidated.map {
+      _.count(_ == '/') match {
+        case 0 => segment
+        case 1 if segment.endsWith("/") => segment.dropRight(1)
+        case _ => throw new IllegalArgumentException("path cannot contain /")
+      }
+    }
   }
 
   override def /(child: String): S3FileDescriptor = addChild(child)
 
   def addChild(child: String): S3FileDescriptor =
-    this.copy(paths = paths :+ sanitize(child))
+    this.copy(paths = paths ++ sanitize(child).toList)
 
   override def addChildren(children: String*): S3FileDescriptor =
-    this.copy(paths = paths ++ children.map(sanitize))
+    this.copy(paths = paths ++ children.flatMap(sanitize))
 
   override def cd(pathString: String): S3FileDescriptor = {
     val newPath = pathString.split("/").map(_.trim).toList.foldLeft(paths) {
@@ -87,7 +104,7 @@ case class S3FileDescriptor(private val bucket: S3Bucket, private val paths: Lis
     S3FileDescriptor(bucket, paths.dropRight(1) :+ f(name))
   }
 
-  def isDirectory: Boolean = bucket.isDirectory(builtPath)
+  lazy val isDirectory: Boolean = bucket.isDirectory(builtPath)
 
   def exists: Boolean = bucket.exists(builtPath)
 

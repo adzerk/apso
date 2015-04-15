@@ -39,7 +39,7 @@ trait FileDescriptor {
    *             Otherwise, the file will be renamed to the remote file descriptor name.
    * @return `true` if the upload was successful, `false` otherwise.
    */
-  def upload(localTarget: LocalFileDescriptor): Option[LocalFileDescriptor]
+  def upload(localTarget: LocalFileDescriptor): Option[FileDescriptor]
 
   /**
    * Returns true if the fd points to a directory
