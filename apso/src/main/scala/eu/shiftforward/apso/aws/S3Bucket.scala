@@ -90,6 +90,30 @@ class S3Bucket(val bucketName: String,
   }.isDefined
 
   /**
+   * Checks if the file in the location specified by `key` in the bucket exists.
+   * @param key the remote pathname for the file
+   * @return true if the file exists, false otherwise.
+   */
+  def exists(key: String): Boolean = retry {
+    s3.getObjectMetadata(bucketName, key)
+  }.isDefined
+
+  /**
+   * Checks if the location specified by `key` is a directory.
+   * @param key the remote pathname to the directory
+   * @return true if the path is a directory, false otherwise.
+   */
+  def isDirectory(key: String): Boolean = retry {
+    s3.listObjects(
+      new ListObjectsRequest()
+        .withBucketName(bucketName)
+        .withMaxKeys(2)
+        .withPrefix(key)).getObjectSummaries
+  }.filter { objs =>
+    objs.length > 1 || objs.length == 1 && objs.last.getKey.endsWith("/")
+  }.isDefined
+
+  /**
    * Sets an access control list on a given Amazon S3 object.
    * @param key the remote pathname for the file
    * @param acl the `CannedAccessControlList` to be applied to the Amazon S3 object
@@ -113,7 +137,7 @@ class S3Bucket(val bucketName: String,
       bucketName,
       sanitizedKey,
       bucketName,
-      mainKey + "/backup/" + name.substring(mainKey.size + 1) + extension))
+      mainKey + "/backup/" + name.substring(mainKey.length + 1) + extension))
   }.isDefined
 
   /**
