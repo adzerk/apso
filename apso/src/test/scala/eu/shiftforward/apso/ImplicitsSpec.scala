@@ -193,5 +193,33 @@ class ImplicitsSpec extends Specification {
         case (k, prob) => sampleDistr(k).toDouble must beCloseTo(runs * prob, runs * prob * 0.1)
       }
     }
+
+    "provide an ordered uniform distribution as a stream" in {
+      val rand = Random
+      val runs = 100000
+      val epsilon = 0.001
+      val stream = rand.increasingUniformStream(runs)
+
+      def centralMoment(n: Int, xs: List[Double]) = {
+        val avg = xs.sum / xs.size
+        val ys = xs map { x: Double => math.pow(x - avg, n.toDouble) }
+        ys.sum / ys.size
+      }
+
+      "the results must be ordered" in {
+        stream.toList.sorted === stream.toList
+      }
+      "the average must be close to 0.5" in {
+        stream.sum / runs must beCloseTo(0.5 +/- epsilon)
+      }
+
+      "the variance must be close to 1/12" in {
+        centralMoment(2, stream.toList) must beCloseTo(1.0 / 12 +/- epsilon)
+      }
+
+      "the skewness must be close to 0" in {
+        centralMoment(3, stream.toList) must beCloseTo(0.0 +/- epsilon)
+      }
+    }
   }
 }
