@@ -132,7 +132,10 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
    * writes the given string `str` to the file pointed by the file descriptor
    * @param str the string to write to the file
    */
-  def write(str: String): Unit = new FileWriter(path).use(_.write(str))
+  def write(str: String): Unit = {
+    mkdirs()
+    new FileWriter(path).use(_.write(str))
+  }
 
   /**
    * Reads the file pointed by the file descriptor and returns it in string format
