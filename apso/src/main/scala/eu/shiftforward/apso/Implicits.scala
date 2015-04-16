@@ -1,5 +1,7 @@
 package eu.shiftforward.apso
 
+import eu.shiftforward.apso.collection.MergedBufferedIterator
+
 import scala.collection.generic.CanBuildFrom
 import scala.compat.Platform
 import scala.util.Random
@@ -198,25 +200,8 @@ object Implicits {
      * @tparam U element type of the resulting collection
      * @return the merged iterators
      */
-    def mergeSorted[U >: T](thatIt: BufferedIterator[U])(implicit ord: Ordering[U]): BufferedIterator[U] = {
-      new BufferedIterator[U] {
-
-        def nextIterator: BufferedIterator[U] = (thisIt.hasNext, thatIt.hasNext) match {
-          case (false, false) => throw new NoSuchElementException
-          case (true, false) => thisIt
-          case (false, true) => thatIt
-          case (true, true) =>
-            if (ord.lt(thisIt.head, thatIt.head)) thisIt
-            else thatIt
-        }
-
-        def head = nextIterator.head
-
-        def next() = nextIterator.next()
-
-        def hasNext: Boolean = thisIt.hasNext || thatIt.hasNext
-      }
-    }
+    def mergeSorted[U >: T](thatIt: BufferedIterator[U])(implicit ord: Ordering[U]): BufferedIterator[U] =
+      MergedBufferedIterator(List(thatIt)).mergeSorted(thisIt)
   }
 
   /**
