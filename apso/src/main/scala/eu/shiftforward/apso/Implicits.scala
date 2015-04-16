@@ -435,7 +435,7 @@ object Implicits {
      * @return ordered stream of doubles
      */
     def decreasingUniformStream(n: Int): Stream[Double] =
-      Stream.iterate((n + 1, 1.0), n + 1) { case (i, currMax) => (i - 1, currMax * math.pow(Random.nextDouble(), 1.0 / i)) }.tail.map(_._2)
+      Stream.iterate((n + 1, 1.0), n + 1) { case (i, currMax) => (i - 1, currMax * math.pow(rand.nextDouble(), 1.0 / i)) }.tail.map(_._2)
 
     /**
      * Returns an increasingly ordered stream of n doubles in [0, 1], according to a
