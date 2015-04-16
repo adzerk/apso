@@ -19,7 +19,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
 
   lazy val file = Paths.get(initialPath).normalize().toAbsolutePath.toFile
 
-  def isDirectory: Boolean = Files.isDirectory(normalizedPath)
+  def isDirectory: Boolean = file.isDirectory
 
   def parent(n: Int): LocalFileDescriptor = {
     val parentPath = (1 to n).foldLeft(normalizedPath)((acc, _) => acc.getParent)
@@ -58,7 +58,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
         localTarget
       }
 
-      localTarget.mkdirs()
+      localTarget.parent().mkdirs()
 
       Try(Files.copy(normalizedPath, downloadFile.normalizedPath)) match {
         case Success(_) =>
@@ -74,10 +74,10 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
 
   def upload(localTarget: LocalFileDescriptor): Option[LocalFileDescriptor] = {
     if (isDirectory) {
-      addChild(name).upload(localTarget)
+      addChild(localTarget.name).upload(localTarget)
     } else {
 
-      mkdirs()
+      parent().mkdirs()
 
       Try(Files.copy(localTarget.normalizedPath, normalizedPath)) match {
         case Success(_) => Some(this)
@@ -112,7 +112,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
 
   def delete(): Boolean = file.delete()
 
-  def mkdirs(): Boolean = if (isDirectory) file.mkdirs() else file.getParentFile.mkdirs()
+  def mkdirs(): Boolean = exists || file.mkdirs()
 
   /**
    * Renames the file pointed by the file descriptor
@@ -129,7 +129,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
    * @param str the string to write to the file
    */
   def write(str: String): Unit = {
-    mkdirs()
+    parent().mkdirs()
     new FileWriter(path).use(_.write(str))
   }
 
