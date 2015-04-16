@@ -25,6 +25,8 @@ trait FileDescriptor {
    * @param localTarget the local destination to which this file should be downloaded.
    *             If the location is a directory, the file will be named the same as the original.
    *             Otherwise, the file will be renamed to the name specified in the file descriptor.
+   * @param safeDownloading downloads the file to filename + ".tmp" and renames it to the original
+   *                        name if the download was successful.
    * @return `true` if the download was successful, `false` otherwise.
    */
   def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean = false): Option[LocalFileDescriptor]

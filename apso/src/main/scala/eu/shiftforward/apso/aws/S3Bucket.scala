@@ -131,7 +131,7 @@ class S3Bucket(val bucketName: String,
   def createDirectory(key: String): Boolean = retry {
     log.info("Creating directory in 's3://{}/{}'", bucketName, key, null)
 
-    val emptyContent = new ByteArrayInputStream("".getBytes)
+    val emptyContent = new ByteArrayInputStream(Array[Byte]())
     val metadata = new ObjectMetadata()
     metadata.setContentLength(0)
 
