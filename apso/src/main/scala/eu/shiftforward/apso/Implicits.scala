@@ -190,7 +190,7 @@ object Implicits {
   final implicit class ApsoBufferedIterator[T](val thisIt: BufferedIterator[T]) extends AnyVal {
 
     /**
-     * Lazilly merges this buffered iterator with another buffered iterator assuming that both collections
+     * Lazily merges this buffered iterator with another buffered iterator assuming that both collections
      * are already sorted.
      * @param thatIt the iterator  to merge with this one
      * @param ord the ordering with which the collections are sorted and with which the merged
@@ -210,11 +210,11 @@ object Implicits {
             else thatIt
         }
 
-        override def head: U = nextIterator.head
+        def head = nextIterator.head
 
-        override def next(): U = nextIterator.next()
+        def next() = nextIterator.next()
 
-        override def hasNext: Boolean = thisIt.hasNext || thatIt.hasNext
+        def hasNext: Boolean = thisIt.hasNext || thatIt.hasNext
       }
     }
   }
