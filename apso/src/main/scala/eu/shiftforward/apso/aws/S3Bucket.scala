@@ -6,7 +6,7 @@ import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model._
 import com.typesafe.config.ConfigFactory
 import eu.shiftforward.apso.Logging
-import java.io.{ File, FileOutputStream }
+import java.io.{ ByteArrayInputStream, File, FileOutputStream }
 import scala.collection.JavaConversions._
 import scala.util.{ Failure, Success, Try }
 
@@ -122,6 +122,21 @@ class S3Bucket(val bucketName: String,
     log.info("Setting 's3://{}/{}' permissions to '{}'", bucketName, key, acl)
     s3.setObjectAcl(bucketName, key, acl)
   }
+
+  /**
+   * Creates an empty directory at the given `key` location
+   * @param key the remote pathname to the directory
+   * @return  true if the directory was created successfully, false otherwise.
+   */
+  def createDirectory(key: String): Boolean = retry {
+    log.info("Creating directory in 's3://{}/{}'", bucketName, key, null)
+
+    val emptyContent = new ByteArrayInputStream("".getBytes)
+    val metadata = new ObjectMetadata()
+    metadata.setContentLength(0)
+
+    s3.putObject(new PutObjectRequest(bucketName, sanitizeKey(key) + "/", emptyContent, metadata))
+  }.isDefined
 
   /**
    * Backups a remote file with the given `key`. A backup consists in copying the supplied file to a backup folder under

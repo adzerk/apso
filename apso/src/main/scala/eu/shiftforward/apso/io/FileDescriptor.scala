@@ -132,6 +132,12 @@ trait FileDescriptor {
    * @return `true` if the delete was successful, `false` otherwise.
    */
   def delete(): Boolean
+
+  /**
+   * Creates intermediary directories
+   * @return true if the creation of successful, false otherwise.
+   */
+  def mkdirs(): Boolean
 }
 
 object FileDescriptor {

@@ -112,10 +112,6 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
 
   def delete(): Boolean = file.delete()
 
-  /**
-   * Creates intermediary directories
-   * @return true if the creation of successful, false otherwise.
-   */
   def mkdirs(): Boolean = if (isDirectory) file.mkdirs() else file.getParentFile.mkdirs()
 
   /**

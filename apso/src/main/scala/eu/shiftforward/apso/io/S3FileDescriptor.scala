@@ -104,11 +104,19 @@ case class S3FileDescriptor(private val bucket: S3Bucket, private val paths: Lis
     S3FileDescriptor(bucket, paths.dropRight(1) :+ f(name))
   }
 
-  lazy val isDirectory: Boolean = bucket.isDirectory(builtPath)
+  private lazy val isDirectoryRemote = bucket.isDirectory(builtPath)
+  private var isDirectoryLocal = false
+  def isDirectory: Boolean = isDirectoryLocal || isDirectoryRemote
 
   def exists: Boolean = bucket.exists(builtPath)
 
   def delete(): Boolean = bucket.delete(builtPath)
+
+  def mkdirs(): Boolean = {
+    val result = isDirectory || bucket.createDirectory(builtPath)
+    isDirectoryLocal = result
+    result
+  }
 
   override def toString: String = s"s3://$path"
 }
