@@ -196,6 +196,7 @@ class ImplicitsSpec extends Specification {
 
     "provide an ordered uniform distribution as a stream" in {
       val rand = Random
+      rand.setSeed(0)
       val runs = 100000
       val epsilon = 0.001
       val stream = rand.increasingUniformStream(runs)
