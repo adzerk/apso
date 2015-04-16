@@ -184,6 +184,42 @@ object Implicits {
   }
 
   /**
+   * Implicit class that provides new methods for buffered iterators.
+   * @param thisIt the buffered iterator to which the new methods are provided.
+   */
+  final implicit class ApsoBufferedIterator[T](val thisIt: BufferedIterator[T]) extends AnyVal {
+
+    /**
+     * Lazilly merges this buffered iterator with another buffered iterator assuming that both collections
+     * are already sorted.
+     * @param thatIt the iterator  to merge with this one
+     * @param ord the ordering with which the collections are sorted and with which the merged
+     *            collection is to be returned
+     * @tparam U element type of the resulting collection
+     * @return the merged iterators
+     */
+    def mergeSorted[U >: T](thatIt: BufferedIterator[U])(implicit ord: Ordering[U]): BufferedIterator[U] = {
+      new BufferedIterator[U] {
+
+        def nextIterator: BufferedIterator[U] = (thisIt.hasNext, thatIt.hasNext) match {
+          case (false, false) => throw new NoSuchElementException
+          case (true, false) => thisIt
+          case (false, true) => thatIt
+          case (true, true) =>
+            if (ord.lt(thisIt.head, thatIt.head)) thisIt
+            else thatIt
+        }
+
+        override def head: U = nextIterator.head
+
+        override def next(): U = nextIterator.next()
+
+        override def hasNext: Boolean = thisIt.hasNext || thatIt.hasNext
+      }
+    }
+  }
+
+  /**
    * Implicit class that provides new methods for maps.
    * @param map the map to which the new methods are provided.
    */
