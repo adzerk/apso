@@ -210,7 +210,7 @@ class ImplicitsSpec extends Specification {
       "the results must be ordered" in {
         stream.toList.sorted === stream.toList
       }
-      
+
       "the average must be close to 0.5" in {
         stream.sum / runs must beCloseTo(0.5 +/- epsilon)
       }
