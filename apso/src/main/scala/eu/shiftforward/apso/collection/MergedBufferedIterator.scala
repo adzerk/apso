@@ -1,16 +1,26 @@
 package eu.shiftforward.apso.collection
 
+import scala.collection.mutable.PriorityQueue
+
 case class MergedBufferedIterator[T](iterators: List[BufferedIterator[T]])(implicit ord: Ordering[T]) extends BufferedIterator[T] {
+  private[this] implicit def bufferedIteratorOrdering = new Ordering[BufferedIterator[T]] {
+    def compare(i1: BufferedIterator[T], i2: BufferedIterator[T]) =
+      ord.compare(i2.head, i1.head)
+  }
 
-  var nonEmptyIterators = iterators.filter(_.hasNext)
+  private[this] lazy val nonEmptyIterators = {
+    val pq = new PriorityQueue[BufferedIterator[T]]
+    pq.enqueue(iterators.filter(_.hasNext): _*)
+    pq
+  }
 
-  def nextIterator = nonEmptyIterators.minBy(_.head)
-
-  def head = nextIterator.head
+  def head = nonEmptyIterators.head.head
 
   def next() = {
-    val res = nextIterator.next()
-    nonEmptyIterators = iterators.filter(_.hasNext)
+    val topIt = nonEmptyIterators.dequeue()
+    val res = topIt.next()
+    if (topIt.hasNext)
+      nonEmptyIterators.enqueue(topIt)
     res
   }
 
@@ -25,7 +35,7 @@ case class MergedBufferedIterator[T](iterators: List[BufferedIterator[T]])(impli
    */
   def mergeSorted[U >: T](thatIt: BufferedIterator[U])(implicit ord: Ordering[U]): BufferedIterator[U] =
     thatIt match {
-      case mIt @ MergedBufferedIterator(thatIts) => MergedBufferedIterator[U](nonEmptyIterators ++ thatIts)
-      case _ => MergedBufferedIterator[U](thatIt :: nonEmptyIterators)
+      case mIt @ MergedBufferedIterator(thatIts) => MergedBufferedIterator[U](nonEmptyIterators.toList ++ thatIts)
+      case _ => MergedBufferedIterator[U](thatIt :: nonEmptyIterators.toList)
     }
 }
