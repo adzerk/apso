@@ -6,7 +6,7 @@ import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model._
 import com.typesafe.config.ConfigFactory
 import eu.shiftforward.apso.Logging
-import java.io.{ File, FileOutputStream }
+import java.io.{ ByteArrayInputStream, File, FileOutputStream }
 import scala.collection.JavaConversions._
 import scala.util.{ Failure, Success, Try }
 
@@ -61,7 +61,7 @@ class S3Bucket(val bucketName: String,
 
     val listings = Iterator.iterate(s3.listObjects(bucketName, sanitizeKey(prefix))) { listing =>
       if (listing.isTruncated) {
-        println("Asking for another batch of objects...")
+        log.info("Asking for another batch of objects...")
         s3.listNextBatchOfObjects(listing)
       } else null
     }
@@ -90,6 +90,30 @@ class S3Bucket(val bucketName: String,
   }.isDefined
 
   /**
+   * Checks if the file in the location specified by `key` in the bucket exists.
+   * @param key the remote pathname for the file
+   * @return true if the file exists, false otherwise.
+   */
+  def exists(key: String): Boolean = retry {
+    s3.getObjectMetadata(bucketName, key)
+  }.isDefined
+
+  /**
+   * Checks if the location specified by `key` is a directory.
+   * @param key the remote pathname to the directory
+   * @return true if the path is a directory, false otherwise.
+   */
+  def isDirectory(key: String): Boolean = retry {
+    s3.listObjects(
+      new ListObjectsRequest()
+        .withBucketName(bucketName)
+        .withMaxKeys(2)
+        .withPrefix(key)).getObjectSummaries
+  }.filter { objs =>
+    objs.length > 1 || objs.length == 1 && objs.last.getKey.endsWith("/")
+  }.isDefined
+
+  /**
    * Sets an access control list on a given Amazon S3 object.
    * @param key the remote pathname for the file
    * @param acl the `CannedAccessControlList` to be applied to the Amazon S3 object
@@ -98,6 +122,21 @@ class S3Bucket(val bucketName: String,
     log.info("Setting 's3://{}/{}' permissions to '{}'", bucketName, key, acl)
     s3.setObjectAcl(bucketName, key, acl)
   }
+
+  /**
+   * Creates an empty directory at the given `key` location
+   * @param key the remote pathname to the directory
+   * @return  true if the directory was created successfully, false otherwise.
+   */
+  def createDirectory(key: String): Boolean = retry {
+    log.info("Creating directory in 's3://{}/{}'", bucketName, key, null)
+
+    val emptyContent = new ByteArrayInputStream(Array[Byte]())
+    val metadata = new ObjectMetadata()
+    metadata.setContentLength(0)
+
+    s3.putObject(new PutObjectRequest(bucketName, sanitizeKey(key) + "/", emptyContent, metadata))
+  }.isDefined
 
   /**
    * Backups a remote file with the given `key`. A backup consists in copying the supplied file to a backup folder under
@@ -113,7 +152,7 @@ class S3Bucket(val bucketName: String,
       bucketName,
       sanitizedKey,
       bucketName,
-      mainKey + "/backup/" + name.substring(mainKey.size + 1) + extension))
+      mainKey + "/backup/" + name.substring(mainKey.length + 1) + extension))
   }.isDefined
 
   /**

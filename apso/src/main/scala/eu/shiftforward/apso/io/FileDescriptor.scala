@@ -13,33 +13,44 @@ trait FileDescriptor {
   def path: String
 
   /**
+   * The name of the file associated to the file descriptor.
+   * @return the file name.
+   */
+  def name: String
+
+  /**
    * Downloads the file to the given local destination.
-   * If the localTarget is a directory, multiple files can be downloaded to that location.
+   * Both the source and the destination must point to a file.
    *
    * @param localTarget the local destination to which this file should be downloaded.
-   *             If the location is a directory, the file will be named the same as the original.
-   *             Otherwise, the file will be renamed to the name specified in the file descriptor.
+   *                    The path must be absolute path to the final file.
+   * @param safeDownloading downloads the file to filename + ".tmp" and renames it to the original
+   *                        name if the download was successful.
    * @return `true` if the download was successful, `false` otherwise.
    */
-  def download(localTarget: LocalFileDescriptor): Boolean
+  def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean = false): Boolean
 
   /**
    * Uploads a local file to this file's location.
-   * If this file descriptor refers to a directory, multiple files can be downloaded to that location.
+   * Both the source and the target must point to a file.
    *
    * @param localTarget the local file that should be uploaded.
-   *             If this remote location is a directory, the local file will be uploaded with the
-   *             same name specified in the localTarget.
-   *             Otherwise, the file will be renamed to the remote file descriptor name.
+   *             The path must be absolute path to the final file.
    * @return `true` if the upload was successful, `false` otherwise.
    */
   def upload(localTarget: LocalFileDescriptor): Boolean
 
   /**
+   * Returns true if the fd points to a directory
+   * @return true if the fd points to a directory
+   */
+  def isDirectory: Boolean
+
+  /**
    * Lists the files in the current file descriptor directory
    * @return a iterator of file descriptors
    */
-  def list(): Iterator[FileDescriptor]
+  def list: Iterator[FileDescriptor] = listByPrefix("")
 
   /**
    * Lists the files in the current file descriptor directory that match the given prefix
@@ -57,17 +68,28 @@ trait FileDescriptor {
 
   /**
    * Adds a new child node to the filesystem path.
-   * @param child the node name.
+   * @param name the node name.
    * @return the new file descriptor with the updated path
    */
-  def addChild(child: String): FileDescriptor
+  def child(name: String): FileDescriptor
+
+  /**
+   * Adds a new child node to the filesystem path.
+   * @param name the node name.
+   * @return the new file descriptor with the updated path
+   */
+  def /(name: String): FileDescriptor = child(name)
 
   /**
    * Adds multiple new child nodes to the filesystem path.
-   * @param children the node names.
+   * @param name the first node name.
+   * @param name2 the second node name.
+   * @param names the remaining node names.
    * @return the new file descriptor with the updated path
    */
-  def addChildren(children: List[String]): FileDescriptor
+  def child(name: String, name2: String, names: String*): FileDescriptor = {
+    names.foldLeft(child(name).child(name2))((acc, c) => acc.child(c))
+  }
 
   /**
    * Changes the path of the file descriptor using unix's cd syntax related to the current directory.
@@ -78,13 +100,45 @@ trait FileDescriptor {
    * @param pathString the cd command
    * @return the new file descriptor with the updated path
    */
-  def cd(pathString: String): FileDescriptor
+  def cd(pathString: String): FileDescriptor = {
+    pathString.split("/").toList.foldLeft(this) {
+      case (acc, "." | "") => acc
+      case (acc, "..") => acc.parent()
+      case (acc, segment) => acc.child(segment)
+    }
+  }
+
+  /**
+   * Returns a new file descriptor pointing to a sibling of the current file descriptor
+   * @param name the file name of the new file descriptor
+   * @return a new file descriptor pointing to a sibling of the current file descriptor
+   */
+  def sibling(name: String): FileDescriptor = sibling(_ => name)
+
+  /**
+   * Returns a new file descriptor pointing to a sibling of the current file descriptor
+   * @param f a function that returns a new name from the current name of the file descriptor
+   * @return a new file descriptor pointing to a sibling of the current file descriptor
+   */
+  def sibling(f: String => String): FileDescriptor = parent().child(f(name))
+
+  /**
+   * Returns true if the file pointed by the file descriptor exists
+   * @return true if the file pointed by the file descriptor exists
+   */
+  def exists: Boolean
 
   /**
    * Deletes the file associated to the file descriptor
    * @return `true` if the delete was successful, `false` otherwise.
    */
   def delete(): Boolean
+
+  /**
+   * Creates intermediary directories
+   * @return true if the creation of successful, false otherwise.
+   */
+  def mkdirs(): Boolean
 }
 
 object FileDescriptor {
@@ -97,7 +151,7 @@ object FileDescriptor {
   def apply(uri: String): FileDescriptor = protocol(uri) match {
     case ("file", path) => LocalFileDescriptor(path)
     case ("s3", path) => S3FileDescriptor(path)
-    case _ => throw new Exception("Protocol not supported")
+    case _ => throw new UnsupportedOperationException("Protocol not supported")
   }
 
   /**
@@ -107,6 +161,6 @@ object FileDescriptor {
    */
   private def protocol(uri: String) = uri.split("://").toList match {
     case protocol :: path :: Nil => (protocol, path)
-    case _ => throw new Exception("Malformed URI")
+    case _ => throw new IllegalArgumentException("Malformed URI")
   }
 }

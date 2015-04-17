@@ -7,58 +7,106 @@ import eu.shiftforward.apso.aws.S3Bucket
 
 import scala.collection.concurrent.TrieMap
 
-case class S3FileDescriptor(private val bucket: S3Bucket, private val paths: List[String])
+case class S3FileDescriptor(private val bucket: S3Bucket, private val elements: List[String])
     extends FileDescriptor with Logging {
 
-  val bucketName = bucket.bucketName
+  lazy val bucketName = bucket.bucketName
 
-  val path = bucketName + paths.foldLeft("")((acc, p) => s"$acc/$p")
+  lazy val path: String = bucketName + elements.foldLeft("")((acc, p) => s"$acc/$p")
 
-  private def buildPath(p: Seq[String]): String = p.mkString("/")
+  lazy val name: String = elements.lastOption.getOrElse("")
 
-  def download(localTarget: LocalFileDescriptor): Boolean = {
-    val localPath = if (localTarget.isDirectory) {
-      paths.lastOption match {
-        case Some(filename) => localTarget.addChild(filename).path
-        case None => throw new Exception("File not specified")
-      }
+  private lazy val builtPath = buildPath(elements)
+
+  @inline private def buildPath(p: Seq[String]): String = p.mkString("/")
+
+  def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean): Boolean = {
+    if (localTarget.isDirectory) {
+      throw new Exception("File descriptor points to a directory")
     } else {
-      localTarget.path
-    }
 
-    bucket.pull(buildPath(paths), localPath)
+      localTarget.parent().mkdirs()
+
+      if (safeDownloading) {
+        val tmpFile = localTarget.sibling(_ + ".tmp")
+        val succeed = bucket.pull(builtPath, tmpFile.path)
+        if (succeed) tmpFile.rename(localTarget)
+        succeed
+      } else {
+        bucket.pull(builtPath, localTarget.path)
+      }
+    }
   }
 
   def upload(localTarget: LocalFileDescriptor): Boolean = {
-    bucket.push(buildPath(paths), new File(localTarget.path))
+    if (localTarget.isDirectory) {
+      throw new Exception("File descriptor points to a directory")
+    } else {
+      bucket.push(builtPath, localTarget.file)
+    }
   }
 
-  def parent(n: Int): S3FileDescriptor = this.copy(paths = paths.dropRight(n))
+  def parent(n: Int): S3FileDescriptor = this.copy(elements = elements.dropRight(n))
 
-  def addChild(child: String): S3FileDescriptor = this.copy(paths = paths :+ child)
+  private def sanitize(segment: String): Option[String] = {
 
-  def addChildren(children: List[String]): S3FileDescriptor =
-    this.copy(paths = paths ++ children)
+    val whiteSpaceValidated = segment.trim match {
+      case "" => None
+      case str => Some(str)
+    }
 
-  def cd(pathString: String): S3FileDescriptor = {
-    val newPath = pathString.split("/").toList.foldLeft(paths) {
+    whiteSpaceValidated.map {
+      _.count(_ == '/') match {
+        case 0 => segment
+        case 1 if segment.endsWith("/") => segment.dropRight(1)
+        case _ => throw new IllegalArgumentException("path cannot contain /")
+      }
+    }
+  }
+
+  override def /(name: String): S3FileDescriptor = child(name)
+
+  def child(name: String): S3FileDescriptor =
+    this.copy(elements = elements ++ sanitize(name).toList)
+
+  override def child(name: String, name2: String, names: String*): S3FileDescriptor =
+    this.copy(elements = elements ++ (Seq(name, name2) ++ names).flatMap(sanitize))
+
+  override def cd(pathString: String): S3FileDescriptor = {
+    val newPath = pathString.split("/").map(_.trim).toList.foldLeft(elements) {
       case (acc, "." | "") => acc
       case (acc, "..") => acc.dropRight(1)
       case (acc, segment) => acc :+ segment
     }
-    this.copy(paths = newPath)
+    this.copy(elements = newPath)
   }
 
-  def list(): Iterator[S3FileDescriptor] = listByPrefix("")
+  override def list: Iterator[S3FileDescriptor] = listByPrefix("")
 
   def listByPrefix(prefix: String): Iterator[S3FileDescriptor] = {
-    val fullPrefix = if (prefix == "") paths else paths :+ prefix
+    val fullPrefix = if (prefix == "") elements else elements :+ prefix
     bucket.getFilesWithMatchingPrefix(buildPath(fullPrefix)).map {
-      f => this.copy(paths = f.split("/").toList)
+      f => this.copy(elements = f.split("/").toList)
     }
   }
 
-  def delete(): Boolean = bucket.delete(buildPath(paths))
+  override def sibling(f: String => String): S3FileDescriptor = {
+    S3FileDescriptor(bucket, elements.dropRight(1) :+ f(name))
+  }
+
+  private lazy val isDirectoryRemote = bucket.isDirectory(builtPath)
+  private var isDirectoryLocal = false
+  def isDirectory: Boolean = isDirectoryLocal || isDirectoryRemote
+
+  def exists: Boolean = bucket.exists(builtPath)
+
+  def delete(): Boolean = bucket.delete(builtPath)
+
+  def mkdirs(): Boolean = {
+    val result = isDirectory || bucket.createDirectory(builtPath)
+    isDirectoryLocal = result
+    result
+  }
 
   override def toString: String = s"s3://$path"
 }
@@ -74,7 +122,7 @@ object S3FileDescriptor {
     path.split('/').toList match {
       case s3bucket :: s3path =>
         val s3BucketRef = s3Buckets.getOrElseUpdate(s3bucket, new S3Bucket(s3bucket))
-        S3FileDescriptor(s3BucketRef, s3path)
+        S3FileDescriptor(s3BucketRef, s3path.filterNot(_.trim == ""))
 
       case _ => throw new Exception("Error parsing S3 URI")
     }
