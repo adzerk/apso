@@ -90,13 +90,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
     }
   }
 
-  override def list: Iterator[LocalFileDescriptor] = {
-    if (isDirectory) {
-      file.listFiles.toIterator.map(f => LocalFileDescriptor(f.getAbsolutePath))
-    } else {
-      Iterator()
-    }
-  }
+  override def list: Iterator[LocalFileDescriptor] = listByPrefix("")
 
   def listByPrefix(prefix: String): Iterator[LocalFileDescriptor] = {
     if (isDirectory) {
