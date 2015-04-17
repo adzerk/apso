@@ -39,7 +39,7 @@ case class S3FileDescriptor(private val bucket: S3Bucket, private val paths: Lis
   }
 
   def upload(localTarget: LocalFileDescriptor): Boolean = {
-    if (localTarget.isDirectory || isDirectory) {
+    if (localTarget.isDirectory) {
       throw new Exception("File descriptor points to a directory")
     } else {
       bucket.push(builtPath, localTarget.file)
