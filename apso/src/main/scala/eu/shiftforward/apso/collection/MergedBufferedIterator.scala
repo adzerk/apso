@@ -2,13 +2,19 @@ package eu.shiftforward.apso.collection
 
 case class MergedBufferedIterator[T](iterators: List[BufferedIterator[T]])(implicit ord: Ordering[T]) extends BufferedIterator[T] {
 
-  def nextIterator = iterators.filter(_.hasNext).minBy(_.head)
+  var nonEmptyIterators = iterators.filter(_.hasNext)
+
+  def nextIterator = nonEmptyIterators.minBy(_.head)
 
   def head = nextIterator.head
 
-  def next() = nextIterator.next()
+  def next() = {
+    val res = nextIterator.next()
+    nonEmptyIterators = iterators.filter(_.hasNext)
+    res
+  }
 
-  def hasNext: Boolean = iterators.exists(_.hasNext)
+  def hasNext: Boolean = nonEmptyIterators.nonEmpty
 
   /**
    * Lazily merges this buffered iterator with another buffered iterator assuming that both collections
@@ -19,7 +25,7 @@ case class MergedBufferedIterator[T](iterators: List[BufferedIterator[T]])(impli
    */
   def mergeSorted[U >: T](thatIt: BufferedIterator[U])(implicit ord: Ordering[U]): BufferedIterator[U] =
     thatIt match {
-      case MergedBufferedIterator(thatIts) => MergedBufferedIterator[U](iterators ++ thatIts)
-      case _ => MergedBufferedIterator[U](thatIt :: iterators)
+      case mIt @ MergedBufferedIterator(thatIts) => MergedBufferedIterator[U](nonEmptyIterators ++ thatIts)
+      case _ => MergedBufferedIterator[U](thatIt :: nonEmptyIterators)
     }
 }
