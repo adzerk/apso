@@ -83,7 +83,7 @@ trait FileDescriptor {
   /**
    * Adds multiple new child nodes to the filesystem path.
    * @param name the first node name.
-   * @param name2 the second node names.
+   * @param name2 the second node name.
    * @param names the remaining node names.
    * @return the new file descriptor with the updated path
    */
