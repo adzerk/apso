@@ -202,6 +202,17 @@ object Implicits {
      */
     def mergeSorted[U >: T](thatIt: BufferedIterator[U])(implicit ord: Ordering[U]): BufferedIterator[U] =
       MergedBufferedIterator(List(thatIt)).mergeSorted(thisIt)
+
+    /**
+     * Safer version of takeWhile that can be applied in succession
+     * @param p predicate
+     * @return iterator with the results
+     */
+    def bufferedTakeWhile(p: T => Boolean) = new BufferedIterator[T] {
+      def hasNext = { thisIt.hasNext && p(thisIt.head) }
+      def next() = (if (hasNext) thisIt else Iterator.empty.buffered).next()
+      def head = thisIt.head
+    }
   }
 
   /**

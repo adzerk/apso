@@ -84,6 +84,17 @@ class ImplicitsSpec extends Specification {
       List(1, 4, 7).iterator.buffered.mergeSorted(List(2, 5, 8).iterator.buffered).mergeSorted(List(3, 6, 9).iterator.buffered).toList ===
         List(1, 2, 3, 4, 5, 6, 7, 8, 9)
     }
+
+    "have a bufferedTakeWhile operation" in {
+      val iter = List(5, 6, 7, 8, 9, 10).iterator.buffered
+      iter.bufferedTakeWhile(_ < 4).toList === List()
+      iter.toList == List(5, 6, 7, 8, 9, 10)
+
+      val iter2 = List(5, 6, 7, 8, 9, 10).iterator.buffered
+      iter2.bufferedTakeWhile(_ < 7).toList === List(5, 6)
+      iter2.bufferedTakeWhile(_ < 10).toList === List(7, 8, 9)
+      iter2.toList === List(10)
+    }
   }
 
   "An ApsoMap" should {
