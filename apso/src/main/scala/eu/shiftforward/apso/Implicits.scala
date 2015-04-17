@@ -425,6 +425,28 @@ object Implicits {
      */
     @inline def samples[T](seq: Traversable[(T, Double)]): Iterator[T] =
       samples(seq, { p: (T, Double) => p._2 }).map(_._1)
+
+    /**
+     * Returns a decreasingly ordered stream of n doubles in [0, 1], according to a
+     * uniform distribution.
+     * More Info: BENTLEY, SAXE, Generating Sorted Lists of Random Numbers
+     *
+     * @param n amount of numbers to generate
+     * @return ordered stream of doubles
+     */
+    def decreasingUniformStream(n: Int): Stream[Double] =
+      Stream.iterate((n + 1, 1.0), n + 1) { case (i, currMax) => (i - 1, currMax * math.pow(rand.nextDouble(), 1.0 / i)) }.tail.map(_._2)
+
+    /**
+     * Returns an increasingly ordered stream of n doubles in [0, 1], according to a
+     * uniform distribution.
+     * More Info: BENTLEY, SAXE, Generating Sorted Lists of Random Numbers
+     *
+     * @param n amount of numbers to generate
+     * @return ordered stream of doubles
+     */
+    def increasingUniformStream(n: Int): Stream[Double] =
+      decreasingUniformStream(n).map(1 - _)
   }
 
   /**
