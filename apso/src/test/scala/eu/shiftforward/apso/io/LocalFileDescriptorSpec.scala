@@ -4,6 +4,8 @@ import java.io.File
 import java.util.UUID
 import org.specs2.mutable.Specification
 
+import scala.util.Try
+
 class LocalFileDescriptorSpec extends Specification {
 
   "A LocalFileDescriptor" should {
@@ -67,7 +69,7 @@ class LocalFileDescriptorSpec extends Specification {
       f.exists must beTrue
     }
 
-    "Download files correctly" in {
+    "Download a file correctly to a file" in {
       val fd1 = LocalFileDescriptor("/tmp") / randomFolder / "testdir2"
       val fd2 = LocalFileDescriptor("/tmp") / randomFolder / "testdir2b"
 
@@ -81,7 +83,7 @@ class LocalFileDescriptorSpec extends Specification {
       file2.readString must beEqualTo("hello world")
     }
 
-    "Download files correctly to a directory" in {
+    "Do not download file to a directory" in {
       val fd1 = LocalFileDescriptor("/tmp") / randomFolder / "testdir02"
       val fd2 = LocalFileDescriptor("/tmp") / randomFolder / "testdir02b"
 
@@ -91,11 +93,10 @@ class LocalFileDescriptorSpec extends Specification {
       val dir2 = fd2 / "two"
       dir2.mkdirs()
 
-      file1.download(dir2)
-      dir2.addChild("one").readString must beEqualTo("hello world")
+      Try(file1.download(dir2)) must beAFailedTry
     }
 
-    "Upload files correctly" in {
+    "Upload file correctly to a file" in {
       val fd1 = LocalFileDescriptor("/tmp") / randomFolder / "testdir3"
       val fd2 = LocalFileDescriptor("/tmp") / randomFolder / "testdir3b"
 
@@ -109,7 +110,7 @@ class LocalFileDescriptorSpec extends Specification {
       file2.readString must beEqualTo("hello world")
     }
 
-    "Upload files correctly to a directory" in {
+    "Do not upload file to a directory" in {
       val fd1 = LocalFileDescriptor("/tmp") / randomFolder / "testdir03"
       val fd2 = LocalFileDescriptor("/tmp") / randomFolder / "testdir03b"
 
@@ -119,8 +120,7 @@ class LocalFileDescriptorSpec extends Specification {
       val dir2 = fd2 / "two"
       dir2.mkdirs()
 
-      dir2.upload(file1)
-      dir2.addChild("one").readString must beEqualTo("hello world")
+      Try(dir2.upload(file1)) must beAFailedTry
     }
 
     "List files correctly" in {

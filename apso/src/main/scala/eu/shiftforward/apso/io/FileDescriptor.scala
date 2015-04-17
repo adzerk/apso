@@ -20,28 +20,25 @@ trait FileDescriptor {
 
   /**
    * Downloads the file to the given local destination.
-   * If the localTarget is a directory, multiple files can be downloaded to that location.
+   * Both the source and the destination must point to a file.
    *
    * @param localTarget the local destination to which this file should be downloaded.
-   *             If the location is a directory, the file will be named the same as the original.
-   *             Otherwise, the file will be renamed to the name specified in the file descriptor.
+   *                    The path must be absolute path to the final file.
    * @param safeDownloading downloads the file to filename + ".tmp" and renames it to the original
    *                        name if the download was successful.
    * @return `true` if the download was successful, `false` otherwise.
    */
-  def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean = false): Option[LocalFileDescriptor]
+  def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean = false): Boolean
 
   /**
    * Uploads a local file to this file's location.
-   * If this file descriptor refers to a directory, multiple files can be downloaded to that location.
+   * Both the source and the target must point to a file.
    *
    * @param localTarget the local file that should be uploaded.
-   *             If this remote location is a directory, the local file will be uploaded with the
-   *             same name specified in the localTarget.
-   *             Otherwise, the file will be renamed to the remote file descriptor name.
+   *             The path must be absolute path to the final file.
    * @return `true` if the upload was successful, `false` otherwise.
    */
-  def upload(localTarget: LocalFileDescriptor): Option[FileDescriptor]
+  def upload(localTarget: LocalFileDescriptor): Boolean
 
   /**
    * Returns true if the fd points to a directory

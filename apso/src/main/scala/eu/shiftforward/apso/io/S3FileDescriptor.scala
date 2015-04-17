@@ -20,18 +20,14 @@ case class S3FileDescriptor(private val bucket: S3Bucket, private val paths: Lis
 
   @inline private def buildPath(p: Seq[String]): String = p.mkString("/")
 
-  def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean): Option[LocalFileDescriptor] = {
+  def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean): Boolean = {
     if (localTarget.isDirectory) {
-      if (name == "") {
-        throw new Exception("s3 file not specified")
-      } else {
-        download(localTarget.addChild(name))
-      }
+      throw new Exception("File descriptor points to a directory")
     } else {
 
-      localTarget.mkdirs()
+      localTarget.parent().mkdirs()
 
-      val result = if (safeDownloading) {
+      if (safeDownloading) {
         val tmpFile = localTarget.sibling(_ + ".tmp")
         val succeed = bucket.pull(builtPath, tmpFile.path)
         if (succeed) tmpFile.rename(localTarget)
@@ -39,20 +35,14 @@ case class S3FileDescriptor(private val bucket: S3Bucket, private val paths: Lis
       } else {
         bucket.pull(builtPath, localTarget.path)
       }
-
-      if (result) Some(localTarget) else None
     }
   }
 
-  def upload(localTarget: LocalFileDescriptor): Option[S3FileDescriptor] = {
-
-    if (localTarget.isDirectory) throw new Exception("Specified file descriptor is a directory")
-    else if (isDirectory) {
-      addChild(localTarget.name).upload(localTarget)
+  def upload(localTarget: LocalFileDescriptor): Boolean = {
+    if (localTarget.isDirectory || isDirectory) {
+      throw new Exception("File descriptor points to a directory")
     } else {
-      if (bucket.push(builtPath, localTarget.file)) {
-        Some(this)
-      } else None
+      bucket.push(builtPath, localTarget.file)
     }
   }
 

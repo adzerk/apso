@@ -1,7 +1,7 @@
 package eu.shiftforward.apso.io
 
 import java.io.{ FileWriter, File }
-import java.nio.file.{ Files, Path, Paths }
+import java.nio.file.{ StandardCopyOption, Files, Path, Paths }
 
 import eu.shiftforward.apso.Logging
 import eu.shiftforward.apso.Implicits.ApsoCloseable
@@ -47,42 +47,44 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
     LocalFileDescriptor(newPath.toString)
   }
 
-  def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean): Option[LocalFileDescriptor] = {
-    if (localTarget.isDirectory) {
-      download(localTarget.addChild(name))
+  def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean): Boolean = {
+    if (isDirectory || localTarget.isDirectory) {
+      throw new Exception("File descriptor points to a directory")
     } else {
 
-      val downloadFile = if (safeDownloading) {
-        localTarget.sibling(_ + ".tmp")
-      } else {
-        localTarget
-      }
+      val downloadFile = if (safeDownloading) localTarget.sibling(_ + ".tmp")
+      else localTarget
 
       localTarget.parent().mkdirs()
 
-      Try(Files.copy(normalizedPath, downloadFile.normalizedPath)) match {
-        case Success(_) =>
-          if (safeDownloading) downloadFile.rename(localTarget)
-          Some(localTarget)
+      val result = Try(Files.copy(normalizedPath, downloadFile.normalizedPath,
+        StandardCopyOption.REPLACE_EXISTING))
 
-        case Failure(ex) =>
-          log.warn("File copy failed ({})", ex.toString)
-          None
+      result match {
+        case Success(_) => if (safeDownloading) downloadFile.rename(localTarget)
+        case Failure(ex) => log.warn("File copy failed ({})", ex.toString)
       }
+
+      result.isSuccess
     }
   }
 
-  def upload(localTarget: LocalFileDescriptor): Option[LocalFileDescriptor] = {
-    if (isDirectory) {
-      addChild(localTarget.name).upload(localTarget)
+  def upload(localTarget: LocalFileDescriptor): Boolean = {
+    if (isDirectory || localTarget.isDirectory) {
+      throw new Exception("File descriptor points to a directory")
     } else {
 
       parent().mkdirs()
 
-      Try(Files.copy(localTarget.normalizedPath, normalizedPath)) match {
-        case Success(_) => Some(this)
-        case Failure(ex) => log.warn("File copy failed ({})", ex.toString); None
+      val result = Try(Files.copy(localTarget.normalizedPath, normalizedPath,
+        StandardCopyOption.REPLACE_EXISTING))
+
+      result match {
+        case Success(_) =>
+        case Failure(ex) => log.warn("File copy failed ({})", ex.toString)
       }
+
+      result.isSuccess
     }
   }
 
