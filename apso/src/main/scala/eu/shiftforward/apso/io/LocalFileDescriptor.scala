@@ -26,15 +26,17 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
     LocalFileDescriptor(parentPath.toString)
   }
 
-  override def /(child: String): LocalFileDescriptor = addChild(child)
+  override def /(name: String): LocalFileDescriptor = child(name)
 
-  def addChild(child: String): LocalFileDescriptor = {
-    val childPath = normalizedPath.resolve(child)
+  def child(name: String): LocalFileDescriptor = {
+    val childPath = normalizedPath.resolve(name)
     LocalFileDescriptor(childPath.toString)
   }
 
-  override def addChildren(children: String*): LocalFileDescriptor = {
-    val childPath = children.foldLeft(normalizedPath)((acc, child) => acc.resolve(child))
+  override def child(name: String, name2: String, names: String*): LocalFileDescriptor = {
+    val childPath = names.foldLeft(child(name).child(name2).normalizedPath) {
+      (acc, child) => acc.resolve(child)
+    }
     LocalFileDescriptor(childPath.toString)
   }
 
@@ -88,7 +90,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
     }
   }
 
-  def list(): Iterator[LocalFileDescriptor] = {
+  override def list: Iterator[LocalFileDescriptor] = {
     if (isDirectory) {
       file.listFiles.toIterator.map(f => LocalFileDescriptor(f.getAbsolutePath))
     } else {

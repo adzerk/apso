@@ -50,7 +50,7 @@ trait FileDescriptor {
    * Lists the files in the current file descriptor directory
    * @return a iterator of file descriptors
    */
-  def list(): Iterator[FileDescriptor]
+  def list: Iterator[FileDescriptor] = listByPrefix("")
 
   /**
    * Lists the files in the current file descriptor directory that match the given prefix
@@ -68,25 +68,27 @@ trait FileDescriptor {
 
   /**
    * Adds a new child node to the filesystem path.
-   * @param child the node name.
+   * @param name the node name.
    * @return the new file descriptor with the updated path
    */
-  def addChild(child: String): FileDescriptor
+  def child(name: String): FileDescriptor
 
   /**
    * Adds a new child node to the filesystem path.
-   * @param child the node name.
+   * @param name the node name.
    * @return the new file descriptor with the updated path
    */
-  def /(child: String): FileDescriptor = addChild(child)
+  def /(name: String): FileDescriptor = child(name)
 
   /**
    * Adds multiple new child nodes to the filesystem path.
-   * @param children the node names.
+   * @param name the first node name.
+   * @param name2 the second node names.
+   * @param names the remaining node names.
    * @return the new file descriptor with the updated path
    */
-  def addChildren(children: String*): FileDescriptor = {
-    children.foldLeft(this)((acc, c) => acc.addChild(c))
+  def child(name: String, name2: String, names: String*): FileDescriptor = {
+    names.foldLeft(child(name).child(name2))((acc, c) => acc.child(c))
   }
 
   /**
@@ -102,7 +104,7 @@ trait FileDescriptor {
     pathString.split("/").toList.foldLeft(this) {
       case (acc, "." | "") => acc
       case (acc, "..") => acc.parent()
-      case (acc, segment) => acc.addChild(segment)
+      case (acc, segment) => acc.child(segment)
     }
   }
 
@@ -118,7 +120,7 @@ trait FileDescriptor {
    * @param f a function that returns a new name from the current name of the file descriptor
    * @return a new file descriptor pointing to a sibling of the current file descriptor
    */
-  def sibling(f: String => String): FileDescriptor = parent().addChild(f(name))
+  def sibling(f: String => String): FileDescriptor = parent().child(f(name))
 
   /**
    * Returns true if the file pointed by the file descriptor exists

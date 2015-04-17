@@ -26,8 +26,8 @@ class LocalFileDescriptorSpec extends Specification {
 
     "Move down the hiearchy correctly" in {
       LocalFileDescriptor("/tmp") / "one" / "two" === LocalFileDescriptor("/tmp/one/two")
-      LocalFileDescriptor("/tmp").addChild("one") === LocalFileDescriptor("/tmp/one")
-      LocalFileDescriptor("/tmp").addChildren("one", "two") === LocalFileDescriptor("/tmp/one/two")
+      LocalFileDescriptor("/tmp").child("one") === LocalFileDescriptor("/tmp/one")
+      LocalFileDescriptor("/tmp").child("one", "two") === LocalFileDescriptor("/tmp/one/two")
       LocalFileDescriptor("/tmp") / "wrong" !== LocalFileDescriptor("/tmp/right")
     }
 
@@ -61,7 +61,7 @@ class LocalFileDescriptorSpec extends Specification {
 
     "Create intermediary folders when required" in {
       val fd = LocalFileDescriptor("/tmp") / randomFolder / "testdir1"
-      val f = fd.addChildren("one", "two")
+      val f = fd.child("one", "two")
       f.exists must beFalse
       f.isDirectory must beFalse
       f.mkdirs()
@@ -128,7 +128,7 @@ class LocalFileDescriptorSpec extends Specification {
       val files = (1 to 5).map(n => fd / n.toString)
 
       files.foreach(_.write("test"))
-      fd.list().toSet === files.toSet
+      fd.list.toSet === files.toSet
     }
 
     "List files by prefix correctly" in {
