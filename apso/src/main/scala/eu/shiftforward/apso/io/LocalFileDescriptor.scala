@@ -118,7 +118,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
    * @return a Some of the renamed file descriptor if successful, otherwise None.
    */
   def rename(to: LocalFileDescriptor): Option[LocalFileDescriptor] = {
-    to.mkdirs()
+    to.parent().mkdirs()
     if (file.renameTo(to.file)) Some(to) else None
   }
 
