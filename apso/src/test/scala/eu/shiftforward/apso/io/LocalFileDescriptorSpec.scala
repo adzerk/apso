@@ -81,8 +81,7 @@ class LocalFileDescriptorSpec extends Specification {
       val file2 = fd2 / "two"
       file2.exists must beFalse
 
-      file1.download(file2, safeDownloading = true)
-      file1.sibling(_ + ".tmp").exists must beFalse
+      file1.download(file2)
       file2.readString must beEqualTo("hello world")
     }
 
@@ -109,7 +108,8 @@ class LocalFileDescriptorSpec extends Specification {
       val file2 = fd2 / "two"
       file2.exists must beFalse
 
-      file1.download(file2)
+      file1.download(file2, safeDownloading = true)
+      file1.sibling(_ + ".tmp").exists must beFalse
       file2.readString must beEqualTo("hello world")
     }
 

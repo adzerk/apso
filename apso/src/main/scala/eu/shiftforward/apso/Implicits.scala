@@ -1,5 +1,7 @@
 package eu.shiftforward.apso
 
+import eu.shiftforward.apso.collection.MergedBufferedIterator
+
 import scala.collection.generic.CanBuildFrom
 import scala.compat.Platform
 import scala.util.Random
@@ -180,6 +182,36 @@ object Implicits {
       if (res._2 == num.zero)
         throw new IllegalArgumentException("The traversable should not be empty!")
       div(res._1, res._2)
+    }
+  }
+
+  /**
+   * Implicit class that provides new methods for buffered iterators.
+   * @param thisIt the buffered iterator to which the new methods are provided.
+   */
+  final implicit class ApsoBufferedIterator[T](val thisIt: BufferedIterator[T]) extends AnyVal {
+
+    /**
+     * Lazily merges this buffered iterator with another buffered iterator assuming that both collections
+     * are already sorted.
+     * @param thatIt the iterator  to merge with this one
+     * @param ord the ordering with which the collections are sorted and with which the merged
+     *            collection is to be returned
+     * @tparam U element type of the resulting collection
+     * @return the merged iterators
+     */
+    def mergeSorted[U >: T](thatIt: BufferedIterator[U])(implicit ord: Ordering[U]): BufferedIterator[U] =
+      MergedBufferedIterator(List(thatIt)).mergeSorted(thisIt)
+
+    /**
+     * Safer version of takeWhile that can be applied in succession
+     * @param p predicate
+     * @return iterator with the results
+     */
+    def bufferedTakeWhile(p: T => Boolean) = new BufferedIterator[T] {
+      def hasNext = { thisIt.hasNext && p(thisIt.head) }
+      def next() = (if (hasNext) thisIt else Iterator.empty.buffered).next()
+      def head = thisIt.head
     }
   }
 
