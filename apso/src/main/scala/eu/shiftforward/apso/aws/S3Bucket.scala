@@ -16,12 +16,20 @@ import scala.util.{ Failure, Success, Try }
  * and pulling files to and from a bucket.
  *
  * @param bucketName the name of the bucket
- * @param credentials optional AWS credentials to use. If the parameter is not supplied, they will
- *                    be retrieved from the [[eu.shiftforward.apso.aws.CredentialStore]].
+ * @param credentials optional AWS credentials factory to use (since AWSCredentials are not serializable).
+ *                    If the parameter is not supplied, they will be retrieved from the
+ *                    [[eu.shiftforward.apso.aws.CredentialStore]].
  */
 class S3Bucket(val bucketName: String,
-               private val credentials: AWSCredentials = CredentialStore.getCredentials)
-    extends Logging {
+               private val credentialsFactory: () => AWSCredentials = { () => CredentialStore.getCredentials })
+    extends Logging with Serializable {
+
+  @transient private[this] var _credentials: AWSCredentials = _
+
+  private def credentials = {
+    if (_credentials == null) _credentials = credentialsFactory()
+    _credentials
+  }
 
   private[this] lazy val config = ConfigFactory.load()
 

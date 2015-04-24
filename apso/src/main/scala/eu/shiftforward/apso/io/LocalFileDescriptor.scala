@@ -11,7 +11,12 @@ import scala.util.{ Failure, Success, Try }
 
 case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with Logging {
 
-  private def normalizedPath: Path = file.toPath
+  @transient private[this] var _normalizedPath: Path = _
+
+  private def normalizedPath = {
+    if (_normalizedPath == null) _normalizedPath = file.toPath
+    _normalizedPath
+  }
 
   lazy val path: String = file.getAbsolutePath
 
