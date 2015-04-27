@@ -38,13 +38,17 @@ class S3Bucket(val bucketName: String,
   private[this] lazy val endpoint = Try(config.getString(configPrefix + ".endpoint")).getOrElse("s3.amazonaws.com")
   private[this] lazy val region = Try(config.getString(configPrefix + ".region")).getOrElse(null)
 
-  private[this] lazy val s3 = {
-    val client = new AmazonS3Client(credentials)
-    client.setEndpoint(endpoint)
-    if (!client.doesBucketExist(bucketName)) {
-      client.createBucket(bucketName, Region.fromValue(region))
+  @transient private[this] var _s3: AmazonS3Client = _
+
+  private[this] def s3 = {
+    if (_s3 == null) {
+      _s3 = new AmazonS3Client(credentials)
+      _s3.setEndpoint(endpoint)
+      if (!_s3.doesBucketExist(bucketName)) {
+        _s3.createBucket(bucketName, Region.fromValue(region))
+      }
     }
-    client
+    _s3
   }
 
   private[this] def splitKey(key: String) = {
