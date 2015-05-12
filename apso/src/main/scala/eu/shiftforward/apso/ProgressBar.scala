@@ -18,9 +18,6 @@ case class ProgressBar(
   private[this] var done = 0L
   private[this] val startTimestamp = currentTime
 
-  private[this] val bar = "=" * width
-  private[this] val spaces = " " * width
-
   private[this] val workchars = List('|', '/', '-', '\\')
   private[this] var lastChar = 0
   private[this] def workChar = {
@@ -52,15 +49,16 @@ case class ProgressBar(
       val percent = done.toDouble / total
       val res = new StringBuilder(width)
 
+      val prefix = f"${(percent * 100).toInt}%3d%% ["
+      val suffix = f"] $workChar [ ${throughputTransformer(throughput)}%2.2f ] $throughputUnit/s  "
+      val remainingWidth = width - prefix.length - suffix.length - (if (percent < 1.0) 1 else 0)
+
       res.append("\r")
-      res.append(f"${(percent * 100).toInt}%3d%% ")
-      res.append("[")
-      res.append(bar.substring(0, (width * percent).toInt))
+      res.append(prefix)
+      res.append("=" * (remainingWidth * percent).toInt)
       if (percent < 1.0) res.append(">")
-      res.append(spaces.substring((width * percent).toInt))
-      res.append("]")
-      res.append(f" $workChar [ ${throughputTransformer(throughput)}%2.2f ] $throughputUnit/s")
-      res.append("  ")
+      res.append(" " * (remainingWidth - (remainingWidth * percent).toInt))
+      res.append(suffix)
       print(res.mkString)
 
       if (isFinished) {
