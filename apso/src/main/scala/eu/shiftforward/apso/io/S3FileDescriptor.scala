@@ -8,7 +8,7 @@ import eu.shiftforward.apso.config.FileDescriptorCredentials
 
 import scala.collection.concurrent.TrieMap
 
-case class S3FileDescriptor(private val bucket: S3Bucket, private val elements: List[String])
+case class S3FileDescriptor(bucket: S3Bucket, private val elements: List[String])
     extends FileDescriptor with Logging {
 
   lazy val bucketName = bucket.bucketName
