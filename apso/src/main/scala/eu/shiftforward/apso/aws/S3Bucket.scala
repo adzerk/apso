@@ -16,7 +16,7 @@ import scala.util.{ Failure, Success, Try }
  * and pulling files to and from a bucket.
  *
  * @param bucketName the name of the bucket
- * @param credentials optional AWS credentials factory to use (since AWSCredentials are not serializable).
+ * @param credentialsFactory optional AWS credentials factory to use (since AWSCredentials are not serializable).
  *                    If the parameter is not supplied, they will be retrieved from the
  *                    [[eu.shiftforward.apso.aws.CredentialStore]].
  */
