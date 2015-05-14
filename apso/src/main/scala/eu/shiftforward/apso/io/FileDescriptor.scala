@@ -1,5 +1,7 @@
 package eu.shiftforward.apso.io
 
+import com.typesafe.config.{ ConfigFactory, Config }
+
 /**
  * A representation of a file stored in an arbitrary location. A descriptor includes logic to
  * copy files to and from a local filesystem, as well as filesystem navigation logic.
@@ -148,10 +150,14 @@ object FileDescriptor {
    * @param uri the URI
    * @return the specific file descriptor given the supported protocols
    */
-  def apply(uri: String): FileDescriptor = protocol(uri) match {
-    case ("file", path) => LocalFileDescriptor(path)
-    case ("s3", path) => S3FileDescriptor(path)
-    case _ => throw new UnsupportedOperationException("Protocol not supported")
+  def apply(uri: String): FileDescriptor = apply(uri, ConfigFactory.empty)
+
+  def apply(uri: String, credentialsConfig: Config): FileDescriptor = {
+    protocol(uri) match {
+      case ("file", path) => LocalFileDescriptor(path)
+      case ("s3", path) => S3FileDescriptor(path, credentialsConfig)
+      case _ => throw new UnsupportedOperationException("Protocol not supported")
+    }
   }
 
   /**
