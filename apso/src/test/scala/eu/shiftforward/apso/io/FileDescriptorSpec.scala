@@ -12,25 +12,25 @@ class FileDescriptorSpec extends Specification with CustomMatchers {
 
   "A FileDescriptor" should {
 
-    "Correctly be initialized given a URI with protocol" in {
+    "correctly be initialized given a URI with protocol" in {
       FileDescriptor("file:///tmp/folder") mustEqual LocalFileDescriptor("/tmp/folder")
       FileDescriptor("s3://tmp/path") mustEqual S3FileDescriptor("tmp/path")
     }
 
-    "Be serializable" in {
+    "be serializable" in {
       FileDescriptor("file:///tmp/folder") must beSerializable
       FileDescriptor("s3://tmp/path") must beSerializable
     }
 
-    "Fail when initializing with an unsupported protocol" in {
+    "fail when initializing with an unsupported protocol" in {
       Try(FileDescriptor("wrongprotocol:///tmp")) must beAFailedTry
     }
 
-    "Fail when initializing without a protocol" in {
+    "fail when initializing without a protocol" in {
       Try(FileDescriptor("tmp")) must beAFailedTry
     }
 
-    "Be initialized with credentials when given a config" in {
+    "be initialized with credentials when given a config" in {
       val config = ConfigFactory.parseString(
         """
           |s3 {
