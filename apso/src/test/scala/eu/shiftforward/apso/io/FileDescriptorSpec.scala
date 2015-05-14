@@ -1,6 +1,9 @@
 package eu.shiftforward.apso.io
 
+import com.amazonaws.auth.BasicAWSCredentials
+import com.typesafe.config.ConfigFactory
 import eu.shiftforward.apso.CustomMatchers
+import eu.shiftforward.apso.aws.S3Bucket
 import org.specs2.mutable.Specification
 
 import scala.util.Try
@@ -14,7 +17,7 @@ class FileDescriptorSpec extends Specification with CustomMatchers {
       FileDescriptor("s3://tmp/path") mustEqual S3FileDescriptor("tmp/path")
     }
 
-    "Be seriablizable" in {
+    "Be serializable" in {
       FileDescriptor("file:///tmp/folder") must beSerializable
       FileDescriptor("s3://tmp/path") must beSerializable
     }
@@ -23,8 +26,29 @@ class FileDescriptorSpec extends Specification with CustomMatchers {
       Try(FileDescriptor("wrongprotocol:///tmp")) must beAFailedTry
     }
 
-    "Fail when initializing without a prococol" in {
+    "Fail when initializing without a protocol" in {
       Try(FileDescriptor("tmp")) must beAFailedTry
+    }
+
+    "Be initialized with credentials when given a config" in {
+      val config = ConfigFactory.parseString(
+        """
+          |s3 {
+          |  credentials = [{
+          |    id = "test"
+          |    creds {
+          |      access-key = "a"
+          |      secret-key = "b"
+          |    }
+          |  }]
+          |}
+        """.stripMargin)
+
+      FileDescriptor("s3://test/path/path", config) match {
+        case s3: S3FileDescriptor =>
+          s3.bucket must beEqualTo(new S3Bucket("test",
+            () => new BasicAWSCredentials("a", "b")))
+      }
     }
 
   }
