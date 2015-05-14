@@ -154,7 +154,7 @@ object S3FileDescriptor {
 
     val protocol = "s3"
 
-    def id(path: String) = path.split("/").head
+    def id(path: String) = path.split("/").headOption.mkString
 
     def createCredentials(s3Config: Config) = {
       new BasicAWSCredentials(

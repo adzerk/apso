@@ -107,5 +107,17 @@ class FileDescriptorCredentialsSpec extends Specification with CustomMatchers {
       val creds = fdCredentials.read(testConfig, path)
       creds must beSome(("repeated-username", "repeated-password"))
     }
+
+    "do not read the credentials if the given id is empty" in {
+      val path = ""
+      val creds = fdCredentials.read(baseConfig, path)
+      creds must beNone
+    }
+
+    "read the credentials if the given id is empty but a default for the protocol is defined" in {
+      val path = ""
+      val creds = fdCredentials.read(testConfig, path)
+      creds must beSome(("default-username", "default-password"))
+    }
   }
 }
