@@ -133,10 +133,20 @@ object S3FileDescriptor {
   /**
    * Creates an S3FileDescriptor from a path string extracting the bucket and the path
    * @param path the uri without the protocol, containing the bucket and path
+   * @param credentials credentials for accessing the s3 bucket
+   * @return a s3 file descriptor
+   */
+  def apply(path: String, credentials: BasicAWSCredentials): S3FileDescriptor = {
+    apply(path, Some(credentials))
+  }
+
+  /**
+   * Creates an S3FileDescriptor from a path string extracting the bucket and the path
+   * @param path the uri without the protocol, containing the bucket and path
    * @param credentials optional credentials for accessing the s3 bucket
    * @return a s3 file descriptor
    */
-  def apply(path: String, credentials: Option[BasicAWSCredentials]): S3FileDescriptor = {
+  private def apply(path: String, credentials: Option[BasicAWSCredentials]): S3FileDescriptor = {
     path.split('/').toList match {
       case s3bucket :: s3path =>
         def newBucket = credentials.fold(new S3Bucket(s3bucket))(s3Cred => new S3Bucket(s3bucket, () => s3Cred))
@@ -151,11 +161,8 @@ object S3FileDescriptor {
    * Credential extractor for a s3 bucket from the credential config
    */
   val credentials = new FileDescriptorCredentials[BasicAWSCredentials] {
-
-    val protocol = "s3"
-
     def id(path: String) = path.split("/").headOption.mkString
-
+    val protocol = "s3"
     def createCredentials(s3Config: Config) = {
       new BasicAWSCredentials(
         s3Config.getString("access-key"),
