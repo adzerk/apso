@@ -38,8 +38,8 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
     LocalFileDescriptor(childPath.toString)
   }
 
-  override def child(name: String, name2: String, names: String*): LocalFileDescriptor = {
-    val childPath = names.foldLeft(child(name).child(name2).normalizedPath) {
+  override def children(names: String*): LocalFileDescriptor = {
+    val childPath = names.foldLeft(normalizedPath) {
       (acc, child) => acc.resolve(child)
     }
     LocalFileDescriptor(childPath.toString)

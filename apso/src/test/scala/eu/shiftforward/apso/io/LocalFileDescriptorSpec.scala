@@ -29,7 +29,7 @@ class LocalFileDescriptorSpec extends Specification {
     "Move down the hiearchy correctly" in {
       LocalFileDescriptor("/tmp") / "one" / "two" === LocalFileDescriptor("/tmp/one/two")
       LocalFileDescriptor("/tmp").child("one") === LocalFileDescriptor("/tmp/one")
-      LocalFileDescriptor("/tmp").child("one", "two") === LocalFileDescriptor("/tmp/one/two")
+      LocalFileDescriptor("/tmp").children("one", "two") === LocalFileDescriptor("/tmp/one/two")
       LocalFileDescriptor("/tmp") / "wrong" !== LocalFileDescriptor("/tmp/right")
     }
 
@@ -63,7 +63,7 @@ class LocalFileDescriptorSpec extends Specification {
 
     "Create intermediary folders when required" in {
       val fd = LocalFileDescriptor("/tmp") / randomFolder / randomString
-      val f = fd.child("one", "two")
+      val f = fd.children("one", "two")
       f.exists must beFalse
       f.isDirectory must beFalse
       f.mkdirs()

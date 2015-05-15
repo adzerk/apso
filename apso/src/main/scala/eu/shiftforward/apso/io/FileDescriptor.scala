@@ -84,14 +84,11 @@ trait FileDescriptor {
 
   /**
    * Adds multiple new child nodes to the filesystem path.
-   * @param name the first node name.
-   * @param name2 the second node name.
-   * @param names the remaining node names.
+   * @param names the node names to add.
    * @return the new file descriptor with the updated path
    */
-  def child(name: String, name2: String, names: String*): FileDescriptor = {
-    names.foldLeft(child(name).child(name2))((acc, c) => acc.child(c))
-  }
+  def children(names: String*): FileDescriptor =
+    names.foldLeft(this)((acc, c) => acc.child(c))
 
   /**
    * Changes the path of the file descriptor using unix's cd syntax related to the current directory.
