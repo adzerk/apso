@@ -70,8 +70,8 @@ case class S3FileDescriptor(bucket: S3Bucket, private val elements: List[String]
   def child(name: String): S3FileDescriptor =
     this.copy(elements = elements ++ sanitize(name).toList)
 
-  override def child(name: String, name2: String, names: String*): S3FileDescriptor =
-    this.copy(elements = elements ++ (Seq(name, name2) ++ names).flatMap(sanitize))
+  override def children(names: String*): S3FileDescriptor =
+    this.copy(elements = elements ++ names.flatMap(sanitize))
 
   override def cd(pathString: String): S3FileDescriptor = {
     val newPath = pathString.split("/").map(_.trim).toList.foldLeft(elements) {
