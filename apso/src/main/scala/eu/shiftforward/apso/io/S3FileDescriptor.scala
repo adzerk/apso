@@ -1,13 +1,14 @@
 package eu.shiftforward.apso.io
 
-import java.io.File
-
+import com.amazonaws.auth.BasicAWSCredentials
+import com.typesafe.config.Config
 import eu.shiftforward.apso.Logging
 import eu.shiftforward.apso.aws.S3Bucket
+import eu.shiftforward.apso.config.FileDescriptorCredentials
 
 import scala.collection.concurrent.TrieMap
 
-case class S3FileDescriptor(private val bucket: S3Bucket, private val elements: List[String])
+case class S3FileDescriptor(bucket: S3Bucket, private val elements: List[String])
     extends FileDescriptor with Logging {
 
   lazy val bucketName = bucket.bucketName
@@ -118,13 +119,54 @@ object S3FileDescriptor {
    * @param path the uri without the protocol, containing the bucket and path
    * @return a s3 file descriptor
    */
-  def apply(path: String): S3FileDescriptor = {
+  def apply(path: String): S3FileDescriptor = apply(path, None)
+
+  /**
+   * Creates an S3FileDescriptor from a path string extracting the bucket and the path
+   * @param path the uri without the protocol, containing the bucket and path
+   * @param credentialsConfig the config containing the credentials
+   * @return a s3 file descriptor
+   */
+  def apply(path: String, credentialsConfig: Config): S3FileDescriptor =
+    apply(path, credentials.read(credentialsConfig, path))
+
+  /**
+   * Creates an S3FileDescriptor from a path string extracting the bucket and the path
+   * @param path the uri without the protocol, containing the bucket and path
+   * @param credentials credentials for accessing the s3 bucket
+   * @return a s3 file descriptor
+   */
+  def apply(path: String, credentials: BasicAWSCredentials): S3FileDescriptor = {
+    apply(path, Some(credentials))
+  }
+
+  /**
+   * Creates an S3FileDescriptor from a path string extracting the bucket and the path
+   * @param path the uri without the protocol, containing the bucket and path
+   * @param credentials optional credentials for accessing the s3 bucket
+   * @return a s3 file descriptor
+   */
+  private def apply(path: String, credentials: Option[BasicAWSCredentials]): S3FileDescriptor = {
     path.split('/').toList match {
       case s3bucket :: s3path =>
-        val s3BucketRef = s3Buckets.getOrElseUpdate(s3bucket, new S3Bucket(s3bucket))
+        def newBucket = credentials.fold(new S3Bucket(s3bucket))(s3Cred => new S3Bucket(s3bucket, () => s3Cred))
+        val s3BucketRef = s3Buckets.getOrElseUpdate(s3bucket, newBucket)
         S3FileDescriptor(s3BucketRef, s3path.filterNot(_.trim == ""))
 
       case _ => throw new Exception("Error parsing S3 URI")
+    }
+  }
+
+  /**
+   * Credential extractor for a s3 bucket from the credential config
+   */
+  val credentials = new FileDescriptorCredentials[BasicAWSCredentials] {
+    def id(path: String) = path.split("/").headOption.mkString
+    val protocol = "s3"
+    def createCredentials(s3Config: Config) = {
+      new BasicAWSCredentials(
+        s3Config.getString("access-key"),
+        s3Config.getString("secret-key"))
     }
   }
 
