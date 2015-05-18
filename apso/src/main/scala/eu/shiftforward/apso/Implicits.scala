@@ -189,7 +189,7 @@ object Implicits {
    * Implicit class that provides new methods for buffered iterators.
    * @param thisIt the buffered iterator to which the new methods are provided.
    */
-  final implicit class ApsoBufferedIterator[T](val thisIt: BufferedIterator[T]) extends AnyVal {
+  final implicit class ApsoBufferedIterator[T](val thisIt: BufferedIterator[T]) {
 
     /**
      * Lazily merges this buffered iterator with another buffered iterator assuming that both collections
