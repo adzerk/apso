@@ -46,6 +46,8 @@ class FileDescriptorSpec extends Specification with CustomMatchers {
 
       FileDescriptor("s3://test/path/path", config) match {
         case s3: S3FileDescriptor =>
+          s3 must beSerializable
+
           s3.bucket must beEqualTo(new S3Bucket("test",
             () => new BasicAWSCredentials("a", "b")))
       }

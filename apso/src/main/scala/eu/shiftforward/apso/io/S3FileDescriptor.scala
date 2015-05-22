@@ -3,7 +3,7 @@ package eu.shiftforward.apso.io
 import com.amazonaws.auth.BasicAWSCredentials
 import com.typesafe.config.Config
 import eu.shiftforward.apso.Logging
-import eu.shiftforward.apso.aws.S3Bucket
+import eu.shiftforward.apso.aws.{ SerializableAWSCredentials, S3Bucket }
 import eu.shiftforward.apso.config.FileDescriptorCredentials
 
 import scala.collection.concurrent.TrieMap
@@ -137,6 +137,16 @@ object S3FileDescriptor {
    * @return a s3 file descriptor
    */
   def apply(path: String, credentials: BasicAWSCredentials): S3FileDescriptor = {
+    apply(path, Some(SerializableAWSCredentials(credentials)))
+  }
+
+  /**
+   * Creates an S3FileDescriptor from a path string extracting the bucket and the path
+   * @param path the uri without the protocol, containing the bucket and path
+   * @param credentials serializable credentials for accessing the s3 bucket
+   * @return a s3 file descriptor
+   */
+  def apply(path: String, credentials: SerializableAWSCredentials): S3FileDescriptor = {
     apply(path, Some(credentials))
   }
 
@@ -146,7 +156,7 @@ object S3FileDescriptor {
    * @param credentials optional credentials for accessing the s3 bucket
    * @return a s3 file descriptor
    */
-  private def apply(path: String, credentials: Option[BasicAWSCredentials]): S3FileDescriptor = {
+  private def apply(path: String, credentials: Option[SerializableAWSCredentials]): S3FileDescriptor = {
     path.split('/').toList match {
       case s3bucket :: s3path =>
         def newBucket = credentials.fold(new S3Bucket(s3bucket))(s3Cred => new S3Bucket(s3bucket, () => s3Cred))
@@ -160,11 +170,11 @@ object S3FileDescriptor {
   /**
    * Credential extractor for a s3 bucket from the credential config
    */
-  val credentials = new FileDescriptorCredentials[BasicAWSCredentials] {
+  val credentials = new FileDescriptorCredentials[SerializableAWSCredentials] {
     def id(path: String) = path.split("/").headOption.mkString
     val protocol = "s3"
     def createCredentials(s3Config: Config) = {
-      new BasicAWSCredentials(
+      new SerializableAWSCredentials(
         s3Config.getString("access-key"),
         s3Config.getString("secret-key"))
     }
