@@ -30,7 +30,8 @@ object ProjectBuild extends Build {
       "org.scalaz"                    %% "scalaz-core"        % "7.1.1"          % "provided",
       "org.slf4j"                      % "slf4j-api"          % "1.7.12",
       "org.specs2"                    %% "specs2"             % "2.4.17"         % "test",
-      "junit"                          % "junit"              % "4.12"           % "test"))
+      "junit"                          % "junit"              % "4.12"           % "test",
+      "org.scalacheck"                %% "scalacheck"         % "1.12.2"         % "test"))
 
   lazy val apsoTestkit = Project("apso-testkit", file("apso-testkit"))
     .settings(commonSettings: _*)
