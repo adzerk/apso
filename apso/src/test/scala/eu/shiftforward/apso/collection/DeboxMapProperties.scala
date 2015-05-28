@@ -76,8 +76,7 @@ class DeboxMapProperties extends Properties("DeboxMap") {
   }
 
   property("getOrElseUpdate") = forAll { (map: DeboxMap[K, V], k: K, v: V) =>
-    val contains = map.contains(k)
-    if (contains) {
+    if (map.contains(k)) {
       val oldValue = map.get(k).get
       map.getOrElseUpdate(k, v) == oldValue
     } else {
