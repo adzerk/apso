@@ -57,6 +57,8 @@ class DeboxMapSpec extends Specification {
       m(2) === 0
 
       m.getOrElseUpdate(2, 1) === 0
+      m.remove(2)
+      m.getOrElseUpdate(2, 1) === 1
     }
 
     "have a working resize/remove" in {

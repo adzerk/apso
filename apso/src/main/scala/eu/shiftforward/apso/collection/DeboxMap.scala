@@ -297,12 +297,32 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
    * @return the value associated with the given key if this map contains the
    *         key, `default` otherwise.
    */
-  final def getOrElseUpdate(key: A, default: => B): B =
-    get(key).getOrElse {
-      val res = default
-      update(key, res)
-      res
+  final def getOrElseUpdate(key: A, default: => B): B = {
+    @inline
+    lazy val value = default
+    @tailrec def loop(i: Int, perturbation: Int, firstFreeBlock: Int): B = {
+      val j = i & mask
+      val status = buckets(j)
+      if (status == 0) { // Free block
+        val freeBlock = if (firstFreeBlock == -1) j else firstFreeBlock
+        keys(freeBlock) = key
+        vals(freeBlock) = value
+        buckets(freeBlock) = 3
+        len += 1
+        used += 1
+        if (used > limit) resize()
+        value
+      } else if (status == 2) { // Free block (freed by a removal)
+        loop((i << 2) + i + perturbation + 1, perturbation >> 5, j)
+      } else if (keys(j) == key) {
+        vals(j)
+      } else {
+        loop((i << 2) + i + perturbation + 1, perturbation >> 5, firstFreeBlock)
+      }
     }
+    val i = key.## & 0x7fffffff
+    loop(i, i, -1)
+  }
 
   /**
    * Applies a function `f` to all entries of this map.
