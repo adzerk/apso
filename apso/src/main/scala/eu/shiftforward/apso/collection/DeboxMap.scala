@@ -177,6 +177,7 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
       if (status == 3 && keys(j) == key) {
         buckets(j) = 2
         len -= 1
+        loop((i << 2) + i + perturbation + 1, perturbation >> 5)
       } else if (status == 0) {
       } else {
         loop((i << 2) + i + perturbation + 1, perturbation >> 5)
