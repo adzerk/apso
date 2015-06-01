@@ -238,7 +238,7 @@ class ImplicitsSpec extends Specification {
       rand.setSeed(0)
       val runs = 100000
       val epsilon = 0.001
-      val stream = rand.increasingUniformStream(runs)
+      val stream = rand.increasingUniformStream(runs).toList
 
       def centralMoment(n: Int, xs: List[Double]) = {
         val avg = xs.sum / xs.size
@@ -247,7 +247,7 @@ class ImplicitsSpec extends Specification {
       }
 
       "the results must be ordered" in {
-        stream.toList.sorted === stream.toList
+        stream.sorted === stream
       }
 
       "the average must be close to 0.5" in {
@@ -255,11 +255,11 @@ class ImplicitsSpec extends Specification {
       }
 
       "the variance must be close to 1/12" in {
-        centralMoment(2, stream.toList) must beCloseTo(1.0 / 12 +/- epsilon)
+        centralMoment(2, stream) must beCloseTo(1.0 / 12 +/- epsilon)
       }
 
       "the skewness must be close to 0" in {
-        centralMoment(3, stream.toList) must beCloseTo(0.0 +/- epsilon)
+        centralMoment(3, stream) must beCloseTo(0.0 +/- epsilon)
       }
     }
   }
