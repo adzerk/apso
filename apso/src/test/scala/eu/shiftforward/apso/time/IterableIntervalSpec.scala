@@ -2,10 +2,9 @@ package eu.shiftforward.apso.time
 
 import com.github.nscala_time.time.Imports._
 import org.specs2.mutable._
-import org.specs2.time.NoTimeConversions
 import Implicits._
 
-class IterableIntervalSpec extends Specification with NoTimeConversions {
+class IterableIntervalSpec extends Specification {
 
   "An iterable interval" should {
 
