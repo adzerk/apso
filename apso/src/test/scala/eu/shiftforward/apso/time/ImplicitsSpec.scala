@@ -2,10 +2,9 @@ package eu.shiftforward.apso.time
 
 import com.github.nscala_time.time.Imports._
 import org.specs2.mutable._
-import org.specs2.time.NoTimeConversions
 import Implicits._
 
-class ImplicitsSpec extends Specification with NoTimeConversions {
+class ImplicitsSpec extends Specification {
   "An ApsoTimeLocalDate" should {
     "support range creation" in {
       val startDate = "2014-01-01".toLocalDate
