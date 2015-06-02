@@ -57,6 +57,8 @@ class DeboxMapSpec extends Specification {
       m(2) === 0
 
       m.getOrElseUpdate(2, 1) === 0
+      m.remove(2)
+      m.getOrElseUpdate(2, 1) === 1
     }
 
     "have a working resize/remove" in {
@@ -136,6 +138,57 @@ class DeboxMapSpec extends Specification {
       m1.update(11, 11)
 
       m1 !== m2
+    }
+
+    "handle hash collisions" in {
+      val str1 = "q978Q1iCaznURFPWnTy1"
+      val str2 = "tW5V7aiYeLQ4ZrCUGJ1x"
+      str1.## === str2.##
+
+      val m1 = DeboxMap.empty[String, Int]
+      m1.update(str1, 1)
+      m1.update(str2, 2)
+
+      m1.get(str1) === Some(1)
+      m1.get(str2) === Some(2)
+
+      m1.remove(str1)
+
+      m1.get(str1) === None
+      m1.get(str2) === Some(2)
+
+      m1.update(str2, 3)
+
+      m1.get(str1) === None
+      m1.get(str2) === Some(3)
+
+      m1.remove(str2)
+
+      m1.get(str1) === None
+      m1.get(str2) === None
+
+      val m2 = DeboxMap.empty[String, Int]
+
+      m2.getOrElseUpdate(str1, 1)
+      m2.getOrElseUpdate(str2, 2)
+
+      m2.getOrElse(str1, -1) === 1
+      m2.getOrElse(str2, -1) === 2
+
+      m2.remove(str1)
+
+      m2.getOrElse(str1, -1) === -1
+      m2.getOrElse(str2, -1) === 2
+
+      m2.getOrElseUpdate(str2, 3)
+
+      m2.getOrElse(str1, -1) === -1
+      m2.getOrElse(str2, -1) === 2
+
+      m2.remove(str2)
+
+      m2.getOrElse(str1, -1) === -1
+      m2.getOrElse(str2, -1) === -1
     }
   }
 
