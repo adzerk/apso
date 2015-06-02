@@ -20,7 +20,7 @@ class DeboxMapProperties extends Properties("DeboxMap") {
       DeboxMap.empty[A, B]
     else {
       val map = DeboxMap[A, B](keys.toArray, values.toArray)
-      // Remove some keys to have invalid blocks
+      // Remove some keys to have dirty blocks (state = 2)
       removedKeys.foreach { k => map.remove(k) }
       map
     }
