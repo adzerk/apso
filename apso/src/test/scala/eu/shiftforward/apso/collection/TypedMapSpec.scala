@@ -27,9 +27,9 @@ class TypedMapSpec extends Specification {
       m3[Int] === 4
       m3.size === 1
 
-      val m4 = m3 + "STR"
-      m4.contains[String] === true
-      m4[String] === "STR"
+      val m4 = m3 + List("STR")
+      m4.contains[List[String]] === true
+      m4[List[String]] === List("STR")
       m4.size === 2
     }
 
