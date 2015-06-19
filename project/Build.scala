@@ -17,8 +17,8 @@ object ProjectBuild extends Build {
     .settings(publishSettings: _*)
     .settings(apsoSettings: _*)
     .settings(libraryDependencies ++= Seq(
-      "com.amazonaws"                  % "aws-java-sdk-ec2"   % "1.9.39"         % "provided",
-      "com.amazonaws"                  % "aws-java-sdk-s3"    % "1.9.39"         % "provided",
+      "com.amazonaws"                  % "aws-java-sdk-ec2"   % "1.10.0"         % "provided",
+      "com.amazonaws"                  % "aws-java-sdk-s3"    % "1.10.0"         % "provided",
       "com.github.nscala-time"        %% "nscala-time"        % "2.0.0"          % "provided",
       "com.j256.simplejmx"             % "simplejmx"          % "1.12",
       "com.typesafe"                   % "config"             % "1.3.0"          % "provided",
@@ -26,13 +26,13 @@ object ProjectBuild extends Build {
       "com.twmacinta"                  % "fast-md5"           % "2.7.1",
       "io.spray"                      %% "spray-json"         % "1.3.2"          % "provided",
       "io.spray"                      %% "spray-httpx"        % "1.3.3"          % "provided",
-      "net.databinder.dispatch"       %% "dispatch-core"      % "0.11.2",
+      "net.databinder.dispatch"       %% "dispatch-core"      % "0.11.3",
       "org.scalaz"                    %% "scalaz-core"        % "7.1.2"          % "provided",
       "org.slf4j"                      % "slf4j-api"          % "1.7.12",
-      "org.specs2"                    %% "specs2-core"        % "3.6"            % "test",
-      "org.specs2"                    %% "specs2-junit"       % "3.6"            % "test",
+      "org.specs2"                    %% "specs2-core"        % "3.6.1"          % "test",
+      "org.specs2"                    %% "specs2-junit"       % "3.6.1"          % "test",
       "junit"                          % "junit"              % "4.12"           % "test",
-      "org.scalacheck"                %% "scalacheck"         % "1.12.2"         % "test"))
+      "org.scalacheck"                %% "scalacheck"         % "1.12.4"         % "test"))
 
   lazy val apsoTestkit = Project("apso-testkit", file("apso-testkit"))
     .settings(commonSettings: _*)
@@ -41,8 +41,8 @@ object ProjectBuild extends Build {
     .settings(libraryDependencies ++= Seq(
       "com.typesafe.akka"             %% "akka-testkit"       % "2.3.11"         % "provided",
       "org.slf4j"                      % "slf4j-api"          % "1.7.12",
-      "org.specs2"                    %% "specs2-core"        % "3.6"            % "provided",
-      "org.specs2"                    %% "specs2-junit"       % "3.6"            % "provided"
+      "org.specs2"                    %% "specs2-core"        % "3.6.1"          % "provided",
+      "org.specs2"                    %% "specs2-junit"       % "3.6.1"          % "provided"
   ))
 
   lazy val commonSettings = Defaults.coreDefaultSettings ++ formatSettings ++ Seq(
