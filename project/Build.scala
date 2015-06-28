@@ -17,8 +17,8 @@ object ProjectBuild extends Build {
     .settings(publishSettings: _*)
     .settings(apsoSettings: _*)
     .settings(libraryDependencies ++= Seq(
-      "com.amazonaws"                  % "aws-java-sdk-ec2"   % "1.10.0"         % "provided",
-      "com.amazonaws"                  % "aws-java-sdk-s3"    % "1.10.0"         % "provided",
+      "com.amazonaws"                  % "aws-java-sdk-ec2"   % "1.10.2"         % "provided",
+      "com.amazonaws"                  % "aws-java-sdk-s3"    % "1.10.2"         % "provided",
       "com.github.nscala-time"        %% "nscala-time"        % "2.0.0"          % "provided",
       "com.j256.simplejmx"             % "simplejmx"          % "1.12",
       "com.typesafe"                   % "config"             % "1.3.0"          % "provided",
