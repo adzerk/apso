@@ -29,8 +29,8 @@ object ProjectBuild extends Build {
       "net.databinder.dispatch"       %% "dispatch-core"      % "0.11.3",
       "org.scalaz"                    %% "scalaz-core"        % "7.1.2"          % "provided",
       "org.slf4j"                      % "slf4j-api"          % "1.7.12",
-      "org.specs2"                    %% "specs2-core"        % "3.6.1"          % "test",
-      "org.specs2"                    %% "specs2-junit"       % "3.6.1"          % "test",
+      "org.specs2"                    %% "specs2-core"        % "3.6.2"          % "test",
+      "org.specs2"                    %% "specs2-junit"       % "3.6.2"          % "test",
       "junit"                          % "junit"              % "4.12"           % "test",
       "org.scalacheck"                %% "scalacheck"         % "1.12.4"         % "test"))
 
