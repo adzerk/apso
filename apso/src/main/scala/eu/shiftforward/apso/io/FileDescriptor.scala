@@ -52,14 +52,14 @@ trait FileDescriptor {
    * Lists the files in the current file descriptor directory
    * @return a iterator of file descriptors
    */
-  def list: Iterator[FileDescriptor] = listByPrefix("")
+  def list: Iterator[FileDescriptor]
 
   /**
-   * Lists the files in the current file descriptor directory that match the given prefix
-   * @param prefix the prefix to match the filenames
+   * Lists all files down the file hierarchy tree that whose relative path match the given prefix
+   * @param prefix the prefix to match given each file relative path to the current directory
    * @return a iterator of file descriptors
    */
-  def listByPrefix(prefix: String): Iterator[FileDescriptor]
+  def listAllFilesWithPrefix(prefix: String): Iterator[FileDescriptor]
 
   /**
    * Returns the file descriptor `n` node up in the filesystem path.

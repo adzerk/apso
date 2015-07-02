@@ -95,16 +95,27 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
     }
   }
 
-  override def list: Iterator[LocalFileDescriptor] = listByPrefix("")
-
-  def listByPrefix(prefix: String): Iterator[LocalFileDescriptor] = {
+  override def list: Iterator[LocalFileDescriptor] = {
     if (isDirectory) {
-      file.listFiles.toIterator.filter(_.getName.startsWith(prefix)).map {
-        f => LocalFileDescriptor(f.getAbsolutePath)
-      }
+      file.listFiles.toIterator.map(f => LocalFileDescriptor(f.getAbsolutePath))
     } else {
       Iterator()
     }
+  }
+
+  def listAllFilesWithPrefix(prefix: String): Iterator[LocalFileDescriptor] = {
+    def aux(file: LocalFileDescriptor, splits: Array[String]): Iterator[LocalFileDescriptor] = {
+      val headStr = splits.headOption.getOrElse("")
+      val rest = splits.drop(1)
+      val restStr = rest.headOption.getOrElse("")
+
+      file.list.filter(_.name.startsWith(headStr)).flatMap {
+        case fd if fd.isDirectory => aux(fd, rest)
+        case fd if fd.name.startsWith(restStr) => Seq(fd)
+        case _ => Seq()
+      }
+    }
+    aux(this, prefix.split('/'))
   }
 
   def exists: Boolean = file.exists()

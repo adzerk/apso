@@ -26,7 +26,7 @@ class LocalFileDescriptorSpec extends Specification {
       LocalFileDescriptor("/tmp/one/two/three").parent(3) == LocalFileDescriptor("/tmp")
     }
 
-    "Move down the hiearchy correctly" in {
+    "Move down the hierarchy correctly" in {
       LocalFileDescriptor("/tmp") / "one" / "two" === LocalFileDescriptor("/tmp/one/two")
       LocalFileDescriptor("/tmp").child("one") === LocalFileDescriptor("/tmp/one")
       LocalFileDescriptor("/tmp").children("one", "two") === LocalFileDescriptor("/tmp/one/two")
@@ -153,7 +153,27 @@ class LocalFileDescriptorSpec extends Specification {
       val files = (1 to 5).map(n => fd / ("a" * n))
 
       files.foreach(f => f.write(f.name))
-      fd.listByPrefix("aaa").toSet === files.filter(_.name.length > 2).toSet
+      fd.list.filter(_.name.startsWith("aaa")).toSet ===
+        files.filter(_.name.length > 2).toSet
+    }
+
+    "List all files by prefix" in {
+      val fd = LocalFileDescriptor("/tmp") / randomFolder / randomString
+
+      val dir1 = fd / "aaa"
+      val dir2 = fd / "bbb"
+      val dir3 = fd / "ccc"
+
+      dir1.mkdirs()
+      dir2.mkdirs()
+      dir3.mkdirs()
+
+      (1 to 5).map(n => dir1 / ("g" * n)).foreach(f => f.write(f.name))
+      (1 to 3).map(n => dir2 / ("j" * n)).foreach(f => f.write(f.name))
+
+      fd.listAllFilesWithPrefix("aaa/ggg").toList must haveSize(3)
+      fd.listAllFilesWithPrefix("") must haveSize(8)
+      dir3.listAllFilesWithPrefix("") must beEmpty
     }
 
     "Know whether the FD points to a directory" in {
