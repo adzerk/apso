@@ -64,11 +64,11 @@ class S3Bucket(val bucketName: String,
   private[this] def sanitizeKey(key: String) = if (key.startsWith("./")) key.drop(2) else key
 
   /**
-   * Returns a list of filenames in a bucket matching a given prefix.
+   * Returns a list of filenames and directories in a bucket matching a given prefix.
    * @param prefix the prefix to match
    * @return a list of filenames in a bucket matching a given prefix.
    */
-  def getFilesWithMatchingPrefix(prefix: String): Iterator[String] = {
+  def getFilesWithMatchingPrefix(prefix: String, includeDirectories: Boolean = false): Iterator[String] = {
     log.info("Finding files matching prefix '{}'...", prefix)
 
     val listings = Iterator.iterate(s3.listObjects(bucketName, sanitizeKey(prefix))) { listing =>
@@ -78,7 +78,10 @@ class S3Bucket(val bucketName: String,
       } else null
     }
 
-    listings.takeWhile(_ != null).flatMap(_.getObjectSummaries).map(_.getKey).filterNot(_.endsWith("/"))
+    listings.takeWhile(_ != null)
+      .flatMap(_.getObjectSummaries)
+      .map(_.getKey)
+      .filterNot(!includeDirectories && _.endsWith("/"))
   }
 
   /**
@@ -121,9 +124,7 @@ class S3Bucket(val bucketName: String,
         .withBucketName(bucketName)
         .withMaxKeys(2)
         .withPrefix(key)).getObjectSummaries
-  }.filter { objs =>
-    objs.length > 1 || objs.length == 1 && objs.last.getKey.endsWith("/")
-  }.isDefined
+  }.exists { _.exists(_.getKey.startsWith(key + "/")) }
 
   /**
    * Sets an access control list on a given Amazon S3 object.
@@ -210,10 +211,14 @@ class S3Bucket(val bucketName: String,
     }
 
     case ex: AmazonServiceException =>
-      log.error(s"Service error: ${ex.getMessage}", ex); false
+      log.error(s"Service error: ${ex.getMessage}", ex); ex.isRetryable
+
+    case ex: AmazonClientException if ex.getMessage ==
+      "Unable to load AWS credentials from any provider in the chain" =>
+      log.error("Unable to load AWS credentials", ex); true
 
     case ex: AmazonClientException =>
-      log.error("Client error pulling file", ex); false
+      log.error("Client error pulling file", ex); ex.isRetryable
 
     case ex: Exception =>
       log.error("An error occurred", ex); false

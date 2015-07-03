@@ -82,13 +82,32 @@ case class S3FileDescriptor(bucket: S3Bucket, private val elements: List[String]
     this.copy(elements = newPath)
   }
 
-  override def list: Iterator[S3FileDescriptor] = listByPrefix("")
-
-  def listByPrefix(prefix: String): Iterator[S3FileDescriptor] = {
-    val fullPrefix = if (prefix == "") elements else elements :+ prefix
-    bucket.getFilesWithMatchingPrefix(buildPath(fullPrefix)).map {
-      f => this.copy(elements = f.split("/").toList)
+  override def list: Iterator[S3FileDescriptor] = {
+    def removePrefix(primary: List[String], secondary: List[String]): List[String] = {
+      (primary, secondary) match {
+        case (h1 :: t1, h2 :: t2) if h1 == h2 => removePrefix(t1, t2)
+        case (Nil, s) => s
+        case (p, Nil) => Nil
+      }
     }
+
+    val s3Elements = listS3WithPrefix("", includeDirectories = true).flatMap {
+      pathStr => removePrefix(elements, pathStr.split("/").toList).take(1).toSet
+    }.toSet
+
+    s3Elements.map {
+      case newElement => this.copy(elements = elements :+ newElement)
+    }.toIterator
+  }
+
+  def listAllFilesWithPrefix(prefix: String): Iterator[S3FileDescriptor] = {
+    listS3WithPrefix(prefix, includeDirectories = false).map {
+      pathStr => this.copy(elements = pathStr.split("/").toList)
+    }
+  }
+
+  private def listS3WithPrefix(prefix: String, includeDirectories: Boolean): Iterator[String] = {
+    bucket.getFilesWithMatchingPrefix(buildPath(elements :+ prefix), includeDirectories)
   }
 
   override def sibling(f: String => String): S3FileDescriptor = {
