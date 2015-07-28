@@ -31,6 +31,8 @@ object Implicits {
      * returned.
      * @return the unwrapped JSON value.
      */
+    @deprecated("Please check out jrudolph/json-lenses project on GitHub (https://github.com/jrudolph/json-lenses)" +
+      " for alternative ways to manipulate JSON values", "28-07-2015")
     def toValue: Any = json match {
       case JsString(str) => str
       case JsNumber(num) => num
@@ -47,9 +49,13 @@ object Implicits {
      * @tparam JV The type of JSON value to return
      * @return The JSON field value (wrapped in an option)
      */
+    @deprecated("Please check out jrudolph/json-lenses project on GitHub (https://github.com/jrudolph/json-lenses)" +
+      " for alternative ways to manipulate JSON values", "28-07-2015")
     def getPath[JV <: JsValue: ClassTag](path: String): Option[JV] =
       getPath(path.split("\\.").toList)
 
+    @deprecated("Please check out jrudolph/json-lenses project on GitHub (https://github.com/jrudolph/json-lenses)" +
+      " for alternative ways to manipulate JSON values", "28-07-2015")
     def getPath[JV <: JsValue: ClassTag](pathElements: List[String]): Option[JV] =
       (pathElements, json) match {
         case (Nil, jv: JV) => Some(jv)
@@ -63,6 +69,8 @@ object Implicits {
      * @param other the other JsValue
      * @return the merged JsValues
      */
+    @deprecated("Please check out jrudolph/json-lenses project on GitHub (https://github.com/jrudolph/json-lenses)" +
+      " for alternative ways to manipulate JSON values", "28-07-2015")
     def merge(other: JsValue): JsValue = (json, other) match {
       case (JsObject(fields), JsObject(otherFields)) =>
         (fields.twoWayMerge(otherFields))((js1, js2) => js1.merge(js2)).toJson
