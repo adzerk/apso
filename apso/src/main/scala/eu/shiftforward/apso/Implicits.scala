@@ -1,9 +1,13 @@
 package eu.shiftforward.apso
 
+import akka.actor.ActorSystem
+import akka.pattern.after
 import eu.shiftforward.apso.collection.MergedBufferedIterator
 
 import scala.collection.generic.CanBuildFrom
 import scala.compat.Platform
+import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Random
 
 /**
@@ -324,6 +328,39 @@ object Implicits {
       } getOrElse {
         Map()
       }
+    }
+  }
+
+  /**
+   * Implicit class to extend the original scala Future[Option].
+   *
+   * @param f future to covert
+   */
+  implicit class ApsoOptionalFuture[A](val f: Future[Option[A]]) extends AnyVal {
+
+    /**
+     * If this future returns None or fails, fallback to another future
+     *
+     * @param other fallback
+     * @return resulting future
+     */
+    def ifNoneOrErrorFallbackTo(other: => Future[Option[A]])(implicit ec: ExecutionContext) = f.flatMap {
+      case None =>
+        other
+      case res =>
+        Future.successful(res)
+    } recoverWith {
+      case _: Exception => other
+    }
+
+    /**
+     * Executes a future with a certain timeout. This method requires an actor system to schedule the timeout.
+     * @param duration timeout duration
+     * @param system actor system
+     * @return new future
+     */
+    def withTimeout(duration: FiniteDuration)(implicit system: ActorSystem, ec: ExecutionContext): Future[Option[A]] = {
+      Future.firstCompletedOf(Seq(f, after(duration, system.scheduler)(Future.successful(None))))
     }
   }
 
