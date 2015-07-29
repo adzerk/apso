@@ -334,7 +334,7 @@ object Implicits {
   /**
    * Implicit class to extend the original scala Future[Option].
    *
-   * @param f future to covert
+   * @param f future to convert
    */
   implicit class ApsoOptionalFuture[A](val f: Future[Option[A]]) extends AnyVal {
 
