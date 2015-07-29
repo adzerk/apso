@@ -47,9 +47,23 @@ object Implicits {
      * @tparam JV The type of JSON value to return
      * @return The JSON field value (wrapped in an option)
      */
+    @deprecated("\nPlease check out jrudolph/json-lenses project on GitHub (https://github.com/jrudolph/json-lenses) " +
+      "for alternative ways to manipulate JSON values.\n" +
+      "For example:\n" +
+      "val json = \"\"\"{\"k1\":{\"k1.1\":\"v1.1\",\"k1.2\":\"v1.2\",\"k1.3\":[{\"k1.3.1\":[1,2,3]},{\"k1.3.1\":[4,5,6]}]}}\"\"\"\n" +
+      "val lens = \"k1\" / \"k1.3\" / * / \"k1.3.1\"\n" +
+      "json.extract[Array[Int]](lens2)\n" +
+      "res2: Seq[Array[Int]] = List(Array(1, 2, 3), Array(4, 5, 6))\n", "28-07-2015")
     def getPath[JV <: JsValue: ClassTag](path: String): Option[JV] =
       getPath(path.split("\\.").toList)
 
+    @deprecated("\nPlease check out jrudolph/json-lenses project on GitHub (https://github.com/jrudolph/json-lenses) " +
+      "for alternative ways to manipulate JSON values.\n" +
+      "For example:\n" +
+      "val json = \"\"\"{\"k1\":{\"k1.1\":\"v1.1\",\"k1.2\":\"v1.2\",\"k1.3\":[{\"k1.3.1\":[1,2,3]},{\"k1.3.1\":[4,5,6]}]}}\"\"\"\n" +
+      "val lens = \"k1\" / \"k1.3\" / * / \"k1.3.1\"\n" +
+      "json.extract[Array[Int]](lens2)\n" +
+      "res2: Seq[Array[Int]] = List(Array(1, 2, 3), Array(4, 5, 6))\n", "28-07-2015")
     def getPath[JV <: JsValue: ClassTag](pathElements: List[String]): Option[JV] =
       (pathElements, json) match {
         case (Nil, jv: JV) => Some(jv)
