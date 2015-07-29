@@ -352,16 +352,6 @@ object Implicits {
     } recoverWith {
       case _: Exception => other
     }
-
-    /**
-     * Executes a future with a certain timeout. This method requires an actor system to schedule the timeout.
-     * @param duration timeout duration
-     * @param system actor system
-     * @return new future
-     */
-    def withTimeout(duration: FiniteDuration)(implicit system: ActorSystem, ec: ExecutionContext): Future[Option[A]] = {
-      Future.firstCompletedOf(Seq(f, after(duration, system.scheduler)(Future.successful(None))))
-    }
   }
 
   /**

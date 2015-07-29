@@ -1,6 +1,5 @@
 package eu.shiftforward.apso
 
-import akka.actor.ActorSystem
 import org.specs2.mutable._
 import eu.shiftforward.apso.Implicits._
 import scala.concurrent.Future
@@ -167,12 +166,6 @@ class ImplicitsSpec extends Specification with FutureExtraMatchers {
 
     "don't fallback on Some" in {
       Future.successful(Some(1)).ifNoneOrErrorFallbackTo(Future.successful(Some(2))).await(1.second) must be_==(Some(1))
-    }
-
-    "add timeouts to Futures" in {
-      implicit val system = ActorSystem("test")
-      Future { Thread.sleep(5000); Some(()) }.withTimeout(500.milliseconds).await(10.seconds) must be(None)
-      Future { Some(()) }.withTimeout(500.milliseconds).await(1.second) must beSome(())
     }
 
   }
