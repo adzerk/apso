@@ -157,15 +157,15 @@ class ImplicitsSpec extends Specification with FutureExtraMatchers {
   "An ApsoOptionalFuture" should {
 
     "fallback on None" in {
-      Future.successful(None).ifNoneOrErrorFallbackTo(Future.successful(Some(()))).await(1.second) must be_==(Some(()))
+      Future.successful(None).ifNoneOrErrorFallbackTo(Future.successful(Some(()))).await(1.second) must beSome
     }
 
     "fallback on Exception" in {
-      Future.failed(new Exception).ifNoneOrErrorFallbackTo(Future.successful(Some(()))).await(1.second) must be_==(Some(()))
+      Future.failed(new Exception).ifNoneOrErrorFallbackTo(Future.successful(Some(()))).await(1.second) must beSome
     }
 
     "don't fallback on Some" in {
-      Future.successful(Some(1)).ifNoneOrErrorFallbackTo(Future.successful(Some(2))).await(1.second) must be_==(Some(1))
+      Future.successful(Some(1)).ifNoneOrErrorFallbackTo(Future.successful(Some(2))).await(1.second) must beSome(1)
     }
 
   }
