@@ -2,9 +2,12 @@ package eu.shiftforward.apso
 
 import org.specs2.mutable._
 import eu.shiftforward.apso.Implicits._
+import scala.concurrent.Future
+import scala.concurrent.duration._
 import scala.util.Random
+import scala.concurrent.ExecutionContext.Implicits.global
 
-class ImplicitsSpec extends Specification {
+class ImplicitsSpec extends Specification with FutureExtraMatchers {
 
   "An ApsoSeq" should {
 
@@ -149,6 +152,22 @@ class ImplicitsSpec extends Specification {
       List(Map(1 -> "c", 2 -> "b", 3 -> "a"), Map(1 -> "c2", 4 -> "aa")).sequenceOnMap(Some("")) ===
         Map(1 -> List("c", "c2"), 2 -> List("b", ""), 3 -> List("a", ""), 4 -> List("", "aa"))
     }
+  }
+
+  "An ApsoOptionalFuture" should {
+
+    "fallback on None" in {
+      Future.successful(None).ifNoneOrErrorFallbackTo(Future.successful(Some(()))).await(1.second) must beSome
+    }
+
+    "fallback on Exception" in {
+      Future.failed(new Exception).ifNoneOrErrorFallbackTo(Future.successful(Some(()))).await(1.second) must beSome
+    }
+
+    "don't fallback on Some" in {
+      Future.successful(Some(1)).ifNoneOrErrorFallbackTo(Future.successful(Some(2))).await(1.second) must beSome(1)
+    }
+
   }
 
   "An ApsoRandom" should {
