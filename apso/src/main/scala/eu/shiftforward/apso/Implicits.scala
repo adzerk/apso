@@ -344,14 +344,12 @@ object Implicits {
      * @param other fallback
      * @return resulting future
      */
-    def ifNoneOrErrorFallbackTo(other: => Future[Option[A]])(implicit ec: ExecutionContext) = f.flatMap {
+    def ifNoneOrErrorFallbackTo[B >: A](other: => Future[Option[B]])(implicit ec: ExecutionContext) = f.flatMap {
       case None =>
         other
       case res =>
         Future.successful(res)
-    } recoverWith {
-      case _: Exception => other
-    }
+    } recoverWith PartialFunction[Throwable, Future[Option[B]]] { _ => other }
   }
 
   /**
