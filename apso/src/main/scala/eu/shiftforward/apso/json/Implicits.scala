@@ -79,8 +79,24 @@ object Implicits {
      */
     def merge(other: JsValue): JsValue = (json, other) match {
       case (JsObject(fields), JsObject(otherFields)) =>
-        (fields.twoWayMerge(otherFields))((js1, js2) => js1.merge(js2)).toJson
+        fields.twoWayMerge(otherFields)((js1, js2) => js1.merge(js2)).toJson
       case (JsArray(arr), JsArray(otherArr)) => (arr ++ otherArr).toJson
+      case _ => throw new IllegalArgumentException("Invalid types for merging")
+    }
+
+    /**
+     * Merge two JsValues if they are JsArrays or JsObjects. If they are JsObjects, a deep merge is performed.
+     *
+     * Conflicts in terminal values are resolved by choosing the value from the "other" JsValue
+     *
+     * @param other the other JsValue
+     * @return the merged JsValues
+     */
+    def mergeWithConflicts(other: JsValue): JsValue = (json, other) match {
+      case (JsObject(fields), JsObject(otherFields)) =>
+        fields.twoWayMerge(otherFields)((js1, js2) => js1.mergeWithConflicts(js2)).toJson
+      case (JsArray(arr), JsArray(otherArr)) => (arr ++ otherArr).toJson
+      case (_, anyVal) => anyVal
       case _ => throw new IllegalArgumentException("Invalid types for merging")
     }
   }
