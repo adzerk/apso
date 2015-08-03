@@ -97,7 +97,7 @@ object Implicits {
         fields.twoWayMerge(otherFields)((js1, js2) => js1.mergeWithConflicts(js2)).toJson
       case (JsArray(arr), JsArray(otherArr)) => (arr ++ otherArr).toJson
       case (_, anyVal) => anyVal
-      case _ => throw new IllegalArgumentException("Invalid types for merging")
+      case _ => throw new IllegalArgumentException("Invalid types for merging 1")
     }
   }
 
