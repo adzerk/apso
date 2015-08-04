@@ -41,7 +41,7 @@ class ImplicitsSpec extends Specification {
       val res =
         """{ "a": {"b": {"c": 9, "d": {"e": 3}, "h": 7, "i": 6}, "f": 5}, "g": [{"key": "val"}], "j": 8 }"""
 
-      source1.parseJson.mergeWithConflicts(source2.parseJson) mustEqual res.parseJson
+      source1.parseJson.merge(source2.parseJson, false) mustEqual res.parseJson
     }
 
     "provide a method to create a json object from complete paths" in {
