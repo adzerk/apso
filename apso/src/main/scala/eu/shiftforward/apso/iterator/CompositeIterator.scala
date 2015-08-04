@@ -13,12 +13,12 @@ import scala.collection.GenTraversableOnce
  */
 class CompositeIterator[A](
     private[iterator] var current: Iterator[A] = Iterator.empty,
-    private[iterator] var iterators: IndexedSeq[() => Iterator[A]] = Vector()) extends Iterator[A] {
+    private[iterator] var iterators: IndexedSeq[Iterator[A]] = Vector()) extends Iterator[A] {
 
   def hasNext: Boolean = {
     if (!current.hasNext) {
       iterators = iterators.dropWhile { it =>
-        current = it()
+        current = it
         !current.hasNext
       }
       if (!iterators.isEmpty) iterators = iterators.drop(1)
@@ -32,28 +32,33 @@ class CompositeIterator[A](
     else throw new NoSuchElementException("next on empty iterator")
 
   override def ++[B >: A](that: => GenTraversableOnce[B]): CompositeIterator[B] =
-    if (that.isInstanceOf[CompositeIterator[_]]) {
-      val composite = that.asInstanceOf[CompositeIterator[B]]
-      val thatIterators = (() => composite.current) +: composite.iterators
+    CompositeIterator[B](this, that.toIterator)
 
-      new CompositeIterator(
-        current = this.current,
-        iterators = (this.iterators ++ thatIterators))
-
-    } else {
-      new CompositeIterator(
-        current = this.current,
-        iterators = (this.iterators :+ (() => that.toIterator)))
-    }
 }
 
 /**
  * Companion object containing a factory for composite iterators.
  */
 object CompositeIterator {
-  def apply[A](its: () => Iterator[A]*): CompositeIterator[A] =
-    new CompositeIterator(iterators = its.toVector)
+  def apply[A](its: Iterator[A]*): CompositeIterator[A] =
+    its.headOption.map { head =>
+      val zero =
+        if (head.isInstanceOf[CompositeIterator[_]]) head.asInstanceOf[CompositeIterator[A]]
+        else new CompositeIterator(iterators = Vector(head))
 
-  def strict[A](its: Iterator[A]*): CompositeIterator[A] =
-    new CompositeIterator(iterators = its.map(() => _).toVector)
+      its.tail.foldLeft(zero) {
+        case (c, it) =>
+          if (it.isInstanceOf[CompositeIterator[_]]) {
+            val composite = it.asInstanceOf[CompositeIterator[A]]
+            val iterators = composite.current +: composite.iterators
+
+            new CompositeIterator(
+              current = c.current,
+              iterators = (c.iterators ++ iterators))
+
+          } else {
+            new CompositeIterator(current = c.current, iterators = (c.iterators :+ it))
+          }
+      }
+    }.getOrElse(new CompositeIterator[A]())
 }
