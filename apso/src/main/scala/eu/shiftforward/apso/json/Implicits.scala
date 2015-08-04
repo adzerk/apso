@@ -73,14 +73,21 @@ object Implicits {
       }
 
     /**
-     * Merge two JsValues if they are JsArrays or JsObjects. If they are JsObjects, a deep merge is performed.
-     * @param other the other JsValue
-     * @return the merged JsValues
+     * Merges two JsValues if they are JsArrays or JsObjects. If they are JsObjects, a deep merge is performed.
+     *
+     * When merging JsObjects, if `failOnConflict` is false and conflicts exists between terminal values, these are
+     * resolved by using the values of the second JSON. If `failOnConflict` is true, an `IllegalArgumentException` is
+     * thrown.
+     *
+     * @param other the other JSON value to merge
+     * @param failOnConflict whether to fail or resolve conflicts by using the values on the `other` JSON.
+     * @return the resulting merged JsObject
      */
-    def merge(other: JsValue): JsValue = (json, other) match {
+    def merge(other: JsValue, failOnConflict: Boolean = true): JsValue = (json, other) match {
       case (JsObject(fields), JsObject(otherFields)) =>
-        (fields.twoWayMerge(otherFields))((js1, js2) => js1.merge(js2)).toJson
+        fields.twoWayMerge(otherFields)((js1, js2) => js1.merge(js2, failOnConflict)).toJson
       case (JsArray(arr), JsArray(otherArr)) => (arr ++ otherArr).toJson
+      case (_, anyVal) if !failOnConflict => anyVal
       case _ => throw new IllegalArgumentException("Invalid types for merging")
     }
   }
