@@ -22,10 +22,12 @@ class ConfigImplicitsSpec extends Specification {
         k = [12345678901, 12345678902]
         l = [1.1, 2.2]
         m = ["a", "b"]
+
         map {
           k1 = "v1"
           k2 = "v2"
         }
+
         num-map {
           k1 = 1
           k2 = 2
@@ -36,6 +38,15 @@ class ConfigImplicitsSpec extends Specification {
             kx1 = "vx1"
           }
         }
+
+        "config.com" {
+          "site.pt" = "ok"
+        }
+
+        config.com {
+          site.pt = "ok2"
+        }
+
       }""")
 
     "get a percentage from a config file" in {
@@ -151,6 +162,8 @@ class ConfigImplicitsSpec extends Specification {
       val map = config.toConfigMap
       map("map").getString("k1") === "v1"
       map("map").getString("k2") === "v2"
+      map("\"config.com\"").getString("\"site.pt\"") === "ok"
+      map("config").getString("com.site.pt") === "ok2"
 
       config.getConfigMapOption("map0") must beNone
       config.getConfigMapOption("config") must beSome.which { _("map").getString("kx1") === "vx1" }
