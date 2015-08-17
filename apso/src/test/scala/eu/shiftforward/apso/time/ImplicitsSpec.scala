@@ -31,5 +31,11 @@ class ImplicitsSpec extends Specification {
 
       dateTime === new DateTime(2014, 1, 1, 23, 59, 59, 999)
     }
+
+    "support conversion to DateTime at the end of day (with target timezone)" in {
+      val dateTime = "2014-01-01".toLocalDate.toDateTimeAtEndOfDay(DateTimeZone.forID("EST"))
+
+      dateTime === new DateTime(2014, 1, 1, 23, 59, 59, 999, DateTimeZone.forID("EST"))
+    }
   }
 }

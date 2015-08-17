@@ -26,7 +26,18 @@ object Implicits {
      * @return a `DateTime` corresponding to this `LocalDate` at the latest valid
      *         time for the date.
      */
-    def toDateTimeAtEndOfDay = (d1 + 1.day).toDateTimeAtStartOfDay - 1.millis
+    def toDateTimeAtEndOfDay =
+      (d1 + 1.day).toDateTimeAtStartOfDay - 1.millis
+
+    /**
+     * Returns a `DateTime` corresponding to this `LocalDate` at the latest valid
+     * time for the date on the given `DateTimeZone`.
+     * @param tz the target `DateTimeZone` for the returned `DateTime`
+     * @return a `DateTime` corresponding to this `LocalDate` at the latest valid
+     *         time for the date on the given `DateTimeZone`.
+     */
+    def toDateTimeAtEndOfDay(tz: DateTimeZone) =
+      (d1 + 1.day).toDateTimeAtStartOfDay(tz) - 1.millis
 
     /**
      * Returns an iterable interval starting at this `LocalDate` (inclusive) and
