@@ -261,12 +261,13 @@ object Implicits {
      *
      * @return the Map value
      */
-    def toConfigMap: Map[String, Config] =
+    def toConfigMap: Map[String, Config] = {
+      val configRegex = "(\"[^\"]*\")|([^\\.]+)".r
       (for {
         entry <- conf.entrySet()
-        key <- entry.getKey.split("\\.").headOption
+        key <- configRegex.findFirstMatchIn(entry.getKey).flatMap(_.subgroups.flatMap(Option(_)).headOption)
         value <- Try(conf.getConfig(key)).toOption
       } yield { key -> value }).toMap
-
+    }
   }
 }
