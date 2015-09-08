@@ -270,4 +270,6 @@ object Implicits {
       } yield { key -> value }).toMap
     }
   }
+
+  implicit def durationToFiniteDuration(d: java.time.Duration): FiniteDuration = Duration.fromNanos(d.toNanos)
 }
