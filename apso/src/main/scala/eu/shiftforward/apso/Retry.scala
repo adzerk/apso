@@ -24,14 +24,8 @@ object Retry {
       case _ =>
         f recoverWith {
           case _ =>
-            (inBetweenSleep match {
-              case Some(sleepDuration) =>
-                Future { Thread.sleep(sleepDuration); () }
-              case None =>
-                Future.successful(())
-            }).flatMap { _ =>
-              apply(maxRetries - 1, inBetweenSleep)(f)
-            }
+            inBetweenSleep.foreach(Thread.sleep)
+            apply(maxRetries - 1, inBetweenSleep)(f)
         }
     }
   }
