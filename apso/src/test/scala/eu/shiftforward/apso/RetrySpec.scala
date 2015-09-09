@@ -22,5 +22,18 @@ class RetrySpec extends Specification with FutureExtraMatchers {
 
       attempts must beEqualTo(4)
     }
+
+    "retry a doomed future a number of times until it fails" in {
+      var attempts = 0
+
+      Retry[Any](10) {
+        Future {
+          attempts = attempts + 1
+          throw new RuntimeException("Doomed")
+        }
+      }.await(2.second) must throwAn[RuntimeException]
+
+      attempts must beEqualTo(11) // 1 attempt + 10 retries
+    }
   }
 }
