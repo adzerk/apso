@@ -13,7 +13,8 @@ object Retry {
    * @param maxRetries the number of retries, 10 by default
    * @param inBetweenSleep the milliseconds to wait between attempts, 100 milliseconds by default
    * @param f the function
-   * @tparam T the type of that the future completes with
+   * @param ec the implicit execution context
+   * @tparam T the type of what the future completes with
    * @return the resulting `f` function
    */
   def apply[T](maxRetries: Int = 10,
