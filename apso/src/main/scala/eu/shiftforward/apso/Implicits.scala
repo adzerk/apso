@@ -113,12 +113,11 @@ object Implicits {
       else if (n >= _seq.length) _seq
       else {
         val pivot = _seq.head
-        val (pivots, rest) = _seq.partition(_ == pivot)
-        val (left, right) = rest.partition { x => ord.lt(x, pivot) }
-        val fullLeftSize = left.length + pivots.length
+        val (left, right) = _seq.tail.partition { x => ord.lt(x, pivot) }
+        val fullLeftSize = left.length + 1 // size of left + pivot
         if (left.length > n) quickSelect(left, n, prepend)
-        else if (fullLeftSize >= n) prepend ++ (left ++ pivots).take(n)
-        else quickSelect(right, n - fullLeftSize, left ++ pivots)
+        else if (fullLeftSize >= n) prepend ++ (left :+ pivot).take(n)
+        else quickSelect(right, n - fullLeftSize, left :+ pivot)
       }
     }
 
