@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import akka.pattern.after
 import eu.shiftforward.apso.collection.MergedBufferedIterator
 
+import scala.annotation.tailrec
 import scala.collection.generic.CanBuildFrom
 import scala.compat.Platform
 import scala.concurrent.duration.FiniteDuration
@@ -105,6 +106,37 @@ object Implicits {
      */
     def sample(percentage: Double): Seq[T] =
       seq.take((seq.length * percentage).toInt)
+
+    @tailrec
+    private[this] def quickSelect(_seq: Seq[T], n: Int, prepend: Seq[T] = Seq.empty)(implicit ord: Ordering[T]): Seq[T] = {
+      if (_seq.isEmpty || n <= 0) Seq.empty
+      else if (n >= _seq.length) _seq
+      else {
+        val pivot = _seq.head
+        val (pivots, rest) = _seq.partition(_ == pivot)
+        val (left, right) = rest.partition { x => ord.lt(x, pivot) }
+        val fullLeftSize = left.length + pivots.length
+        if (left.length > n) quickSelect(left, n, prepend)
+        else if (fullLeftSize >= n) prepend ++ (left ++ pivots).take(n)
+        else quickSelect(right, n - fullLeftSize, left ++ pivots)
+      }
+    }
+
+    /**
+     * Returns a set containing the n smallest elements of this sequence
+     * @param n number of elements to extract
+     * @param ord element ordering
+     * @return the set of n smallest elements
+     */
+    def takeSmallest(n: Int)(implicit ord: Ordering[T]): Set[T] = quickSelect(seq, n).toSet
+
+    /**
+     * Returns a set containing the n largest elements of this sequence
+     * @param n number of elements to extract
+     * @param ord element ordering
+     * @return the set of n largest elements
+     */
+    def takeLargest(n: Int)(implicit ord: Ordering[T]): Set[T] = takeSmallest(n)(ord.reverse)
   }
 
   /**
