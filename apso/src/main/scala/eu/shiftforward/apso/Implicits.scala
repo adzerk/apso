@@ -126,17 +126,17 @@ object Implicits {
      * Returns a set containing the n smallest elements of this sequence
      * @param n number of elements to extract
      * @param ord element ordering
-     * @return the set of n smallest elements
+     * @return an unordered sequence of the n smallest elements
      */
-    def takeSmallest(n: Int)(implicit ord: Ordering[T]): Set[T] = quickSelect(seq, n).toSet
+    def takeSmallest(n: Int)(implicit ord: Ordering[T]): Seq[T] = quickSelect(seq, n)
 
     /**
      * Returns a set containing the n largest elements of this sequence
      * @param n number of elements to extract
      * @param ord element ordering
-     * @return the set of n largest elements
+     * @return an unordered sequence of the n largest elements
      */
-    def takeLargest(n: Int)(implicit ord: Ordering[T]): Set[T] = takeSmallest(n)(ord.reverse)
+    def takeLargest(n: Int)(implicit ord: Ordering[T]): Seq[T] = takeSmallest(n)(ord.reverse)
   }
 
   /**
