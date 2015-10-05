@@ -204,8 +204,8 @@ class ImplicitsSpec extends Specification with FutureExtraMatchers {
 
       val tests = (1 to runs).map { _ => rand.chooseN(elems, n) }
 
-      tests.map(_.size).toSet === Set(5)
-      val elementCounts: Map[Int, Int] = tests.flatten.groupBy(identity).map { case (k, v) => k -> v.size }
+      tests.map(_.size).toSet === Set(n)
+      val elementCounts: Map[Int, Int] = tests.flatten.groupBy(identity).mapValues(_.size)
 
       elementCounts.keys.size must beCloseTo(elems.size +/- 5)
 

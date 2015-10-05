@@ -4,7 +4,7 @@ import eu.shiftforward.apso.collection.MergedBufferedIterator
 import scala.annotation.tailrec
 import scala.collection.generic.CanBuildFrom
 import scala.compat.Platform
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Random
 
 /**
