@@ -1,6 +1,6 @@
 package eu.shiftforward.apso.config
 
-import com.typesafe.config.{ ConfigException, Config }
+import com.typesafe.config._
 
 import scala.concurrent.duration._
 import scala.collection.JavaConversions._
@@ -246,7 +246,7 @@ object Implicits {
       ) yield entry.unwrapped().asInstanceOf[T]).toList
 
     /**
-     * Converts a config into a Map[String,T]
+     * Converts a config into a Map[String, T]
      *
      * @tparam T the return type of the Map
      * @return the Map value
@@ -254,10 +254,17 @@ object Implicits {
     def toMap[T]: Map[String, T] =
       (for (
         entry <- conf.entrySet()
-      ) yield (entry.getKey, entry.getValue.unwrapped().asInstanceOf[T])).toMap
+      ) yield {
+        val entryValue = entry.getValue match {
+          case config: ConfigObject => conf.getConfig(entry.getKey).asInstanceOf[T]
+          case config: ConfigList => conf.getConfigList(entry.getKey).toList.asInstanceOf[T]
+          case other => other.unwrapped().asInstanceOf[T]
+        }
+        (entry.getKey, entryValue)
+      }).toMap
 
     /**
-     * Converts a config into a Map[String,Config]
+     * Converts a config into a Map[String, Config]
      *
      * @return the Map value
      */
