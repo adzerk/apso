@@ -39,7 +39,7 @@ class ImplicitsSpec extends Specification with FutureExtraMatchers {
       List(1, 4, 3, 2, 5).takeSmallest(2) === List(1, 2)
       List(1, 3, 9, 7, 7).takeLargest(2) === List(9, 7)
       List(1, 9, 4, 3, 1, 5, -1).takeSmallest(3) === List(-1, 1, 1)
-      List().takeSmallest(5) === List()
+      List.empty[Int].takeSmallest(5) === List()
       List(1, 4, 3, 2, 5).takeLargest(10) === List(1, 4, 3, 2, 5)
       List(1, 4, 3, 2, 5).takeLargest(0) === List()
     }
