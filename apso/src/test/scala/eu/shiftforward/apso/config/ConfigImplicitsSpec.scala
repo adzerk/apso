@@ -1,6 +1,6 @@
 package eu.shiftforward.apso.config
 
-import com.typesafe.config.{ ConfigException, ConfigFactory }
+import com.typesafe.config.{ Config, ConfigException, ConfigFactory }
 import eu.shiftforward.apso.config.Implicits._
 import org.specs2.mutable.Specification
 
@@ -31,6 +31,11 @@ class ConfigImplicitsSpec extends Specification {
         num-map {
           k1 = 1
           k2 = 2
+        }
+
+        list-map {
+          k1 = [{v = "v1"}, {v = "v2"}]
+          k2 = [{v = "v3"}, {v = "v4"}]
         }
 
         config {
@@ -158,7 +163,20 @@ class ConfigImplicitsSpec extends Specification {
       config.getStringListOption("a") must throwAn[Exception]
     }
 
-    "allow extracting configurations returning an map of configs" in {
+    "allow extracting configurations returning an option of a map of list of configs" in {
+      config.getMapOption[List[Config]]("map0") must beNone
+      config.getMapOption[List[Config]]("list-map") must beSome.which {
+        case map: Map[String, List[Config]] =>
+          map.get("k1") must beSome.which { configs =>
+            configs.map(_.getString("v")) must beEqualTo(List("v1", "v2"))
+          }
+          map.get("k2") must beSome.which { configs =>
+            configs.map(_.getString("v")) must beEqualTo(List("v3", "v4"))
+          }
+      }
+    }
+
+    "allow extracting configurations returning a map of configs" in {
       val map = config.toConfigMap
       map("map").getString("k1") === "v1"
       map("map").getString("k2") === "v2"
