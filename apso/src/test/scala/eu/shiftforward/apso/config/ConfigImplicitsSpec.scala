@@ -38,6 +38,10 @@ class ConfigImplicitsSpec extends Specification {
           k2 = [{v = "v3"}, {v = "v4"}]
         }
 
+        list-map2 {
+          k3 = ["v5", "v6"]
+        }
+
         config {
           map {
             kx1 = "vx1"
@@ -163,7 +167,7 @@ class ConfigImplicitsSpec extends Specification {
       config.getStringListOption("a") must throwAn[Exception]
     }
 
-    "allow extracting configurations returning an option of a map of list of configs" in {
+    "allow extracting configurations returning an option of a map of list of configs or something" in {
       config.getMapOption[List[Config]]("map0") must beNone
       config.getMapOption[List[Config]]("list-map") must beSome.which {
         case map: Map[String, List[Config]] =>
@@ -173,6 +177,10 @@ class ConfigImplicitsSpec extends Specification {
           map.get("k2") must beSome.which { configs =>
             configs.map(_.getString("v")) must beEqualTo(List("v3", "v4"))
           }
+      }
+
+      config.getMapOption[List[String]]("list-map2") must beSome.which {
+        _.get("k3") must beSome.which(_ === List("v5", "v6"))
       }
     }
 
