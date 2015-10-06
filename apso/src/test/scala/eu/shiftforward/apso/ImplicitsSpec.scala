@@ -2,12 +2,13 @@ package eu.shiftforward.apso
 
 import eu.shiftforward.apso.Implicits._
 import org.specs2.mutable._
+import org.specs2.ScalaCheck
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.Random
 
-class ImplicitsSpec extends Specification with FutureExtraMatchers {
+class ImplicitsSpec extends Specification with ScalaCheck with FutureExtraMatchers {
 
   "An ApsoSeq" should {
 
@@ -35,13 +36,10 @@ class ImplicitsSpec extends Specification with FutureExtraMatchers {
       Seq(Impl1(3)).mergeSorted(Seq(Impl2(5))) must beAnInstanceOf[Seq[Base]]
     }
 
-    "take the n smallest/largest values" in {
-      List(1, 4, 3, 2, 5).takeSmallest(2).sorted === List(1, 2)
-      List(1, 3, 9, 7, 7).takeLargest(2).sorted === List(7, 9)
-      List(1, 9, 4, 3, 1, 5, -1).takeSmallest(3).sorted === List(-1, 1, 1)
-      List.empty[Int].takeSmallest(5).sorted === List()
-      List(1, 4, 3, 2, 5).takeLargest(10).sorted === List(1, 2, 3, 4, 5)
-      List(1, 4, 3, 2, 5).takeLargest(0).sorted === List()
+    "support taking the n smallest/largest values" ! prop {
+      (s: List[Int], t: Int) =>
+        s.takeSmallest(t).sorted == s.sorted.take(t) &&
+          s.takeLargest(t).sorted.reverse == s.sorted.reverse.take(t)
     }
   }
 
