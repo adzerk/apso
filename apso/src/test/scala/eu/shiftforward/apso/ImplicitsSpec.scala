@@ -1,12 +1,12 @@
 package eu.shiftforward.apso
 
+import eu.shiftforward.apso.Implicits._
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
-import eu.shiftforward.apso.Implicits._
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.Random
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class ImplicitsSpec extends Specification with ScalaCheck with FutureExtraMatchers {
 
@@ -186,7 +186,13 @@ class ImplicitsSpec extends Specification with ScalaCheck with FutureExtraMatche
       override def nextDouble() = { val e = nextElems.head; nextElems = nextElems.tail; e }
     }
 
-    "select correctly an element from a sequence" in {
+    def centralMoment(n: Int, xs: Iterable[Double]) = {
+      val avg = xs.sum / xs.size
+      val ys = xs map { x: Double => math.pow(x - avg, n.toDouble) }
+      ys.sum / ys.size
+    }
+
+    "select correctly an element from an indexed sequence" in {
       val rand = new MockRandom(1, 4, 3, 2)
       val seq = Vector("a", "b", "c", "d", "e")
 
@@ -194,6 +200,30 @@ class ImplicitsSpec extends Specification with ScalaCheck with FutureExtraMatche
       rand.choose(seq) === Some("e")
       rand.choose(seq) === Some("d")
       rand.choose(Vector()) === None
+    }
+
+    "select correctly multiple elements from a sequence" in {
+      val rand = Random
+      rand.setSeed(0)
+      val runs = 10000
+      val n = 5
+      val elems = Stream.iterate(0, 50) { _ + 1 }
+
+      val tests = (1 to runs).map { _ => rand.chooseN(elems, n) }
+
+      tests.map(_.size).toSet === Set(n)
+      val elementCounts: Map[Int, Int] = tests.flatten.groupBy(identity).mapValues(_.size)
+
+      elementCounts.keys.size must beCloseTo(elems.size +/- 5)
+
+      // Expected probability of a number being picked
+      val prob = (1 to n).foldLeft((elems.size, 0.0)) {
+        case ((rem, acc), next) =>
+          val newAcc = acc + (1.0 - acc) * (1.0 / (rem - 1))
+          (rem - 1, newAcc)
+      }._2
+
+      elementCounts.values.sum.toDouble / (elementCounts.size * runs) must beCloseTo(prob +/- 0.05)
     }
 
     "select correctly an element from a sequence using weights" in {
@@ -265,12 +295,6 @@ class ImplicitsSpec extends Specification with ScalaCheck with FutureExtraMatche
       val runs = 100000
       val epsilon = 0.001
       val stream = rand.increasingUniformStream(runs).toList
-
-      def centralMoment(n: Int, xs: List[Double]) = {
-        val avg = xs.sum / xs.size
-        val ys = xs map { x: Double => math.pow(x - avg, n.toDouble) }
-        ys.sum / ys.size
-      }
 
       "the results must be ordered" in {
         stream.sorted === stream

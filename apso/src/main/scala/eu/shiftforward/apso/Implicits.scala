@@ -1,13 +1,9 @@
 package eu.shiftforward.apso
 
-import akka.actor.ActorSystem
-import akka.pattern.after
 import eu.shiftforward.apso.collection.MergedBufferedIterator
-
 import scala.annotation.tailrec
 import scala.collection.generic.CanBuildFrom
 import scala.compat.Platform
-import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Random
 
@@ -390,7 +386,7 @@ object Implicits {
   final implicit class ApsoRandom(val rand: Random) extends AnyVal {
 
     /**
-     * Chooses a random element from a sequence.
+     * Chooses a random element from an indexed sequence.
      * @param seq the indexed sequence of elements to choose from
      * @tparam T the type of the elements
      * @return the selected element wrapped in a `Some` if `seq` has at least one element, `None`
@@ -398,6 +394,24 @@ object Implicits {
      */
     def choose[T](seq: IndexedSeq[T]): Option[T] =
       if (seq.isEmpty) None else Some(seq(rand.nextInt(seq.length)))
+
+    /**
+     * Chooses n random element from a sequence.
+     * @param seq the sequence of elements to choose from
+     * @tparam T the type of the elements
+     * @return the selected elements
+     */
+    def chooseN[T](seq: Seq[T], n: Int): Seq[T] = {
+      @tailrec
+      def chooseAux(_seq: Seq[T], _n: Int, acc: Seq[T]): Seq[T] =
+        if (_seq.isEmpty || _n <= 0) acc
+        else {
+          val prob = n.toDouble / _seq.size
+          if (rand.nextDouble() < prob) chooseAux(_seq.tail, _n - 1, _seq.head +: acc)
+          else chooseAux(_seq.tail, _n, acc)
+        }
+      chooseAux(seq, n, Seq.empty)
+    }
 
     /**
      * Chooses an element of a sequence according to a weight function.
