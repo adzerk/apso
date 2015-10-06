@@ -7,7 +7,7 @@ class TypedMapSpec extends Specification {
   "A TypedMap" should {
 
     "have a working insert" in {
-      val m1 = TypedMap.empty
+      val m1 = TypedMap.empty[Any]
       m1.contains[Int] === false
       m1.get[Int] === None
       m1.getOrElse[Int](-1) === -1
@@ -37,6 +37,19 @@ class TypedMapSpec extends Specification {
       val m = TypedMap.empty + 2
       m.size === 1
       m.-[Int].size === 0
+    }
+
+    "have correct types" in {
+      TypedMap.empty must beAnInstanceOf[TypedMap[Nothing]]
+      TypedMap.empty[Int] must beAnInstanceOf[TypedMap[Int]]
+      (TypedMap.empty + 2) must beAnInstanceOf[TypedMap[Int]]
+      TypedMap(2) must beAnInstanceOf[TypedMap[Int]]
+      (TypedMap.empty + 2 + "asd") must beAnInstanceOf[TypedMap[Any]]
+      TypedMap(2, "asd") must beAnInstanceOf[TypedMap[Any]]
+      (TypedMap.empty + List(2) + List(3)) must beAnInstanceOf[TypedMap[List[Int]]]
+      TypedMap(List(2), List(3)) must beAnInstanceOf[TypedMap[List[Int]]]
+      (TypedMap.empty + List(2) + List("asd")) must beAnInstanceOf[TypedMap[List[Any]]]
+      TypedMap(List(2), List("asd")) must beAnInstanceOf[TypedMap[List[Any]]]
     }
   }
 
