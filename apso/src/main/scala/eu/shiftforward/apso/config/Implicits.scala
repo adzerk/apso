@@ -2,6 +2,7 @@ package eu.shiftforward.apso.config
 
 import com.typesafe.config._
 
+import scala.annotation.implicitNotFound
 import scala.concurrent.duration._
 import scala.collection.JavaConversions._
 import scala.util.Try
@@ -194,7 +195,7 @@ object Implicits {
      * @tparam T the return type of the Map
      * @return the Map wrapped in a `Some` if one is defined and `None` if not
      */
-    def getMapOption[T](path: String): Option[Map[String, T]] =
+    def getMapOption[T](path: String)(implicit configReader: ConfigReader[T]): Option[Map[String, T]] =
       getOption(conf, path, _.getMap[T](_))
 
     /**
@@ -204,7 +205,7 @@ object Implicits {
      * @tparam T the return type of the Map
      * @return the Map value
      */
-    def getMap[T](path: String): Map[String, T] = conf.getConfig(path).toMap[T]
+    def getMap[T](path: String)(implicit configReader: ConfigReader[T]): Map[String, T] = conf.getConfig(path).toMap[T]
 
     /**
      * Gets the value as a Map[String, Config] wrapped in a `Some` if it is defined and `None` if not.
@@ -246,25 +247,18 @@ object Implicits {
       ) yield entry.unwrapped().asInstanceOf[T]).toList
 
     /**
-     * Converts a config into a Map[String, T]
+     * Converts the config into a Map[String, T]
      *
      * @tparam T the return type of the Map
      * @return the Map value
      */
-    def toMap[T]: Map[String, T] =
+    def toMap[T](implicit configReader: ConfigReader[T]): Map[String, T] =
       (for (
         entry <- conf.entrySet()
-      ) yield {
-        val entryValue = entry.getValue match {
-          case config: ConfigObject => conf.getConfig(entry.getKey).asInstanceOf[T]
-          case config: ConfigList => conf.getConfigList(entry.getKey).toList.asInstanceOf[T]
-          case other => other.unwrapped().asInstanceOf[T]
-        }
-        (entry.getKey, entryValue)
-      }).toMap
+      ) yield (entry.getKey, configReader(conf, entry.getKey))).toMap
 
     /**
-     * Converts a config into a Map[String, Config]
+     * Converts the config into a Map[String, Config]
      *
      * @return the Map value
      */
@@ -277,6 +271,37 @@ object Implicits {
       } yield { key -> value }).toMap
     }
   }
+
+  /**
+   * Represents a function that given a config and the config key string, will return the given type.
+   *
+   * @tparam T the type to be returned
+   */
+  @implicitNotFound(msg = "could not find implicit ConfigReader[${T}]")
+  trait ConfigReader[T] extends ((Config, String) => T)
+
+  def configReader[T](f: (Config, String) => T): ConfigReader[T] =
+    new ConfigReader[T] {
+      def apply(config: Config, key: String): T = f(config, key)
+    }
+
+  // ConfigReaders implicits:
+  implicit val boolConfigReader = configReader[Boolean](_.getBoolean(_))
+  implicit val stringConfigReader = configReader[String](_.getString(_))
+  implicit val intConfigReader = configReader[Int](_.getInt(_))
+  implicit val doubleConfigReader = configReader[Double](_.getDouble(_))
+  implicit val longConfigReader = configReader[Long](_.getLong(_))
+  implicit val durationConfigReader = configReader[java.time.Duration](_.getDuration(_))
+  implicit val configConfigReader = configReader[Config](_.getConfig(_))
+
+  // ConfigReaders implicits for lists:
+  implicit val boolListConfigReader = configReader[List[Boolean]](_.getBooleanList(_).toList.map(Boolean.unbox))
+  implicit val stringListConfigReader = configReader[List[String]](_.getStringList(_).toList)
+  implicit val intListConfigReader = configReader[List[Int]](_.getIntList(_).toList.map(Int.unbox))
+  implicit val doubleListConfigReader = configReader[List[Double]](_.getDoubleList(_).toList.map(Double.unbox))
+  implicit val longListConfigReader = configReader[List[Long]](_.getLongList(_).toList.map(Long.unbox))
+  implicit val durationListConfigReader = configReader[List[java.time.Duration]](_.getDurationList(_).toList)
+  implicit val configListConfigReader = configReader[List[Config]](_.getConfigList(_).toList)
 
   implicit def durationToFiniteDuration(d: java.time.Duration): FiniteDuration = Duration.fromNanos(d.toNanos)
 }
