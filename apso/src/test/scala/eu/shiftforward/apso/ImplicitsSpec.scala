@@ -36,12 +36,16 @@ class ImplicitsSpec extends Specification with FutureExtraMatchers {
     }
 
     "take the n smallest/largest values" in {
-      List(1, 4, 3, 2, 5).takeSmallest(2).sorted === List(1, 2)
-      List(1, 3, 9, 7, 7).takeLargest(2).sorted === List(7, 9)
-      List(1, 9, 4, 3, 1, 5, -1).takeSmallest(3).sorted === List(-1, 1, 1)
-      List.empty[Int].takeSmallest(5).sorted === List()
-      List(1, 4, 3, 2, 5).takeLargest(10).sorted === List(1, 2, 3, 4, 5)
-      List(1, 4, 3, 2, 5).takeLargest(0).sorted === List()
+      val maxSeqSize = 100
+      val nIterations = 100
+      val maxV = 1000
+
+      (0 until nIterations).forall { _ =>
+        val seq = (0 until Random.nextInt(maxSeqSize)).map(_ => Random.nextInt(maxV))
+        val takeV = Random.nextInt(maxSeqSize)
+        seq.takeSmallest(takeV).sorted === seq.sorted.take(takeV)
+        seq.takeLargest(takeV).sorted.reverse === seq.sorted.reverse.take(takeV)
+      }
     }
   }
 

@@ -84,7 +84,7 @@ object Implicits {
       val fullLeftSize = left.length + 1 // size of left + pivot
       if (left.length > n) quickSelect(left, n, prepend)
       else if (fullLeftSize >= n) prepend ++ (left :+ pivot).take(n)
-      else quickSelect(right, n - fullLeftSize, left :+ pivot)
+      else quickSelect(right, n - fullLeftSize, prepend ++ left :+ pivot)
     }
   }
 
