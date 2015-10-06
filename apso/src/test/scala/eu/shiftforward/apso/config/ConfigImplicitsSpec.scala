@@ -180,7 +180,7 @@ class ConfigImplicitsSpec extends Specification {
       }
 
       config.getMapOption[List[String]]("list-map2") must beSome.which {
-        _.get("k3") must beSome(List("v5", "v6"))
+        _.get("k3") must beSome.which(_ === List("v5", "v6"))
       }
     }
 
