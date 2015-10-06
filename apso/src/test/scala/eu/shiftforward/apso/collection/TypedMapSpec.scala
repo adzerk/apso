@@ -7,6 +7,10 @@ class TypedMapSpec extends Specification {
 
   def beTypedAs[A]: Matcher[A] = { a: A => ok }
 
+  class Animal(val name: String)
+  class Dog(n: String) extends Animal(n)
+  class Cat(n: String) extends Animal(n)
+
   "A TypedMap" should {
 
     "have a working insert" in {
@@ -40,6 +44,21 @@ class TypedMapSpec extends Specification {
       val m = TypedMap.empty + 2
       m.size === 1
       m.-[Int].size === 0
+    }
+
+    "support type hierarchies" in {
+      val m = TypedMap.empty[Animal]
+
+      val m1 = m + new Dog("Baco") + new Cat("Tareco")
+      m1[Dog].name === "Baco"
+      m1[Cat].name === "Tareco"
+
+      val m2 = m1 + new Dog("Sherlock")
+      m2[Dog].name === "Sherlock"
+
+      val mm = TypedMap(new Dog("Baco"), new Cat("Tareco"))
+      mm[Dog].name === "Baco"
+      mm[Cat].name === "Tareco"
     }
 
     "have correct types" in {
