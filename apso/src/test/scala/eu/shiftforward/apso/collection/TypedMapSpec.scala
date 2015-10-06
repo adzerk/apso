@@ -1,8 +1,11 @@
 package eu.shiftforward.apso.collection
 
+import org.specs2.matcher.Matcher
 import org.specs2.mutable._
 
 class TypedMapSpec extends Specification {
+
+  def beTypedAs[A]: Matcher[A] = { a: A => ok }
 
   "A TypedMap" should {
 
@@ -40,16 +43,16 @@ class TypedMapSpec extends Specification {
     }
 
     "have correct types" in {
-      TypedMap.empty must beAnInstanceOf[TypedMap[Nothing]]
-      TypedMap.empty[Int] must beAnInstanceOf[TypedMap[Int]]
-      (TypedMap.empty + 2) must beAnInstanceOf[TypedMap[Int]]
-      TypedMap(2) must beAnInstanceOf[TypedMap[Int]]
-      (TypedMap.empty + 2 + "asd") must beAnInstanceOf[TypedMap[Any]]
-      TypedMap(2, "asd") must beAnInstanceOf[TypedMap[Any]]
-      (TypedMap.empty + List(2) + List(3)) must beAnInstanceOf[TypedMap[List[Int]]]
-      TypedMap(List(2), List(3)) must beAnInstanceOf[TypedMap[List[Int]]]
-      (TypedMap.empty + List(2) + List("asd")) must beAnInstanceOf[TypedMap[List[Any]]]
-      TypedMap(List(2), List("asd")) must beAnInstanceOf[TypedMap[List[Any]]]
+      TypedMap.empty must beTypedAs[TypedMap[_]]
+      TypedMap.empty[Int] must beTypedAs[TypedMap[Int]]
+      (TypedMap.empty + 2) must beTypedAs[TypedMap[Int]]
+      TypedMap(2) must beTypedAs[TypedMap[Int]]
+      (TypedMap.empty + 2 + "asd") must beTypedAs[TypedMap[Any]]
+      TypedMap(2, "asd") must beTypedAs[TypedMap[Any]]
+      (TypedMap.empty + List(2) + List(3)) must beTypedAs[TypedMap[List[Int]]]
+      TypedMap(List(2), List(3)) must beTypedAs[TypedMap[List[Int]]]
+      (TypedMap.empty + List(2) + List("asd")) must beTypedAs[TypedMap[List[Any]]]
+      TypedMap(List(2), List("asd")) must beTypedAs[TypedMap[List[Any]]]
     }
   }
 
