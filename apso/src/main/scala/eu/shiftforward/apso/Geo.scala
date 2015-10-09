@@ -9,7 +9,7 @@ object Geo {
   /**
    * A pair of `Double` representing, respectively, the latitude and longitude of a position.
    */
-  type Coordinate = (Double, Double)
+  type Coordinates = (Double, Double)
 
   private[this] val EARTH_RADIUS = 6371.009 // kilometers
 
@@ -20,7 +20,7 @@ object Geo {
    * @param p2 the coordinates of the second point
    * @return the distance in kilometers between two points on the planet Earth.
    */
-  def distance(p1: Coordinate, p2: Coordinate) = {
+  def distance(p1: Coordinates, p2: Coordinates) = {
     val deltaLong = toRadians(abs(p1._2 - p2._2))
     val lat1 = toRadians(p1._1)
     val lat2 = toRadians(p2._1)
