@@ -182,7 +182,7 @@ object S3FileDescriptor {
         val s3BucketRef = s3Buckets.getOrElseUpdate(s3bucket, newBucket)
         S3FileDescriptor(s3BucketRef, s3path.filterNot(_.trim == ""))
 
-      case _ => throw new Exception("Error parsing S3 URI")
+      case _ => throw new IllegalArgumentException("Error parsing S3 URI")
     }
   }
 

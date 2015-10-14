@@ -24,6 +24,7 @@ object ProjectBuild extends Build {
       "com.typesafe"                   % "config"             % "1.3.0"          % "provided",
       "com.typesafe.akka"             %% "akka-actor"         % "2.3.12"         % "provided",
       "com.twmacinta"                  % "fast-md5"           % "2.7.1",
+      "fr.janalyse"                   %% "janalyse-ssh"       % "0.9.19"         % "provided",
       "io.spray"                      %% "spray-json"         % "1.3.2"          % "provided",
       "io.spray"                      %% "spray-httpx"        % "1.3.3"          % "provided",
       "net.databinder.dispatch"       %% "dispatch-core"      % "0.11.3",
@@ -61,7 +62,8 @@ object ProjectBuild extends Build {
       "Sonatype Snapshots Repository" at "http://oss.sonatype.org/content/repositories/snapshots",
       "Spray Repository"              at "http://repo.spray.io/",
       "Bintray Scalaz Releases"       at "http://dl.bintray.com/scalaz/releases",
-      "Typesafe Repository"           at "http://repo.typesafe.com/typesafe/releases/"),
+      "Typesafe Repository"           at "http://repo.typesafe.com/typesafe/releases/",
+      "JAnalyse Repository"           at "http://www.janalyse.fr/repository/"),
 
     testOptions in Test += Tests.Argument(TestFrameworks.Specs2, "junitxml", "console"),
 
