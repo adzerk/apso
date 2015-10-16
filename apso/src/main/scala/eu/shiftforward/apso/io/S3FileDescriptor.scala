@@ -192,7 +192,7 @@ object S3FileDescriptor {
   val credentials = new FileDescriptorCredentials[SerializableAWSCredentials] {
     def id(path: String) = path.split("/").headOption.mkString
     val protocol = "s3"
-    def createCredentials(s3Config: Config) = {
+    def createCredentials(id: String, s3Config: Config) = {
       new SerializableAWSCredentials(
         s3Config.getString("access-key"),
         s3Config.getString("secret-key"))

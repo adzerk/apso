@@ -38,9 +38,10 @@ trait FileDescriptorCredentials[T] {
    * @return the credential object `T`
    */
   def read(config: Config, path: String): Option[T] = {
+    val fdId = id(path)
+
     config.getConfigListOption(s"$protocol.credentials")
       .flatMap { protocolCreds =>
-        val fdId = id(path)
         protocolCreds.find {
           case protocolCred if protocolCred.hasPath("ids") =>
             protocolCred.getStringList("ids").contains(fdId)
@@ -49,7 +50,7 @@ trait FileDescriptorCredentials[T] {
         }.map(_.getConfig("creds"))
       }
       .orElse(config.getConfigOption(s"$protocol.default"))
-      .map(createCredentials)
+      .map(createCredentials(fdId, _))
   }
 
   /**
@@ -64,7 +65,7 @@ trait FileDescriptorCredentials[T] {
    *                 credential object `T` for the file descriptor
    * @return the credential object `T`
    */
-  protected def createCredentials(fdConfig: Config): T
+  protected def createCredentials(fdId: String, fdConfig: Config): T
 
   /**
    * Returns an unique id from the given file descriptor path to use when
