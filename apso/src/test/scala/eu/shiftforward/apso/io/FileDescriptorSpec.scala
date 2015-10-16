@@ -11,15 +11,25 @@ import scala.util.Try
 class FileDescriptorSpec extends Specification with CustomMatchers {
 
   "A FileDescriptor" should {
+    val sftpConfig = ConfigFactory.parseString("""
+      sftp {
+        default = {
+          username = "foo"
+          password = "bar"
+        }
+      }
+    """)
 
     "correctly be initialized given a URI with protocol" in {
       FileDescriptor("file:///tmp/folder") mustEqual LocalFileDescriptor("/tmp/folder")
       FileDescriptor("s3://tmp/path") mustEqual S3FileDescriptor("tmp/path")
+      FileDescriptor("sftp://localhost/tmp/path", sftpConfig) mustEqual SftpFileDescriptor("localhost/tmp/path", sftpConfig)
     }
 
     "be serializable" in {
       FileDescriptor("file:///tmp/folder") must beSerializable
       FileDescriptor("s3://tmp/path") must beSerializable
+      FileDescriptor("sftp://localhost/tmp/path", sftpConfig) must beSerializable
     }
 
     "fail when initializing with an unsupported protocol" in {
