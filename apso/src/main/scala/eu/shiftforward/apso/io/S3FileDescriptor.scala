@@ -17,7 +17,7 @@ case class S3FileDescriptor(bucket: S3Bucket, protected val elements: List[Strin
 
   @inline private def buildPath(p: Seq[String]): String = p.mkString("/")
 
-  protected def copy(elements: List[String]) =
+  protected def duplicate(elements: List[String]) =
     this.copy(elements = elements)
 
   def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean): Boolean = {

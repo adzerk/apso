@@ -32,7 +32,7 @@ case class SftpFileDescriptor(
     doConnect(3)
   }
 
-  protected def copy(elements: List[String]) =
+  protected def duplicate(elements: List[String]) =
     this.copy(elements = elements)
 
   def exists: Boolean = ssh(_.exists(path))

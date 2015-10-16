@@ -22,14 +22,14 @@ trait RemoteFileDescriptor { this: FileDescriptor =>
     }
   }
 
-  protected def copy(elements: List[String]): FileDescriptor
+  protected def duplicate(elements: List[String]): FileDescriptor
 
   def parent(n: Int): FileDescriptor =
-    this.copy(elements = elements.dropRight(n))
+    this.duplicate(elements = elements.dropRight(n))
 
   def child(name: String): FileDescriptor =
-    this.copy(elements = elements ++ sanitize(name).toList)
+    this.duplicate(elements = elements ++ sanitize(name).toList)
 
   override def children(names: String*): FileDescriptor =
-    this.copy(elements = elements ++ names.flatMap(sanitize))
+    this.duplicate(elements = elements ++ names.flatMap(sanitize))
 }

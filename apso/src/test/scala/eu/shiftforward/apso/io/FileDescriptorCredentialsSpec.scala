@@ -10,7 +10,7 @@ class FileDescriptorCredentialsSpec extends Specification with CustomMatchers {
   val fdCredentials = new FileDescriptorCredentials[(String, String)] {
     def protocol: String = "test-protocol"
     def id(path: String): String = path
-    def createCredentials(fdConfig: Config): (String, String) =
+    def createCredentials(id: String, fdConfig: Config): (String, String) =
       (fdConfig.getString("username"), fdConfig.getString("password"))
   }
 
