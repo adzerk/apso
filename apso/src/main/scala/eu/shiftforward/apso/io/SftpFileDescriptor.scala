@@ -98,14 +98,24 @@ case class SftpFileDescriptor(
   override def toString: String =
     if (port != 22) s"sftp://$username@$host:$port$path"
     else s"sftp://$username@$host$path"
+
+  override def equals(other: Any): Boolean = other match {
+    case that: SftpFileDescriptor =>
+      username == that.username &&
+        host == that.host &&
+        port == that.port &&
+        path == that.path &&
+        sshOptions.password == that.sshOptions.password &&
+        sshOptions.identities == that.sshOptions.identities
+    case _ => false
+  }
 }
 
 object SftpFileDescriptor {
   private def splitMeta(url: String): (String, Int, String) = {
     val idRegex = """(.*@)?([\d|\w|\.]+)(:\d+)?(\/.*)""".r
     url match {
-      case idRegex(id, path) => (id, 22, path)
-      case idRegex(id, port, path) => (id, port.drop(1).toInt, path)
+      case idRegex(_, id, null, path) => (id, 22, path)
       case idRegex(_, id, port, path) => (id, port.drop(1).toInt, path)
       case _ => throw new IllegalArgumentException("Error parsing SFTP URI.")
     }
@@ -159,5 +169,5 @@ object SftpFileDescriptor {
     apply(url, SSHOptions(host = host, username = username, identities = List(SSHIdentity(key)), port = port))
 
   def apply(url: String, host: String, username: String, password: String, port: Int)(implicit d1: DummyImplicit, d2: DummyImplicit): SftpFileDescriptor =
-    apply(url, SSHOptions(host = host, username = username, password = password, port = port))
+    apply(url, SSHOptions(host = host, username = username, identities = List(), password = password, port = port))
 }
