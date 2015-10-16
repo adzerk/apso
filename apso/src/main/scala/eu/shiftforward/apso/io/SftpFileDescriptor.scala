@@ -10,7 +10,9 @@ import java.io.File
 
 case class SftpFileDescriptor(
     private val sshOptions: SSHOptions,
-    private val elements: List[String]) extends FileDescriptor with Logging {
+    protected val elements: List[String]) extends FileDescriptor with RemoteFileDescriptor with Logging {
+
+  protected def root = "/"
 
   private def username = sshOptions.username
   private def host = sshOptions.host
@@ -30,47 +32,26 @@ case class SftpFileDescriptor(
     doConnect(3)
   }
 
-  lazy val name: String = elements.lastOption.getOrElse("") // Same as S3FileDescriptor
-  lazy val path: String = "/" + elements.mkString("/") // SAME as S3FileDescriptor
+  protected def copy(elements: List[String]) =
+    this.copy(elements = elements)
 
   def exists: Boolean = ssh(_.exists(path))
   def isDirectory: Boolean = ssh(_.isDirectory(path))
 
-  def list: Iterator[SftpFileDescriptor] =
+  def list: Iterator[FileDescriptor] =
     if (isDirectory) {
       ssh(_.ls(path)).toIterator.map(this.child)
     } else {
       Iterator()
     }
 
-  def listAllFilesWithPrefix(prefix: String): Iterator[SftpFileDescriptor] = {
-    def aux(f: SftpFileDescriptor): Iterator[SftpFileDescriptor] =
+  def listAllFilesWithPrefix(prefix: String): Iterator[FileDescriptor] = {
+    def aux(f: FileDescriptor): Iterator[FileDescriptor] =
       if (f.isDirectory) f.list.flatMap(aux)
       else Iterator(f)
 
     this.list.filter(_.name.startsWith(prefix)).flatMap(aux)
   }
-
-  private def sanitize(segment: String): Option[String] = { // SAME as S3FileDescriptor
-    val whiteSpaceValidated = segment.trim match {
-      case "" => None
-      case str => Some(str)
-    }
-
-    whiteSpaceValidated.map {
-      _.count(_ == '/') match {
-        case 0 => segment
-        case 1 if segment.endsWith("/") => segment.dropRight(1)
-        case _ => throw new IllegalArgumentException("path cannot contain /")
-      }
-    }
-  }
-
-  def parent(n: Int): SftpFileDescriptor = // SAME as S3FileDescriptor
-    this.copy(elements = elements.dropRight(n))
-
-  def child(name: String): SftpFileDescriptor = // SAME as S3FileDescriptor
-    this.copy(elements = elements ++ sanitize(name).toList)
 
   def delete(): Boolean =
     if (exists) {

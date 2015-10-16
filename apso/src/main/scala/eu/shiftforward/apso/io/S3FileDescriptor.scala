@@ -8,18 +8,17 @@ import eu.shiftforward.apso.config.FileDescriptorCredentials
 
 import scala.collection.concurrent.TrieMap
 
-case class S3FileDescriptor(bucket: S3Bucket, private val elements: List[String])
-    extends FileDescriptor with Logging {
+case class S3FileDescriptor(bucket: S3Bucket, protected val elements: List[String])
+    extends FileDescriptor with RemoteFileDescriptor with Logging {
 
-  lazy val bucketName = bucket.bucketName
-
-  lazy val path: String = bucketName + elements.foldLeft("")((acc, p) => s"$acc/$p")
-
-  lazy val name: String = elements.lastOption.getOrElse("")
+  protected val root = bucket.bucketName
 
   private lazy val builtPath = buildPath(elements)
 
   @inline private def buildPath(p: Seq[String]): String = p.mkString("/")
+
+  protected def copy(elements: List[String]) =
+    this.copy(elements = elements)
 
   def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean): Boolean = {
     if (localTarget.isDirectory) {
@@ -47,33 +46,7 @@ case class S3FileDescriptor(bucket: S3Bucket, private val elements: List[String]
     }
   }
 
-  def parent(n: Int): S3FileDescriptor = this.copy(elements = elements.dropRight(n))
-
-  private def sanitize(segment: String): Option[String] = {
-
-    val whiteSpaceValidated = segment.trim match {
-      case "" => None
-      case str => Some(str)
-    }
-
-    whiteSpaceValidated.map {
-      _.count(_ == '/') match {
-        case 0 => segment
-        case 1 if segment.endsWith("/") => segment.dropRight(1)
-        case _ => throw new IllegalArgumentException("path cannot contain /")
-      }
-    }
-  }
-
-  override def /(name: String): S3FileDescriptor = child(name)
-
-  def child(name: String): S3FileDescriptor =
-    this.copy(elements = elements ++ sanitize(name).toList)
-
-  override def children(names: String*): S3FileDescriptor =
-    this.copy(elements = elements ++ names.flatMap(sanitize))
-
-  override def cd(pathString: String): S3FileDescriptor = {
+  override def cd(pathString: String): FileDescriptor = {
     val newPath = pathString.split("/").map(_.trim).toList.foldLeft(elements) {
       case (acc, "." | "") => acc
       case (acc, "..") => acc.dropRight(1)
@@ -82,7 +55,7 @@ case class S3FileDescriptor(bucket: S3Bucket, private val elements: List[String]
     this.copy(elements = newPath)
   }
 
-  override def list: Iterator[S3FileDescriptor] = {
+  override def list: Iterator[FileDescriptor] = {
     def removePrefix(primary: List[String], secondary: List[String]): List[String] = {
       (primary, secondary) match {
         case (h1 :: t1, h2 :: t2) if h1 == h2 => removePrefix(t1, t2)
@@ -100,7 +73,7 @@ case class S3FileDescriptor(bucket: S3Bucket, private val elements: List[String]
     }.toIterator
   }
 
-  def listAllFilesWithPrefix(prefix: String): Iterator[S3FileDescriptor] = {
+  def listAllFilesWithPrefix(prefix: String): Iterator[FileDescriptor] = {
     listS3WithPrefix(prefix, includeDirectories = false).map {
       pathStr => this.copy(elements = pathStr.split("/").toList)
     }
