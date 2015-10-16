@@ -98,22 +98,19 @@ case class SftpFileDescriptor(
 }
 
 object SftpFileDescriptor {
-  def apply(path: String, sshOptions: SSHOptions): SftpFileDescriptor =
-    path.split("/").toList match {
-      case Nil => SftpFileDescriptor(sshOptions, Nil)
-      case "" :: hd :: tail => SftpFileDescriptor(sshOptions, hd :: tail)
-      case _ =>
-        throw new IllegalArgumentException("Error parsing SFTP URI. Only absolute paths are supported.")
-    }
-
-  val credentials = new FileDescriptorCredentials[(String, String, Int, Either[String, String])] {
-    val idRegex = """(.*@)?(\d*|\w*|\.*)\/(.*)""".r
-
-    def id(path: String) = path match {
-      case idRegex(id, _) => id
-      case idRegex(_, id, _) => id
+  private def splitIdAndPath(url: String): (String, String) = {
+    val idRegex = """(.*@)?([\d|\w|\.]+)(\/.*)""".r
+    url match {
+      case idRegex(id, path) => (id, path)
+      case idRegex(_, id, path) => (id, path)
       case _ => throw new IllegalArgumentException("Error parsing SFTP URI.")
     }
+  }
+
+  val credentials = new FileDescriptorCredentials[(String, String, Int, Either[String, String])] {
+    val idRegex = """(.*@)?([\d|\w|\.]+)\/(.*)""".r
+
+    def id(path: String) = splitIdAndPath(path)._1
 
     val protocol = "sftp"
 
@@ -129,22 +126,33 @@ object SftpFileDescriptor {
     }
   }
 
-  def apply(path: String, credentialsConfig: Config): SftpFileDescriptor =
-    apply(path, credentials.read(credentialsConfig, path))
+  def apply(url: String, sshOptions: SSHOptions): SftpFileDescriptor = {
+    val (_, path) = splitIdAndPath(url)
 
-  def apply(path: String, credentials: Option[(String, String, Int, Either[String, String])]): SftpFileDescriptor = {
-    val creds = credentials.getOrElse(throw new IllegalArgumentException(s"No credentials found for $path"))
-    creds match {
-      case (hostname, username, port, Left(keypair)) =>
-        apply(path, hostname, username = username, key = keypair, port = port)
-      case (hostname, username, port, Right(password)) =>
-        apply(path, hostname, username = username, password = password, port = port)
+    path.split("/").toList match {
+      case Nil => SftpFileDescriptor(sshOptions, Nil)
+      case "" :: hd :: tail => SftpFileDescriptor(sshOptions, hd :: tail)
+      case _ =>
+        throw new IllegalArgumentException("Error parsing SFTP URI. Only absolute paths are supported.")
     }
   }
 
-  def apply(path: String, host: String, username: String, key: String, port: Int)(implicit d: DummyImplicit): SftpFileDescriptor =
-    apply(path, SSHOptions(host = host, username = username, identities = List(SSHIdentity(key)), port = port))
+  def apply(path: String, credentialsConfig: Config): SftpFileDescriptor =
+    apply(path, credentials.read(credentialsConfig, path))
 
-  def apply(path: String, host: String, username: String, password: String, port: Int)(implicit d1: DummyImplicit, d2: DummyImplicit): SftpFileDescriptor =
-    apply(path, SSHOptions(host = host, username = username, password = password, port = port))
+  def apply(url: String, credentials: Option[(String, String, Int, Either[String, String])]): SftpFileDescriptor = {
+    val creds = credentials.getOrElse(throw new IllegalArgumentException(s"No credentials found."))
+    creds match {
+      case (hostname, username, port, Left(keypair)) =>
+        apply(url, hostname, username = username, key = keypair, port = port)
+      case (hostname, username, port, Right(password)) =>
+        apply(url, hostname, username = username, password = password, port = port)
+    }
+  }
+
+  def apply(url: String, host: String, username: String, key: String, port: Int)(implicit d: DummyImplicit): SftpFileDescriptor =
+    apply(url, SSHOptions(host = host, username = username, identities = List(SSHIdentity(key)), port = port))
+
+  def apply(url: String, host: String, username: String, password: String, port: Int)(implicit d1: DummyImplicit, d2: DummyImplicit): SftpFileDescriptor =
+    apply(url, SSHOptions(host = host, username = username, password = password, port = port))
 }
