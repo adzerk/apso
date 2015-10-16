@@ -16,6 +16,7 @@ case class SftpFileDescriptor(
 
   private def username = sshOptions.username
   private def host = sshOptions.host
+  private def port = sshOptions.port
 
   private def ssh[A](block: SSH => A): A = {
     def doConnect(retries: Int): A = {
@@ -94,40 +95,42 @@ case class SftpFileDescriptor(
     }
   }
 
-  override def toString: String = s"sftp://$username@$host$path"
+  override def toString: String =
+    if (port != 22) s"sftp://$username@$host:$port$path"
+    else s"sftp://$username@$host$path"
 }
 
 object SftpFileDescriptor {
-  private def splitIdAndPath(url: String): (String, String) = {
-    val idRegex = """(.*@)?([\d|\w|\.]+)(\/.*)""".r
+  private def splitMeta(url: String): (String, Int, String) = {
+    val idRegex = """(.*@)?([\d|\w|\.]+)(:\d+)?(\/.*)""".r
     url match {
-      case idRegex(id, path) => (id, path)
-      case idRegex(_, id, path) => (id, path)
+      case idRegex(id, path) => (id, 22, path)
+      case idRegex(id, port, path) => (id, port.drop(1).toInt, path)
+      case idRegex(_, id, port, path) => (id, port.drop(1).toInt, path)
       case _ => throw new IllegalArgumentException("Error parsing SFTP URI.")
     }
   }
 
-  val credentials = new FileDescriptorCredentials[(String, String, Int, Either[String, String])] {
+  val credentials = new FileDescriptorCredentials[(String, String, Either[String, String])] {
     val idRegex = """(.*@)?([\d|\w|\.]+)\/(.*)""".r
 
-    def id(path: String) = splitIdAndPath(path)._1
+    def id(path: String) = splitMeta(path)._1
 
     val protocol = "sftp"
 
     def createCredentials(hostname: String, sftpConfig: Config) = {
       val username = sftpConfig.getString("username")
-      val port = sftpConfig.getIntOption("port").getOrElse(22)
 
       val creds = sftpConfig.getStringOption("keypair-file").map(Left(_))
         .orElse(sftpConfig.getStringOption("password").map(Right(_)))
         .getOrElse(throw new IllegalArgumentException("Error parsing SFTP URI. No keypair file or password provided."))
 
-      (hostname, username, port, creds)
+      (hostname, username, creds)
     }
   }
 
   def apply(url: String, sshOptions: SSHOptions): SftpFileDescriptor = {
-    val (_, path) = splitIdAndPath(url)
+    val (_, _, path) = splitMeta(url)
 
     path.split("/").toList match {
       case Nil => SftpFileDescriptor(sshOptions, Nil)
@@ -140,12 +143,14 @@ object SftpFileDescriptor {
   def apply(path: String, credentialsConfig: Config): SftpFileDescriptor =
     apply(path, credentials.read(credentialsConfig, path))
 
-  def apply(url: String, credentials: Option[(String, String, Int, Either[String, String])]): SftpFileDescriptor = {
+  def apply(url: String, credentials: Option[(String, String, Either[String, String])]): SftpFileDescriptor = {
     val creds = credentials.getOrElse(throw new IllegalArgumentException(s"No credentials found."))
+    val (_, port, _) = splitMeta(url)
+
     creds match {
-      case (hostname, username, port, Left(keypair)) =>
+      case (hostname, username, Left(keypair)) =>
         apply(url, hostname, username = username, key = keypair, port = port)
-      case (hostname, username, port, Right(password)) =>
+      case (hostname, username, Right(password)) =>
         apply(url, hostname, username = username, password = password, port = port)
     }
   }
