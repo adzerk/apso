@@ -1,5 +1,6 @@
 package eu.shiftforward.apso
 
+import org.specs2.execute.AsResult
 import org.specs2.matcher._
 import org.specs2.mutable.SpecificationLike
 
@@ -13,16 +14,16 @@ trait FutureExtraMatchers { this: SpecificationLike =>
     def await(timeout: Duration) = Await.result(awaitable, timeout)
   }
 
-  implicit class RichFutureExtraMatcher[T](m: Matcher[T]) {
+  implicit class RichFutureExtraMatcher[T: AsResult](m: => T) {
     /**
      * @return a matcher that needs to eventually match, after a given number of retries.
      */
-    def eventually(retries: Int): Matcher[T] = EventuallyMatchers.eventually(retries, 100.milliseconds)(m)
+    def eventually(retries: Int): T = EventuallyMatchers.eventually(retries, 100.milliseconds)(m)
   }
 
-  def beEventually[T](f: T => MatchResult[_]): Matcher[T] =
-    (f: Matcher[T]).eventually(40, 200.milliseconds)
+  def beEventually[T: AsResult](f: => T): T =
+    eventually(40, 200.milliseconds)(f)
 
-  def beEventually[T](retries: Int, sleep: FiniteDuration)(f: T => MatchResult[_]): Matcher[T] =
-    (f: Matcher[T]).eventually(retries, sleep)
+  def beEventually[T: AsResult](retries: Int, sleep: FiniteDuration)(f: => T): T =
+    eventually(retries, sleep)(f)
 }

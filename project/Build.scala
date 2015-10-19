@@ -29,9 +29,9 @@ object ProjectBuild extends Build {
       "net.databinder.dispatch"       %% "dispatch-core"      % "0.11.3",
       "org.scalaz"                    %% "scalaz-core"        % "7.1.4"          % "provided",
       "org.slf4j"                      % "slf4j-api"          % "1.7.12",
-      "org.specs2"                    %% "specs2-core"        % "3.6.4"          % "test",
-      "org.specs2"                    %% "specs2-scalacheck"  % "3.6.4"          % "test",
-      "org.specs2"                    %% "specs2-junit"       % "3.6.4"          % "test",
+      "org.specs2"                    %% "specs2-core"        % "3.6.5"          % "test",
+      "org.specs2"                    %% "specs2-scalacheck"  % "3.6.5"          % "test",
+      "org.specs2"                    %% "specs2-junit"       % "3.6.5"          % "test",
       "junit"                          % "junit"              % "4.12"           % "test",
       "org.scalacheck"                %% "scalacheck"         % "1.12.5"         % "test"))
 
@@ -42,8 +42,8 @@ object ProjectBuild extends Build {
     .settings(libraryDependencies ++= Seq(
       "com.typesafe.akka"             %% "akka-testkit"       % "2.3.14"          % "provided",
       "org.slf4j"                      % "slf4j-api"          % "1.7.12",
-      "org.specs2"                    %% "specs2-core"        % "3.6.4"          % "provided",
-      "org.specs2"                    %% "specs2-junit"       % "3.6.4"          % "provided"
+      "org.specs2"                    %% "specs2-core"        % "3.6.5"          % "provided",
+      "org.specs2"                    %% "specs2-junit"       % "3.6.5"          % "provided"
   ))
 
   lazy val commonSettings = Defaults.coreDefaultSettings ++ formatSettings ++ Seq(
