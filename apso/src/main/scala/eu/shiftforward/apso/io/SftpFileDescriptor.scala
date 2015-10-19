@@ -8,6 +8,25 @@ import eu.shiftforward.apso.config.Implicits._
 import fr.janalyse.ssh._
 import java.io.File
 
+/**
+ * A `FileDescriptor` for files served over SFTP. This file descriptor only supports absolute paths.
+ * Currently SSH connections are not "cached" and each request requires starting a new connection.
+ *
+ * The URI for this `FileDescriptor` should be in the format:
+ * - `sftp://<username>@<hostname>:<port>/<absolute-path>`
+ *
+ * Both the username and port are optional. Additionally, the credentials config expects an object
+ * with the following format:
+ *
+ * `sftp {
+ *    default = {
+ *      username = <username>
+ *      password = <password>
+ *    }
+ *  }`
+ *
+ * It is also possible to provide credentials for a specific `hostname`.
+ */
 case class SftpFileDescriptor(
     private val sshOptions: SSHOptions,
     protected val elements: List[String]) extends FileDescriptor with RemoteFileDescriptor with Logging {
