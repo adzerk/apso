@@ -12,7 +12,7 @@ case class SftpFileDescriptor(
     private val sshOptions: SSHOptions,
     protected val elements: List[String]) extends FileDescriptor with RemoteFileDescriptor with Logging {
 
-  protected def root = "/"
+  protected def root = ""
 
   private def username = sshOptions.username
   private def host = sshOptions.host

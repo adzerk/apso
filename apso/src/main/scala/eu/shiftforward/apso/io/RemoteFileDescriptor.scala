@@ -4,8 +4,8 @@ trait RemoteFileDescriptor { this: FileDescriptor =>
   protected def elements: List[String]
   protected def root: String
 
-  val name: String = elements.lastOption.getOrElse("")
-  val path: String = root + elements.mkString("/")
+  lazy val name: String = elements.lastOption.getOrElse("")
+  lazy val path: String = root + "/" + elements.mkString("/")
 
   private def sanitize(segment: String): Option[String] = {
     val whiteSpaceValidated = segment.trim match {
