@@ -24,7 +24,7 @@ trait RemoteFileDescriptor { this: FileDescriptor =>
 
   protected def duplicate(elements: List[String]): FileDescriptor
 
-  def parent(n: Int): FileDescriptor =
+  def parent(n: Int = 1): FileDescriptor =
     this.duplicate(elements = elements.dropRight(n))
 
   def child(name: String): FileDescriptor =

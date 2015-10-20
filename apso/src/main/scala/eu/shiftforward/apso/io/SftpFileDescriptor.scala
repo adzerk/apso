@@ -105,6 +105,7 @@ case class SftpFileDescriptor(
       throw new Exception("File descriptor points to a directory")
     } else {
       try {
+        parent().mkdirs()
         ssh(_.send(localTarget.file, path))
         true
 

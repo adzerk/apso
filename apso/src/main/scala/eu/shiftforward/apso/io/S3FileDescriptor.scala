@@ -11,7 +11,9 @@ import scala.collection.concurrent.TrieMap
 case class S3FileDescriptor(bucket: S3Bucket, protected val elements: List[String])
     extends FileDescriptor with RemoteFileDescriptor with Logging {
 
-  protected val root = bucket.bucketName
+  val bucketName = bucket.bucketName
+
+  protected val root = bucketName
 
   private lazy val builtPath = buildPath(elements)
 
