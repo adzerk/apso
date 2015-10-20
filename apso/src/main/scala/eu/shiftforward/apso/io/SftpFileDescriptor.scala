@@ -43,8 +43,8 @@ case class SftpFileDescriptor(
         SSH.once(sshOptions)(block)
       } catch {
         case e: JSchException if retries > 0 =>
-          log.warn("[{}] {}. Retrying in 5 seconds...", host, e.getMessage, null)
-          Thread.sleep(5000)
+          log.warn("[{}] {}. Retrying in 10 seconds...", host, e.getMessage, null)
+          Thread.sleep(10000)
           doConnect(retries - 1)
       }
     }
