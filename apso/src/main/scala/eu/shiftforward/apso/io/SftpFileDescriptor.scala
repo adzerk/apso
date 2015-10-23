@@ -25,7 +25,8 @@ import java.io.File
  *    }
  *  }`
  *
- * It is also possible to provide credentials for a specific `hostname`.
+ * What is considered as an `id` for credentials handling is the `hostname` of the file descriptor,
+ * therefore it is possible to provide credentials for a specific `hostname`.
  */
 case class SftpFileDescriptor(
     private val sshOptions: SSHOptions,
