@@ -8,18 +8,20 @@ import eu.shiftforward.apso.config.FileDescriptorCredentials
 
 import scala.collection.concurrent.TrieMap
 
-case class S3FileDescriptor(bucket: S3Bucket, private val elements: List[String])
-    extends FileDescriptor with Logging {
+case class S3FileDescriptor(bucket: S3Bucket, protected val elements: List[String])
+    extends FileDescriptor with RemoteFileDescriptor with Logging {
+  type Self = S3FileDescriptor
 
-  lazy val bucketName = bucket.bucketName
+  val bucketName = bucket.bucketName
 
-  lazy val path: String = bucketName + elements.foldLeft("")((acc, p) => s"$acc/$p")
-
-  lazy val name: String = elements.lastOption.getOrElse("")
+  protected val root = bucketName
 
   private lazy val builtPath = buildPath(elements)
 
   @inline private def buildPath(p: Seq[String]): String = p.mkString("/")
+
+  protected def duplicate(elements: List[String]) =
+    this.copy(elements = elements)
 
   def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean): Boolean = {
     if (localTarget.isDirectory) {
@@ -46,32 +48,6 @@ case class S3FileDescriptor(bucket: S3Bucket, private val elements: List[String]
       bucket.push(builtPath, localTarget.file)
     }
   }
-
-  def parent(n: Int): S3FileDescriptor = this.copy(elements = elements.dropRight(n))
-
-  private def sanitize(segment: String): Option[String] = {
-
-    val whiteSpaceValidated = segment.trim match {
-      case "" => None
-      case str => Some(str)
-    }
-
-    whiteSpaceValidated.map {
-      _.count(_ == '/') match {
-        case 0 => segment
-        case 1 if segment.endsWith("/") => segment.dropRight(1)
-        case _ => throw new IllegalArgumentException("path cannot contain /")
-      }
-    }
-  }
-
-  override def /(name: String): S3FileDescriptor = child(name)
-
-  def child(name: String): S3FileDescriptor =
-    this.copy(elements = elements ++ sanitize(name).toList)
-
-  override def children(names: String*): S3FileDescriptor =
-    this.copy(elements = elements ++ names.flatMap(sanitize))
 
   override def cd(pathString: String): S3FileDescriptor = {
     val newPath = pathString.split("/").map(_.trim).toList.foldLeft(elements) {
@@ -182,7 +158,7 @@ object S3FileDescriptor {
         val s3BucketRef = s3Buckets.getOrElseUpdate(s3bucket, newBucket)
         S3FileDescriptor(s3BucketRef, s3path.filterNot(_.trim == ""))
 
-      case _ => throw new Exception("Error parsing S3 URI")
+      case _ => throw new IllegalArgumentException("Error parsing S3 URI")
     }
   }
 
@@ -192,7 +168,7 @@ object S3FileDescriptor {
   val credentials = new FileDescriptorCredentials[SerializableAWSCredentials] {
     def id(path: String) = path.split("/").headOption.mkString
     val protocol = "s3"
-    def createCredentials(s3Config: Config) = {
+    def createCredentials(id: String, s3Config: Config) = {
       new SerializableAWSCredentials(
         s3Config.getString("access-key"),
         s3Config.getString("secret-key"))

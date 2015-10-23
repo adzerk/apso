@@ -64,6 +64,16 @@ class S3Bucket(val bucketName: String,
   private[this] def sanitizeKey(key: String) = if (key.startsWith("./")) key.drop(2) else key
 
   /**
+   * Returns size of the file in the location specified by `key` in the bucket. If the file doesn't
+   * exist the return value is 0.
+   * @param key the remote pathname for the file
+   * @return the size of the file in the location specified by `key` in the bucket if the exists, 0 otherwise.
+   */
+  def size(key: String): Long = retry {
+    s3.getObjectMetadata(bucketName, key).getContentLength
+  }.getOrElse(0)
+
+  /**
    * Returns a list of filenames and directories in a bucket matching a given prefix.
    * @param prefix the prefix to match
    * @return a list of filenames in a bucket matching a given prefix.

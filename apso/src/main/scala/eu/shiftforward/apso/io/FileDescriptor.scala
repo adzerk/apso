@@ -153,6 +153,7 @@ object FileDescriptor {
     protocol(uri) match {
       case ("file", path) => LocalFileDescriptor(path)
       case ("s3", path) => S3FileDescriptor(path, credentialsConfig)
+      case ("sftp", path) => SftpFileDescriptor(path, credentialsConfig)
       case _ => throw new UnsupportedOperationException("Protocol not supported")
     }
   }
