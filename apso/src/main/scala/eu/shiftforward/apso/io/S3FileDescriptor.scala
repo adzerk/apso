@@ -10,6 +10,7 @@ import scala.collection.concurrent.TrieMap
 
 case class S3FileDescriptor(bucket: S3Bucket, protected val elements: List[String])
     extends FileDescriptor with RemoteFileDescriptor with Logging {
+  type Self = S3FileDescriptor
 
   val bucketName = bucket.bucketName
 
@@ -48,7 +49,7 @@ case class S3FileDescriptor(bucket: S3Bucket, protected val elements: List[Strin
     }
   }
 
-  override def cd(pathString: String): FileDescriptor = {
+  override def cd(pathString: String): S3FileDescriptor = {
     val newPath = pathString.split("/").map(_.trim).toList.foldLeft(elements) {
       case (acc, "." | "") => acc
       case (acc, "..") => acc.dropRight(1)
@@ -57,7 +58,7 @@ case class S3FileDescriptor(bucket: S3Bucket, protected val elements: List[Strin
     this.copy(elements = newPath)
   }
 
-  override def list: Iterator[FileDescriptor] = {
+  override def list: Iterator[S3FileDescriptor] = {
     def removePrefix(primary: List[String], secondary: List[String]): List[String] = {
       (primary, secondary) match {
         case (h1 :: t1, h2 :: t2) if h1 == h2 => removePrefix(t1, t2)
@@ -75,7 +76,7 @@ case class S3FileDescriptor(bucket: S3Bucket, protected val elements: List[Strin
     }.toIterator
   }
 
-  def listAllFilesWithPrefix(prefix: String): Iterator[FileDescriptor] = {
+  def listAllFilesWithPrefix(prefix: String): Iterator[S3FileDescriptor] = {
     listS3WithPrefix(prefix, includeDirectories = false).map {
       pathStr => this.copy(elements = pathStr.split("/").toList)
     }

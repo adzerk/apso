@@ -1,6 +1,8 @@
 package eu.shiftforward.apso.io
 
 trait RemoteFileDescriptor { this: FileDescriptor =>
+  type Self <: RemoteFileDescriptor
+
   protected def elements: List[String]
   protected def root: String
 
@@ -22,14 +24,14 @@ trait RemoteFileDescriptor { this: FileDescriptor =>
     }
   }
 
-  protected def duplicate(elements: List[String]): FileDescriptor
+  protected def duplicate(elements: List[String]): Self
 
-  def parent(n: Int = 1): FileDescriptor =
+  def parent(n: Int = 1): Self =
     this.duplicate(elements = elements.dropRight(n))
 
-  def child(name: String): FileDescriptor =
+  def child(name: String): Self =
     this.duplicate(elements = elements ++ sanitize(name).toList)
 
-  override def children(names: String*): FileDescriptor =
+  override def children(names: String*): Self =
     this.duplicate(elements = elements ++ names.flatMap(sanitize))
 }

@@ -30,6 +30,7 @@ import java.io.File
 case class SftpFileDescriptor(
     private val sshOptions: SSHOptions,
     protected val elements: List[String]) extends FileDescriptor with RemoteFileDescriptor with Logging {
+  type Self = SftpFileDescriptor
 
   protected def root = ""
 
@@ -58,15 +59,15 @@ case class SftpFileDescriptor(
   def exists: Boolean = ssh(_.exists(path))
   def isDirectory: Boolean = ssh(_.isDirectory(path))
 
-  def list: Iterator[FileDescriptor] =
+  def list: Iterator[SftpFileDescriptor] =
     if (isDirectory) {
       ssh(_.ls(path)).toIterator.map(this.child)
     } else {
       Iterator()
     }
 
-  def listAllFilesWithPrefix(prefix: String): Iterator[FileDescriptor] = {
-    def aux(f: FileDescriptor): Iterator[FileDescriptor] =
+  def listAllFilesWithPrefix(prefix: String): Iterator[SftpFileDescriptor] = {
+    def aux(f: SftpFileDescriptor): Iterator[SftpFileDescriptor] =
       if (f.isDirectory) f.list.flatMap(aux)
       else Iterator(f)
 
