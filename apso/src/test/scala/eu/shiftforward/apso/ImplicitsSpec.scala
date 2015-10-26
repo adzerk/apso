@@ -292,8 +292,8 @@ class ImplicitsSpec extends Specification with ScalaCheck with FutureExtraMatche
     "provide an ordered uniform distribution as a stream" in {
       val rand = Random
       rand.setSeed(0)
-      val runs = 100000
-      val epsilon = 0.001
+      val runs = 1000000
+      val epsilon = 0.005
       val stream = rand.increasingUniformStream(runs).toList
 
       "the results must be ordered" in {
