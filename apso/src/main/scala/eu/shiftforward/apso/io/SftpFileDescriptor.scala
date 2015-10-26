@@ -135,7 +135,7 @@ case class SftpFileDescriptor(
 
 object SftpFileDescriptor {
   private def splitMeta(url: String): (String, Int, String) = {
-    val idRegex = """(.*@)?([\d|\w|\.]+)(:\d+)?(\/.*)""".r
+    val idRegex = """(.*@)?([\-|\d|\w|\.]+)(:\d+)?(\/.*)""".r
     url match {
       case idRegex(_, id, null, path) => (id, 22, path)
       case idRegex(_, id, port, path) => (id, port.drop(1).toInt, path)

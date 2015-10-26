@@ -24,6 +24,7 @@ class FileDescriptorSpec extends Specification with CustomMatchers {
       FileDescriptor("file:///tmp/folder") mustEqual LocalFileDescriptor("/tmp/folder")
       FileDescriptor("s3://tmp/path") mustEqual S3FileDescriptor("tmp/path")
       FileDescriptor("sftp://localhost/tmp/path", sftpConfig) mustEqual SftpFileDescriptor("localhost/tmp/path", sftpConfig)
+      FileDescriptor("sftp://valid-host.com/tmp/path", sftpConfig) mustEqual SftpFileDescriptor("valid-host.com/tmp/path", sftpConfig)
     }
 
     "be serializable" in {
