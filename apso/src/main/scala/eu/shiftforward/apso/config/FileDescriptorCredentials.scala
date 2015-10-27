@@ -46,7 +46,7 @@ trait FileDescriptorCredentials[T] {
           case protocolCred if protocolCred.hasPath("ids") =>
             protocolCred.getStringList("ids").contains(fdId)
           case protocolCred =>
-            protocolCred.getStringOption("id").contains(fdId)
+            protocolCred.getStringOption("id").exists(_ == fdId)
         }.map(_.getConfig("creds"))
       }
       .orElse(config.getConfigOption(s"$protocol.default"))
