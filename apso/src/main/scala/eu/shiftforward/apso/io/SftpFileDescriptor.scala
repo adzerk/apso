@@ -1,12 +1,14 @@
 package eu.shiftforward.apso.io
 
 import com.jcraft.jsch.JSchException
-import com.typesafe.config.Config
+import com.typesafe.config.{ Config, ConfigFactory }
 import eu.shiftforward.apso.Logging
 import eu.shiftforward.apso.config.FileDescriptorCredentials
 import eu.shiftforward.apso.config.Implicits._
 import fr.janalyse.ssh._
 import java.io.File
+import java.util.concurrent.Semaphore
+import scala.collection.mutable.HashMap
 
 /**
  * A `FileDescriptor` for files served over SFTP. This file descriptor only supports absolute paths.
@@ -42,7 +44,12 @@ case class SftpFileDescriptor(
   private def ssh[A](block: SSH => A): A = {
     def doConnect(retries: Int): A = {
       try {
-        SSH.once(sshOptions)(block)
+        try {
+          SftpFileDescriptor.acquireConnection(host)
+          SSH.once(sshOptions)(block)
+        } finally {
+          SftpFileDescriptor.releaseConnection(host)
+        }
       } catch {
         case e: JSchException if retries > 0 =>
           log.warn("[{}] {}. Retrying in 10 seconds...", host, e.getMessage, null)
@@ -134,6 +141,23 @@ case class SftpFileDescriptor(
 }
 
 object SftpFileDescriptor {
+  private[this] val config = ConfigFactory.load()
+  private[this] val maxConnections =
+    config.getInt("apso.io.file-descriptor.sftp.max-connections-per-host")
+
+  private[this] val currentConnections =
+    HashMap[String, Semaphore]().withDefaultValue(new Semaphore(maxConnections, true))
+
+  private def acquireConnection(host: String) = {
+    val semaphore = synchronized { currentConnections(host) }
+    semaphore.acquire()
+  }
+
+  private def releaseConnection(host: String) = synchronized {
+    val semaphore = synchronized { currentConnections(host) }
+    semaphore.release()
+  }
+
   private def splitMeta(url: String): (String, Int, String) = {
     val idRegex = """(.*@)?([\-|\d|\w|\.]+)(:\d+)?(\/.*)""".r
     url match {
