@@ -5,12 +5,10 @@ import eu.shiftforward.apso.Logging
 import eu.shiftforward.apso.config.FileDescriptorCredentials
 import eu.shiftforward.apso.config.Implicits._
 import java.io.File
-
 import org.apache.commons.vfs2._
 import org.apache.commons.vfs2.impl.StandardFileSystemManager
 import org.apache.commons.vfs2.provider.sftp.SftpFileSystemConfigBuilder
-
-import scala.util.Try
+import scala.util.{ Properties, Try }
 
 /**
  * A `FileDescriptor` for files served over SFTP. This file descriptor only supports absolute paths.
@@ -178,8 +176,8 @@ object SftpFileDescriptor {
     }
   }
 
-  def apply(host: String, port: Int, url: String, username: String, password: Option[String],
-            identities: Array[File])(implicit d: DummyImplicit): SftpFileDescriptor = {
+  def apply(host: String, port: Int, url: String, username: String, password: Option[String], identities: Array[File])(
+    implicit d: DummyImplicit): SftpFileDescriptor = {
     val (_, _, path) = splitMeta(url)
 
     val elements =
@@ -192,8 +190,8 @@ object SftpFileDescriptor {
     SftpFileDescriptor(host, port, username, password, elements, identities)
   }
 
-  def apply(host: String, port: Int, url: String, username: String,
-            password: Option[String])(implicit d: DummyImplicit): SftpFileDescriptor =
+  def apply(host: String, port: Int, url: String, username: String, password: Option[String])(
+    implicit d: DummyImplicit): SftpFileDescriptor =
     apply(host, port, url, username, password, Array[File]())
 
   def apply(url: String, credentials: Option[(String, String, Either[String, String])]): SftpFileDescriptor = {
@@ -202,7 +200,7 @@ object SftpFileDescriptor {
 
     creds match {
       case (host, username, Left(keyPair)) =>
-        apply(host, port, url, username, None, Array(new File(keyPair)))
+        apply(host, port, url, username, None, Array(new File(Properties.userHome + "/.ssh/" + keyPair)))
       case (host, username, Right(password)) =>
         apply(host, port, url, username, Some(password), Array[File]())
     }
