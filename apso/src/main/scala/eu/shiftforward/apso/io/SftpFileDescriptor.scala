@@ -1,6 +1,7 @@
 package eu.shiftforward.apso.io
 
 import com.typesafe.config.Config
+import com.jcraft.jsch.UserInfo
 import eu.shiftforward.apso.Logging
 import eu.shiftforward.apso.config.FileDescriptorCredentials
 import eu.shiftforward.apso.config.Implicits._
@@ -38,6 +39,16 @@ case class SftpFileDescriptor(
   elements: List[String],
   identities: Array[File] = Array.empty)
     extends FileDescriptor with RemoteFileDescriptor with Logging {
+
+  case class SftpPassphraseUserInfo(passphrase: Option[String]) extends UserInfo {
+    def getPassphrase() = passphrase.getOrElse("")
+    def getPassword() = null
+    def promptPassphrase(s: String) = true
+    def promptPassword(s: String) = true
+    def promptYesNo(s: String) = true
+    def showMessage(message: String) {}
+  }
+
   type Self = SftpFileDescriptor
 
   @transient private[this] var _fsOpts: FileSystemOptions = _
@@ -49,7 +60,11 @@ case class SftpFileDescriptor(
       SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(_fsOpts, "no")
       SftpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(_fsOpts, false)
       SftpFileSystemConfigBuilder.getInstance().setTimeout(_fsOpts, 10000)
-      SftpFileSystemConfigBuilder.getInstance().setIdentities(_fsOpts, identities)
+
+      if (identities.nonEmpty) {
+        SftpFileSystemConfigBuilder.getInstance().setIdentities(_fsOpts, identities)
+        SftpFileSystemConfigBuilder.getInstance().setUserInfo(_fsOpts, SftpPassphraseUserInfo(None))
+      }
     }
 
     _fsOpts
