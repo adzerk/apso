@@ -1,12 +1,16 @@
 package eu.shiftforward.apso.io
 
-import com.jcraft.jsch.JSchException
 import com.typesafe.config.Config
 import eu.shiftforward.apso.Logging
 import eu.shiftforward.apso.config.FileDescriptorCredentials
 import eu.shiftforward.apso.config.Implicits._
-import fr.janalyse.ssh._
 import java.io.File
+
+import org.apache.commons.vfs2._
+import org.apache.commons.vfs2.impl.StandardFileSystemManager
+import org.apache.commons.vfs2.provider.sftp.SftpFileSystemConfigBuilder
+
+import scala.util.Try
 
 /**
  * A `FileDescriptor` for files served over SFTP. This file descriptor only supports absolute paths.
@@ -29,25 +33,37 @@ import java.io.File
  * therefore it is possible to provide credentials for a specific `hostname`.
  */
 case class SftpFileDescriptor(
-    private val sshOptions: SSHOptions,
-    protected val elements: List[String]) extends FileDescriptor with RemoteFileDescriptor with Logging {
+  host: String,
+  port: Int,
+  username: String,
+  password: String,
+  elements: List[String],
+  identities: Array[File] = Array.empty)
+    extends FileDescriptor with RemoteFileDescriptor with Logging {
   type Self = SftpFileDescriptor
 
-  protected def root = ""
+  private[this] val fsOpts = new FileSystemOptions()
 
-  private def username = sshOptions.username
-  private def host = sshOptions.host
-  private def port = sshOptions.port
+  SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(fsOpts, "no")
+  SftpFileSystemConfigBuilder.getInstance().setTimeout(fsOpts, 10000)
+  SftpFileSystemConfigBuilder.getInstance().setIdentities(fsOpts, identities)
 
-  private def ssh[A](block: SSH => A): A = {
+  protected[this] val root = ""
+  private[this] val remotePath = "sftp://" + username + ":" + password + "@" + host + path
+
+  private def ssh[A](block: StandardFileSystemManager => A): A = {
     def doConnect(retries: Int): A = {
+      val fsManager = new StandardFileSystemManager()
+      fsManager.init()
       try {
-        SSH.once(sshOptions)(block)
+        block(fsManager)
       } catch {
-        case e: JSchException if retries > 0 =>
+        case e: FileSystemException if retries > 0 =>
           log.warn("[{}] {}. Retrying in 10 seconds...", host, e.getMessage, null)
           Thread.sleep(10000)
           doConnect(retries - 1)
+      } finally {
+        fsManager.close()
       }
     }
 
@@ -57,15 +73,11 @@ case class SftpFileDescriptor(
   protected def duplicate(elements: List[String]) =
     this.copy(elements = elements)
 
-  def exists: Boolean = ssh(_.exists(path))
-  def isDirectory: Boolean = ssh(_.isDirectory(path))
+  def exists: Boolean = ssh(_.resolveFile(remotePath, fsOpts).exists())
+  def isDirectory: Boolean = ssh(_.resolveFile(remotePath, fsOpts).getType == FileType.FOLDER)
 
   def list: Iterator[SftpFileDescriptor] =
-    if (isDirectory) {
-      ssh(_.ls(path)).toIterator.map(this.child)
-    } else {
-      Iterator()
-    }
+    ssh(_.resolveFile(remotePath, fsOpts).getChildren).toIterator.map(_.getName.getBaseName).map(this.child)
 
   def listAllFilesWithPrefix(prefix: String): Iterator[SftpFileDescriptor] = {
     def aux(f: SftpFileDescriptor): Iterator[SftpFileDescriptor] =
@@ -75,67 +87,47 @@ case class SftpFileDescriptor(
     this.list.filter(_.name.startsWith(prefix)).flatMap(aux)
   }
 
-  def delete(): Boolean =
-    if (exists) {
-      if (isDirectory) ssh(_.rmdir(path))
-      else { ssh(_.rm(path)); true }
+  def delete(): Boolean = Try(ssh(_.resolveFile(remotePath, fsOpts).delete(Selectors.SELECT_ALL))).isSuccess
 
-    } else false
-
-  def mkdirs(): Boolean = exists || ssh(_.mkdir(path))
+  def mkdirs(): Boolean = Try(ssh(_.resolveFile(remotePath, fsOpts).createFolder())).isSuccess
 
   def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean): Boolean = {
-    if (isDirectory || localTarget.isDirectory) {
-      throw new Exception("File descriptor points to a directory")
-    } else {
+    require(!localTarget.isDirectory, s"File descriptor can't point to a directory: ${localTarget.path}")
+    require(!isDirectory, s"File descriptor can't point to a directory: ${this.path}")
+
+    if (localTarget.parent().mkdirs()) {
       val downloadFile = if (safeDownloading) localTarget.sibling(_ + ".tmp") else localTarget
-      localTarget.parent().mkdirs()
-      ssh(_.receive(this.path, new File(downloadFile.path)))
 
-      // FIXME: currently the JASSH API provides no way to know wheter a file download was successful
-      // there's an open issue to improve this (https://github.com/dacr/jassh/issues/16)
-      val success = downloadFile.exists
+      val downloadResult = Try {
+        ssh(m => m.resolveFile(downloadFile.path).copyFrom(m.resolveFile(remotePath, fsOpts), Selectors.SELECT_SELF))
+      }
 
-      if (success && safeDownloading) downloadFile.rename(localTarget)
+      if (downloadResult.isSuccess && safeDownloading)
+        downloadFile.rename(localTarget)
 
-      success
-    }
+      downloadResult.isSuccess
+    } else false
   }
 
   def upload(localTarget: LocalFileDescriptor): Boolean = {
-    if (isDirectory || localTarget.isDirectory) {
-      throw new Exception("File descriptor points to a directory")
-    } else {
-      try {
-        parent().mkdirs()
-        ssh(_.send(localTarget.file, path))
-        true
+    require(!localTarget.isDirectory, s"File descriptor can't point to a directory: ${localTarget.path}")
+    require(!isDirectory, s"File descriptor can't point to a directory: ${this.path}")
 
-      } catch {
-        case e: Throwable => false
-      }
-    }
+    parent().mkdirs() &&
+      Try {
+        ssh(m => m.resolveFile(remotePath, fsOpts).copyFrom(m.resolveFile(localTarget.path), Selectors.SELECT_SELF))
+      }.isSuccess
   }
 
   override def toString: String =
     if (port != 22) s"sftp://$username@$host:$port$path"
     else s"sftp://$username@$host$path"
-
-  override def equals(other: Any): Boolean = other match {
-    case that: SftpFileDescriptor =>
-      username == that.username &&
-        host == that.host &&
-        port == that.port &&
-        path == that.path &&
-        sshOptions.password == that.sshOptions.password &&
-        sshOptions.identities == that.sshOptions.identities
-    case _ => false
-  }
 }
 
 object SftpFileDescriptor {
+  private[this] val idRegex = """(.*@)?([\-|\d|\w|\.]+)(:\d+)?(\/.*)""".r
+
   private def splitMeta(url: String): (String, Int, String) = {
-    val idRegex = """(.*@)?([\-|\d|\w|\.]+)(:\d+)?(\/.*)""".r
     url match {
       case idRegex(_, id, null, path) => (id, 22, path)
       case idRegex(_, id, port, path) => (id, port.drop(1).toInt, path)
@@ -143,14 +135,11 @@ object SftpFileDescriptor {
     }
   }
 
-  val credentials = new FileDescriptorCredentials[(String, String, Either[String, String])] {
-    val idRegex = """(.*@)?([\d|\w|\.]+)\/(.*)""".r
-
+  private[this] val credentials = new FileDescriptorCredentials[(String, String, Either[String, String])] {
+    final val protocol = "sftp"
     def id(path: String) = splitMeta(path)._1
 
-    val protocol = "sftp"
-
-    def createCredentials(hostname: String, sftpConfig: Config) = {
+    def createCredentials(hostname: String, sftpConfig: Config): (String, String, Either[String, String]) = {
       val username = sftpConfig.getString("username")
 
       val creds = sftpConfig.getStringOption("keypair-file").map(Left(_))
@@ -161,35 +150,36 @@ object SftpFileDescriptor {
     }
   }
 
-  def apply(url: String, sshOptions: SSHOptions): SftpFileDescriptor = {
+  def apply(host: String, port: Int, url: String, username: String, password: String,
+            identities: Array[File])(implicit d: DummyImplicit): SftpFileDescriptor = {
     val (_, _, path) = splitMeta(url)
 
-    path.split("/").toList match {
-      case Nil => SftpFileDescriptor(sshOptions, Nil)
-      case "" :: hd :: tail => SftpFileDescriptor(sshOptions, hd :: tail)
-      case _ =>
-        throw new IllegalArgumentException("Error parsing SFTP URI. Only absolute paths are supported.")
-    }
+    val elements =
+      path.split("/").toList match {
+        case Nil => Nil
+        case "" :: hd :: tail => hd :: tail
+        case _ => throw new IllegalArgumentException("Error parsing SFTP URI. Only absolute paths are supported.")
+      }
+
+    SftpFileDescriptor(host, port, username, password, elements, identities)
   }
 
-  def apply(path: String, credentialsConfig: Config): SftpFileDescriptor =
-    apply(path, credentials.read(credentialsConfig, path))
+  def apply(host: String, port: Int, url: String, username: String,
+            password: String)(implicit d: DummyImplicit): SftpFileDescriptor =
+    apply(host, port, url, username, password, Array[File]())
 
   def apply(url: String, credentials: Option[(String, String, Either[String, String])]): SftpFileDescriptor = {
     val creds = credentials.getOrElse(throw new IllegalArgumentException(s"No credentials found."))
     val (_, port, _) = splitMeta(url)
 
     creds match {
-      case (hostname, username, Left(keypair)) =>
-        apply(url, hostname, username = username, key = keypair, port = port)
-      case (hostname, username, Right(password)) =>
-        apply(url, hostname, username = username, password = password, port = port)
+      case (host, username, Left(keyPair)) =>
+        apply(host, port, url, username, "", Array(new File(keyPair)))
+      case (host, username, Right(password)) =>
+        apply(host, port, url, username, password, Array[File]())
     }
   }
 
-  def apply(url: String, host: String, username: String, key: String, port: Int)(implicit d: DummyImplicit): SftpFileDescriptor =
-    apply(url, SSHOptions(host = host, username = username, identities = List(SSHIdentity(key)), port = port))
-
-  def apply(url: String, host: String, username: String, password: String, port: Int)(implicit d1: DummyImplicit, d2: DummyImplicit): SftpFileDescriptor =
-    apply(url, SSHOptions(host = host, username = username, identities = List(), password = password, port = port))
+  def apply(path: String, credentialsConfig: Config): SftpFileDescriptor =
+    apply(path, credentials.read(credentialsConfig, path))
 }
