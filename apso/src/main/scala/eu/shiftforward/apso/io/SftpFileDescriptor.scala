@@ -36,20 +36,32 @@ case class SftpFileDescriptor(
   host: String,
   port: Int,
   username: String,
-  password: String,
+  password: Option[String],
   elements: List[String],
   identities: Array[File] = Array.empty)
     extends FileDescriptor with RemoteFileDescriptor with Logging {
   type Self = SftpFileDescriptor
 
-  private[this] val fsOpts = new FileSystemOptions()
+  @transient private[this] var _fsOpts: FileSystemOptions = _
 
-  SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(fsOpts, "no")
-  SftpFileSystemConfigBuilder.getInstance().setTimeout(fsOpts, 10000)
-  SftpFileSystemConfigBuilder.getInstance().setIdentities(fsOpts, identities)
+  private[this] def fsOpts =
+    _fsOpts match {
+      case null =>
+        _fsOpts = new FileSystemOptions()
+
+        SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(_fsOpts, "no")
+        SftpFileSystemConfigBuilder.getInstance().setTimeout(_fsOpts, 10000)
+        SftpFileSystemConfigBuilder.getInstance().setIdentities(_fsOpts, identities)
+        _fsOpts
+      case _ => _fsOpts
+    }
 
   protected[this] val root = ""
-  private[this] val remotePath = "sftp://" + username + ":" + password + "@" + host + path
+
+  private[this] val remotePath = password match {
+    case None => s"sftp://$username@$host$path"
+    case Some(pw) => s"sftp://$username:$pw@$host$path"
+  }
 
   private def ssh[A](block: StandardFileSystemManager => A): A = {
     def doConnect(retries: Int): A = {
@@ -122,6 +134,18 @@ case class SftpFileDescriptor(
   override def toString: String =
     if (port != 22) s"sftp://$username@$host:$port$path"
     else s"sftp://$username@$host$path"
+
+  override def equals(other: Any): Boolean = other match {
+    case that: SftpFileDescriptor =>
+      username == that.username &&
+        host == that.host &&
+        port == that.port &&
+        username == that.username &&
+        password == that.password &&
+        (identities sameElements that.identities) &&
+        path == that.path
+    case _ => false
+  }
 }
 
 object SftpFileDescriptor {
@@ -150,7 +174,7 @@ object SftpFileDescriptor {
     }
   }
 
-  def apply(host: String, port: Int, url: String, username: String, password: String,
+  def apply(host: String, port: Int, url: String, username: String, password: Option[String],
             identities: Array[File])(implicit d: DummyImplicit): SftpFileDescriptor = {
     val (_, _, path) = splitMeta(url)
 
@@ -165,7 +189,7 @@ object SftpFileDescriptor {
   }
 
   def apply(host: String, port: Int, url: String, username: String,
-            password: String)(implicit d: DummyImplicit): SftpFileDescriptor =
+            password: Option[String])(implicit d: DummyImplicit): SftpFileDescriptor =
     apply(host, port, url, username, password, Array[File]())
 
   def apply(url: String, credentials: Option[(String, String, Either[String, String])]): SftpFileDescriptor = {
@@ -174,9 +198,9 @@ object SftpFileDescriptor {
 
     creds match {
       case (host, username, Left(keyPair)) =>
-        apply(host, port, url, username, "", Array(new File(keyPair)))
+        apply(host, port, url, username, None, Array(new File(keyPair)))
       case (host, username, Right(password)) =>
-        apply(host, port, url, username, password, Array[File]())
+        apply(host, port, url, username, Some(password), Array[File]())
     }
   }
 
