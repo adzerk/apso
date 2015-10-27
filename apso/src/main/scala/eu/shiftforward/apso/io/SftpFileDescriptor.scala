@@ -42,17 +42,18 @@ case class SftpFileDescriptor(
 
   @transient private[this] var _fsOpts: FileSystemOptions = _
 
-  private[this] def fsOpts =
-    _fsOpts match {
-      case null =>
-        _fsOpts = new FileSystemOptions()
+  private[this] def fsOpts = {
+    if (_fsOpts == null) {
+      _fsOpts = new FileSystemOptions()
 
-        SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(_fsOpts, "no")
-        SftpFileSystemConfigBuilder.getInstance().setTimeout(_fsOpts, 10000)
-        SftpFileSystemConfigBuilder.getInstance().setIdentities(_fsOpts, identities)
-        _fsOpts
-      case _ => _fsOpts
+      SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(_fsOpts, "no")
+      SftpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(_fsOpts, false)
+      SftpFileSystemConfigBuilder.getInstance().setTimeout(_fsOpts, 10000)
+      SftpFileSystemConfigBuilder.getInstance().setIdentities(_fsOpts, identities)
     }
+
+    _fsOpts
+  }
 
   protected[this] val root = ""
 
