@@ -89,7 +89,11 @@ case class SftpFileDescriptor(
   def isDirectory: Boolean = ssh(_.resolveFile(remotePath, fsOpts).getType == FileType.FOLDER)
 
   def list: Iterator[SftpFileDescriptor] =
-    ssh(_.resolveFile(remotePath, fsOpts).getChildren).toIterator.map(_.getName.getBaseName).map(this.child)
+    if (isDirectory) {
+      ssh(_.resolveFile(remotePath, fsOpts).getChildren).toIterator.map(_.getName.getBaseName).map(this.child)
+    } else {
+      Iterator()
+    }
 
   def listAllFilesWithPrefix(prefix: String): Iterator[SftpFileDescriptor] = {
     def aux(f: SftpFileDescriptor): Iterator[SftpFileDescriptor] =
