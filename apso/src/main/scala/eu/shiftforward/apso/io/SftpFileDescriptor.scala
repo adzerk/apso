@@ -28,6 +28,14 @@ import scala.util.{ Properties, Try }
  *    }
  *  }`
  *
+ * Or if using public key authentication:
+ * `sftp {
+ *    default = {
+ *      keypair-file = <key filename>
+ *      passphrase = <passphrase>
+ *    }
+ *  }`
+ *
  * What is considered as an `id` for credentials handling is the `hostname` of the file descriptor,
  * therefore it is possible to provide credentials for a specific `hostname`.
  */
@@ -37,12 +45,12 @@ case class SftpFileDescriptor(
   username: String,
   password: Option[String],
   elements: List[String],
-  identity: Option[File])
+  identity: Option[SftpFileDescriptor.Identity])
     extends FileDescriptor with RemoteFileDescriptor with Logging {
 
   case class SftpPassphraseUserInfo(passphrase: Option[String]) extends UserInfo {
     def getPassphrase() = passphrase.getOrElse("")
-    def getPassword() = null
+    def getPassword() = ""
     def promptPassphrase(s: String) = true
     def promptPassword(s: String) = true
     def promptYesNo(s: String) = true
@@ -61,9 +69,10 @@ case class SftpFileDescriptor(
       SftpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(_fsOpts, false)
       SftpFileSystemConfigBuilder.getInstance().setTimeout(_fsOpts, 10000)
 
-      identity.foreach { i =>
-        SftpFileSystemConfigBuilder.getInstance().setIdentities(_fsOpts, Array(i))
-        SftpFileSystemConfigBuilder.getInstance().setUserInfo(_fsOpts, SftpPassphraseUserInfo(None))
+      identity.foreach {
+        case (f, p) =>
+          SftpFileSystemConfigBuilder.getInstance().setIdentities(_fsOpts, Array(f))
+          SftpFileSystemConfigBuilder.getInstance().setUserInfo(_fsOpts, SftpPassphraseUserInfo(p))
       }
     }
 
@@ -167,6 +176,8 @@ case class SftpFileDescriptor(
 }
 
 object SftpFileDescriptor {
+  type Identity = (File, Option[String]) // (key, passphrase)
+
   private[this] val idRegex = """(.*@)?([\-|\d|\w|\.]+)(:\d+)?(\/.*)""".r
 
   private def splitMeta(url: String): (String, Int, String) = {
@@ -177,22 +188,25 @@ object SftpFileDescriptor {
     }
   }
 
-  private[this] val credentials = new FileDescriptorCredentials[(String, String, Either[String, String])] {
+  private[this] val credentials = new FileDescriptorCredentials[(String, String, Either[Identity, String])] {
     final val protocol = "sftp"
     def id(path: String) = splitMeta(path)._1
 
-    def createCredentials(hostname: String, sftpConfig: Config): (String, String, Either[String, String]) = {
+    def createCredentials(hostname: String, sftpConfig: Config): (String, String, Either[Identity, String]) = {
       val username = sftpConfig.getString("username")
 
-      val creds = sftpConfig.getStringOption("keypair-file").map(Left(_))
-        .orElse(sftpConfig.getStringOption("password").map(Right(_)))
-        .getOrElse(throw new IllegalArgumentException("Error parsing SFTP URI. No keypair file or password provided."))
+      val creds =
+        sftpConfig.getStringOption("keypair-file").map { fname =>
+          Left((new File(Properties.userHome + "/.ssh/" + fname), sftpConfig.getStringOption("passphrase")))
+        }
+          .orElse(sftpConfig.getStringOption("password").map(Right(_)))
+          .getOrElse(throw new IllegalArgumentException("Error parsing SFTP URI. No keypair file or password provided."))
 
       (hostname, username, creds)
     }
   }
 
-  def apply(host: String, port: Int, url: String, username: String, password: Option[String], identity: Option[File])(
+  def apply(host: String, port: Int, url: String, username: String, password: Option[String], identity: Option[Identity])(
     implicit d: DummyImplicit): SftpFileDescriptor = {
     val (_, _, path) = splitMeta(url)
 
@@ -210,13 +224,13 @@ object SftpFileDescriptor {
     implicit d: DummyImplicit): SftpFileDescriptor =
     apply(host, port, url, username, password, None)
 
-  def apply(url: String, credentials: Option[(String, String, Either[String, String])]): SftpFileDescriptor = {
+  def apply(url: String, credentials: Option[(String, String, Either[Identity, String])]): SftpFileDescriptor = {
     val creds = credentials.getOrElse(throw new IllegalArgumentException(s"No credentials found."))
     val (_, port, _) = splitMeta(url)
 
     creds match {
-      case (host, username, Left(keyPair)) =>
-        apply(host, port, url, username, None, Some(new File(Properties.userHome + "/.ssh/" + keyPair)))
+      case (host, username, Left(identity)) =>
+        apply(host, port, url, username, None, Some(identity))
       case (host, username, Right(password)) =>
         apply(host, port, url, username, Some(password), None)
     }
