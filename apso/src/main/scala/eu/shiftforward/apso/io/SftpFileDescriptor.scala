@@ -31,6 +31,7 @@ import scala.util.{ Properties, Try }
  * Or if using public key authentication:
  * `sftp {
  *    default = {
+ *      username = <username>
  *      keypair-file = <key filename>
  *      passphrase = <passphrase>
  *    }

@@ -25,7 +25,7 @@ object ProjectBuild extends Build {
       "com.typesafe.akka"             %% "akka-actor"         % "2.3.14"         % "provided",
       "com.twmacinta"                  % "fast-md5"           % "2.7.1",
       "org.apache.commons"             % "commons-vfs2"       % "2.0"            % "provided",
-      "fr.janalyse"                   %% "janalyse-ssh"       % "0.9.19"         % "provided",
+      "com.jcraft"                     % "jsch"               % "0.1.53"         % "provided",
       "io.spray"                      %% "spray-json"         % "1.3.2"          % "provided",
       "io.spray"                      %% "spray-httpx"        % "1.3.3"          % "provided",
       "net.databinder.dispatch"       %% "dispatch-core"      % "0.11.3",
