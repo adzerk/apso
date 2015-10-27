@@ -37,7 +37,7 @@ case class SftpFileDescriptor(
   username: String,
   password: Option[String],
   elements: List[String],
-  identities: Array[File] = Array.empty)
+  identity: Option[File])
     extends FileDescriptor with RemoteFileDescriptor with Logging {
 
   case class SftpPassphraseUserInfo(passphrase: Option[String]) extends UserInfo {
@@ -61,8 +61,8 @@ case class SftpFileDescriptor(
       SftpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(_fsOpts, false)
       SftpFileSystemConfigBuilder.getInstance().setTimeout(_fsOpts, 10000)
 
-      if (identities.nonEmpty) {
-        SftpFileSystemConfigBuilder.getInstance().setIdentities(_fsOpts, identities)
+      identity.foreach { i =>
+        SftpFileSystemConfigBuilder.getInstance().setIdentities(_fsOpts, Array(i))
         SftpFileSystemConfigBuilder.getInstance().setUserInfo(_fsOpts, SftpPassphraseUserInfo(None))
       }
     }
@@ -160,7 +160,7 @@ case class SftpFileDescriptor(
         port == that.port &&
         username == that.username &&
         password == that.password &&
-        (identities sameElements that.identities) &&
+        identity == that.identity &&
         path == that.path
     case _ => false
   }
@@ -192,7 +192,7 @@ object SftpFileDescriptor {
     }
   }
 
-  def apply(host: String, port: Int, url: String, username: String, password: Option[String], identities: Array[File])(
+  def apply(host: String, port: Int, url: String, username: String, password: Option[String], identity: Option[File])(
     implicit d: DummyImplicit): SftpFileDescriptor = {
     val (_, _, path) = splitMeta(url)
 
@@ -203,12 +203,12 @@ object SftpFileDescriptor {
         case _ => throw new IllegalArgumentException("Error parsing SFTP URI. Only absolute paths are supported.")
       }
 
-    SftpFileDescriptor(host, port, username, password, elements, identities)
+    SftpFileDescriptor(host, port, username, password, elements, identity)
   }
 
   def apply(host: String, port: Int, url: String, username: String, password: Option[String])(
     implicit d: DummyImplicit): SftpFileDescriptor =
-    apply(host, port, url, username, password, Array[File]())
+    apply(host, port, url, username, password, None)
 
   def apply(url: String, credentials: Option[(String, String, Either[String, String])]): SftpFileDescriptor = {
     val creds = credentials.getOrElse(throw new IllegalArgumentException(s"No credentials found."))
@@ -216,9 +216,9 @@ object SftpFileDescriptor {
 
     creds match {
       case (host, username, Left(keyPair)) =>
-        apply(host, port, url, username, None, Array(new File(Properties.userHome + "/.ssh/" + keyPair)))
+        apply(host, port, url, username, None, Some(new File(Properties.userHome + "/.ssh/" + keyPair)))
       case (host, username, Right(password)) =>
-        apply(host, port, url, username, Some(password), Array[File]())
+        apply(host, port, url, username, Some(password), None)
     }
   }
 
