@@ -58,8 +58,8 @@ case class SftpFileDescriptor(
   protected[this] val root = ""
 
   private[this] val remotePath = password match {
-    case None => s"sftp://$username@$host$path"
-    case Some(pw) => s"sftp://$username:$pw@$host$path"
+    case None => s"sftp://$username@$host:$port$path"
+    case Some(pw) => s"sftp://$username:$pw@$host:$port$path"
   }
 
   private def ssh[A](block: StandardFileSystemManager => A): A = {
