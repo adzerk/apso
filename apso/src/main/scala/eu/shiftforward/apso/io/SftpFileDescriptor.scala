@@ -132,8 +132,8 @@ case class SftpFileDescriptor(
   def mkdirs(): Boolean = Try(ssh(_.resolveFile(remotePath, fsOpts).createFolder())).isSuccess
 
   def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean): Boolean = {
-    require(!localTarget.isDirectory, s"File descriptor can't point to a directory: ${localTarget.path}")
-    require(!isDirectory, s"File descriptor can't point to a directory: ${this.path}")
+    require(!localTarget.isDirectory, s"Local file descriptor can't point to a directory: ${localTarget.path}")
+    require(!isDirectory, s"Remote file descriptor can't point to a directory: ${this.path}")
 
     if (localTarget.parent().mkdirs()) {
       val downloadFile = if (safeDownloading) localTarget.sibling(_ + ".tmp") else localTarget
@@ -150,8 +150,8 @@ case class SftpFileDescriptor(
   }
 
   def upload(localTarget: LocalFileDescriptor): Boolean = {
-    require(!localTarget.isDirectory, s"File descriptor can't point to a directory: ${localTarget.path}")
-    require(!isDirectory, s"File descriptor can't point to a directory: ${this.path}")
+    require(!localTarget.isDirectory, s"Local file descriptor can't point to a directory: ${localTarget.path}")
+    require(!isDirectory, s"Remote file descriptor can't point to a directory: ${this.path}")
 
     parent().mkdirs() &&
       Try {
