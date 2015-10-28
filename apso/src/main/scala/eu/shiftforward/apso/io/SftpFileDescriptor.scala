@@ -127,7 +127,7 @@ case class SftpFileDescriptor(
     this.list.filter(_.name.startsWith(prefix)).flatMap(aux)
   }
 
-  def delete(): Boolean = Try(ssh(_.resolveFile(remotePath, fsOpts).delete(Selectors.SELECT_SELF))).isSuccess
+  def delete(): Boolean = Try(ssh(_.resolveFile(remotePath, fsOpts).delete(Selectors.SELECT_SELF)) > 0).getOrElse(false)
 
   def mkdirs(): Boolean = Try(ssh(_.resolveFile(remotePath, fsOpts).createFolder())).isSuccess
 
