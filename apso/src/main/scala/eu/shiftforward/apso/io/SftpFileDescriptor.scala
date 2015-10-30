@@ -190,17 +190,17 @@ object SftpFileDescriptor {
   private[this] val maxConnections =
     config.getInt("apso.io.file-descriptor.sftp.max-connections-per-host")
 
-  private[this] val currentConnections =
-    HashMap[String, Semaphore]().withDefaultValue(new Semaphore(maxConnections, true))
+  private[this] val currentConnections = HashMap[String, Semaphore]()
 
-  private def acquireConnection(host: String) = {
-    val semaphore = synchronized { currentConnections(host) }
+  def acquireConnection(host: String) = {
+    val semaphore = synchronized {
+      currentConnections.getOrElseUpdate(host, new Semaphore(maxConnections, true))
+    }
     semaphore.acquire()
   }
 
-  private def releaseConnection(host: String) = synchronized {
-    val semaphore = synchronized { currentConnections(host) }
-    semaphore.release()
+  def releaseConnection(host: String) = synchronized {
+    currentConnections.get(host).foreach(_.release())
   }
 
   type Identity = (File, Option[String]) // (key, passphrase)
