@@ -96,6 +96,7 @@ case class SftpFileDescriptor(
       } catch {
         case e: FileSystemException if retries > 0 =>
           log.warn("[{}] {}. Retrying in 10 seconds...", host, e.getMessage, null)
+          log.debug("Failure cause: {}", e.getCause)
           Thread.sleep(10000)
           doConnect(retries - 1)
       } finally {
