@@ -1,14 +1,16 @@
 package eu.shiftforward.apso.io
 
-import com.typesafe.config.Config
 import com.jcraft.jsch.UserInfo
+import com.typesafe.config.{ Config, ConfigFactory }
 import eu.shiftforward.apso.Logging
 import eu.shiftforward.apso.config.FileDescriptorCredentials
 import eu.shiftforward.apso.config.Implicits._
 import java.io.File
+import java.util.concurrent.Semaphore
 import org.apache.commons.vfs2._
 import org.apache.commons.vfs2.impl.StandardFileSystemManager
 import org.apache.commons.vfs2.provider.sftp.SftpFileSystemConfigBuilder
+import scala.collection.mutable.HashMap
 import scala.util.{ Properties, Try }
 
 /**
@@ -89,18 +91,25 @@ case class SftpFileDescriptor(
 
   private def ssh[A](block: StandardFileSystemManager => A): A = {
     def doConnect(retries: Int): A = {
-      val fsManager = new StandardFileSystemManager()
-      fsManager.init()
       try {
-        block(fsManager)
+        SftpFileDescriptor.acquireConnection(host)
+
+        val fsManager = new StandardFileSystemManager()
+
+        try {
+          fsManager.init()
+          block(fsManager)
+
+        } finally {
+          fsManager.close()
+          SftpFileDescriptor.releaseConnection(host)
+        }
       } catch {
         case e: FileSystemException if retries > 0 =>
           log.warn("[{}] {}. Retrying in 10 seconds...", host, e.getMessage, null)
           log.debug("Failure cause: {}", e.getCause)
           Thread.sleep(10000)
           doConnect(retries - 1)
-      } finally {
-        fsManager.close()
       }
     }
 
@@ -178,6 +187,23 @@ case class SftpFileDescriptor(
 }
 
 object SftpFileDescriptor {
+  private[this] val config = ConfigFactory.load()
+  private[this] val maxConnections =
+    config.getInt("apso.io.file-descriptor.sftp.max-connections-per-host")
+
+  private[this] val currentConnections = HashMap[String, Semaphore]()
+
+  def acquireConnection(host: String) = {
+    val semaphore = synchronized {
+      currentConnections.getOrElseUpdate(host, new Semaphore(maxConnections, true))
+    }
+    semaphore.acquire()
+  }
+
+  def releaseConnection(host: String) = synchronized {
+    currentConnections.get(host).foreach(_.release())
+  }
+
   type Identity = (File, Option[String]) // (key, passphrase)
 
   private[this] val idRegex = """(.*@)?([\-|\d|\w|\.]+)(:\d+)?(\/.*)""".r
