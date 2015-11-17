@@ -310,7 +310,9 @@ object Implicits {
   implicit val intConfigReader = configReader[Int](_.getInt(_))
   implicit val doubleConfigReader = configReader[Double](_.getDouble(_))
   implicit val longConfigReader = configReader[Long](_.getLong(_))
-  implicit val durationConfigReader = configReader[java.time.Duration](_.getDuration(_))
+  implicit val durationConfigReader = configReader[Duration](_.getDuration(_))
+  implicit val finiteDurationConfigReader = configReader[FiniteDuration](_.getDuration(_))
+  implicit val javaDurationConfigReader = configReader[java.time.Duration](_.getDuration(_))
   implicit val configConfigReader = configReader[Config](_.getConfig(_))
 
   // ConfigReaders implicits for lists:
@@ -319,7 +321,11 @@ object Implicits {
   implicit val intListConfigReader = configReader[List[Int]](_.getIntList(_).toList.map(Int.unbox))
   implicit val doubleListConfigReader = configReader[List[Double]](_.getDoubleList(_).toList.map(Double.unbox))
   implicit val longListConfigReader = configReader[List[Long]](_.getLongList(_).toList.map(Long.unbox))
-  implicit val durationListConfigReader = configReader[List[java.time.Duration]](_.getDurationList(_).toList)
+  implicit val durationListConfigReader =
+    configReader[List[Duration]](_.getDurationList(_).map(durationToFiniteDuration).toList)
+  implicit val finiteDurationListConfigReader =
+    configReader[List[FiniteDuration]](_.getDurationList(_).map(durationToFiniteDuration).toList)
+  implicit val javaDurationListConfigReader = configReader[List[java.time.Duration]](_.getDurationList(_).toList)
   implicit val configListConfigReader = configReader[List[Config]](_.getConfigList(_).toList)
 
   implicit def durationToFiniteDuration(d: java.time.Duration): FiniteDuration = Duration.fromNanos(d.toNanos)
