@@ -1,0 +1,20 @@
+stages:
+  - test
+  - publish
+test:
+  stage: test
+  script:
+    - sbt +test
+  tags:
+    - java
+    - sbt
+publish:
+  stage: publish
+  script:
+    - sbt +publish
+  tags:
+    - java
+    - sbt
+  only:
+    - master
+  allow_failure: true
