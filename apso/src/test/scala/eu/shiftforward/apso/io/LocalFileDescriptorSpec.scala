@@ -4,6 +4,7 @@ import java.io.File
 import java.util.UUID
 import org.specs2.mutable.Specification
 
+import scala.io.Source
 import scala.util.Try
 
 class LocalFileDescriptorSpec extends Specification {
@@ -19,6 +20,12 @@ class LocalFileDescriptorSpec extends Specification {
       val file = new File("/tmp/one/two/three")
       val fd = LocalFileDescriptor("/tmp/one/two/three")
       file.getAbsolutePath == fd.path
+    }
+
+    "Retrieve the size of a file" in {
+      val fd1 = LocalFileDescriptor("/tmp") / randomFolder / randomString
+      fd1.write("hello world")
+      fd1.size === "hello world".getBytes.length
     }
 
     "Move up the hierarchy correctly" in {
@@ -140,6 +147,13 @@ class LocalFileDescriptorSpec extends Specification {
       Try(dir2.upload(file1)) must beAFailedTry
     }
 
+    "Stream a file as bytes or lines" in {
+      val fd1 = LocalFileDescriptor("/tmp") / randomFolder / randomString
+      fd1.write("1\n2\n3\n4")
+      Source.fromInputStream(fd1.stream()).mkString === "1\n2\n3\n4"
+      fd1.lines().toList === List("1", "2", "3", "4")
+    }
+
     "List files correctly" in {
       val fd = LocalFileDescriptor("/tmp") / randomFolder / randomString
       val files = (1 to 5).map(n => fd / n.toString)
@@ -188,6 +202,5 @@ class LocalFileDescriptorSpec extends Specification {
       fd.exists must beTrue
       fd.isDirectory must beFalse
     }
-
   }
 }

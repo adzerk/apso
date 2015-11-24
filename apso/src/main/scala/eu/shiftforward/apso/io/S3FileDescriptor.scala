@@ -23,6 +23,8 @@ case class S3FileDescriptor(bucket: S3Bucket, protected val elements: List[Strin
   protected def duplicate(elements: List[String]) =
     this.copy(elements = elements)
 
+  def size = bucket.size(builtPath)
+
   def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean): Boolean = {
     if (localTarget.isDirectory) {
       throw new Exception("File descriptor points to a directory")
@@ -48,6 +50,8 @@ case class S3FileDescriptor(bucket: S3Bucket, protected val elements: List[Strin
       bucket.push(builtPath, localTarget.file)
     }
   }
+
+  def stream() = bucket.stream(builtPath)
 
   override def cd(pathString: String): S3FileDescriptor = {
     val newPath = pathString.split("/").map(_.trim).toList.foldLeft(elements) {

@@ -1,6 +1,10 @@
 package eu.shiftforward.apso.io
 
+import java.io.InputStream
+
 import com.typesafe.config.{ ConfigFactory, Config }
+
+import scala.io.Source
 
 /**
  * A representation of a file stored in an arbitrary location. A descriptor includes logic to
@@ -19,6 +23,11 @@ trait FileDescriptor {
    * @return the file name.
    */
   def name: String
+
+  /**
+   * The size of the file associated to the file descriptor.
+   */
+  def size: Long
 
   /**
    * Downloads the file to the given local destination.
@@ -41,6 +50,18 @@ trait FileDescriptor {
    * @return `true` if the upload was successful, `false` otherwise.
    */
   def upload(localTarget: LocalFileDescriptor): Boolean
+
+  /**
+    * Returns an input stream for the contents of this file.
+    * @return an input stream for the contents of this file.
+    */
+  def stream(): InputStream
+
+  /**
+    * Returns an iterator with the lines of this file.
+    * @return an iterator with the lines of this file.
+    */
+  def lines(): Iterator[String] = Source.fromInputStream(stream()).getLines()
 
   /**
    * Returns true if the fd points to a directory
