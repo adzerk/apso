@@ -6,7 +6,7 @@ import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model._
 import com.typesafe.config.ConfigFactory
 import eu.shiftforward.apso.Logging
-import java.io.{ ByteArrayInputStream, File, FileOutputStream }
+import java.io.{ InputStream, ByteArrayInputStream, File, FileOutputStream }
 import scala.collection.JavaConversions._
 import scala.util.{ Failure, Success, Try }
 
@@ -207,6 +207,9 @@ class S3Bucket(val bucketName: String,
     outputStream.flush()
     outputStream.close()
   }.isDefined
+
+  def stream(key: String): InputStream =
+    s3.getObject(new GetObjectRequest(bucketName, sanitizeKey(key))).getObjectContent
 
   private[this] def handler: PartialFunction[Throwable, Boolean] = {
     case ex: AmazonS3Exception => ex.getStatusCode match {

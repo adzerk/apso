@@ -5,7 +5,7 @@ import com.typesafe.config.{ Config, ConfigFactory }
 import eu.shiftforward.apso.Logging
 import eu.shiftforward.apso.config.FileDescriptorCredentials
 import eu.shiftforward.apso.config.Implicits._
-import java.io.File
+import java.io.{ InputStream, File }
 import java.util.concurrent.Semaphore
 import org.apache.commons.vfs2._
 import org.apache.commons.vfs2.impl.StandardFileSystemManager
@@ -119,6 +119,8 @@ case class SftpFileDescriptor(
   protected def duplicate(elements: List[String]) =
     this.copy(elements = elements)
 
+  def size = ssh(_.resolveFile(remotePath, fsOpts).getContent.getSize)
+
   def exists: Boolean = ssh(_.resolveFile(remotePath, fsOpts).exists())
   def isDirectory: Boolean = ssh(_.resolveFile(remotePath, fsOpts).getType == FileType.FOLDER)
 
@@ -167,6 +169,29 @@ case class SftpFileDescriptor(
       Try {
         ssh(m => m.resolveFile(remotePath, fsOpts).copyFrom(m.resolveFile(localTarget.path), Selectors.SELECT_SELF))
       }.isSuccess
+  }
+
+  def stream() = new InputStream {
+    SftpFileDescriptor.acquireConnection(host)
+    private[this] val fsManager = new StandardFileSystemManager()
+    fsManager.init()
+    private[this] val inner = fsManager.resolveFile(remotePath, fsOpts).getContent.getInputStream
+
+    def read() = inner.read()
+
+    override def read(b: Array[Byte]) = inner.read(b)
+    override def read(b: Array[Byte], off: Int, len: Int): Int = inner.read(b, off, len)
+    override def skip(n: Long) = inner.skip(n)
+    override def available() = inner.available()
+    override def mark(readlimit: Int) = inner.mark(readlimit)
+    override def markSupported() = inner.markSupported()
+    override def reset() = inner.reset()
+
+    override def close() = {
+      inner.close()
+      fsManager.close()
+      SftpFileDescriptor.releaseConnection(host)
+    }
   }
 
   override def toString: String =

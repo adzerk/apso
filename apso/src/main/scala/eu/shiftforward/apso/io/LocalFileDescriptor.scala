@@ -1,6 +1,6 @@
 package eu.shiftforward.apso.io
 
-import java.io.{ FileWriter, File }
+import java.io.{ FileInputStream, InputStream, FileWriter, File }
 import java.nio.file.{ StandardCopyOption, Files, Path, Paths }
 
 import eu.shiftforward.apso.Logging
@@ -25,6 +25,8 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
   lazy val file = Paths.get(initialPath).normalize().toAbsolutePath.toFile
 
   def isDirectory: Boolean = file.isDirectory
+
+  def size = file.length()
 
   def parent(n: Int): LocalFileDescriptor = {
     val parentPath = (1 to n).foldLeft(normalizedPath)((acc, _) => acc.getParent)
@@ -94,6 +96,8 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
       result.isSuccess
     }
   }
+
+  def stream() = new FileInputStream(file)
 
   override def list: Iterator[LocalFileDescriptor] = {
     if (isDirectory) {
