@@ -74,11 +74,11 @@ class S3Bucket(val bucketName: String,
   }.getOrElse(0)
 
   /**
-   * Returns a list of filenames and directories in a bucket matching a given prefix.
+   * Returns a list of objects in a bucket matching a given prefix.
    * @param prefix the prefix to match
-   * @return a list of filenames in a bucket matching a given prefix.
+   * @return a list of objects in a bucket matching a given prefix.
    */
-  def getFilesWithMatchingPrefix(prefix: String, includeDirectories: Boolean = false): Iterator[String] = {
+  def getObjectsWithMatchingPrefix(prefix: String, includeDirectories: Boolean = false): Iterator[S3ObjectSummary] = {
     log.info("Finding files matching prefix '{}'...", prefix)
 
     val listings = Iterator.iterate(s3.listObjects(bucketName, sanitizeKey(prefix))) { listing =>
@@ -88,11 +88,17 @@ class S3Bucket(val bucketName: String,
       } else null
     }
 
-    listings.takeWhile(_ != null)
-      .flatMap(_.getObjectSummaries)
-      .map(_.getKey)
-      .filterNot(!includeDirectories && _.endsWith("/"))
+    val objects = listings.takeWhile(_ != null).flatMap(_.getObjectSummaries)
+    if (includeDirectories) objects else objects.filterNot(_.getKey.endsWith("/"))
   }
+
+  /**
+   * Returns a list of filenames and directories in a bucket matching a given prefix.
+   * @param prefix the prefix to match
+   * @return a list of filenames in a bucket matching a given prefix.
+   */
+  def getFilesWithMatchingPrefix(prefix: String, includeDirectories: Boolean = false): Iterator[String] =
+    getObjectsWithMatchingPrefix(prefix, includeDirectories).map(_.getKey)
 
   /**
    * Pushes a given local `File` to the location specified by `key` in the bucket.

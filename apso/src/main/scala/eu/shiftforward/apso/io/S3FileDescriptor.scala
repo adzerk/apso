@@ -1,6 +1,7 @@
 package eu.shiftforward.apso.io
 
 import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.services.s3.model.S3ObjectSummary
 import com.typesafe.config.Config
 import eu.shiftforward.apso.Logging
 import eu.shiftforward.apso.aws.{ SerializableAWSCredentials, S3Bucket }
@@ -8,8 +9,11 @@ import eu.shiftforward.apso.config.FileDescriptorCredentials
 
 import scala.collection.concurrent.TrieMap
 
-case class S3FileDescriptor(bucket: S3Bucket, protected val elements: List[String])
+case class S3FileDescriptor(bucket: S3Bucket,
+                            protected val elements: List[String],
+                            private var summary: Option[S3ObjectSummary] = None)
     extends FileDescriptor with RemoteFileDescriptor with Logging {
+
   type Self = S3FileDescriptor
 
   val bucketName = bucket.bucketName
@@ -23,7 +27,10 @@ case class S3FileDescriptor(bucket: S3Bucket, protected val elements: List[Strin
   protected def duplicate(elements: List[String]) =
     this.copy(elements = elements)
 
-  def size = bucket.size(builtPath)
+  def size = summary match {
+    case Some(info) => info.getSize
+    case None => bucket.size(builtPath)
+  }
 
   def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean): Boolean = {
     if (localTarget.isDirectory) {
@@ -71,23 +78,23 @@ case class S3FileDescriptor(bucket: S3Bucket, protected val elements: List[Strin
       }
     }
 
-    val s3Elements = listS3WithPrefix("", includeDirectories = true).flatMap {
-      pathStr => removePrefix(elements, pathStr.split("/").toList).take(1).toSet
-    }.toSet
+    val s3Elements = listS3WithPrefix("", includeDirectories = true).map { info =>
+      removePrefix(elements, info.getKey.split("/").toList).head -> info
+    }.toMap
 
     s3Elements.map {
-      case newElement => this.copy(elements = elements :+ newElement)
+      case (newElement, info) => this.copy(elements = elements :+ newElement, summary = Some(info))
     }.toIterator
   }
 
   def listAllFilesWithPrefix(prefix: String): Iterator[S3FileDescriptor] = {
-    listS3WithPrefix(prefix, includeDirectories = false).map {
-      pathStr => this.copy(elements = pathStr.split("/").toList)
+    listS3WithPrefix(prefix, includeDirectories = false).map { info =>
+      this.copy(elements = info.getKey.split("/").toList, summary = Some(info))
     }
   }
 
-  private def listS3WithPrefix(prefix: String, includeDirectories: Boolean): Iterator[String] = {
-    bucket.getFilesWithMatchingPrefix(buildPath(elements :+ prefix), includeDirectories)
+  private[this] def listS3WithPrefix(prefix: String, includeDirectories: Boolean): Iterator[S3ObjectSummary] = {
+    bucket.getObjectsWithMatchingPrefix(buildPath(elements :+ prefix), includeDirectories)
   }
 
   override def sibling(f: String => String): S3FileDescriptor = {

@@ -52,15 +52,15 @@ trait FileDescriptor {
   def upload(localTarget: LocalFileDescriptor): Boolean
 
   /**
-    * Returns an input stream for the contents of this file.
-    * @return an input stream for the contents of this file.
-    */
+   * Returns an input stream for the contents of this file.
+   * @return an input stream for the contents of this file.
+   */
   def stream(): InputStream
 
   /**
-    * Returns an iterator with the lines of this file.
-    * @return an iterator with the lines of this file.
-    */
+   * Returns an iterator with the lines of this file.
+   * @return an iterator with the lines of this file.
+   */
   def lines(): Iterator[String] = Source.fromInputStream(stream()).getLines()
 
   /**
