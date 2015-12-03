@@ -445,22 +445,6 @@ object Implicits {
       monteCarlo(seq, { p: (T, Double) => p._2 }, r).map(_._1)
 
     /**
-     * Chooses an element of a sequence according to a weight function.
-     * @param seq the sequence of elements to choose from
-     * @param valueFunc the function that maps elements to weights
-     * @param r the random value used to select the elements. If the default random value is used,
-     *          the weighted selection uses 1.0 as the sum of all weights. To use another scale of
-     *          weights, a random value between 0.0 and the maximum weight should be passed.
-     * @tparam T the type of the elements
-     * @return the selected element wrapped in a `Some` if some element was chosen, `None`
-     *         otherwise. Not choosing any element can happen if the weights of the elements do not
-     *         sum up to the maximum value of `r`.
-     */
-    @deprecated("Use the equivalent monteCarlo method instead.", "0.4")
-    def weightedChoice[T](seq: Seq[T], valueFunc: T => Double, r: Double = rand.nextDouble()) =
-      monteCarlo(seq, valueFunc, r)
-
-    /**
      * Chooses a random element of a traversable using the reservoir sampling technique, traversing
      * only once the given sequence.
      * @param seq the elements to choose from
