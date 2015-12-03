@@ -96,14 +96,7 @@ object ProjectBuild extends Build {
         Some("snapshots" at sf + "snapshots")
       else
         Some("releases"  at sf + "releases")
-    },
-
-    credentials += Credentials(
-      "Sonatype Nexus Repository Manager",
-      "NEXUS_URL",
-      "NEXUS_USER",
-      "NEXUS_PASS")
-  )
+    })
 
   lazy val noPublishing = Seq(
     publish := (),
