@@ -4,14 +4,14 @@ stages:
 test:
   stage: test
   script:
-    - sbt +test
+    - sbt test
   tags:
     - java
     - sbt
 publish:
   stage: publish
   script:
-    - sbt +publish
+    - sbt publish
   tags:
     - java
     - sbt
