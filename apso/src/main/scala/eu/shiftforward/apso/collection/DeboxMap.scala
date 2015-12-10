@@ -137,31 +137,29 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
    * @param key the key to update
    * @param value the value to assign to the given key
    */
-  final def update(key: A, value: B) {
-    @inline
-    @tailrec def loop(i: Int, perturbation: Int) {
+  final def update(key: A, value: B): Unit = {
+    @inline @tailrec
+    def loop(i: Int, perturbation: Int, freeBlock: Int): Unit = {
       val j = i & mask
       val status = buckets(j)
       if (status == 0) {
-        keys(j) = key
-        vals(j) = value
-        buckets(j) = 3
+        val writeTo = if (freeBlock == -1) j else freeBlock
+        keys(writeTo) = key
+        vals(writeTo) = value
+        buckets(writeTo) = 3
         len += 1
         used += 1
         if (used > limit) resize()
       } else if (status == 2) {
-        keys(j) = key
-        vals(j) = value
-        buckets(j) = 3
-        len += 1
+        loop((i << 2) + i + perturbation + 1, perturbation >> 5, j)
       } else if (keys(j) == key) {
         vals(j) = value
       } else {
-        loop((i << 2) + i + perturbation + 1, perturbation >> 5)
+        loop((i << 2) + i + perturbation + 1, perturbation >> 5, freeBlock)
       }
     }
     val i = key.## & 0x7fffffff
-    loop(i, i)
+    loop(i, i, -1)
   }
 
   /**
@@ -169,15 +167,13 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
    * nothing.
    * @param key the key to remove
    */
-  final def remove(key: A) {
-    @inline
-    @tailrec def loop(i: Int, perturbation: Int) {
+  final def remove(key: A): Unit = {
+    @inline @tailrec def loop(i: Int, perturbation: Int): Unit = {
       val j = i & mask
       val status = buckets(j)
       if (status == 3 && keys(j) == key) {
         buckets(j) = 2
         len -= 1
-        loop((i << 2) + i + perturbation + 1, perturbation >> 5)
       } else if (status == 0) {
       } else {
         loop((i << 2) + i + perturbation + 1, perturbation >> 5)
