@@ -4,19 +4,19 @@ import com.typesafe.config.{ Config, ConfigFactory }
 import eu.shiftforward.apso.Logging
 import eu.shiftforward.apso.config.FileDescriptorCredentials
 import eu.shiftforward.apso.config.Implicits._
+import io.github.andrebeat.pool.Pool
 import java.io.{ InputStream, File }
-import java.util.concurrent.Semaphore
+import java.util.concurrent.ConcurrentHashMap
 import net.schmizz.sshj._
 import net.schmizz.sshj.sftp.{ FileMode, SFTPClient }
 import net.schmizz.sshj.transport.verification._
 import net.schmizz.sshj.xfer.scp.SCPFileTransfer
 import scala.collection.JavaConverters._
-import scala.collection.mutable.HashMap
 import scala.util.{ Properties, Try }
 
 /**
  * A `FileDescriptor` for files served over SFTP. This file descriptor only supports absolute paths.
- * Currently SSH connections are not "cached" and each request requires starting a new connection.
+ * The SSH connections for a given host are pooled.
  *
  * The URI for this `FileDescriptor` should be in the format:
  * - `sftp://<username>@<hostname>:<port>/<absolute-path>`
@@ -56,44 +56,19 @@ case class SftpFileDescriptor(
 
   protected[this] val root = ""
 
-  def sshClient() = {
-    val sshClient = new SSHClient()
-    sshClient.addHostKeyVerifier(new PromiscuousVerifier())
-    sshClient.useCompression()
-    sshClient.connect(host, port)
+  private[this] def sshClient() =
+    SftpFileDescriptor.acquireConnection(host, port, username, password, identity)
 
-    (password, identity) match {
-      case (Some(p), _) =>
-        sshClient.authPassword(username, password.get)
-      case (_, Some((f, p))) =>
-        val keyProvider = p match {
-          case Some(passphrase) =>
-            sshClient.loadKeys(f.getAbsolutePath, passphrase)
-          case None =>
-            sshClient.loadKeys(f.getAbsolutePath)
-        }
-
-        sshClient.authPublickey(username, keyProvider)
-      case _ =>
-        throw new IllegalArgumentException("Either a password or pub-priv key identity must be provided")
-    }
-
-    sshClient
-  }
-
-  def sftp[A](block: SFTPClient => A): A = {
+  private[this] def sftp[A](block: SFTPClient => A): A = {
     def doConnect(retries: Int): A =
       try {
-        SftpFileDescriptor.acquireConnection(host)
-        val ssh = sshClient()
-        val sftp = ssh.newSFTPClient
-
-        try {
-          block(sftp)
-        } finally {
-          sftp.close()
-          ssh.disconnect()
-          SftpFileDescriptor.releaseConnection(host)
+        sshClient.use { ssh =>
+          val sftp = ssh.newSFTPClient
+          try {
+            block(sftp)
+          } finally {
+            sftp.close()
+          }
         }
       } catch {
         case e: Exception if retries > 0 =>
@@ -165,9 +140,8 @@ case class SftpFileDescriptor(
   }
 
   def stream() = new InputStream {
-    SftpFileDescriptor.acquireConnection(host)
-
-    private[this] val ssh = sshClient()
+    private[this] val sshLease = sshClient()
+    private[this] val ssh = sshLease.get()
     private[this] val sftp = ssh.newSFTPClient
     private[this] val remoteFile = sftp.open(path)
     private[this] val inner = new remoteFile.RemoteFileInputStream()
@@ -184,8 +158,7 @@ case class SftpFileDescriptor(
     override def close() = {
       inner.close()
       sftp.close()
-      ssh.disconnect()
-      SftpFileDescriptor.releaseConnection(host)
+      sshLease.release()
     }
   }
 
@@ -210,18 +183,67 @@ object SftpFileDescriptor {
   private[this] val config = ConfigFactory.load()
   private[this] val maxConnections =
     config.getInt("apso.io.file-descriptor.sftp.max-connections-per-host")
+  private[this] val maxIdleTime =
+    config.getDuration("apso.io.file-descriptor.sftp.max-idle-time")
 
-  private[this] val currentConnections = HashMap[String, Semaphore]()
+  private[this] val connectionPools = new ConcurrentHashMap[String, Pool[SSHClient]]()
 
-  def acquireConnection(host: String) = {
-    val semaphore = synchronized {
-      currentConnections.getOrElseUpdate(host, new Semaphore(maxConnections, true))
+  private[this] def sshClient(
+    host: String,
+    port: Int,
+    username: String,
+    password: Option[String],
+    identity: Option[Identity]) = {
+
+    val sshClient = new SSHClient()
+    sshClient.addHostKeyVerifier(new PromiscuousVerifier())
+    sshClient.useCompression()
+    sshClient.connect(host, port)
+
+    (password, identity) match {
+      case (Some(p), _) =>
+        sshClient.authPassword(username, password.get)
+      case (_, Some((f, p))) =>
+        val keyProvider = p match {
+          case Some(passphrase) =>
+            sshClient.loadKeys(f.getAbsolutePath, passphrase)
+          case None =>
+            sshClient.loadKeys(f.getAbsolutePath)
+        }
+
+        sshClient.authPublickey(username, keyProvider)
+      case _ =>
+        throw new IllegalArgumentException("Either a password or pub-priv key identity must be provided")
     }
-    semaphore.acquire()
+
+    sshClient
   }
 
-  def releaseConnection(host: String) = synchronized {
-    currentConnections.get(host).foreach(_.release())
+  private def acquireConnection(
+    host: String,
+    port: Int,
+    username: String,
+    password: Option[String],
+    identity: Option[Identity]) = {
+
+    val pool = {
+      var p = connectionPools.get(host)
+      if (p == null) {
+        synchronized {
+          val pool = Pool(
+            maxConnections,
+            () => sshClient(host, port, username, password, identity),
+            dispose = { ssh: SSHClient => ssh.disconnect() },
+            maxIdleTime = maxIdleTime)
+
+          connectionPools.put(host, pool)
+
+          pool
+        }
+      } else p
+    }
+
+    pool.acquire()
   }
 
   type Identity = (File, Option[String]) // (key, passphrase)
