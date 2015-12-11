@@ -56,19 +56,14 @@ case class SftpFileDescriptor(
 
   protected[this] val root = ""
 
-  private[this] def sshClient() =
+  private[this] def sftpClient() =
     SftpFileDescriptor.acquireConnection(host, port, username, password, identity)
 
   private[this] def sftp[A](block: SFTPClient => A): A = {
     def doConnect(retries: Int): A =
       try {
-        sshClient.use { ssh =>
-          val sftp = ssh.newSFTPClient
-          try {
-            block(sftp)
-          } finally {
-            sftp.close()
-          }
+        sftpClient.use { sftp =>
+          block(sftp)
         }
       } catch {
         case e: Exception if retries > 0 =>
@@ -140,9 +135,8 @@ case class SftpFileDescriptor(
   }
 
   def stream() = new InputStream {
-    private[this] val sshLease = sshClient()
-    private[this] val ssh = sshLease.get()
-    private[this] val sftp = ssh.newSFTPClient
+    private[this] val sftpLease = sftpClient()
+    private[this] val sftp = sftpLease.get()
     private[this] val remoteFile = sftp.open(path)
     private[this] val inner = new remoteFile.RemoteFileInputStream()
 
@@ -157,8 +151,7 @@ case class SftpFileDescriptor(
     override def reset() = inner.reset()
     override def close() = {
       inner.close()
-      sftp.close()
-      sshLease.release()
+      sftpLease.release()
     }
   }
 
@@ -186,7 +179,20 @@ object SftpFileDescriptor {
   private[this] val maxIdleTime =
     config.getDuration("apso.io.file-descriptor.sftp.max-idle-time")
 
-  private[this] val connectionPools = new ConcurrentHashMap[String, Pool[SSHClient]]()
+  private[this] val connectionPools = new ConcurrentHashMap[String, Pool[SftpClient]]()
+
+  // This is just a helper class to tie together the lifetime of the SFTPClient
+  // with the SSHClient, i.e. when we close the SFTPClient we also want to
+  // disconnect the underlying SSH connection.
+  private class SftpClient(private[this] val ssh: SSHClient) {
+    val sftpClient = ssh.newSFTPClient
+    def close() = {
+      sftpClient.close()
+      ssh.disconnect()
+    }
+  }
+
+  implicit def sftpClientToSFTPClient(c: SftpClient): SFTPClient = c.sftpClient
 
   private[this] def sshClient(
     host: String,
@@ -232,8 +238,8 @@ object SftpFileDescriptor {
         synchronized {
           val pool = Pool(
             maxConnections,
-            () => sshClient(host, port, username, password, identity),
-            dispose = { ssh: SSHClient => ssh.disconnect() },
+            () => new SftpClient(sshClient(host, port, username, password, identity)),
+            dispose = { c: SftpClient => c.close() },
             maxIdleTime = maxIdleTime)
 
           connectionPools.put(host, pool)
