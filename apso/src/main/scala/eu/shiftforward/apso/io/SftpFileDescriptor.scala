@@ -1,15 +1,16 @@
 package eu.shiftforward.apso.io
 
-import com.jcraft.jsch.UserInfo
 import com.typesafe.config.{ Config, ConfigFactory }
 import eu.shiftforward.apso.Logging
 import eu.shiftforward.apso.config.FileDescriptorCredentials
 import eu.shiftforward.apso.config.Implicits._
 import java.io.{ InputStream, File }
 import java.util.concurrent.Semaphore
-import org.apache.commons.vfs2._
-import org.apache.commons.vfs2.impl.StandardFileSystemManager
-import org.apache.commons.vfs2.provider.sftp.SftpFileSystemConfigBuilder
+import net.schmizz.sshj._
+import net.schmizz.sshj.sftp.{ FileMode, SFTPClient }
+import net.schmizz.sshj.transport.verification._
+import net.schmizz.sshj.xfer.scp.SCPFileTransfer
+import scala.collection.JavaConverters._
 import scala.collection.mutable.HashMap
 import scala.util.{ Properties, Try }
 
@@ -51,67 +52,56 @@ case class SftpFileDescriptor(
   identity: Option[SftpFileDescriptor.Identity])
     extends FileDescriptor with RemoteFileDescriptor with Logging {
 
-  case class SftpPassphraseUserInfo(passphrase: Option[String]) extends UserInfo {
-    def getPassphrase() = passphrase.getOrElse("")
-    def getPassword() = ""
-    def promptPassphrase(s: String) = true
-    def promptPassword(s: String) = true
-    def promptYesNo(s: String) = true
-    def showMessage(message: String) {}
-  }
-
   type Self = SftpFileDescriptor
-
-  @transient private[this] var _fsOpts: FileSystemOptions = _
-
-  private[this] def fsOpts = {
-    if (_fsOpts == null) {
-      _fsOpts = new FileSystemOptions()
-
-      SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(_fsOpts, "no")
-      SftpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(_fsOpts, false)
-      SftpFileSystemConfigBuilder.getInstance().setTimeout(_fsOpts, 10000)
-
-      identity.foreach {
-        case (f, p) =>
-          SftpFileSystemConfigBuilder.getInstance().setIdentities(_fsOpts, Array(f))
-          SftpFileSystemConfigBuilder.getInstance().setUserInfo(_fsOpts, SftpPassphraseUserInfo(p))
-      }
-    }
-
-    _fsOpts
-  }
 
   protected[this] val root = ""
 
-  private[this] val remotePath = password match {
-    case None => s"sftp://$username@$host:$port$path"
-    case Some(pw) => s"sftp://$username:$pw@$host:$port$path"
+  def sshClient() = {
+    val sshClient = new SSHClient()
+    sshClient.addHostKeyVerifier(new PromiscuousVerifier())
+    sshClient.useCompression()
+    sshClient.connect(host, port)
+
+    (password, identity) match {
+      case (Some(p), _) =>
+        sshClient.authPassword(username, password.get)
+      case (_, Some((f, p))) =>
+        val keyProvider = p match {
+          case Some(passphrase) =>
+            sshClient.loadKeys(f.getAbsolutePath, passphrase)
+          case None =>
+            sshClient.loadKeys(f.getAbsolutePath)
+        }
+
+        sshClient.authPublickey(username, keyProvider)
+      case _ =>
+        throw new IllegalArgumentException("Either a password or pub-priv key identity must be provided")
+    }
+
+    sshClient
   }
 
-  private def ssh[A](block: StandardFileSystemManager => A): A = {
-    def doConnect(retries: Int): A = {
+  def sftp[A](block: SFTPClient => A): A = {
+    def doConnect(retries: Int): A =
       try {
         SftpFileDescriptor.acquireConnection(host)
-
-        val fsManager = new StandardFileSystemManager()
+        val ssh = sshClient()
+        val sftp = ssh.newSFTPClient
 
         try {
-          fsManager.init()
-          block(fsManager)
-
+          block(sftp)
         } finally {
-          fsManager.close()
+          sftp.close()
+          ssh.disconnect()
           SftpFileDescriptor.releaseConnection(host)
         }
       } catch {
-        case e: FileSystemException if retries > 0 =>
+        case e: Exception if retries > 0 =>
           log.warn("[{}] {}. Retrying in 10 seconds...", host, e.getMessage, null)
           log.debug("Failure cause: {}", e.getCause)
           Thread.sleep(10000)
           doConnect(retries - 1)
       }
-    }
 
     doConnect(3)
   }
@@ -119,14 +109,14 @@ case class SftpFileDescriptor(
   protected def duplicate(elements: List[String]) =
     this.copy(elements = elements)
 
-  def size = ssh(_.resolveFile(remotePath, fsOpts).getContent.getSize)
+  def size = sftp(_.size(path))
 
-  def exists: Boolean = ssh(_.resolveFile(remotePath, fsOpts).exists())
-  def isDirectory: Boolean = ssh(_.resolveFile(remotePath, fsOpts).getType == FileType.FOLDER)
+  def exists: Boolean = sftp(c => Option(c.statExistence(path)).isDefined)
+  def isDirectory: Boolean = exists && sftp(_.`type`(path) == FileMode.Type.DIRECTORY)
 
   def list: Iterator[SftpFileDescriptor] =
     if (isDirectory) {
-      ssh(_.resolveFile(remotePath, fsOpts).getChildren).toIterator.map(_.getName.getBaseName).map(this.child)
+      sftp(_.ls(path)).asScala.toIterator.map(_.getName).map(this.child)
     } else {
       Iterator()
     }
@@ -139,23 +129,26 @@ case class SftpFileDescriptor(
     this.list.filter(_.name.startsWith(prefix)).flatMap(aux)
   }
 
-  def delete(): Boolean = Try(ssh(_.resolveFile(remotePath, fsOpts).delete(Selectors.SELECT_SELF)) > 0).getOrElse(false)
+  def delete(): Boolean =
+    Try {
+      if (isDirectory) sftp(_.rmdir(path))
+      else sftp(_.rm(path))
+    }.isSuccess
 
-  def mkdirs(): Boolean = Try(ssh(_.resolveFile(remotePath, fsOpts).createFolder())).isSuccess
+  def mkdirs(): Boolean =
+    Try(sftp(_.mkdirs(path))).isSuccess
 
   def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean): Boolean = {
     require(!localTarget.isDirectory, s"Local file descriptor can't point to a directory: ${localTarget.path}")
     require(!isDirectory, s"Remote file descriptor can't point to a directory: ${this.path}")
 
+    log.info("Downloading '{}' to '{}'", toString, localTarget.toString, null)
+
     if (localTarget.parent().mkdirs()) {
       val downloadFile = if (safeDownloading) localTarget.sibling(_ + ".tmp") else localTarget
+      val downloadResult = Try(sftp(_.get(path, downloadFile.path)))
 
-      val downloadResult = Try {
-        ssh(m => m.resolveFile(downloadFile.path).copyFrom(m.resolveFile(remotePath, fsOpts), Selectors.SELECT_SELF))
-      }
-
-      if (downloadResult.isSuccess && safeDownloading)
-        downloadFile.rename(localTarget)
+      if (downloadResult.isSuccess && safeDownloading) downloadFile.rename(localTarget)
 
       downloadResult.isSuccess
     } else false
@@ -165,17 +158,19 @@ case class SftpFileDescriptor(
     require(!localTarget.isDirectory, s"Local file descriptor can't point to a directory: ${localTarget.path}")
     require(!isDirectory, s"Remote file descriptor can't point to a directory: ${this.path}")
 
+    log.info("Uploading '{}' to '{}'", localTarget.toString, toString, null)
+
     parent().mkdirs() &&
-      Try {
-        ssh(m => m.resolveFile(remotePath, fsOpts).copyFrom(m.resolveFile(localTarget.path), Selectors.SELECT_SELF))
-      }.isSuccess
+      Try(sftp(_.put(localTarget.path, path))).isSuccess
   }
 
   def stream() = new InputStream {
     SftpFileDescriptor.acquireConnection(host)
-    private[this] val fsManager = new StandardFileSystemManager()
-    fsManager.init()
-    private[this] val inner = fsManager.resolveFile(remotePath, fsOpts).getContent.getInputStream
+
+    private[this] val ssh = sshClient()
+    private[this] val sftp = ssh.newSFTPClient
+    private[this] val remoteFile = sftp.open(path)
+    private[this] val inner = new remoteFile.RemoteFileInputStream()
 
     def read() = inner.read()
 
@@ -186,10 +181,10 @@ case class SftpFileDescriptor(
     override def mark(readlimit: Int) = inner.mark(readlimit)
     override def markSupported() = inner.markSupported()
     override def reset() = inner.reset()
-
     override def close() = {
       inner.close()
-      fsManager.close()
+      sftp.close()
+      ssh.disconnect()
       SftpFileDescriptor.releaseConnection(host)
     }
   }
