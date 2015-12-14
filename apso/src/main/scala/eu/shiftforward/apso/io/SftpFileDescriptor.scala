@@ -82,7 +82,7 @@ case class SftpFileDescriptor(
 
   def size = sftp(_.size(path))
 
-  def exists: Boolean = sftp(c => Option(c.statExistence(path)).isDefined)
+  def exists: Boolean = sftp(c => c.statExistence(path) != null)
   def isDirectory: Boolean = exists && sftp(_.`type`(path) == FileMode.Type.DIRECTORY)
 
   def list: Iterator[SftpFileDescriptor] =
