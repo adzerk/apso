@@ -5,11 +5,11 @@ import eu.shiftforward.apso.Logging
 import eu.shiftforward.apso.config.FileDescriptorCredentials
 import eu.shiftforward.apso.config.Implicits._
 import io.github.andrebeat.pool.Pool
-import java.io.{ InputStream, IOException, File }
+import java.io.{ InputStream, IOException, File, FileNotFoundException }
 import java.util.concurrent.ConcurrentHashMap
 import net.schmizz.sshj._
 import net.schmizz.sshj.common.SSHException
-import net.schmizz.sshj.sftp.{ FileAttributes, FileMode, SFTPClient }
+import net.schmizz.sshj.sftp.{ FileAttributes, FileMode, Response, SFTPClient, SFTPException }
 import net.schmizz.sshj.transport.verification._
 import net.schmizz.sshj.xfer.scp.SCPFileTransfer
 import scala.collection.JavaConverters._
@@ -68,6 +68,8 @@ case class SftpFileDescriptor(
           block(sftp)
         }
       } catch {
+        case e: SFTPException if e.getStatusCode == Response.StatusCode.NO_SUCH_FILE =>
+          throw new FileNotFoundException(toString)
         case e @ (_: SSHException | _: IOException) if retries > 0 =>
           log.warn("[{}] {}. Retrying in 10 seconds...", host, e.getMessage, null)
           log.debug("Failure cause: {}", e.getCause)
@@ -79,18 +81,21 @@ case class SftpFileDescriptor(
   }
 
   protected def duplicate(elements: List[String]) =
-    this.copy(elements = elements)
+    this.copy(elements = elements, fileAttributes = None)
 
-  def size = fileAttributes match {
-    case Some(fa) => fa.getSize
+  protected def withFileAttributes[A](f: FileAttributes => A): A = fileAttributes match {
+    case Some(fa) => f(fa)
     case None => {
       fileAttributes = Some(sftp(_.stat(path)))
-      this.size
+      withFileAttributes(f)
     }
   }
 
-  def exists: Boolean = sftp(c => c.statExistence(path) != null)
-  def isDirectory: Boolean = exists && sftp(_.`type`(path) == FileMode.Type.DIRECTORY)
+  def size = withFileAttributes(_.getSize)
+
+  def isDirectory: Boolean = withFileAttributes(_.getType == FileMode.Type.DIRECTORY)
+
+  def exists: Boolean = fileAttributes.isDefined || sftp(c => c.statExistence(path) != null)
 
   def list: Iterator[SftpFileDescriptor] =
     if (isDirectory) {
