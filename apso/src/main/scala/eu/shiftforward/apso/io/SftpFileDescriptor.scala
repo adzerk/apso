@@ -9,7 +9,7 @@ import java.io.{ InputStream, IOException, File }
 import java.util.concurrent.ConcurrentHashMap
 import net.schmizz.sshj._
 import net.schmizz.sshj.common.SSHException
-import net.schmizz.sshj.sftp.{ FileMode, SFTPClient }
+import net.schmizz.sshj.sftp.{ FileAttributes, FileMode, SFTPClient }
 import net.schmizz.sshj.transport.verification._
 import net.schmizz.sshj.xfer.scp.SCPFileTransfer
 import scala.collection.JavaConverters._
@@ -50,7 +50,8 @@ case class SftpFileDescriptor(
   username: String,
   password: Option[String],
   elements: List[String],
-  identity: Option[SftpFileDescriptor.Identity])
+  identity: Option[SftpFileDescriptor.Identity],
+  private var fileAttributes: Option[FileAttributes] = None)
     extends FileDescriptor with RemoteFileDescriptor with Logging {
 
   type Self = SftpFileDescriptor
@@ -80,14 +81,22 @@ case class SftpFileDescriptor(
   protected def duplicate(elements: List[String]) =
     this.copy(elements = elements)
 
-  def size = sftp(_.size(path))
+  def size = fileAttributes match {
+    case Some(fa) => fa.getSize
+    case None => {
+      fileAttributes = Some(sftp(_.stat(path)))
+      this.size
+    }
+  }
 
   def exists: Boolean = sftp(c => c.statExistence(path) != null)
   def isDirectory: Boolean = exists && sftp(_.`type`(path) == FileMode.Type.DIRECTORY)
 
   def list: Iterator[SftpFileDescriptor] =
     if (isDirectory) {
-      sftp(_.ls(path)).asScala.toIterator.map(_.getName).map(this.child)
+      sftp(_.ls(path)).asScala.toIterator.map { r =>
+        this.child(r.getName).copy(fileAttributes = Some(r.getAttributes))
+      }
     } else {
       Iterator()
     }
