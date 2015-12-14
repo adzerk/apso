@@ -63,7 +63,7 @@ case class SftpFileDescriptor(
   private[this] def sftp[A](block: SFTPClient => A): A = {
     def doConnect(retries: Int): A =
       try {
-        sftpClient.use { sftp =>
+        sftpClient().use { sftp =>
           block(sftp)
         }
       } catch {
@@ -234,7 +234,7 @@ object SftpFileDescriptor {
     identity: Option[Identity]) = {
 
     val pool = {
-      var p = connectionPools.get(host)
+      val p = connectionPools.get(host)
       if (p == null) {
         synchronized {
           val pool = Pool(
