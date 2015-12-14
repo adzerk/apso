@@ -5,9 +5,10 @@ import eu.shiftforward.apso.Logging
 import eu.shiftforward.apso.config.FileDescriptorCredentials
 import eu.shiftforward.apso.config.Implicits._
 import io.github.andrebeat.pool.Pool
-import java.io.{ InputStream, File }
+import java.io.{ InputStream, IOException, File }
 import java.util.concurrent.ConcurrentHashMap
 import net.schmizz.sshj._
+import net.schmizz.sshj.common.SSHException
 import net.schmizz.sshj.sftp.{ FileMode, SFTPClient }
 import net.schmizz.sshj.transport.verification._
 import net.schmizz.sshj.xfer.scp.SCPFileTransfer
@@ -66,7 +67,7 @@ case class SftpFileDescriptor(
           block(sftp)
         }
       } catch {
-        case e: Exception if retries > 0 =>
+        case e @ (_: SSHException | _: IOException) if retries > 0 =>
           log.warn("[{}] {}. Retrying in 10 seconds...", host, e.getMessage, null)
           log.debug("Failure cause: {}", e.getCause)
           Thread.sleep(10000)
