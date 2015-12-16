@@ -141,7 +141,7 @@ case class SftpFileDescriptor(
 
   def upload(localTarget: LocalFileDescriptor): Boolean = {
     require(!localTarget.isDirectory, s"Local file descriptor can't point to a directory: ${localTarget.path}")
-    require(!isDirectory, s"Remote file descriptor can't point to a directory: ${this.path}")
+    require(!exists || !isDirectory, s"Remote file descriptor can't point to a directory: ${this.path}")
 
     log.info("Uploading '{}' to '{}'", localTarget.toString, toString, null)
 
