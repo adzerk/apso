@@ -28,7 +28,7 @@ object ProjectBuild extends Build {
       "org.bouncycastle"               % "bcprov-jdk15on"     % "1.53",
       "org.bouncycastle"               % "bcpkix-jdk15on"     % "1.53",
       "com.jcraft"                     % "jzlib"              % "1.1.3",
-      "io.github.andrebeat"           %% "scala-pool"         % "0.1.0",
+      "io.github.andrebeat"           %% "scala-pool"         % "0.2.0",
       "io.spray"                      %% "spray-json"         % "1.3.2"          % "provided",
       "io.spray"                      %% "spray-httpx"        % "1.3.3"          % "provided",
       "net.databinder.dispatch"       %% "dispatch-core"      % "0.11.3",
