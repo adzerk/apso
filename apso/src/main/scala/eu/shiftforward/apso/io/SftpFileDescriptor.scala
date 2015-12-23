@@ -107,11 +107,13 @@ case class SftpFileDescriptor(
     }
 
   def listAllFilesWithPrefix(prefix: String): Iterator[SftpFileDescriptor] = {
-    def aux(f: SftpFileDescriptor): Iterator[SftpFileDescriptor] =
-      if (f.isDirectory) f.list.flatMap(aux)
+    val sanitizedPrefix = prefix.dropWhile(_ == '/')
+    val prePrefix = sanitizedPrefix.takeWhile(_ != '/')
+    val posPrefix = sanitizedPrefix.dropWhile(_ != '/').drop(1)
+    this.list.filter(_.name.startsWith(prePrefix)).flatMap { f =>
+      if (f.isDirectory) f.listAllFilesWithPrefix(posPrefix)
       else Iterator(f)
-
-    this.list.filter(_.name.startsWith(prefix)).flatMap(aux)
+    }
   }
 
   def delete(): Boolean =
