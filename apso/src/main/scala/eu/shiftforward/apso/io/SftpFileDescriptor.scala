@@ -51,10 +51,12 @@ case class SftpFileDescriptor(
   password: Option[String],
   elements: List[String],
   identity: Option[SftpFileDescriptor.Identity],
-  private var fileAttributes: Option[FileAttributes] = None)
+  @transient private var _fileAttributes: Option[FileAttributes] = None)
     extends FileDescriptor with RemoteFileDescriptor with Logging {
 
   type Self = SftpFileDescriptor
+
+  def fileAttributes = if (_fileAttributes == null) None else _fileAttributes
 
   protected[this] val root = ""
 
@@ -81,12 +83,12 @@ case class SftpFileDescriptor(
   }
 
   protected def duplicate(elements: List[String]) =
-    this.copy(elements = elements, fileAttributes = None)
+    this.copy(elements = elements, _fileAttributes = None)
 
   protected def withFileAttributes[A](f: FileAttributes => A): A = fileAttributes match {
     case Some(fa) => f(fa)
     case None => {
-      fileAttributes = Some(sftp(_.stat(path)))
+      _fileAttributes = Some(sftp(_.stat(path)))
       withFileAttributes(f)
     }
   }
@@ -100,7 +102,7 @@ case class SftpFileDescriptor(
   def list: Iterator[SftpFileDescriptor] =
     if (isDirectory) {
       sftp(_.ls(path)).asScala.toIterator.map { r =>
-        this.child(r.getName).copy(fileAttributes = Some(r.getAttributes))
+        this.child(r.getName).copy(_fileAttributes = Some(r.getAttributes))
       }
     } else {
       Iterator()
