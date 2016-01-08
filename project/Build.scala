@@ -27,6 +27,7 @@ object ProjectBuild extends Build {
       "com.hierynomus"                 % "sshj"               % "0.15.0",
       "org.bouncycastle"               % "bcprov-jdk15on"     % "1.53",
       "org.bouncycastle"               % "bcpkix-jdk15on"     % "1.53",
+      "com.chuusai"                   %% "shapeless"          % "2.2.5",
       "com.jcraft"                     % "jzlib"              % "1.1.3",
       "io.github.andrebeat"           %% "scala-pool"         % "0.2.0",
       "io.spray"                      %% "spray-json"         % "1.3.2"          % "provided",
