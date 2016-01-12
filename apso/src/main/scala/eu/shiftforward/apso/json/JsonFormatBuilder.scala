@@ -4,6 +4,7 @@ import eu.shiftforward.apso.json.JsonFormatBuilder._
 import eu.shiftforward.apso.json.JsonFormatBuilder.Field
 import shapeless._
 import spray.json._
+import spray.json.DefaultJsonProtocol._
 
 /**
  * A type-safe way to construct a `JSONFormat` by incrementally adding, removing or updating fields.
@@ -28,7 +29,7 @@ case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: 
    * Adds a field to this builder.
    *
    * @param name the name of the new field
-   *             @param default the default value of the new field
+   * @param default the default value of the new field
    * @tparam A the type of the new field
    * @return a new instance of `JsonFormatBuilder` with the new field
    */
@@ -39,13 +40,35 @@ case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: 
    * Adds a field to this builder.
    *
    * @param name the name of the new field
-   *             @param default the default value of the new field
-   *                            @param jf a `JSONFormat` to use in the new field
+   * @param default the default value of the new field
+   * @param jf a `JSONFormat` to use in the new field
    * @tparam A the type of the new field
    * @return a new instance of `JsonFormatBuilder` with the new field
    */
   def field[A](name: String, default: A, jf: JsonFormat[A])(implicit ev: AppenderAux[A, C, FC], dummy: DummyImplicit) =
     JsonFormatBuilder(ev.append(fields, Field(name, jf, Some(default))))(ev.formatter)
+
+  /**
+   * Adds an optional field to this builder which defaults to `None`.
+   *
+   * @param name the name of the new field
+   * @tparam A the type of the new field
+   * @return a new instance of `JsonFormatBuilder` with the new field
+   */
+  def optionalField[A](name: String)(
+    implicit jf: JsonFormat[A], ev: AppenderAux[Option[A], C, FC]): JsonFormatBuilder[ev.COut, ev.FCOut] =
+    optionalField(name, jf)
+
+  /**
+   * Adds an optional field to this builder which defaults to `None`.
+   *
+   * @param name the name of the new field
+   * @param jf a `JSONFormat` to use in the new field
+   * @tparam A the type of the new field
+   * @return a new instance of `JsonFormatBuilder` with the new field
+   */
+  def optionalField[A](name: String, jf: JsonFormat[A])(implicit ev: AppenderAux[Option[A], C, FC], dummy: DummyImplicit) =
+    JsonFormatBuilder(ev.append(fields, Field(name, optionJsonFormat(jf), Some(None))))(ev.formatter)
 
   /**
    * Replaces a field in this builder with another one.
@@ -62,7 +85,7 @@ case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: 
    * Replaces a field in this builder with another one.
    *
    * @param name the name of the new field
-   *             @param default the default value of the new field
+   * @param default the default value of the new field
    * @tparam N the index of the field to replace
    * @tparam A the type of the new field
    * @return a new instance of `JsonFormatBuilder` with the field replaced
@@ -74,8 +97,8 @@ case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: 
    * Replaces a field in this builder with another one.
    *
    * @param name the name of the new field
-   *             @param default the default value of the new field
-   *                            @param jf a `JSONFormat` to use in the new field
+   * @param default the default value of the new field
+   * @param jf a `JSONFormat` to use in the new field
    * @tparam N the index of the field to replace
    * @tparam A the type of the new field
    * @return a new instance of `JsonFormatBuilder` with the field replaced
@@ -109,7 +132,7 @@ case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: 
    * @param preRead a function transforming the JSON content before reads
    * @param readFunc a function converting the list of fields to an instance of `A`
    * @param writeFunc a function extracting the list of fields from an instance of `A`
-   *                  @param postWrite a function transforming the JSON content after writes
+   * @param postWrite a function transforming the JSON content after writes
    * @tparam A the type of objects for which a `JSONFormat` is to be returned
    * @return a `JSONFormat` for objects of type `A`.
    */
@@ -133,6 +156,18 @@ case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: 
  * A companion object containing auxiliary types and factories for `JsonFormatBuilder`.
  */
 object JsonFormatBuilder {
+
+  private def optionJsonFormat[A](jf: JsonFormat[A]) = new JsonFormat[Option[A]] {
+    def write(option: Option[A]) = option match {
+      case Some(a) => jf.write(a)
+      case None => null
+    }
+
+    def read(value: JsValue) = value match {
+      case JsNull => None
+      case a => Some(jf.read(a))
+    }
+  }
 
   /**
    * Returns a `JsonFormatBuilder` with no fields.
@@ -169,8 +204,11 @@ object JsonFormatBuilder {
         def read(obj: Map[String, JsValue], fa: Field[A] :: FC) =
           readValue(obj, fa.head) :: ev.read(obj, fa.tail)
 
-        def write(fa: Field[A] :: FC, a: A :: AS) =
-          ev.write(fa.tail, a.tail) + (fa.head.name -> fa.head.jf.write(a.head))
+        def write(fa: Field[A] :: FC, a: A :: AS) = {
+          val jsValue = fa.head.jf.write(a.head)
+          if (jsValue == null) ev.write(fa.tail, a.tail)
+          else ev.write(fa.tail, a.tail) + (fa.head.name -> jsValue)
+        }
       }
   }
 
