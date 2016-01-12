@@ -67,21 +67,8 @@ case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: 
    * @tparam A the type of the new field
    * @return a new instance of `JsonFormatBuilder` with the new field
    */
-  def optionalField[A](name: String, jf: JsonFormat[A])(implicit ev: AppenderAux[Option[A], C, FC], dummy: DummyImplicit, dummy2: DummyImplicit) = {
-    implicit val jsonFormat = jf
-    implicit val ojf = implicitly[JsonFormat[Option[A]]]
-    JsonFormatBuilder(ev.append(fields, Field(name, ojf, Some(None))))(ev.formatter)
-  }
-  /**
-   * Adds an optional field to this builder which defaults to `None`.
-   *
-   * @param name the name of the new field
-   * @param jf a `JSONFormat` to use in the new field
-   * @tparam A the type of the new field
-   * @return a new instance of `JsonFormatBuilder` with the new field
-   */
-  def optionalField[A](name: String, jf: JsonFormat[Option[A]])(implicit ev: AppenderAux[Option[A], C, FC], dummy: DummyImplicit) =
-    JsonFormatBuilder(ev.append(fields, Field(name, jf, Some(None))))(ev.formatter)
+  def optionalField[A](name: String, jf: JsonFormat[A])(implicit ev: AppenderAux[Option[A], C, FC], dummy: DummyImplicit) =
+    JsonFormatBuilder(ev.append(fields, Field(name, optionJsonFormat(jf), Some(None))))(ev.formatter)
 
   /**
    * Replaces a field in this builder with another one.
@@ -170,6 +157,18 @@ case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: 
  */
 object JsonFormatBuilder {
 
+  private def optionJsonFormat[A](jf: JsonFormat[A]) = new JsonFormat[Option[A]] {
+    def write(option: Option[A]) = option match {
+      case Some(a) => jf.write(a)
+      case None => null
+    }
+
+    def read(value: JsValue) = value match {
+      case JsNull => None
+      case a => Some(jf.read(a))
+    }
+  }
+
   /**
    * Returns a `JsonFormatBuilder` with no fields.
    *
@@ -205,10 +204,11 @@ object JsonFormatBuilder {
         def read(obj: Map[String, JsValue], fa: Field[A] :: FC) =
           readValue(obj, fa.head) :: ev.read(obj, fa.tail)
 
-        def write(fa: Field[A] :: FC, a: A :: AS) =
-          if (a.head == None) ev.write(fa.tail, a.tail)
-          else if (a.head == null) ev.write(fa.tail, a.tail) + (fa.head.name -> JsNull)
-          else ev.write(fa.tail, a.tail) + (fa.head.name -> fa.head.jf.write(a.head))
+        def write(fa: Field[A] :: FC, a: A :: AS) = {
+          val jsValue = fa.head.jf.write(a.head)
+          if (jsValue == null) ev.write(fa.tail, a.tail)
+          else ev.write(fa.tail, a.tail) + (fa.head.name -> jsValue)
+        }
       }
   }
 

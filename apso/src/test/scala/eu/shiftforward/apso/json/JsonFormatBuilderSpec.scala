@@ -94,7 +94,6 @@ class JsonFormatBuilderSpec extends Specification {
 
       Test4(Some(3), Some("x")).toJson(jf1) mustEqual """{ "a": 3, "b": "x" }""".parseJson
       Test4(Some(3), None).toJson(jf1) mustEqual """{ "a": 3 }""".parseJson
-      Test4(Some(3), null).toJson(jf1) mustEqual """{ "a": 3, "b": null }""".parseJson
       Test4(None, None).toJson(jf1) mustEqual """{ }""".parseJson
     }
   }
