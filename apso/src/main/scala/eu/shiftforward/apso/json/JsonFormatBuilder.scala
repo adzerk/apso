@@ -55,19 +55,9 @@ case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: 
    * @tparam A the type of the new field
    * @return a new instance of `JsonFormatBuilder` with the new field
    */
-  def optionalField[A](name: String)(implicit jf: JsonFormat[Option[A]], ev: AppenderAux[Option[A], C, FC]) =
-    JsonFormatBuilder(ev.append(fields, Field(name, jf, Some(None))))(ev.formatter)
-
-  /**
-   * Adds an optional field to this builder which defaults to `None`.
-   *
-   * @param name the name of the new field
-   * @param jf a `JSONFormat` to use in the new field
-   * @tparam A the type of the new field
-   * @return a new instance of `JsonFormatBuilder` with the new field
-   */
-  def optionalField[A](name: String, jf: JsonFormat[Option[A]])(implicit ev: AppenderAux[Option[A], C, FC], dummy: DummyImplicit) =
-    JsonFormatBuilder(ev.append(fields, Field(name, jf, Some(None))))(ev.formatter)
+  def optionalField[A](name: String)(
+    implicit jf: JsonFormat[A], ev: AppenderAux[Option[A], C, FC]): JsonFormatBuilder[ev.COut, ev.FCOut] =
+    optionalField(name, jf)
 
   /**
    * Adds an optional field to this builder which defaults to `None`.
@@ -82,6 +72,16 @@ case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: 
     implicit val ojf = implicitly[JsonFormat[Option[A]]]
     JsonFormatBuilder(ev.append(fields, Field(name, ojf, Some(None))))(ev.formatter)
   }
+  /**
+   * Adds an optional field to this builder which defaults to `None`.
+   *
+   * @param name the name of the new field
+   * @param jf a `JSONFormat` to use in the new field
+   * @tparam A the type of the new field
+   * @return a new instance of `JsonFormatBuilder` with the new field
+   */
+  def optionalField[A](name: String, jf: JsonFormat[Option[A]])(implicit ev: AppenderAux[Option[A], C, FC], dummy: DummyImplicit) =
+    JsonFormatBuilder(ev.append(fields, Field(name, jf, Some(None))))(ev.formatter)
 
   /**
    * Replaces a field in this builder with another one.
