@@ -11,6 +11,7 @@ class JsonFormatBuilderSpec extends Specification {
   case class Test(a: Int, b: List[String], c: Double)
   case class Test2(a: Int, b2: List[Boolean], c: Double)
   case class Test3(b: List[String], c: Double)
+  case class Test4(a: Option[Int], b: Option[String])
 
   "A JsonFormatBuilder" should {
 
@@ -75,6 +76,26 @@ class JsonFormatBuilderSpec extends Specification {
       """{ "a": 3, "b": ["x", "y"], "c": 3.0 }""".parseJson.convertTo[Test3](jf2) mustEqual Test3(List("x", "y"), 3.0)
 
       Test3(List("x", "y"), 2.5).toJson(jf2) mustEqual """{ "b": ["x", "y"], "c": 2.5 }""".parseJson
+    }
+
+    "allow defining optional fields" in {
+      val builder = JsonFormatBuilder()
+        .optionalField[Int]("a")
+        .optionalField[String]("b")
+
+      val jf1 = builder.jsonFormat[Test4](
+        { case a :: b :: HNil => Test4(a, b) },
+        { foo => foo.a :: foo.b :: HNil })
+
+      """{ "a": 3, "b": "hello" }""".parseJson.convertTo[Test4](jf1) mustEqual Test4(Some(3), Some("hello"))
+      """{ "a": 3 }""".parseJson.convertTo[Test4](jf1) mustEqual Test4(Some(3), None)
+      """{ "a": 3, "b": null }""".parseJson.convertTo[Test4](jf1) mustEqual Test4(Some(3), None)
+      """{ }""".parseJson.convertTo[Test4](jf1) mustEqual Test4(None, None)
+
+      Test4(Some(3), Some("x")).toJson(jf1) mustEqual """{ "a": 3, "b": "x" }""".parseJson
+      Test4(Some(3), None).toJson(jf1) mustEqual """{ "a": 3 }""".parseJson
+      Test4(Some(3), null).toJson(jf1) mustEqual """{ "a": 3, "b": null }""".parseJson
+      Test4(None, None).toJson(jf1) mustEqual """{ }""".parseJson
     }
   }
 }
