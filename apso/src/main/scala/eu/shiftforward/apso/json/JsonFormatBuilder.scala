@@ -206,7 +206,9 @@ object JsonFormatBuilder {
           readValue(obj, fa.head) :: ev.read(obj, fa.tail)
 
         def write(fa: Field[A] :: FC, a: A :: AS) =
-          ev.write(fa.tail, a.tail) + (fa.head.name -> fa.head.jf.write(a.head))
+          if (a.head == None) ev.write(fa.tail, a.tail)
+          else if (a.head == null) ev.write(fa.tail, a.tail) + (fa.head.name -> JsNull)
+          else ev.write(fa.tail, a.tail) + (fa.head.name -> fa.head.jf.write(a.head))
       }
   }
 
