@@ -112,10 +112,13 @@ class HMap[KeyType[_] <: HMapKey[_]](val entries: ListBuffer[(KeyType[V], V) for
   def copy: HMap[KeyType] = HMap() ++ this
 
   override def toString = entries.mkString("HMap(", ", ", ")")
+
   override def equals(oth: Any) = oth match {
     case obj: HMap[_] => entries == obj.entries
     case _ => false
   }
+
+  override def hashCode() = entries.hashCode()
 }
 
 /**
