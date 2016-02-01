@@ -18,6 +18,14 @@ abstract class JsonHMapKey[V](val sym: Symbol)(implicit reg: JsonKeyRegistry, js
   override def toKey: JsonHMapKey[Value] = this
 
   /**
+   * Returns a stable copy of this `HMapKey` without the JSON support. Useful for creating serializable equivalent
+   * keys.
+   *
+   * @return a stable copy of this `HMapKey` without the JSON support.
+   */
+  lazy val toHMapKey: HMapKey[Value] = new HMapKey[Value] {}
+
+  /**
    * Converts an object of this key's value type to JSON.
    * @param v the object to convert
    * @return the given object as a JSON value.
@@ -32,4 +40,21 @@ abstract class JsonHMapKey[V](val sym: Symbol)(implicit reg: JsonKeyRegistry, js
   def toValue(v: JsValue): Value = jsonFormat.read(v)
 
   override def toString: String = sym.toString()
+}
+
+/**
+ * Companion object for `JsonHMapKey`.
+ */
+object JsonHMapKey {
+
+  /**
+   * Creates a new `JsonHMapKey` by wrapping a normal `HMapKey`.
+   *
+   * @param key the key to wrap
+   * @param sym the JSON key associated with this map key
+   * @tparam V the type of the value associated with this key
+   * @return a new `JsonHMapKey` that wraps the given `HMapKey`.
+   */
+  def wrap[V](key: HMapKey[V], sym: Symbol)(implicit reg: JsonKeyRegistry, jsonFormat: JsonFormat[V]) =
+    new JsonHMapKey[V](sym) { override lazy val toHMapKey = key }
 }
