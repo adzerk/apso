@@ -5,7 +5,7 @@ package eu.shiftforward.apso.collection
  * @constructor the default constructor.
  * @tparam V the type of the value associated with this key
  */
-class HMapKey[V] extends Serializable {
+class HMapKey[V] {
 
   /**
    * The type of the value associated with this key. Useful in cases where the

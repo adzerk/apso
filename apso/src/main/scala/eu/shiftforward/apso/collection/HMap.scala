@@ -8,8 +8,7 @@ import scala.collection.mutable.ListBuffer
  * @param entries a list of key-value pairs present in the map
  * @tparam KeyType the type of keys used in this map
  */
-class HMap[KeyType[_] <: HMapKey[_]](val entries: ListBuffer[(KeyType[V], V) forSome { type V }])
-    extends Serializable {
+class HMap[KeyType[_] <: HMapKey[_]](val entries: ListBuffer[(KeyType[V], V) forSome { type V }]) {
 
   /**
    * Retrieves the value which is associated with a given key. If the key does
@@ -111,7 +110,7 @@ class HMap[KeyType[_] <: HMapKey[_]](val entries: ListBuffer[(KeyType[V], V) for
    */
   def copy: HMap[KeyType] = HMap() ++ this
 
-  override def toString = entries.mkString("HMap(", ", ", ")")
+  override def toString = entries.map { case (k, v) => s"$k -> $v" }.mkString("HMap(", ", ", ")")
 
   override def equals(oth: Any) = oth match {
     case obj: HMap[_] => entries.toSet == obj.entries.toSet
