@@ -11,6 +11,13 @@ import scala.collection.mutable.ListBuffer
 class HMap[KeyType[_] <: HMapKey[_]](val entries: ListBuffer[(KeyType[V], V) forSome { type V }]) {
 
   /**
+   * Creates an `HMap` with an empty list of entries.
+   * @return a new map containing no entries.
+   */
+  // This is necessary for classes extending `HMap` to be able to implement `Serializable`.
+  def this() = this(ListBuffer.empty)
+
+  /**
    * Retrieves the value which is associated with a given key. If the key does
    * not exist in this map, a `NoSuchElementException` is thrown.
    * @param key the key to lookup
