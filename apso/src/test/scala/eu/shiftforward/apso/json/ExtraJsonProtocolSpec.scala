@@ -30,6 +30,8 @@ class ExtraJsonProtocolSpec extends Specification {
       """"2m"""".parseJson.convertTo[FiniteDuration] mustEqual 2.minutes
       """"2h"""".parseJson.convertTo[FiniteDuration] mustEqual 2.hours
       """"2d"""".parseJson.convertTo[FiniteDuration] mustEqual 2.days
+
+      """"garbagio"""".parseJson.convertTo[FiniteDuration] must throwAn[DeserializationException]
     }
 
     "provide a JsonFormat for Interval" in {

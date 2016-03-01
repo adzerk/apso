@@ -25,7 +25,12 @@ trait ExtraTimeJsonProtocol {
 
     def read(json: JsValue) = {
       json match {
-        case JsString(duration) => ConfigFactory.parseString(s"d=$duration").get[FiniteDuration]("d")
+        case JsString(duration) =>
+          try {
+            ConfigFactory.parseString(s"d=$duration").get[FiniteDuration]("d")
+          } catch {
+            case ex: Exception => deserializationError("Expected a valid duration String", ex)
+          }
         case j: JsObject =>
           j.fields.headOption match {
             case Some(("milliseconds", JsNumber(milliseconds))) => milliseconds.longValue.millis
