@@ -48,6 +48,11 @@ class ConfigImplicitsSpec extends Specification {
           }
         }
 
+        map-escape {
+          a = "a"
+          "(a,{} b. c)" = "abc"
+        }
+
         "config.com" {
           "site.pt" = "ok"
         }
@@ -157,6 +162,12 @@ class ConfigImplicitsSpec extends Specification {
       config.getTypedListOption[String]("m") must beEqualTo(Some(List("a", "b")))
       config.getTypedListOption[String]("m0") must beNone
       config.getTypedListOption[String]("f") must throwAn[Exception]
+    }
+
+    "allow extracting configurations returnin a map" in {
+      config.getMap[String]("map") must beEqualTo(Map("k1" -> "v1", "k2" -> "v2"))
+      config.getMap[Int]("num-map") must beEqualTo(Map("k1" -> 1, "k2" -> 2))
+      config.getMap[String]("map-escape") must beEqualTo(Map("a" -> "a", "(a,{} b. c)" -> "abc"))
     }
 
     "allow extracting configurations returning an option of a map" in {

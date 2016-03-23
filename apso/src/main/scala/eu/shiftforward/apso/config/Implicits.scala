@@ -271,10 +271,23 @@ object Implicits {
      * @tparam T the return type of the Map
      * @return the Map value
      */
-    def toMap[T](implicit configReader: ConfigReader[T]): Map[String, T] =
-      (for (
-        entry <- conf.entrySet()
-      ) yield (entry.getKey, configReader(conf, entry.getKey))).toMap
+    def toMap[T](implicit configReader: ConfigReader[T]): Map[String, T] = {
+      // config key strings are different between `conf.root.unwrapped` and `conf.entrySet()`
+      val unwrappedMap = conf.root.unwrapped()
+      val wrappedMap = conf.entrySet().map(e => e.getKey -> e.getValue.unwrapped()).toMap
+
+      val reversedUnwrappedMap: Map[AnyRef, String] = unwrappedMap.toMap.map(e => e._2 -> e._1)
+      val reverseWrappedMap: Map[AnyRef, String] = wrappedMap.map(e => e._2 -> e._1)
+
+      val joinedByKey: Map[(String, String), AnyRef] =
+        reversedUnwrappedMap.map {
+          case (k, v) => (v, reverseWrappedMap(k)) -> k
+        }
+
+      for (((unwrappedKey, wrappedKey), _) <- joinedByKey) yield {
+        (unwrappedKey, configReader(conf, wrappedKey))
+      }
+    }
 
     /**
      * Converts the config into a Map[String, Config]
