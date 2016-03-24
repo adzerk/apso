@@ -51,6 +51,8 @@ class ConfigImplicitsSpec extends Specification {
         map-escape {
           a = "a"
           "(a,{} b. c)" = "abc"
+          "x{}" = "abc"
+          "_()#..!" = "a"
         }
 
         "config.com" {
@@ -167,7 +169,8 @@ class ConfigImplicitsSpec extends Specification {
     "allow extracting configurations returnin a map" in {
       config.getMap[String]("map") must beEqualTo(Map("k1" -> "v1", "k2" -> "v2"))
       config.getMap[Int]("num-map") must beEqualTo(Map("k1" -> 1, "k2" -> 2))
-      config.getMap[String]("map-escape") must beEqualTo(Map("a" -> "a", "(a,{} b. c)" -> "abc"))
+      config.getMap[String]("map-escape") must beEqualTo(
+        Map("a" -> "a", "(a,{} b. c)" -> "abc", "x{}" -> "abc", "_()#..!" -> "a"))
     }
 
     "allow extracting configurations returning an option of a map" in {
