@@ -308,7 +308,7 @@ object Implicits {
    * @tparam T the type to be returned
    */
   @implicitNotFound(msg = "Could not find a way to read a ${T} from a Config. You might want to import or implement a ConfigReader[${T}]")
-  trait ConfigReader[T] extends ((Config, String) => T)
+  trait ConfigReader[+T] extends ((Config, String) => T)
 
   def configReader[T](f: (Config, String) => T): ConfigReader[T] =
     new ConfigReader[T] {
