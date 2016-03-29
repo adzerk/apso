@@ -1,16 +1,20 @@
 package eu.shiftforward.apso.config
 
 import com.typesafe.config._
+import com.github.nscala_time.time.Imports.{ Duration => _, _ }
 
 import scala.annotation.implicitNotFound
 import scala.concurrent.duration._
 import scala.collection.JavaConversions._
 import scala.util.Try
 
+import eu.shiftforward.apso.io.LocalFileDescriptor
+import ConfigReader.{ BasicConfigReaders, ExtendedConfigReaders }
+
 /**
  * Provides useful extension methods for `Config` instances.
  */
-object Implicits {
+object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
 
   @inline private[this] def extractOption[A](conf: Config, path: String, f: (Config, String) => A) =
     if (conf.hasPath(path)) Some(f(conf, path)) else None
@@ -302,42 +306,70 @@ object Implicits {
     }
   }
 
-  /**
-   * Represents a function that given a config and the config key string, will return the given type.
-   *
-   * @tparam T the type to be returned
-   */
-  @implicitNotFound(msg = "Could not find a way to read a ${T} from a Config. You might want to import or implement a ConfigReader[${T}]")
-  trait ConfigReader[+T] extends ((Config, String) => T)
+}
 
+/**
+ * Represents a function that given a config and the config key string, will return the given type.
+ *
+ * @tparam T the type to be returned
+ */
+@implicitNotFound(msg = "Could not find a way to read a ${T} from a Config. You might want to import or implement a ConfigReader[${T}]")
+trait ConfigReader[+T] extends ((Config, String) => T)
+
+object ConfigReader {
   def configReader[T](f: (Config, String) => T): ConfigReader[T] =
     new ConfigReader[T] {
       def apply(config: Config, key: String): T = f(config, key)
     }
 
-  // ConfigReaders implicits:
-  implicit val boolConfigReader = configReader[Boolean](_.getBoolean(_))
-  implicit val stringConfigReader = configReader[String](_.getString(_))
-  implicit val intConfigReader = configReader[Int](_.getInt(_))
-  implicit val doubleConfigReader = configReader[Double](_.getDouble(_))
-  implicit val longConfigReader = configReader[Long](_.getLong(_))
-  implicit val durationConfigReader = configReader[Duration](_.getDuration(_))
-  implicit val finiteDurationConfigReader = configReader[FiniteDuration](_.getDuration(_))
-  implicit val javaDurationConfigReader = configReader[java.time.Duration](_.getDuration(_))
-  implicit val configConfigReader = configReader[Config](_.getConfig(_))
+  trait BasicConfigReaders {
+    // ConfigReaders implicits:
+    implicit val boolConfigReader = configReader[Boolean](_.getBoolean(_))
+    implicit val stringConfigReader = configReader[String](_.getString(_))
+    implicit val intConfigReader = configReader[Int](_.getInt(_))
+    implicit val doubleConfigReader = configReader[Double](_.getDouble(_))
+    implicit val longConfigReader = configReader[Long](_.getLong(_))
+    implicit val durationConfigReader = configReader[Duration](_.getDuration(_))
+    implicit val finiteDurationConfigReader = configReader[FiniteDuration](_.getDuration(_))
+    implicit val javaDurationConfigReader = configReader[java.time.Duration](_.getDuration(_))
+    implicit val configConfigReader = configReader[Config](_.getConfig(_))
 
-  // ConfigReaders implicits for lists:
-  implicit val boolListConfigReader = configReader[List[Boolean]](_.getBooleanList(_).toList.map(Boolean.unbox))
-  implicit val stringListConfigReader = configReader[List[String]](_.getStringList(_).toList)
-  implicit val intListConfigReader = configReader[List[Int]](_.getIntList(_).toList.map(Int.unbox))
-  implicit val doubleListConfigReader = configReader[List[Double]](_.getDoubleList(_).toList.map(Double.unbox))
-  implicit val longListConfigReader = configReader[List[Long]](_.getLongList(_).toList.map(Long.unbox))
-  implicit val durationListConfigReader =
-    configReader[List[Duration]](_.getDurationList(_).map(durationToFiniteDuration).toList)
-  implicit val finiteDurationListConfigReader =
-    configReader[List[FiniteDuration]](_.getDurationList(_).map(durationToFiniteDuration).toList)
-  implicit val javaDurationListConfigReader = configReader[List[java.time.Duration]](_.getDurationList(_).toList)
-  implicit val configListConfigReader = configReader[List[Config]](_.getConfigList(_).toList)
+    // ConfigReaders implicits for lists:
+    implicit val boolListConfigReader = configReader[List[Boolean]](_.getBooleanList(_).toList.map(Boolean.unbox))
+    implicit val stringListConfigReader = configReader[List[String]](_.getStringList(_).toList)
+    implicit val intListConfigReader = configReader[List[Int]](_.getIntList(_).toList.map(Int.unbox))
+    implicit val doubleListConfigReader = configReader[List[Double]](_.getDoubleList(_).toList.map(Double.unbox))
+    implicit val longListConfigReader = configReader[List[Long]](_.getLongList(_).toList.map(Long.unbox))
+    implicit val durationListConfigReader =
+      configReader[List[Duration]](_.getDurationList(_).map(durationToFiniteDuration).toList)
+    implicit val finiteDurationListConfigReader =
+      configReader[List[FiniteDuration]](_.getDurationList(_).map(durationToFiniteDuration).toList)
+    implicit val javaDurationListConfigReader = configReader[List[java.time.Duration]](_.getDurationList(_).toList)
+    implicit val configListConfigReader = configReader[List[Config]](_.getConfigList(_).toList)
 
-  implicit def durationToFiniteDuration(d: java.time.Duration): FiniteDuration = Duration.fromNanos(d.toNanos)
+    implicit def durationToFiniteDuration(d: java.time.Duration): FiniteDuration = Duration.fromNanos(d.toNanos)
+  }
+
+  object BasicConfigReaders extends BasicConfigReaders
+
+  trait ExtendedConfigReaders {
+    /**
+     * A `ConfigReader` for reading a `LocalDate` from a `Config`.
+     */
+    implicit val localDateConfReader = configReader[LocalDate](_.getString(_).toLocalDate)
+
+    /**
+     * A `ConfigReader` for reading a `DateTime` from a `Config`.
+     */
+    implicit val dateTimeConfReader = configReader[DateTime](_.getString(_).toDateTime)
+
+    /**
+     * A `ConfigReader` for reading a `LocalFileDescriptor` from a `Config`.
+     */
+    implicit val localFileDescriptorConfReader = configReader[LocalFileDescriptor] {
+      (config, key) => LocalFileDescriptor(config.getString(key))
+    }
+  }
+
+  object ExtendedConfigReaders extends ExtendedConfigReaders
 }
