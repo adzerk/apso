@@ -19,13 +19,13 @@ trait FileDescriptor {
   def path: String
 
   /**
-   * The name of the file associated to the file descriptor.
+   * The name of the file associated with the file descriptor.
    * @return the file name.
    */
   def name: String
 
   /**
-   * The size of the file associated to the file descriptor.
+   * The size of the file associated with the file descriptor.
    */
   def size: Long
 
@@ -149,7 +149,7 @@ trait FileDescriptor {
   def exists: Boolean
 
   /**
-   * Deletes the file associated to the file descriptor
+   * Deletes the file associated with the file descriptor
    * @return `true` if the delete was successful, `false` otherwise.
    */
   def delete(): Boolean

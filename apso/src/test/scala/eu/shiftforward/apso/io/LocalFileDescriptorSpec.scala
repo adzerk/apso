@@ -45,7 +45,7 @@ class LocalFileDescriptorSpec extends Specification {
       LocalFileDescriptor("/tmp/one/two").sibling(_ + ".tmp") === LocalFileDescriptor("/tmp/one/two.tmp")
     }
 
-    "Write and read to the file associated to the file descriptor" in {
+    "Write and read to the file associated with the file descriptor" in {
       val fd = LocalFileDescriptor("/tmp") / randomFolder / randomString
       fd.exists must beFalse
       fd.write("test")
@@ -54,7 +54,7 @@ class LocalFileDescriptorSpec extends Specification {
       fd.delete()
     }
 
-    "Delete a existing file associated to the file descriptor" in {
+    "Delete a existing file associated with the file descriptor" in {
       val fd = LocalFileDescriptor("/tmp") / randomFolder / randomString
       fd.exists must beFalse
       fd.write("test")
