@@ -1,6 +1,7 @@
 package eu.shiftforward.apso.io
 
 import java.io.File
+import java.nio.file.Files
 import java.util.UUID
 import org.specs2.mutable.Specification
 
@@ -61,6 +62,25 @@ class LocalFileDescriptorSpec extends Specification {
       fd.exists must beTrue
       fd.delete()
       fd.exists must beFalse
+    }
+
+    "Delete a directory associated with the file descriptor" in {
+      val symlinkFd = LocalFileDescriptor("/tmp") / randomString / randomString
+      symlinkFd.write("test")
+
+      val dirFd = LocalFileDescriptor("/tmp") / randomString
+
+      (dirFd / randomString).write("test")
+      (dirFd / randomString / randomString).write("test")
+
+      // we create a symbolic link to an "external" folder which should not be followed while
+      // deleting the directory
+      Files.createSymbolicLink((dirFd / "symlink").file.toPath, symlinkFd.parent().file.toPath)
+
+      dirFd.deleteDir() must beTrue
+
+      symlinkFd.exists must beTrue
+      symlinkFd.delete()
     }
 
     "Have a correctly working 'cd' interface" in {
