@@ -40,7 +40,7 @@ trait ProxySupport {
 
   def proxyToUnmatchedPath(uri: Uri)(implicit system: ActorSystem): Route = {
     sending(ctx => ctx.request.copy(
-      uri = uri.withPath(uri.path.++(ctx.unmatchedPath)),
+      uri = uri.withPath(uri.path.++(ctx.unmatchedPath)).withQuery(ctx.request.uri.query),
       headers = stripHost(ctx.request.headers)))
   }
 }

@@ -31,7 +31,7 @@ class ProxySupportSpec
         new Actor {
           def receive = {
             case x: Http.Connected => sender ! Http.Register(self)
-            case x: HttpRequest => sender ! HttpResponse(entity = x.uri.path.toString)
+            case x: HttpRequest => sender ! HttpResponse(entity = x.uri.toRelative.toString)
             case _: Http.ConnectionClosed => // ignore
           }
         }
@@ -47,7 +47,7 @@ class ProxySupportSpec
         } ~
         path("get-path-proxied") {
           proxyTo(Uri(s"http://$interface:$port/$serverPath"))
-        }~
+        } ~
         pathPrefix("get-path-proxied-unmatched") {
           proxyToUnmatchedPath(Uri(s"http://$interface:$port/$serverPath"))
         }
@@ -85,6 +85,10 @@ class ProxySupportSpec
       Post("/get-path-proxied-unmatched/other/path/parts") ~> routes ~> check {
         status == OK
         responseAs[String] must be_==("/remote-proxy/other/path/parts")
+      }
+      Get("/get-path-proxied-unmatched/other/path/parts?foo=bar") ~> routes ~> check {
+        status == OK
+        responseAs[String] must be_==("/remote-proxy/other/path/parts?foo=bar")
       }
     }
   }
