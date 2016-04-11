@@ -24,13 +24,22 @@ trait ExtraTimeJsonProtocol {
     def write(dur: FiniteDuration) = JsObject("milliseconds" -> dur.toMillis.toJson)
 
     def read(json: JsValue) = {
+
+      def tryToParseDuration(duration: String) = {
+        try {
+          ConfigFactory.parseString(s"d=$duration").get[FiniteDuration]("d")
+        } catch {
+          case ex: Exception => deserializationError("Expected a Number or a unit-annotated String", ex)
+        }
+      }
+
       json match {
+        case JsNumber(duration) =>
+          tryToParseDuration(duration.toString())
+
         case JsString(duration) =>
-          try {
-            ConfigFactory.parseString(s"d=$duration").get[FiniteDuration]("d")
-          } catch {
-            case ex: Exception => deserializationError("Expected a valid duration String", ex)
-          }
+          tryToParseDuration(duration)
+
         case j: JsObject =>
           j.fields.headOption match {
             case Some(("milliseconds", JsNumber(milliseconds))) => milliseconds.longValue.millis
@@ -41,8 +50,7 @@ trait ExtraTimeJsonProtocol {
             case _ => deserializationError(
               "Expected the following units: 'milliseconds', 'seconds', 'minutes', 'hours' or 'days'.")
           }
-        case _ => deserializationError(
-          "Expected the following units: 'milliseconds', 'seconds', 'minutes', 'hours' or 'days'.")
+        case _ => deserializationError("Expected either a Number, String or JSON Object!")
       }
     }
   }

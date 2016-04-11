@@ -26,6 +26,7 @@ class ExtraJsonProtocolSpec extends Specification {
       """{"hours":   2}""".parseJson.convertTo[FiniteDuration] mustEqual 2.hours
       """{"days":    2}""".parseJson.convertTo[FiniteDuration] mustEqual 2.days
 
+      """2""".parseJson.convertTo[FiniteDuration] mustEqual 2.milliseconds
       """"2s"""".parseJson.convertTo[FiniteDuration] mustEqual 2.seconds
       """"2m"""".parseJson.convertTo[FiniteDuration] mustEqual 2.minutes
       """"2h"""".parseJson.convertTo[FiniteDuration] mustEqual 2.hours
