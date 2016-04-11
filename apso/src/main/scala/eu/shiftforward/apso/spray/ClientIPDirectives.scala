@@ -1,6 +1,5 @@
 package eu.shiftforward.apso.spray
 
-import spray.http.HttpHeaders._
 import spray.routing.Directive1
 import spray.routing.directives.{ BasicDirectives, HeaderDirectives }
 
