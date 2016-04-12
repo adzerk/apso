@@ -137,9 +137,9 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
    * @return `true` if the delete was successful, `false` otherwise.
    */
   def deleteDir(): Boolean = {
-    def aux(fd: LocalFileDescriptor, pad: String = ""): Boolean = {
+    def aux(fd: LocalFileDescriptor): Boolean = {
       if (isDirectory && !Files.isSymbolicLink(fd.normalizedPath)) {
-        fd.list.foreach(aux(_, pad + " "))
+        fd.list.foreach(aux)
       }
       fd.delete()
     }
