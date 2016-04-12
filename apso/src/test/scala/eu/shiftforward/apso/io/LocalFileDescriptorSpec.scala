@@ -78,6 +78,7 @@ class LocalFileDescriptorSpec extends Specification {
       Files.createSymbolicLink((dirFd / "symlink").file.toPath, symlinkFd.parent().file.toPath)
 
       dirFd.deleteDir() must beTrue
+      dirFd.exists must beFalse
 
       symlinkFd.exists must beTrue
       symlinkFd.delete()
