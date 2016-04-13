@@ -130,6 +130,22 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
 
   def delete(): Boolean = file.delete()
 
+  /**
+   * Deletes the directory associated with the file descriptor by recursively deleting all the
+   * directories and files inside it. Symbolic links are not followed and are just deleted as
+   * "regular" files.
+   * @return `true` if the delete was successful, `false` otherwise.
+   */
+  def deleteDir(): Boolean = {
+    def aux(fd: LocalFileDescriptor): Boolean = {
+      if (isDirectory && !Files.isSymbolicLink(fd.normalizedPath)) {
+        fd.list.foreach(aux)
+      }
+      fd.delete()
+    }
+    isDirectory && aux(this)
+  }
+
   def mkdirs(): Boolean = exists || file.mkdirs()
 
   /**
