@@ -5,7 +5,7 @@ import java.net.URI
 import scala.concurrent.duration._
 
 import com.typesafe.config.{ Config, ConfigFactory }
-import org.joda.time.{ DateTime, Interval }
+import org.joda.time.{ DateTime, Interval, LocalDate }
 import org.specs2.mutable.Specification
 import spray.json._
 
@@ -71,6 +71,14 @@ class ExtraJsonProtocolSpec extends Specification {
 
       dateTime.toJson.compactPrint mustEqual dateTimeJsonString
       dateTimeJsonString.parseJson.convertTo[DateTime] mustEqual dateTime
+    }
+
+    "provide a JsonFormat for LocalDate" in {
+      val localDate = new LocalDate("2016-01-01")
+      val localDateJsonString = """"2016-01-01""""
+
+      localDate.toJson.compactPrint mustEqual localDateJsonString
+      localDateJsonString.parseJson.convertTo[LocalDate] mustEqual localDate
     }
   }
 }

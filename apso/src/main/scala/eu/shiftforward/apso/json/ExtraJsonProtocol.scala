@@ -4,8 +4,8 @@ import java.net.URI
 
 import scala.concurrent.duration._
 
+import com.github.nscala_time.time.Imports._
 import com.typesafe.config.{ Config, ConfigFactory, ConfigRenderOptions }
-import org.joda.time.{ DateTime, Interval }
 import spray.json.DefaultJsonProtocol._
 import spray.json._
 
@@ -99,6 +99,16 @@ trait ExtraMiscJsonProtocol {
       case JsString(date) => new DateTime(date)
       case _ =>
         deserializationError("The value for a 'DateTime' has an invalid type - it must be a String.")
+    }
+  }
+
+  implicit object LocalDateFormat extends JsonFormat[LocalDate] {
+    override def write(date: LocalDate): JsValue = date.toString.toJson
+
+    override def read(json: JsValue): LocalDate = json match {
+      case JsString(date) => date.toLocalDate
+      case _ =>
+        deserializationError("The value for a 'LocalDate' has an invalid type - it must be a String.")
     }
   }
 }
