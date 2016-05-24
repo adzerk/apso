@@ -14,12 +14,12 @@ trait TestHelper {
   }
 
   @deprecated("Use eu.shiftforward.apso.io.getResourceURL instead where the `resource` argument " +
-    "is already prefixed with a '/'")
+    "is already prefixed with a '/'", "2016/05/24")
   def getResourceURL(resource: String): String =
     URLDecoder.decode(getClass.getResource(resource).getFile, "UTF-8")
 
   @deprecated("Use eu.shiftforward.apso.io.getResourceStream instead where the `resource` " +
-    "argument is already prefixed with a '/'")
+    "argument is already prefixed with a '/'", "2016/05/24")
   def getResourceStream(resource: String): InputStream =
     getClass.getResourceAsStream(resource)
 }

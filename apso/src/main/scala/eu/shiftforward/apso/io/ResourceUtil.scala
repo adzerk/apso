@@ -6,8 +6,8 @@ import java.net.URLDecoder
 import scala.io.Source
 
 /**
-  * Utility methods for handling resource files
-  */
+ * Utility methods for handling resource files
+ */
 object ResourceUtil {
   val defaultEncoding = "UTF-8"
 
