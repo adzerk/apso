@@ -5,7 +5,7 @@ credentials ++= {
   if (nexusUser == null || nexusPass == null) Nil
   else Seq(
     Credentials(
-      "Sonatype Nexus Repository Manager",
+      "Nexus Repository Manager",
       "NEXUS_URL",
       nexusUser,
       nexusPass))
