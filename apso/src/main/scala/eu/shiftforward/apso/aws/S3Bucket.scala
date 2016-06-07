@@ -209,13 +209,17 @@ class S3Bucket(val bucketName: String,
       read = inputStream.read(bytes)
     }
 
+    log.info("Downloaded 's3://{}/{}' to '{}'. Closing files.", bucketName, key, destination)
+
     inputStream.close()
     outputStream.flush()
     outputStream.close()
   }.isDefined
 
-  def stream(key: String): InputStream =
+  def stream(key: String): InputStream = {
+    log.info("Streaming 's3://{}/{}'", bucketName: Any, key: Any)
     s3.getObject(new GetObjectRequest(bucketName, sanitizeKey(key))).getObjectContent
+  }
 
   private[this] def handler: PartialFunction[Throwable, Boolean] = {
     case ex: AmazonS3Exception => ex.getStatusCode match {
