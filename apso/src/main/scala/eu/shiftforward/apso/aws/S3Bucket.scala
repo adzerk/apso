@@ -66,6 +66,7 @@ class S3Bucket(val bucketName: String,
   /**
    * Returns size of the file in the location specified by `key` in the bucket. If the file doesn't
    * exist the return value is 0.
+   *
    * @param key the remote pathname for the file
    * @return the size of the file in the location specified by `key` in the bucket if the exists, 0 otherwise.
    */
@@ -75,6 +76,7 @@ class S3Bucket(val bucketName: String,
 
   /**
    * Returns a list of objects in a bucket matching a given prefix.
+   *
    * @param prefix the prefix to match
    * @return a list of objects in a bucket matching a given prefix.
    */
@@ -94,6 +96,7 @@ class S3Bucket(val bucketName: String,
 
   /**
    * Returns a list of filenames and directories in a bucket matching a given prefix.
+   *
    * @param prefix the prefix to match
    * @return a list of filenames in a bucket matching a given prefix.
    */
@@ -102,6 +105,7 @@ class S3Bucket(val bucketName: String,
 
   /**
    * Pushes a given local `File` to the location specified by `key` in the bucket.
+   *
    * @param key the remote pathname for the file
    * @param file the local `File` to push
    * @return true if the push was successful, false otherwise.
@@ -113,6 +117,7 @@ class S3Bucket(val bucketName: String,
 
   /**
    * Deletes the file in the location specified by `key` in the bucket.
+   *
    * @param key the remote pathname for the file
    * @return true if the deletion was successful, false otherwise.
    */
@@ -122,6 +127,7 @@ class S3Bucket(val bucketName: String,
 
   /**
    * Checks if the file in the location specified by `key` in the bucket exists.
+   *
    * @param key the remote pathname for the file
    * @return true if the file exists, false otherwise.
    */
@@ -131,6 +137,7 @@ class S3Bucket(val bucketName: String,
 
   /**
    * Checks if the location specified by `key` is a directory.
+   *
    * @param key the remote pathname to the directory
    * @return true if the path is a directory, false otherwise.
    */
@@ -144,6 +151,7 @@ class S3Bucket(val bucketName: String,
 
   /**
    * Sets an access control list on a given Amazon S3 object.
+   *
    * @param key the remote pathname for the file
    * @param acl the `CannedAccessControlList` to be applied to the Amazon S3 object
    */
@@ -154,6 +162,7 @@ class S3Bucket(val bucketName: String,
 
   /**
    * Creates an empty directory at the given `key` location
+   *
    * @param key the remote pathname to the directory
    * @return  true if the directory was created successfully, false otherwise.
    */
@@ -170,6 +179,7 @@ class S3Bucket(val bucketName: String,
   /**
    * Backups a remote file with the given `key`. A backup consists in copying the supplied file to a backup folder under
    * the same bucket and folder the file is currently in.
+   *
    * @param key the remote pathname to backup
    * @return true if the backup was successful, false otherwise.
    */
@@ -186,6 +196,7 @@ class S3Bucket(val bucketName: String,
 
   /**
    * Pulls a remote file with the given `key`, to the local storage in the pathname provided by `destination`.
+   *
    * @param key the remote pathname to pull from
    * @param destination the local pathname to pull to
    * @return true if the pull was successful, false otherwise
