@@ -12,9 +12,9 @@ The `Benchmark` object provides an apply method to measure the running time of a
 scala> import eu.shiftforward.apso.Benchmark
 import eu.shiftforward.apso.Benchmark
 
-scala> Benchmark("test") { (0 to 100000000).sum }
+scala> Benchmark("test") { (0l to 100000000).sum }
 # Block "test" completed, time taken: 1 ms (0.001 s)
-res0: Int = 987459712
+res0: Int = 5000000050000000
 ```
 
 ## CounterPair
