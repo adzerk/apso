@@ -20,4 +20,3 @@ class ElasticIP(ip: String, credentials: AWSCredentials = CredentialStore.getCre
     ec2.associateAddress(new AssociateAddressRequest(instanceId, ip))
   }
 }
-
