@@ -1,4 +1,4 @@
-package eu.shiftforward.apso.collection
+package eu.shiftforward.apso.iterator
 
 import scala.collection.mutable.PriorityQueue
 
