@@ -1,6 +1,6 @@
 package eu.shiftforward.apso
 
-import eu.shiftforward.apso.collection.MergedBufferedIterator
+import eu.shiftforward.apso.iterator.MergedBufferedIterator
 import scala.annotation.tailrec
 import scala.collection.generic.CanBuildFrom
 import scala.compat.Platform
