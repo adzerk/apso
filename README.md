@@ -66,6 +66,7 @@ Apso is ShiftForward's utilities library. It provides a series of useful methods
     - [Implicits](#implicits)
     - [ProxySupport](#proxysupport)
 - [Time](#time)
+- [TestKit](#testkit)
 
 ## Benchmark
 
