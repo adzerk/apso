@@ -1195,3 +1195,13 @@ res1: eu.shiftforward.apso.time.IterableInterval = SteppedInterval(2012-02-01T00
 scala> (new DateTime("2012-01-01") until new DateTime("2012-02-01") by 2.minutes)
 res2: eu.shiftforward.apso.time.IterableInterval = SteppedInterval(2012-01-01T00:00:00.000Z, 2012-01-01T00:02:00.000Z, 2012-01-01T00:04:00.000Z, 2012-01-01T00:06:00.000Z, 2012-01-01T00:08:00.000Z, 2012-01-01T00:10:00.000Z, 2012-01-01T00:12:00.000Z, 2012-01-01T00:14:00.000Z, 2012-01-01T00:16:00.000Z, 2012-01-01T00:18:00.000Z, 2012-01-01T00:20:00.000Z, 2012-01-01T00:22:00.000Z, 2012-01-01T00:24:00.000Z, 2012-01-01T00:26:00.000Z, 2012-01-01T00:28:00.000Z, 2012-01-01T00:30:00.000Z, 2012-01-01T00:32:00.000Z, 2012-01-01T00:34:00.000Z, 2012-01-01T00:36:00.000Z, 2012-01-01T00:38:00.000Z, 2012-01-01T00:40:00.000Z, 2012-01-01T00:42:00.000Z, 2012-01-01T00:44:00.000Z, 2012-01-01T00:46:00.000Z, 2012-01-01T00:48:00.000Z, 2012-01-01T00:50:00.000Z, 2012-01-01T00:52:00.000Z, 2012-01-01T00:54:00.000Z, 20...
 ```
+
+## TestKit
+
+Apso comes with a TestKit with extra useful matchers for [specs2](https://etorreborre.github.io/specs2/). The following traits with extra matchers are available:
+
+* `CustomMatchers`: provides a matcher to check if an object is serializable and one to check if a file exists;
+* `FutureExtraMatchers`: provides extra matchers for futures and implicit conversions for awaitables;
+* `JreVersionTestHelper`: provides a wrapper for `AsResult` to only run a spec if a specific JRE version is satisfied;
+* `TestHelper`: provides a helper method to create a temporary directory that is deleted on exit;
+* `ActorMatchers`: provides various matchers to be used on akka's TestKit probes and check for different behaviours regarding the reception of messages.
