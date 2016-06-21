@@ -61,6 +61,30 @@ object Implicits {
   }
 
   /**
+   * Implicit class that provides new methods for `JsObjects`.
+   * @param json the `JsObjects` to which the new methods are provided.
+   */
+  final implicit class ApsoJsonJsObject(val json: JsObject) extends AnyVal {
+    /**
+     * Returns a set of keys of this object where nested keys are separated by a separator character.
+     *
+     * Eg. {"a":1,"b":{"c":2},"d":null}.flattenedKeySet(".", ignoreNull = true) = Set("a","b.c")
+     *
+     * @param separator character separator to use
+     * @param ignoreNull if set, fields with a null value are ignored
+     * @return flattened key set
+     */
+    def flattenedKeySet(separator: String = ".", ignoreNull: Boolean = true): Set[String] = {
+      val fields = json.fields.toSet
+      fields.flatMap {
+        case (k, v: JsObject) => v.flattenedKeySet(separator, ignoreNull).map(k + separator + _)
+        case (k, JsNull) if ignoreNull => Set.empty[String]
+        case (k, v) => Set(k)
+      }
+    }
+  }
+
+  /**
    * Creates a JsObject from a sequence of pairs of dot-separated paths with the corresponding
    * leaf values (eg. `List(("root.leaf1", JsString("leafVal1")), ("root.leaf2", JsString("leafVal2")))`
    * @param paths the sequence of dot-separated paths

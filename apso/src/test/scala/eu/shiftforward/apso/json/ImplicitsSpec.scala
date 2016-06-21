@@ -30,7 +30,7 @@ class ImplicitsSpec extends Specification {
       val res =
         """{ "a": {"b": {"c": 9, "d": {"e": 3}, "h": 7, "i": 6}, "f": 5}, "g": [{"key": "val"}], "j": 8 }"""
 
-      source1.parseJson.merge(source2.parseJson, false) mustEqual res.parseJson
+      source1.parseJson.merge(source2.parseJson, failOnConflict = false) mustEqual res.parseJson
     }
 
     "provide a method to create a json object from complete paths" in {
@@ -45,6 +45,13 @@ class ImplicitsSpec extends Specification {
         """{ "a": {"b": {"c": 1, "d": {"e": 3}}, "f": 5}, "g": 4 }"""
 
       res mustEqual expected.parseJson
+    }
+
+    "provide a method to get the key set of a JsObject" in {
+      val obj = """{"a":1,"b":{"c":2},"d":null}""".parseJson.asJsObject
+      obj.flattenedKeySet(".", ignoreNull = true) === Set("a", "b.c")
+      obj.flattenedKeySet(".", ignoreNull = false) === Set("a", "b.c", "d")
+      obj.flattenedKeySet("/", ignoreNull = true) === Set("a", "b/c")
     }
   }
 }
