@@ -1,12 +1,14 @@
 package eu.shiftforward.apso.aws
 
-import com.amazonaws.{ AmazonClientException, AmazonServiceException }
+import com.amazonaws.{ AmazonClientException, AmazonServiceException, ClientConfiguration }
 import com.amazonaws.auth._
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model._
 import com.typesafe.config.ConfigFactory
+
 import eu.shiftforward.apso.Logging
-import java.io.{ InputStream, ByteArrayInputStream, File, FileOutputStream }
+import java.io.{ ByteArrayInputStream, File, FileOutputStream, InputStream }
+
 import scala.collection.JavaConversions._
 import scala.util.{ Failure, Success, Try }
 
@@ -42,7 +44,9 @@ class S3Bucket(val bucketName: String,
 
   private[this] def s3 = {
     if (_s3 == null) {
-      _s3 = new AmazonS3Client(credentials)
+      val defaultConfig = new ClientConfiguration()
+        .withTcpKeepAlive(true)
+      _s3 = new AmazonS3Client(credentials, defaultConfig)
       _s3.setEndpoint(endpoint)
       if (!_s3.doesBucketExist(bucketName)) {
         _s3.createBucket(bucketName, Region.fromValue(region))
