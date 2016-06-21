@@ -10,7 +10,10 @@ import eu.shiftforward.apso.Logging
 import java.io.{ ByteArrayInputStream, File, FileOutputStream, InputStream }
 
 import scala.collection.JavaConversions._
+import scala.concurrent.duration._
 import scala.util.{ Failure, Success, Try }
+
+import eu.shiftforward.apso.collection.InsistentInputStream
 
 /**
  * A representation of an Amazon's S3 bucket. This class wraps an
@@ -233,7 +236,10 @@ class S3Bucket(val bucketName: String,
 
   def stream(key: String): InputStream = {
     log.info("Streaming 's3://{}/{}'", bucketName: Any, key: Any)
-    s3.getObject(new GetObjectRequest(bucketName, sanitizeKey(key))).getObjectContent
+    new InsistentInputStream(
+      () => s3.getObject(new GetObjectRequest(bucketName, sanitizeKey(key))).getObjectContent,
+      10,
+      Some(100.milliseconds))
   }
 
   private[this] def handler: PartialFunction[Throwable, Boolean] = {
