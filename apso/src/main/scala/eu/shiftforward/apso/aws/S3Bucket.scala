@@ -14,7 +14,7 @@ import scala.collection.JavaConversions._
 import scala.concurrent.duration._
 import scala.util.{ Failure, Success, Try }
 
-import eu.shiftforward.apso.collection.InsistentInputStream
+import eu.shiftforward.apso.io.InsistentInputStream
 
 /**
  * A representation of an Amazon's S3 bucket. This class wraps an

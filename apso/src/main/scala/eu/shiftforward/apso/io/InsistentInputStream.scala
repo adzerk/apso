@@ -1,4 +1,4 @@
-package eu.shiftforward.apso.collection
+package eu.shiftforward.apso.io
 
 import java.io.InputStream
 
