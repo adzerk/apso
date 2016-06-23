@@ -4,6 +4,7 @@ import com.amazonaws.{ AmazonClientException, AmazonServiceException, ClientConf
 import com.amazonaws.auth._
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model._
+import com.amazonaws.services.s3.transfer.TransferManager
 import com.typesafe.config.ConfigFactory
 
 import eu.shiftforward.apso.Logging
@@ -56,6 +57,15 @@ class S3Bucket(val bucketName: String,
       }
     }
     _s3
+  }
+
+  @transient private[this] var _transferManager: TransferManager = _
+
+  private[this] def transferManager = {
+    if (_transferManager == null) {
+      _transferManager = new TransferManager(s3)
+    }
+    _transferManager
   }
 
   private[this] def splitKey(key: String) = {
@@ -119,7 +129,9 @@ class S3Bucket(val bucketName: String,
    */
   def push(key: String, file: File): Boolean = retry {
     log.info("Pushing '{}' to 's3://{}/{}'", file.getPath, bucketName, key)
-    s3.putObject(new PutObjectRequest(bucketName, sanitizeKey(key), file))
+    transferManager
+      .upload(new PutObjectRequest(bucketName, sanitizeKey(key), file))
+      .waitForUploadResult()
   }.isDefined
 
   /**
