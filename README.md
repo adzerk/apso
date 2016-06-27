@@ -1,5 +1,3 @@
-![apso](http://gitlab.shiftforward.eu/apso/raw/master/apso.png)
-
 # Apso
 
 Apso is ShiftForward's utilities library. It provides a series of useful methods.
