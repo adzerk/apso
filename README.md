@@ -1,3 +1,5 @@
+<p align="center"><img src="https://raw.githubusercontent.com/ShiftForward/apso/master/apso.png"/></p>
+
 # Apso
 
 Apso is ShiftForward's utilities library. It provides a series of useful methods.
