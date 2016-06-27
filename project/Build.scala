@@ -57,7 +57,7 @@ object ProjectBuild extends Build {
 
   lazy val commonSettings = Defaults.coreDefaultSettings ++ formatSettings ++ Seq(
     organization := "eu.shiftforward",
-    version := "0.7",
+    version := "0.8-SNAPSHOT",
     scalaVersion := "2.11.8",
 
     resolvers ++= Seq(
