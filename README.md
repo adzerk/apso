@@ -30,7 +30,6 @@ Apso is ShiftForward's utilities library. It provides a series of useful methods
     - [S3Bucket](#s3bucket)
     - [SerializableAWSCredentials](#serializableawscredentials)
 - [Collections](#collections)
-    - [DeboxMap](#deboxmap)
     - [HMap](#hmap)
     - [Trie](#trie)
     - [TypedMap](#typedmap)
@@ -566,28 +565,6 @@ The `SerializableAWSCredentials` class provides a serializable container for AWS
 ## Collections
 
 The `eu.shiftforward.apso.collection` package provides some helpful collections:
-
-### DeboxMap
-
-The `DeboxMap` is a `Map` that doesn't box. It is based on the `DeboxMap` at [non/debox](https://github.com/non/debox) but includes a bunch of bugfixes. It has a similar usage to scala's `Map`:
-
-```scala
-scala> import eu.shiftforward.apso.collection._
-import eu.shiftforward.apso.collection._
-
-scala> val m = DeboxMap[Int, Int]()
-m: eu.shiftforward.apso.collection.DeboxMap[Int,Int] = <function1>
-
-scala> m(1) = 2
-
-scala> m(2) = 3
-
-scala> m(1)
-res0: Int = 2
-
-scala> m(2)
-res1: Int = 3
-```
 
 ### HMap
 
