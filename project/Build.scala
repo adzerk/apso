@@ -14,7 +14,6 @@ object ProjectBuild extends Build {
   lazy val apso = Project("apso", file("apso"))
     .dependsOn(apsoTestkit % "test")
     .settings(commonSettings: _*)
-    .settings(publishSettings: _*)
     .settings(apsoSettings: _*)
     .settings(libraryDependencies ++= Seq(
       "com.amazonaws"                  % "aws-java-sdk-ec2"          % "1.10.65"        % "provided",
@@ -46,7 +45,6 @@ object ProjectBuild extends Build {
 
   lazy val apsoTestkit = Project("apso-testkit", file("apso-testkit"))
     .settings(commonSettings: _*)
-    .settings(publishSettings: _*)
     .settings(apsoTestkitSettings: _*)
     .settings(libraryDependencies ++= Seq(
       "com.typesafe.akka"             %% "akka-testkit"       % "2.4.2"          % "provided",
@@ -61,15 +59,12 @@ object ProjectBuild extends Build {
     scalaVersion := "2.11.8",
 
     resolvers ++= Seq(
-      "SF Nexus Releases"             at "http://NEXUS_URL/content/repositories/releases",
-      "SF Nexus Snapshots"            at "http://NEXUS_URL/content/repositories/snapshots",
-      "3rd Party"                     at "http://NEXUS_URL/content/repositories/thirdparty",
-      "3rd Party Snapshots"           at "http://NEXUS_URL/content/repositories/thirdparty-snapshots",
       "Sonatype Repository"           at "http://oss.sonatype.org/content/repositories/releases",
       "Sonatype Snapshots Repository" at "http://oss.sonatype.org/content/repositories/snapshots",
       "Spray Repository"              at "http://repo.spray.io/",
       "Bintray Scalaz Releases"       at "http://dl.bintray.com/scalaz/releases",
       "Typesafe Repository"           at "http://repo.typesafe.com/typesafe/releases/",
+      "JCenter Repository"            at "http://jcenter.bintray.com/",
       "JAnalyse Repository"           at "http://www.janalyse.fr/repository/"),
 
     testOptions in Test += Tests.Argument(TestFrameworks.Specs2, "junitxml", "console"),
@@ -95,15 +90,6 @@ object ProjectBuild extends Build {
     FormattingPreferences()
       .setPreference(AlignParameters, true)
       .setPreference(DoubleIndentClassDeclaration, true)
-
-  lazy val publishSettings = Seq(
-    publishTo <<= version { (v: String) =>
-      val sf = "http://NEXUS_URL/content/repositories/"
-      if (v.trim.endsWith("SNAPSHOT"))
-        Some("snapshots" at sf + "snapshots")
-      else
-        Some("releases"  at sf + "releases")
-    })
 
   lazy val noPublishing = Seq(
     publish := (),

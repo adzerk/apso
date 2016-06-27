@@ -1,4 +1,4 @@
-![apso](http://REPOSITORY_URL/apso/raw/master/apso.png)
+![apso](http://gitlab.shiftforward.eu/apso/raw/master/apso.png)
 
 # Apso
 
