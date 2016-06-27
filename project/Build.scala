@@ -14,6 +14,7 @@ object ProjectBuild extends Build {
   lazy val apso = Project("apso", file("apso"))
     .dependsOn(apsoTestkit % "test")
     .settings(commonSettings: _*)
+    .settings(publishSettings: _*)
     .settings(apsoSettings: _*)
     .settings(libraryDependencies ++= Seq(
       "com.amazonaws"                  % "aws-java-sdk-ec2"          % "1.10.65"        % "provided",
@@ -45,6 +46,7 @@ object ProjectBuild extends Build {
 
   lazy val apsoTestkit = Project("apso-testkit", file("apso-testkit"))
     .settings(commonSettings: _*)
+    .settings(publishSettings: _*)
     .settings(apsoTestkitSettings: _*)
     .settings(libraryDependencies ++= Seq(
       "com.typesafe.akka"             %% "akka-testkit"       % "2.4.2"          % "provided",
@@ -90,6 +92,15 @@ object ProjectBuild extends Build {
     FormattingPreferences()
       .setPreference(AlignParameters, true)
       .setPreference(DoubleIndentClassDeclaration, true)
+
+  lazy val publishSettings = Seq(
+    publishTo <<= version { (v: String) =>
+      val nexus = "https://oss.sonatype.org/"
+      if (v.trim.endsWith("SNAPSHOT"))
+        Some("snapshots" at nexus + "content/repositories/snapshots")
+      else
+        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+    })
 
   lazy val noPublishing = Seq(
     publish := (),
