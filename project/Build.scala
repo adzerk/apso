@@ -57,7 +57,7 @@ object ProjectBuild extends Build {
 
   lazy val commonSettings = Defaults.coreDefaultSettings ++ formatSettings ++ Seq(
     organization := "eu.shiftforward",
-    version := "0.7-SNAPSHOT",
+    version := "0.7",
     scalaVersion := "2.11.8",
 
     resolvers ++= Seq(
@@ -100,7 +100,74 @@ object ProjectBuild extends Build {
         Some("snapshots" at nexus + "content/repositories/snapshots")
       else
         Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-    })
+    },
+    pomIncludeRepository := { _ => false },
+    licenses := Seq("MIT License" ->
+      url("http://www.opensource.org/licenses/mit-license.php")),
+    homepage := Some(url("https://github.com/ShiftForward/apso")),
+    pomExtra := (
+      <scm>
+        <url>git@github.com:ShiftForward/apso.git</url>
+        <connection>scm:git:git@github.com:ShiftForward/apso.git</connection>
+      </scm>
+      <developers>
+        <developer>
+          <id>ruippeixotog</id>
+          <name>Rui Gonçalves</name>
+          <roles>
+            <role>developer</role>
+          </roles>
+        </developer>
+        <developer>
+          <id>andrebeat</id>
+          <name>André Silva</name>
+          <roles>
+            <role>developer</role>
+          </roles>
+        </developer>
+        <developer>
+          <id>jcazevedo</id>
+          <name>Joao Azevedo</name>
+          <roles>
+            <role>developer</role>
+          </roles>
+        </developer>
+        <developer>
+          <id>JD557</id>
+          <name>João Costa</name>
+          <roles>
+            <role>developer</role>
+          </roles>
+        </developer>
+        <developer>
+          <id>queimadus</id>
+          <name>Bruno Maia</name>
+          <roles>
+            <role>developer</role>
+          </roles>
+        </developer>
+        <developer>
+          <id>luismfonseca</id>
+          <name>Luís Fonseca</name>
+          <roles>
+            <role>developer</role>
+          </roles>
+        </developer>
+        <developer>
+          <id>hugoferreira</id>
+          <name>Hugo Ferreira</name>
+          <roles>
+            <role>developer</role>
+          </roles>
+        </developer>
+        <developer>
+          <id>belerophon</id>
+          <name>André Cardoso</name>
+          <roles>
+            <role>developer</role>
+          </roles>
+        </developer>
+      </developers>))
 
   lazy val noPublishing = Seq(
     publish := (),
