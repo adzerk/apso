@@ -107,7 +107,7 @@ object ProjectBuild extends Build {
     homepage := Some(url("https://github.com/ShiftForward/apso")),
     pomExtra := (
       <scm>
-        <url>git@github.com:ShiftForward/apso.git</url>
+        <url>https://github.com/ShiftForward/apso.git</url>
         <connection>scm:git:git@github.com:ShiftForward/apso.git</connection>
       </scm>
       <developers>
