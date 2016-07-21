@@ -102,8 +102,8 @@ object ProjectBuild extends Build {
         Some("releases"  at nexus + "service/local/staging/deploy/maven2")
     },
     pomIncludeRepository := { _ => false },
-    licenses := Seq("MIT License" ->
-      url("http://www.opensource.org/licenses/mit-license.php")),
+    licenses := Seq("Apache License, Version 2.0" ->
+      url("http://www.apache.org/licenses/LICENSE-2.0")),
     homepage := Some(url("https://github.com/ShiftForward/apso")),
     pomExtra := (
       <scm>
