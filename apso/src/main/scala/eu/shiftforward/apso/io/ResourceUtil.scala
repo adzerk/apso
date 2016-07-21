@@ -8,7 +8,7 @@ import scala.io.Source
 /**
  * Utility methods for handling resource files
  */
-object ResourceUtil {
+trait ResourceUtil {
   val defaultEncoding = "UTF-8"
 
   def getResourceURL(path: String, encoding: String = defaultEncoding): String =
@@ -20,3 +20,5 @@ object ResourceUtil {
   def getResourceAsString(path: String, encoding: String = defaultEncoding) =
     Source.fromInputStream(getResourceStream(path: String), encoding).mkString
 }
+
+object ResourceUtil extends ResourceUtil
