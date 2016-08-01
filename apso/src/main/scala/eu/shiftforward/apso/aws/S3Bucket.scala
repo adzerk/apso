@@ -1,5 +1,12 @@
 package eu.shiftforward.apso.aws
 
+import java.io.{ ByteArrayInputStream, File, FileOutputStream, InputStream }
+import java.util.concurrent.{ Executors, ThreadFactory }
+
+import scala.collection.JavaConversions._
+import scala.concurrent.duration._
+import scala.util.{ Failure, Success, Try }
+
 import com.amazonaws.{ AmazonClientException, AmazonServiceException, ClientConfiguration }
 import com.amazonaws.auth._
 import com.amazonaws.services.s3.AmazonS3Client
@@ -8,12 +15,6 @@ import com.amazonaws.services.s3.transfer.TransferManager
 import com.typesafe.config.ConfigFactory
 
 import eu.shiftforward.apso.Logging
-import java.io.{ ByteArrayInputStream, File, FileOutputStream, InputStream }
-
-import scala.collection.JavaConversions._
-import scala.concurrent.duration._
-import scala.util.{ Failure, Success, Try }
-
 import eu.shiftforward.apso.io.InsistentInputStream
 
 /**
@@ -63,7 +64,22 @@ class S3Bucket(val bucketName: String,
 
   private[this] def transferManager = {
     if (_transferManager == null) {
-      _transferManager = new TransferManager(s3)
+      // This is the default thread pool used by the `TransferManager`. I had to replicate it here
+      // to make sure that threads are daemonized. This could be problematic, e.g. shutting down the
+      // JVM before a transfer has finished, although this won't happen in our use case since we
+      // always wait for transfers to finish.
+      val executor = Executors.newFixedThreadPool(10, new ThreadFactory() {
+        var threadCount = 1;
+        def newThread(r: Runnable) = {
+          val thread = new Thread(r)
+          thread.setDaemon(true)
+          thread.setName(s"s3-transfer-manager-worker-$threadCount")
+          threadCount += 1
+          thread
+        }
+      })
+
+      _transferManager = new TransferManager(s3, executor)
     }
     _transferManager
   }
