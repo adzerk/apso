@@ -52,7 +52,7 @@ trait ProxySupport extends ClientIPDirectives {
   }
 
   private val optionalRemoteAddress: Directive1[Option[RemoteAddress]] =
-    headerValuePF { case `Remote-Address`(address) ⇒ Some(address) } | provide(None)
+    headerValuePF { case `Remote-Address`(address) => Some(address) } | provide(None)
 
   def proxyTo(uri: Uri)(implicit system: ActorSystem): Route = {
     optionalRemoteAddress { ip =>
