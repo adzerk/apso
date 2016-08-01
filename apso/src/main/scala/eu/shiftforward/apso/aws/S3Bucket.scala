@@ -68,6 +68,7 @@ class S3Bucket(val bucketName: String,
       // to make sure that threads are daemonized. This could be problematic, e.g. shutting down the
       // JVM before a transfer has finished, although this won't happen in our use case since we
       // always wait for transfers to finish.
+      // (This code is copy-pasted from the AWS SDK with the addition of the `setDaemon` call).
       val executor = Executors.newFixedThreadPool(10, new ThreadFactory() {
         var threadCount = 1;
         def newThread(r: Runnable) = {
