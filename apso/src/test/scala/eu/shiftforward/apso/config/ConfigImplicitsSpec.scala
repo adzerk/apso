@@ -55,6 +55,17 @@ class ConfigImplicitsSpec extends Specification {
           "_()#..!" = "a"
         }
 
+        map-nested {
+          a {
+            b {
+              e = "4"
+              f = "7"
+            }
+            c = "5"
+          }
+          d = "6"
+        }
+
         "config.com" {
           "site.pt" = "ok"
         }
@@ -171,6 +182,8 @@ class ConfigImplicitsSpec extends Specification {
       config.getMap[Int]("num-map") must beEqualTo(Map("k1" -> 1, "k2" -> 2))
       config.getMap[String]("map-escape") must beEqualTo(
         Map("a" -> "a", "(a,{} b. c)" -> "abc", "x{}" -> "abc", "_()#..!" -> "a"))
+      config.getMap[String]("map-nested") must beEqualTo(
+        Map("a.b.e" -> "4", "a.b.f" -> "7", "a.c" -> "5", "d" -> "6"))
     }
 
     "allow extracting configurations returning an option of a map" in {
