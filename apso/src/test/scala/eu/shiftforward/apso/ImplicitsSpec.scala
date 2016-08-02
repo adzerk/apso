@@ -163,15 +163,18 @@ class ImplicitsSpec(implicit env: ExecutionEnv) extends Specification with Scala
   "An ApsoOptionalFuture" should {
 
     "fallback on None" in {
-      Future.successful(None).ifNoneOrErrorFallbackTo(Future.successful(Some(()))) must beSome.await
+      val f = Future.successful(None).ifNoneOrErrorFallbackTo(Future.successful(Some(())))
+      f must beSome.await.eventually
     }
 
     "fallback on Exception" in {
-      Future.failed(new Exception).ifNoneOrErrorFallbackTo(Future.successful(Some(()))) must beSome.await
+      val f = Future.failed(new Exception).ifNoneOrErrorFallbackTo(Future.successful(Some(())))
+      f must beSome.await.eventually
     }
 
     "don't fallback on Some" in {
-      Future.successful(Some(1)).ifNoneOrErrorFallbackTo(Future.successful(Some(2))) must beSome(1).await
+      val f = Future.successful(Some(1)).ifNoneOrErrorFallbackTo(Future.successful(Some(2)))
+      f must beSome(1).await.eventually
     }
 
   }
