@@ -58,7 +58,7 @@ class ConfigImplicitsSpec extends Specification {
         map-nested {
           a {
             b {
-              e = "4"
+              "\ne" = "4"
               f = "7"
             }
             c = "5"
@@ -183,7 +183,7 @@ class ConfigImplicitsSpec extends Specification {
       config.getMap[String]("map-escape") must beEqualTo(
         Map("a" -> "a", "(a,{} b. c)" -> "abc", "x{}" -> "abc", "_()#..!" -> "a"))
       config.getMap[String]("map-nested") must beEqualTo(
-        Map("a.b.e" -> "4", "a.b.f" -> "7", "a.c" -> "5", "d" -> "6"))
+        Map("a.b.\ne" -> "4", "a.b.f" -> "7", "a.c" -> "5", "d" -> "6"))
     }
 
     "allow extracting configurations returning an option of a map" in {
