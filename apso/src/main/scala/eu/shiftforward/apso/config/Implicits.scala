@@ -280,15 +280,19 @@ object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
       val unwrappedSet = conf.root.entrySet().map(e => e.getKey -> e.getValue)
       val wrappedSet = conf.entrySet().map(e => e.getKey -> e.getValue)
 
-      val joinedByKey =
-        unwrappedSet.map {
-          case (k, v) =>
-            (k, wrappedSet.find(_._2 == v).getOrElse(throw new IllegalStateException(s"Key '$k' not found!"))._1) -> v
-        }.toMap
-
-      for (((unwrappedKey, wrappedKey), _) <- joinedByKey) yield {
-        (unwrappedKey, configReader(conf, wrappedKey))
-      }
+      unwrappedSet.flatMap {
+        case (k, v) =>
+          v match {
+            case obj: ConfigObject => obj.toConfig().toMap(configReader).map {
+              case (nk, nv) =>
+                (k + "." + nk) -> nv
+            }
+            case nv =>
+              Set(k ->
+                configReader(conf, wrappedSet.find(_._2 == nv).getOrElse(
+                  throw new IllegalStateException(s"Key '$k' not found!"))._1))
+          }
+      }.toMap
     }
 
     /**
