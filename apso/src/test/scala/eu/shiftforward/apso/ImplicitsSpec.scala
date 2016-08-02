@@ -1,14 +1,13 @@
 package eu.shiftforward.apso
 
 import eu.shiftforward.apso.Implicits._
+import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.concurrent.duration._
 import scala.util.Random
 
-class ImplicitsSpec extends Specification with ScalaCheck with FutureExtraMatchers {
+class ImplicitsSpec(implicit env: ExecutionEnv) extends Specification with ScalaCheck with FutureExtraMatchers {
 
   "An ApsoSeq" should {
 
@@ -164,15 +163,15 @@ class ImplicitsSpec extends Specification with ScalaCheck with FutureExtraMatche
   "An ApsoOptionalFuture" should {
 
     "fallback on None" in {
-      Future.successful(None).ifNoneOrErrorFallbackTo(Future.successful(Some(()))).await(1.second) must beSome
+      Future.successful(None).ifNoneOrErrorFallbackTo(Future.successful(Some(()))) must beSome.await
     }
 
     "fallback on Exception" in {
-      Future.failed(new Exception).ifNoneOrErrorFallbackTo(Future.successful(Some(()))).await(1.second) must beSome
+      Future.failed(new Exception).ifNoneOrErrorFallbackTo(Future.successful(Some(()))) must beSome.await
     }
 
     "don't fallback on Some" in {
-      Future.successful(Some(1)).ifNoneOrErrorFallbackTo(Future.successful(Some(2))).await(1.second) must beSome(1)
+      Future.successful(Some(1)).ifNoneOrErrorFallbackTo(Future.successful(Some(2))) must beSome(1).await
     }
 
   }
