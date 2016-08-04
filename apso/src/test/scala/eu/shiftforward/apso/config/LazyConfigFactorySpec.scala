@@ -1,6 +1,6 @@
 package eu.shiftforward.apso.config
 
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{ ConfigException, ConfigFactory }
 import org.specs2.mutable.Specification
 
 class LazyConfigFactorySpec extends Specification {
@@ -21,6 +21,44 @@ class LazyConfigFactorySpec extends Specification {
     "Load an overrides.conf that has priority over application.conf if it exists" in {
       ConfigFactory.load.getString("path2") mustEqual "."
       LazyConfigFactory.load.getString("path2") mustEqual System.getenv.get("PATH")
+    }
+
+    "Have a config loading DSL" in {
+
+      "Load a config in a given key" in {
+        LazyConfigFactory.loadAt("a").config.getInt("a1") mustEqual 2
+        LazyConfigFactory.loadAt("a.b").config.getInt("b1") mustEqual 5
+      }
+
+      "Load a config in a given key with some overrides" in {
+        LazyConfigFactory.loadAt("a.b").withOverrides("b1" -> 6).config.getInt("b1") mustEqual 6
+        LazyConfigFactory.loadAt("a.b").withOverrides("b2" -> 6).config must throwA[ConfigException.ValidationFailed]
+      }
+
+      "Load a config in a given key with some extra settings" in {
+        LazyConfigFactory.loadAt("a.b").withSettings("b2" -> "new").config.getString("b2") mustEqual "new"
+        LazyConfigFactory.loadAt("a.b").withSettings("b1" -> "new").config must throwA[ConfigException.ValidationFailed]
+      }
+
+      "Support different ways to provide configs in withSettings and withOverrides" in {
+        LazyConfigFactory.loadAt("a").withOverrides(ConfigFactory.parseString("{ a1 = 2, a2 = aa }"))
+          .config.getString("a2") mustEqual "aa"
+
+        LazyConfigFactory.loadAt("a").withOverrides("{ a1 = 2, a2 = aa }")
+          .config.getString("a2") mustEqual "aa"
+
+        LazyConfigFactory.loadAt("a").withOverrides("a1" -> 2, "a2" -> "aa")
+          .config.getString("a2") mustEqual "aa"
+
+        LazyConfigFactory.loadAt("a").withSettings(ConfigFactory.parseString("{ a3 = 2, a4 = aa }"))
+          .config.getInt("a3") mustEqual 2
+
+        LazyConfigFactory.loadAt("a").withSettings("{ a3 = 2, a4 = aa }")
+          .config.getInt("a3") mustEqual 2
+
+        LazyConfigFactory.loadAt("a").withSettings("a3" -> 2, "a4" -> "aa")
+          .config.getInt("a3") mustEqual 2
+      }
     }
   }
 }
