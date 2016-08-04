@@ -3,7 +3,7 @@ package eu.shiftforward.apso.json
 import java.net.URI
 
 import scala.concurrent.duration._
-import scala.util.Try
+import scala.util.{ Failure, Success, Try }
 
 import com.github.nscala_time.time.Imports._
 import com.typesafe.config.{ Config, ConfigFactory, ConfigRenderOptions }
@@ -26,13 +26,11 @@ trait ExtraTimeJsonProtocol {
 
     def read(json: JsValue) = {
 
-      def tryToParseDuration(duration: String) = {
-        try {
-          ConfigFactory.parseString(s"d=$duration").get[FiniteDuration]("d")
-        } catch {
-          case ex: Exception => deserializationError("Expected a Number or a unit-annotated String", ex)
+      def tryToParseDuration(duration: String) =
+        Try(ConfigFactory.parseString(s"d=$duration").get[FiniteDuration]("d")) match {
+          case Success(d) => d
+          case Failure(t) => deserializationError("Expected a Number or a unit-annotated String", t)
         }
-      }
 
       json match {
         case JsNumber(duration) =>
@@ -91,10 +89,9 @@ trait ExtraHttpJsonProtocol {
 trait ExtraMiscJsonProtocol {
   implicit object ConfigJsonFormat extends JsonFormat[Config] {
     def write(conf: Config): JsValue = conf.root.render(ConfigRenderOptions.concise()).parseJson
-    def read(json: JsValue): Config = try {
-      ConfigFactory.parseString(json.toString)
-    } catch {
-      case t: Throwable => deserializationError("Could not parse config: " + json, t)
+    def read(json: JsValue): Config = Try(ConfigFactory.parseString(json.toString)) match {
+      case Success(v) => v
+      case Failure(t) => deserializationError("Could not parse config: " + json, t)
     }
   }
 
