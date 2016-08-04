@@ -327,18 +327,21 @@ object ConfigReader {
     }
 
   trait BasicConfigReaders {
-    // ConfigReaders implicits:
+
+    // ConfigReaders implicits
     implicit val boolConfigReader = configReader[Boolean](_.getBoolean(_))
     implicit val stringConfigReader = configReader[String](_.getString(_))
     implicit val intConfigReader = configReader[Int](_.getInt(_))
     implicit val doubleConfigReader = configReader[Double](_.getDouble(_))
     implicit val longConfigReader = configReader[Long](_.getLong(_))
+    implicit val unitConfigReader = configReader[Unit]((_, _) => ())
     implicit val durationConfigReader = configReader[Duration](_.getDuration(_))
     implicit val finiteDurationConfigReader = configReader[FiniteDuration](_.getDuration(_))
     implicit val javaDurationConfigReader = configReader[java.time.Duration](_.getDuration(_))
+    implicit val configValueConfigReader = configReader[ConfigValue](_.getValue(_))
     implicit val configConfigReader = configReader[Config](_.getConfig(_))
 
-    // ConfigReaders implicits for lists:
+    // ConfigReaders implicits for lists
     implicit val boolListConfigReader = configReader[List[Boolean]](_.getBooleanList(_).toList.map(Boolean.unbox))
     implicit val stringListConfigReader = configReader[List[String]](_.getStringList(_).toList)
     implicit val intListConfigReader = configReader[List[Int]](_.getIntList(_).toList.map(Int.unbox))

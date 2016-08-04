@@ -6,6 +6,9 @@ import java.net.{ MalformedURLException, URL }
 import com.typesafe.config._
 import com.typesafe.config.impl.Parseable
 
+import eu.shiftforward.apso.config.Implicits._
+import scala.collection.convert.WrapAsJava._
+
 /**
  * Contains static methods for creating `Config` instances in a lazy way.
  *
@@ -17,7 +20,7 @@ import com.typesafe.config.impl.Parseable
  */
 object LazyConfigFactory {
 
-  def load: Config = load(ConfigParseOptions.defaults, ConfigResolveOptions.defaults)
+  lazy val load: Config = load(ConfigParseOptions.defaults, ConfigResolveOptions.defaults)
 
   def load(resourceBasename: String): Config =
     load(ConfigFactory.parseResourcesAnySyntax(resourceBasename),
@@ -71,4 +74,111 @@ object LazyConfigFactory {
 
   def defaultReference(parseOptions: ConfigParseOptions) =
     Parseable.newResources("reference.conf", parseOptions).parse.toConfig
+
+  private[this] implicit def stringAsConfig(str: String): Config =
+    ConfigFactory.parseString(str)
+
+  private[this] implicit def seqKeyValueConfig(str: Seq[(String, Any)]): Config =
+    str.foldLeft(ConfigFactory.empty) {
+      case (acc, (path, v)) => ConfigFactory.parseString(s"$path = $v").withFallback(acc)
+    }
+
+  /**
+   * A `Config` builder providing a DSL for retireving and modifying configs.
+   */
+  trait Builder {
+
+    /**
+     * The built config.
+     */
+    def config: Config
+
+    /**
+     * Returns a new builder with some settings overridden. The provided settings must exist in the currently built
+     * config; otherwise, a `ConfigFactory.ValidationFailed` is thrown.
+     *
+     * @param overrides the settings to override in the current config
+     * @return a new builder with the given settings overridden.
+     */
+    def withOverrides(overrides: Config): Builder = new WithOverridesBuilder(config, overrides)
+
+    /**
+     * Returns a new builder with some settings overridden. The provided settings must exist in the currently built
+     * config; otherwise, a `ConfigFactory.ValidationFailed` is thrown.
+     *
+     * @param overrides the settings to override in the current config as a parseable config
+     * @return a new builder with the given settings overridden.
+     */
+    def withOverrides(overrides: String): Builder = new WithOverridesBuilder(config, overrides)
+
+    /**
+     * Returns a new builder with some settings overridden. The provided settings must exist in the currently built
+     * config; otherwise, a `ConfigFactory.ValidationFailed` is thrown.
+     *
+     * @param overrides a setting to override in the current config as a key-value pair
+     * @param moreOverrides additional settings to override in the current config as key-value pairs
+     * @return a new builder with the given settings overridden.
+     */
+    def withOverrides(overrides: (String, Any), moreOverrides: (String, Any)*): Builder =
+      new WithOverridesBuilder(config, overrides +: moreOverrides)
+
+    /**
+     * Returns a new builder with some additional settings. The provided settings must not exist in the currently built
+     * config; otherwise, a `ConfigFactory.ValidationFailed` is thrown.
+     *
+     * @param settings the settings to add to the current config
+     * @return a new builder with the given settings added.
+     */
+    def withSettings(settings: Config): Builder = new WithSettingsBuilder(config, settings)
+
+    /**
+     * Returns a new builder with some additional settings. The provided settings must not exist in the currently built
+     * config; otherwise, a `ConfigFactory.ValidationFailed` is thrown.
+     *
+     * @param settings the settings to add to the current config as a parseable config
+     * @return a new builder with the given settings added.
+     */
+    def withSettings(settings: String): Builder = new WithSettingsBuilder(config, settings)
+
+    /**
+     * Returns a new builder with some additional settings. The provided settings must not exist in the currently built
+     * config; otherwise, a `ConfigFactory.ValidationFailed` is thrown.
+     *
+     * @param settings a setting to add to the current config as a key-value pair
+     * @param moreSettings additional settings to add to the current config as key-value pairs
+     * @return a new builder with the given settings added.
+     */
+    def withSettings(settings: (String, Any), moreSettings: (String, Any)*): Builder =
+      new WithSettingsBuilder(config, settings +: moreSettings)
+  }
+
+  /**
+   * Returns a `LazyConfigFactory.Builder` targeted at a path of the default config.
+   *
+   * @param path the target path of the default config
+   * @return a `LazyConfigFactory.Builder` targeted at the given path of the default config.
+   */
+  def loadAt(path: String): Builder = new AtPathBuilder(path)
+
+  private[this] class AtPathBuilder(path: String) extends Builder {
+    lazy val config = load.getConfig(path)
+  }
+
+  private[this] class WithOverridesBuilder(baseConfig: Config, overrides: Config) extends Builder {
+    baseConfig.checkValid(overrides)
+    lazy val config = overrides.withFallback(baseConfig)
+  }
+
+  private[this] class WithSettingsBuilder(baseConfig: Config, settings: Config) extends Builder {
+    val validationProblems = settings.toMap[Unit].keys.toSeq.collect {
+      case path if baseConfig.hasPath(path) =>
+        new ConfigException.ValidationProblem(path, settings.origin(),
+          "Settings added with .withSettings() must not override existing ones")
+    }
+
+    if (validationProblems.nonEmpty)
+      throw new ConfigException.ValidationFailed(validationProblems)
+
+    lazy val config = baseConfig.withFallback(settings)
+  }
 }
