@@ -1,11 +1,34 @@
 package eu.shiftforward.apso.json
 
-import eu.shiftforward.apso.json.Implicits._
 import org.specs2.mutable._
+import spray.json.DefaultJsonProtocol._
 import spray.json._
+
+import eu.shiftforward.apso.json.Implicits._
 
 class ImplicitsSpec extends Specification {
   "The Apso Json Implicits should" should {
+
+    "convert JsonValues to values" in {
+      "asd".toJson.toValue === "asd"
+      123.toJson.toValue === 123
+      Map("x" -> Map("y" -> 1)).toJson.toValue === Map("x" -> Map("y" -> 1))
+      JsArray(Vector(1.toJson, 2.toJson, "a".toJson)).toValue === List(1, 2, "a")
+      true.toJson.toValue === true
+    }
+
+    "provide a merge method for json arrays" in {
+      val source1 =
+        """[1, 2, 3]"""
+
+      val source2 =
+        """["a", "b", "c"]"""
+
+      val res =
+        """[1, 2, 3, "a", "b", "c"]"""
+
+      source1.parseJson.merge(source2.parseJson) mustEqual res.parseJson
+    }
 
     "provide a merge method for json objects" in {
       val source1 =

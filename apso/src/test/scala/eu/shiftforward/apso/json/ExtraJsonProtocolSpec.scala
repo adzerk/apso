@@ -25,14 +25,16 @@ class ExtraJsonProtocolSpec extends Specification {
       """{"minutes": 2}""".parseJson.convertTo[FiniteDuration] mustEqual 2.minutes
       """{"hours":   2}""".parseJson.convertTo[FiniteDuration] mustEqual 2.hours
       """{"days":    2}""".parseJson.convertTo[FiniteDuration] mustEqual 2.days
+      """{"meters":  2}""".parseJson.convertTo[FiniteDuration] must throwA[DeserializationException]
 
       """2""".parseJson.convertTo[FiniteDuration] mustEqual 2.milliseconds
       """"2s"""".parseJson.convertTo[FiniteDuration] mustEqual 2.seconds
       """"2m"""".parseJson.convertTo[FiniteDuration] mustEqual 2.minutes
       """"2h"""".parseJson.convertTo[FiniteDuration] mustEqual 2.hours
       """"2d"""".parseJson.convertTo[FiniteDuration] mustEqual 2.days
+      """"garbagio"""".parseJson.convertTo[FiniteDuration] must throwA[DeserializationException]
 
-      """"garbagio"""".parseJson.convertTo[FiniteDuration] must throwAn[DeserializationException]
+      "true".parseJson.convertTo[FiniteDuration] must throwA[DeserializationException]
     }
 
     "provide a JsonFormat for Interval" in {
@@ -41,6 +43,7 @@ class ExtraJsonProtocolSpec extends Specification {
 
       interval.toJson.compactPrint mustEqual intervalJsonString
       intervalJsonString.parseJson.convertTo[Interval] mustEqual interval
+      """{"invalidObject":true}""".parseJson.convertTo[Interval] must throwA[DeserializationException]
     }
 
     "provide a JsonFormat for URI" in {
@@ -49,6 +52,8 @@ class ExtraJsonProtocolSpec extends Specification {
 
       uri.toJson.compactPrint mustEqual uriJsonString
       uriJsonString.parseJson.convertTo[URI] mustEqual uri
+      "true".parseJson.convertTo[URI] must throwA[DeserializationException]
+      """"{invalidUri}"""".parseJson.convertTo[URI] must throwA[DeserializationException]
     }
 
     "provide a JsonFormat for Config" in {
@@ -63,6 +68,7 @@ class ExtraJsonProtocolSpec extends Specification {
 
       config.toJson.compactPrint mustEqual configJsonString
       configJsonString.parseJson.convertTo[Config] mustEqual config
+      "true".parseJson.convertTo[Config] must throwA[DeserializationException]
     }
 
     "provide a JsonFormat for DateTime" in {
@@ -71,6 +77,7 @@ class ExtraJsonProtocolSpec extends Specification {
 
       dateTime.toJson.compactPrint mustEqual dateTimeJsonString
       dateTimeJsonString.parseJson.convertTo[DateTime] mustEqual dateTime
+      "true".parseJson.convertTo[DateTime] must throwA[DeserializationException]
     }
 
     "provide a JsonFormat for LocalDate" in {
@@ -79,6 +86,7 @@ class ExtraJsonProtocolSpec extends Specification {
 
       localDate.toJson.compactPrint mustEqual localDateJsonString
       localDateJsonString.parseJson.convertTo[LocalDate] mustEqual localDate
+      "true".parseJson.convertTo[LocalDate] must throwA[DeserializationException]
     }
   }
 }
