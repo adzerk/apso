@@ -1,11 +1,12 @@
 package eu.shiftforward.apso
 
-import eu.shiftforward.apso.iterator.MergedBufferedIterator
 import scala.annotation.tailrec
 import scala.collection.generic.CanBuildFrom
 import scala.compat.Platform
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Random
+
+import eu.shiftforward.apso.iterator.MergedBufferedIterator
 
 /**
  * Object containing implicit classes and methods of general purpose.
@@ -39,9 +40,10 @@ object Implicits {
      *         this string.
      */
     def enumerate(n: Int): IndexedSeq[String] = {
+      require(n >= 0, "n must not be negative")
       val alphabet = s.split("").filterNot(_.isEmpty).toIndexedSeq
-
-      Iterable.fill(n)(alphabet) reduceLeft { (a, b) => for (a <- a; b <- b) yield a + b }
+      if (alphabet.isEmpty || n == 0) IndexedSeq.empty[String]
+      else Iterable.fill(n)(alphabet) reduceLeft { (a, b) => for (a <- a; b <- b) yield a + b }
     }
 
     /**
@@ -51,6 +53,7 @@ object Implicits {
      * @return the padded string.
      */
     def padLeft(length: Int, ch: Char) = {
+      require(length >= 0, "length must not be negative")
       val sb = new StringBuilder(length)
       (1 to length - s.length).foreach { i => sb.append(ch) }
       sb.append(s).toString()
@@ -100,10 +103,14 @@ object Implicits {
      * @return a new sequence of `n` subsequences of this sequence.
      */
     def split(n: Int): IndexedSeq[Seq[T]] = {
-      val q = seq.length / n
-      val r = seq.length % n
-      val indices = for (i <- 0 to n) yield q * i + math.min(i, r)
-      for (i <- 0 until n) yield seq.slice(indices(i), indices(i + 1))
+      require(n >= 0, "n must not be negative")
+      if (n == 0) IndexedSeq.empty
+      else {
+        val q = seq.length / n
+        val r = seq.length % n
+        val indices = for (i <- 0 to n) yield q * i + math.min(i, r)
+        for (i <- 0 until n) yield seq.slice(indices(i), indices(i + 1))
+      }
     }
 
     /**
@@ -114,8 +121,10 @@ object Implicits {
      * @return a subsequence of this sequence based on a percentage of the total
      *         number of elements.
      */
-    def sample(percentage: Double): Seq[T] =
+    def sample(percentage: Double): Seq[T] = {
+      require(percentage >= 0 && percentage <= 1, "percentage must be in [0, 1]")
       seq.take((seq.length * percentage).toInt)
+    }
 
     /**
      * Returns a set containing the n smallest elements of this sequence

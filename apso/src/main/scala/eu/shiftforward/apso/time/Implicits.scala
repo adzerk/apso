@@ -90,7 +90,7 @@ object Implicits {
      * @return `true` if this `DateTime` is in the range between the two given
      *         `DateTimes`, `false` otherwise.
      */
-    def between(dStart: DateTime, dEnd: DateTime) = isSameDay(dStart) || isSameDay(dEnd) || dStart < d1 && d1 < dEnd
+    def between(dStart: DateTime, dEnd: DateTime) = dStart < d1 && d1 < dEnd
 
     /**
      * Returns an iterable interval starting at this `DateTime` (inclusive) and
@@ -115,8 +115,12 @@ object Implicits {
      *         interval in `n` equal parts.
      */
     def split(n: Int): Seq[ReadableInterval] = {
-      val q = (interval.millis / n).toInt
-      (0 until n).map { i => (interval.getStart + q * i) to (interval.getStart + q * (i + 1)) }
+      require(n >= 0, "n must not be negative")
+      if (n == 0) Seq.empty
+      else {
+        val q = (interval.millis / n).toInt
+        (0 until n).map { i => (interval.getStart + q * i + i) to (interval.getStart + q * (i + 1) + i) }
+      }
     }
   }
 

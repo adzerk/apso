@@ -1,15 +1,89 @@
 package eu.shiftforward.apso
 
-import eu.shiftforward.apso.Implicits._
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.concurrent.duration._
+import scala.util.{ Random, Try }
+
+import org.scalacheck.Arbitrary._
+import org.scalacheck.Gen._
+import org.specs2.ScalaCheck
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mutable._
-import org.specs2.ScalaCheck
-import scala.concurrent.Future
-import scala.util.Random
+
+import eu.shiftforward.apso.Implicits._
 
 class ImplicitsSpec(implicit env: ExecutionEnv) extends Specification with ScalaCheck with FutureExtraMatchers {
 
+  "An ApsoAny" should {
+
+    "wrap itself as a Some" in {
+      1.some === Some(1)
+      "A".some === Some("A")
+      List(1, 2, 3).some === Some(List(1, 2, 3))
+    }
+
+  }
+
+  "An ApsoString" should {
+
+    "enumerate all strings of a given length using the inner string alphabet" in {
+      "".enumerate(-1) must throwAn[IllegalArgumentException]
+      "".enumerate(0) must beEmpty
+      "".enumerate(5) must beEmpty
+      "aba".enumerate(0) must beEmpty
+      "aba".enumerate(1).toSet === Set("a", "b")
+      "aba".enumerate(3).toSet === Set("aaa", "aab", "aba", "abb", "baa", "bab", "bba", "bbb")
+    }
+
+    "pad a string with a certain character to the left" in {
+      "".padLeft(-1, ' ') must throwAn[IllegalArgumentException]
+      "".padLeft(0, ' ') === ""
+      "".padLeft(3, ' ') === "   "
+      "".padLeft(3, 'x') === "xxx"
+      "abc".padLeft(0, ' ') === "abc"
+      "abc".padLeft(1, ' ') === "abc"
+      "abc".padLeft(6, ' ') === "   abc"
+      "abc".padLeft(6, 'x') === "xxxabc"
+    }
+
+    "return itself as a null-terminated byte array" in {
+      val emptyString = "".getBytesWithNullTerminator
+      emptyString.length === 1
+      emptyString(0) === 0.toByte
+      val normalString = "abc".getBytesWithNullTerminator
+      normalString.length === 4
+      normalString(0) === 'a'.toByte
+      normalString(1) === 'b'.toByte
+      normalString(2) === 'c'.toByte
+      normalString(3) === 0.toByte
+    }
+
+  }
+
   "An ApsoSeq" should {
+
+    "split itself into subsequences" in {
+      List.empty.split(3) === Vector(Nil, Nil, Nil)
+      List(1, 2, 3, 4).split(-1) must throwAn[IllegalArgumentException]
+      List(1, 2, 3, 4).split(0) must beEmpty
+      List(1, 2, 3, 4).split(1) === Vector(List(1, 2, 3, 4))
+      List(1, 2, 3, 4).split(2) === Vector(List(1, 2), List(3, 4))
+      List(1, 2, 3, 4).split(3) === Vector(List(1, 2), List(3), List(4))
+      List(1, 2, 3, 4).split(4) === Vector(List(1), List(2), List(3), List(4))
+      List(1, 2, 3, 4).split(5) === Vector(List(1), List(2), List(3), List(4), Nil)
+    }
+
+    "sample a percentage of itself" ! prop {
+      (list: List[Int], percentage: Double) =>
+        if (percentage < 0.0 || percentage > 1.0) {
+          Try(list.sample(percentage)).isFailure
+        } else {
+          val sample = list.sample(percentage)
+          sample.size == list.size * percentage
+          sample.toSet.subsetOf(list.toSet)
+        }
+    }.setGen2(frequency(4 -> choose(0.0, 1.0), 1 -> arbDouble.arbitrary))
 
     "merge two sorted collections" in {
       List(1, 5, 6).mergeSorted[Int, List[Int]](List.empty[Int]) === List(1, 5, 6)

@@ -3,6 +3,7 @@ package eu.shiftforward.apso.json
 import java.net.URI
 
 import scala.concurrent.duration._
+import scala.util.Try
 
 import com.github.nscala_time.time.Imports._
 import com.typesafe.config.{ Config, ConfigFactory, ConfigRenderOptions }
@@ -80,7 +81,8 @@ trait ExtraHttpJsonProtocol {
     def write(uri: URI) = JsString(uri.toString)
 
     def read(json: JsValue) = json match {
-      case JsString(uri) => new URI(uri)
+      case JsString(uri) =>
+        Try(new URI(uri)).getOrElse(deserializationError("Invalid URI: " + uri))
       case other => deserializationError("Expected String with URI, got: " + other)
     }
   }
@@ -89,7 +91,11 @@ trait ExtraHttpJsonProtocol {
 trait ExtraMiscJsonProtocol {
   implicit object ConfigJsonFormat extends JsonFormat[Config] {
     def write(conf: Config): JsValue = conf.root.render(ConfigRenderOptions.concise()).parseJson
-    def read(json: JsValue): Config = ConfigFactory.parseString(json.toString)
+    def read(json: JsValue): Config = try {
+      ConfigFactory.parseString(json.toString)
+    } catch {
+      case t: Throwable => deserializationError("Could not parse config: " + json, t)
+    }
   }
 
   implicit object DateTimeFormat extends JsonFormat[DateTime] {
