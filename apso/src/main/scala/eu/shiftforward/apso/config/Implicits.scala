@@ -275,25 +275,10 @@ object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
      * @tparam T the return type of the Map
      * @return the Map value
      */
-    def toMap[T](implicit configReader: ConfigReader[T]): Map[String, T] = {
-      // config key strings are different between `conf.root.entrySet` and `conf.entrySet()`
-      val unwrappedSet = conf.root.entrySet().map(e => e.getKey -> e.getValue)
-      val wrappedSet = conf.entrySet().map(e => e.getKey -> e.getValue)
-
-      unwrappedSet.flatMap {
-        case (k, v) =>
-          v match {
-            case obj: ConfigObject => obj.toConfig().toMap(configReader).map {
-              case (nk, nv) =>
-                (k + "." + nk) -> nv
-            }
-            case nv =>
-              Set(k ->
-                configReader(conf, wrappedSet.find(_._2 == nv).getOrElse(
-                  throw new IllegalStateException(s"Key '$k' not found!"))._1))
-          }
-      }.toMap
-    }
+    def toMap[T](implicit configReader: ConfigReader[T]): Map[String, T] =
+      (for (
+        entry <- conf.entrySet()
+      ) yield (entry.getKey, configReader(conf, entry.getKey))).toMap
 
     /**
      * Converts the config into a Map[String, Config]
