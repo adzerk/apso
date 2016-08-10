@@ -243,7 +243,7 @@ class ConfigImplicitsSpec extends Specification {
       config.getListOption("f") must throwAn[Exception]
     }
 
-    "allow extracting configurations returnin a map" in {
+    "allow extracting configurations returning a map" in {
       config.getMap[String]("map") must beEqualTo(Map("k1" -> "v1", "k2" -> "v2"))
       config.getMap[Int]("num-map") must beEqualTo(Map("k1" -> 1, "k2" -> 2))
       config.getMap[String]("map-escape") must beEqualTo(
