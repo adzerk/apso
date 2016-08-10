@@ -63,6 +63,9 @@ class ConfigImplicitsSpec extends Specification {
             b {
               "\ne" = "4"
               f = "7"
+              "weird!$%" {
+                "eml!hash" = 7
+              }
             }
             c = "5"
           }
@@ -247,9 +250,9 @@ class ConfigImplicitsSpec extends Specification {
       config.getMap[String]("map") must beEqualTo(Map("k1" -> "v1", "k2" -> "v2"))
       config.getMap[Int]("num-map") must beEqualTo(Map("k1" -> 1, "k2" -> 2))
       config.getMap[String]("map-escape") must beEqualTo(
-        Map("a" -> "a", "(a,{} b. c)" -> "abc", "x{}" -> "abc", "_()#..!" -> "a"))
+        Map("a" -> "a", "\"(a,{} b. c)\"" -> "abc", "\"x{}\"" -> "abc", "\"_()#..!\"" -> "a"))
       config.getMap[String]("map-nested") must beEqualTo(
-        Map("a.b.\ne" -> "4", "a.b.f" -> "7", "a.c" -> "5", "d" -> "6"))
+        Map("""a.b."\ne"""" -> "4", "a.b.f" -> "7", "a.c" -> "5", "d" -> "6", """a.b."weird!$%"."eml!hash"""" -> "7"))
     }
 
     "allow extracting configurations returning an option of a map" in {
@@ -286,6 +289,19 @@ class ConfigImplicitsSpec extends Specification {
 
       config.getConfigMapOption("map0") must beNone
       config.getConfigMapOption("config") must beSome.which { _("map").getString("kx1") === "vx1" }
+    }
+
+    "allow converting configurations into a map with keys that are valid paths" in {
+      val confNested = config.getConfig("map-nested")
+      forall(confNested.toMap[Unit].keys) { k =>
+        confNested.hasPath(k) must not(throwA[ConfigException])
+        confNested.hasPath(k) must beTrue
+      }
+      val confEscape = config.getConfig("map-escape")
+      forall(confEscape.toMap[Unit].keys) { k =>
+        confEscape.hasPath(k) must not(throwA[ConfigException])
+        confEscape.hasPath(k) must beTrue
+      }
     }
 
   }
