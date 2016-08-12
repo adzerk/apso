@@ -251,21 +251,36 @@ class ConfigImplicitsSpec extends Specification {
       config.getMap[Int]("num-map") must beEqualTo(Map("k1" -> 1, "k2" -> 2))
       config.getMap[String]("map-escape") must beEqualTo(
         Map("a" -> "a", "\"(a,{} b. c)\"" -> "abc", "\"x{}\"" -> "abc", "\"_()#..!\"" -> "a"))
-      config.getMap[String]("map-nested") must beEqualTo(
+      config.getFlattenedMap[String]("map-nested") must beEqualTo(
         Map("""a.b."\ne"""" -> "4", "a.b.f" -> "7", "a.c" -> "5", "d" -> "6", """a.b."weird!$%"."eml!hash"""" -> "7"))
+
+      val confEscape = config.getConfig("map-escape")
+      val mapEscape = confEscape.toMap[String]
+      forall(mapEscape.keys) { k =>
+        confEscape.hasPath(k) must not(throwA[ConfigException])
+        confEscape.hasPath(k) must beTrue
+      }
+      mapEscape("a") must beEqualTo("a")
+      mapEscape("\"(a,{} b. c)\"") must beEqualTo("abc")
+
+      config.getConfig("map-nested").toMap[String] must throwA[ConfigException]
     }
 
     "allow extracting configurations returning an option of a map" in {
       config.getMapOption[String]("map") must beEqualTo(Some(Map("k1" -> "v1", "k2" -> "v2")))
       config.getMapOption[Int]("num-map") must beEqualTo(Some(Map("k1" -> 1, "k2" -> 2)))
-      config.getConfig("num-map").toMap[Int] must beEqualTo(Map("k1" -> 1, "k2" -> 2))
+      config.getConfig("num-map").toFlattenedMap[Int] must beEqualTo(Map("k1" -> 1, "k2" -> 2))
       config.getMapOption[String]("map0") must beNone
       config.getStringListOption("a") must throwAn[Exception]
     }
 
     "allow extracting configurations returning an option of a map of list of configs or something" in {
       config.getMapOption[List[Config]]("map0") must beNone
-      config.getMapOption[List[Config]]("list-map") must beSome.which {
+
+      val shallowMap = config.getMapOption[List[Config]]("list-map")
+      val deepMap = config.getFlattenedMapOption[List[Config]]("list-map")
+      shallowMap must beEqualTo(deepMap)
+      shallowMap must beSome.which {
         map: Map[String, List[Config]] =>
           map.get("k1") must beSome.which { configs =>
             configs.map(_.getString("v")) must beEqualTo(List("v1", "v2"))
@@ -293,12 +308,16 @@ class ConfigImplicitsSpec extends Specification {
 
     "allow converting configurations into a map with keys that are valid paths" in {
       val confNested = config.getConfig("map-nested")
-      forall(confNested.toMap[Unit].keys) { k =>
+      forall(confNested.toFlattenedMap[Unit].keys) { k =>
         confNested.hasPath(k) must not(throwA[ConfigException])
         confNested.hasPath(k) must beTrue
       }
       val confEscape = config.getConfig("map-escape")
-      forall(confEscape.toMap[Unit].keys) { k =>
+      forall(confEscape.toFlattenedMap[String].keys) { k =>
+        confEscape.hasPath(k) must not(throwA[ConfigException])
+        confEscape.hasPath(k) must beTrue
+      }
+      forall(confEscape.toMap[String].keys) { k =>
         confEscape.hasPath(k) must not(throwA[ConfigException])
         confEscape.hasPath(k) must beTrue
       }
