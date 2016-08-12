@@ -222,6 +222,16 @@ object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
       extractOption(conf, path, _.getMap[T](_))
 
     /**
+     * Gets the value as a deep flattened Map[String, T] wrapped in a `Some` if it is defined and `None` if not.
+     *
+     * @param path the path in the config
+     * @tparam T the return type of the Map
+     * @return the Map wrapped in a `Some` if one is defined and `None` if not
+     */
+    def getFlattenedMapOption[T](path: String)(implicit configReader: ConfigReader[T]): Option[Map[String, T]] =
+      extractOption(conf, path, _.getFlattenedMap[T](_))
+
+    /**
      * Gets the value as a Map[String, T]
      *
      * @param path the path in the config
@@ -229,6 +239,16 @@ object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
      * @return the Map value
      */
     def getMap[T](path: String)(implicit configReader: ConfigReader[T]): Map[String, T] = conf.getConfig(path).toMap[T]
+
+    /**
+     * Gets the value as a deep flattened Map[String, T]
+     *
+     * @param path the path in the config
+     * @tparam T the return type of the Map
+     * @return the Map value
+     */
+    def getFlattenedMap[T](path: String)(implicit configReader: ConfigReader[T]): Map[String, T] =
+      conf.getConfig(path).toFlattenedMap[T]
 
     /**
      * Gets the value as a Map[String, Config] wrapped in a `Some` if it is defined and `None` if not.
@@ -274,25 +294,25 @@ object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
      *
      * @tparam T the return type of the Map
      * @return the Map value
+     * @throws ConfigException if the value cannot be read as type `T`
      */
     def toMap[T](implicit configReader: ConfigReader[T]): Map[String, T] = {
-      // config key strings are different between `conf.root.entrySet` and `conf.entrySet()`
-      val unwrappedSet = conf.root.entrySet().map(e => e.getKey -> e.getValue)
-      val wrappedSet = conf.entrySet().map(e => e.getKey -> e.getValue)
-
-      unwrappedSet.flatMap {
-        case (k, v) =>
-          v match {
-            case obj: ConfigObject => obj.toConfig().toMap(configReader).map {
-              case (nk, nv) =>
-                (k + "." + nk) -> nv
-            }
-            case nv =>
-              Set(k ->
-                configReader(conf, wrappedSet.find(_._2 == nv).getOrElse(
-                  throw new IllegalStateException(s"Key '$k' not found!"))._1))
-          }
+      conf.root.keySet().map { k =>
+        val quotedKey = ConfigUtil.joinPath(k)
+        quotedKey -> configReader(conf, quotedKey)
       }.toMap
+    }
+
+    /**
+     * Converts the config into a Map[String, T] with all the config keys flattened into one.
+     *
+     * @tparam T the return type of the Map
+     * @return the Map value
+     */
+    def toFlattenedMap[T](implicit configReader: ConfigReader[T]): Map[String, T] = {
+      (for (
+        entry <- conf.entrySet()
+      ) yield (entry.getKey, configReader(conf, entry.getKey))).toMap
     }
 
     /**
