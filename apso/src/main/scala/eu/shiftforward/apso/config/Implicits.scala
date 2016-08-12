@@ -222,6 +222,16 @@ object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
       extractOption(conf, path, _.getMap[T](_))
 
     /**
+     * Gets the value as a deep flattened Map[String, T] wrapped in a `Some` if it is defined and `None` if not.
+     *
+     * @param path the path in the config
+     * @tparam T the return type of the Map
+     * @return the Map wrapped in a `Some` if one is defined and `None` if not
+     */
+    def getFlattenedMapOption[T](path: String)(implicit configReader: ConfigReader[T]): Option[Map[String, T]] =
+      extractOption(conf, path, _.getFlattenedMap[T](_))
+
+    /**
      * Gets the value as a Map[String, T]
      *
      * @param path the path in the config
@@ -229,6 +239,16 @@ object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
      * @return the Map value
      */
     def getMap[T](path: String)(implicit configReader: ConfigReader[T]): Map[String, T] = conf.getConfig(path).toMap[T]
+
+    /**
+     * Gets the value as a deep flattened Map[String, T]
+     *
+     * @param path the path in the config
+     * @tparam T the return type of the Map
+     * @return the Map value
+     */
+    def getFlattenedMap[T](path: String)(implicit configReader: ConfigReader[T]): Map[String, T] =
+      conf.getConfig(path).toFlattenedMap[T]
 
     /**
      * Gets the value as a Map[String, Config] wrapped in a `Some` if it is defined and `None` if not.
@@ -274,11 +294,26 @@ object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
      *
      * @tparam T the return type of the Map
      * @return the Map value
+     * @throws ConfigException if the value cannot be read as type `T`
      */
-    def toMap[T](implicit configReader: ConfigReader[T]): Map[String, T] =
+    def toMap[T](implicit configReader: ConfigReader[T]): Map[String, T] = {
+      conf.root.keySet().map { k =>
+        val quotedKey = ConfigUtil.joinPath(k)
+        quotedKey -> configReader(conf, quotedKey)
+      }.toMap
+    }
+
+    /**
+     * Converts the config into a Map[String, T] with all the config keys flattened into one.
+     *
+     * @tparam T the return type of the Map
+     * @return the Map value
+     */
+    def toFlattenedMap[T](implicit configReader: ConfigReader[T]): Map[String, T] = {
       (for (
         entry <- conf.entrySet()
       ) yield (entry.getKey, configReader(conf, entry.getKey))).toMap
+    }
 
     /**
      * Converts the config into a Map[String, Config]

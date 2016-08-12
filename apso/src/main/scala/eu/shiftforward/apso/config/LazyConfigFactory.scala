@@ -170,7 +170,7 @@ object LazyConfigFactory {
   }
 
   private[this] class WithSettingsBuilder(baseConfig: Config, settings: Config) extends Builder {
-    val validationProblems = settings.toMap[Unit].keys.toSeq.collect {
+    val validationProblems = settings.toFlattenedMap[Unit].keys.toSeq.collect {
       case path if baseConfig.hasPath(path) =>
         new ConfigException.ValidationProblem(path, settings.origin(),
           "Settings added with .withSettings() must not override existing ones")
