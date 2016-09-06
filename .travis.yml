@@ -7,6 +7,9 @@ script:
   - sbt ++$TRAVIS_SCALA_VERSION clean coverage test
 after_success:
   - sbt ++$TRAVIS_SCALA_VERSION coverageReport coverageAggregate coveralls
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+      sbt ++$TRAVIS_SCALA_VERSION publish;
+      fi
 cache:
   directories:
     - $HOME/.ivy2/cache
