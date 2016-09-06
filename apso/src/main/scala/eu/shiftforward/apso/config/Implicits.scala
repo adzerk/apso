@@ -2,6 +2,7 @@ package eu.shiftforward.apso.config
 
 import com.typesafe.config._
 import com.github.nscala_time.time.Imports.{ Duration => _, _ }
+import pureconfig._
 
 import scala.annotation.implicitNotFound
 import scala.concurrent.duration._
@@ -328,8 +329,10 @@ object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
         value <- Try(conf.getConfig(key)).toOption
       } yield { key -> value }).toMap
     }
-  }
 
+    def to[T: ConfigConvert]: Try[T] =
+      loadConfig[T](conf)
+  }
 }
 
 /**
