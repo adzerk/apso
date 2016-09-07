@@ -152,6 +152,23 @@ class S3Bucket(val bucketName: String,
   }.isDefined
 
   /**
+   * Pushes a given `InputStream` to the location specified by `key` in the bucket.
+   *
+   * @param key the remote pathname for the file
+   * @param inputStream the `InputStream` to push
+   * @param length the content lenght (setting this to `None` can impact performance
+   * @return true if the push was successful, false otherwise.
+   */
+  def push(key: String, inputStream: InputStream, length: Option[Long]): Boolean = retry {
+    log.info("Pushing to 's3://{}/{}'", bucketName: Any, key: Any)
+    val metadata = new ObjectMetadata()
+    length.foreach(metadata.setContentLength)
+    transferManager
+      .upload(new PutObjectRequest(bucketName, sanitizeKey(key), inputStream, metadata))
+      .waitForUploadResult()
+  }.isDefined
+
+  /**
    * Deletes the file in the location specified by `key` in the bucket.
    *
    * @param key the remote pathname for the file

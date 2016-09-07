@@ -1,12 +1,14 @@
 package eu.shiftforward.apso.io
 
+import java.io.InputStream
+
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.s3.model.S3ObjectSummary
 import com.typesafe.config.Config
-import eu.shiftforward.apso.Logging
-import eu.shiftforward.apso.aws.{ SerializableAWSCredentials, S3Bucket }
-import eu.shiftforward.apso.config.FileDescriptorCredentials
 
+import eu.shiftforward.apso.Logging
+import eu.shiftforward.apso.aws.{ S3Bucket, SerializableAWSCredentials }
+import eu.shiftforward.apso.config.FileDescriptorCredentials
 import scala.collection.concurrent.TrieMap
 
 case class S3FileDescriptor(bucket: S3Bucket,
@@ -55,6 +57,14 @@ case class S3FileDescriptor(bucket: S3Bucket,
       throw new Exception("File descriptor points to a directory")
     } else {
       bucket.push(builtPath, localTarget.file)
+    }
+  }
+
+  def upload(inputStream: InputStream, length: Option[Long]): Boolean = {
+    if (isDirectory) {
+      throw new Exception("File descriptor points to a directory")
+    } else {
+      bucket.push(builtPath, inputStream, length)
     }
   }
 

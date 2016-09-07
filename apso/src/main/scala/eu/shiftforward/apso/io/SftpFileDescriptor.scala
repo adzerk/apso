@@ -1,12 +1,14 @@
 package eu.shiftforward.apso.io
 
 import com.typesafe.config.{ Config, ConfigFactory }
+
 import eu.shiftforward.apso.Logging
 import eu.shiftforward.apso.config.FileDescriptorCredentials
 import eu.shiftforward.apso.config.Implicits._
 import io.github.andrebeat.pool.Pool
-import java.io.{ InputStream, IOException, File, FileNotFoundException }
+import java.io.{ File, FileNotFoundException, IOException, InputStream }
 import java.util.concurrent.ConcurrentHashMap
+
 import net.schmizz.sshj._
 import net.schmizz.sshj.common.SSHException
 import net.schmizz.sshj.sftp.{ FileAttributes, FileMode, Response, SFTPClient, SFTPException }
@@ -14,6 +16,8 @@ import net.schmizz.sshj.transport.verification._
 import net.schmizz.sshj.xfer.scp.SCPFileTransfer
 import scala.collection.JavaConverters._
 import scala.util.{ Properties, Try }
+
+import net.schmizz.sshj.xfer.InMemorySourceFile
 
 /**
  * A `FileDescriptor` for files served over SFTP. This file descriptor only supports absolute paths.
@@ -151,6 +155,21 @@ case class SftpFileDescriptor(
 
     parent().mkdirs() &&
       Try(sftp(_.put(localTarget.path, path))).isSuccess
+  }
+
+  def upload(inputStream: InputStream, length: Option[Long]): Boolean = {
+    require(!exists || !isDirectory, s"Remote file descriptor can't point to a directory: ${this.path}")
+
+    log.info("Uploading to '{}'", toString)
+
+    val sourceFile = new InMemorySourceFile {
+      override def getLength: Long = length.getOrElse(0)
+      override val getName: String = elements.last
+      override val getInputStream: InputStream = inputStream
+    }
+
+    parent().mkdirs() &&
+      Try(sftp(_.put(sourceFile, path))).isSuccess
   }
 
   def stream() = new InputStream {
