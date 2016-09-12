@@ -56,4 +56,12 @@ trait ActorMatchers extends SpecificationLike {
   def receiveAllOf(max: FiniteDuration, msg: Any*): Matcher[TestKitBase] = { probe: TestKitBase =>
     probe.expectMsgAllOf(max, msg: _*) must not(throwAn[Exception])
   }
+
+  def receiveAllOfInOrder(msgList: Any*): Matcher[TestKitBase] = { probe: TestKitBase =>
+    msgList.foreach { msg => probe.expectMsg(msg) } must not(throwAn[Exception])
+  }
+
+  def receiveAllOfInOrder(max: FiniteDuration, msgList: Any*): Matcher[TestKitBase] = { probe: TestKitBase =>
+    msgList.foreach { msg => probe.expectMsg(max, msg) } must not(throwAn[Exception])
+  }
 }
