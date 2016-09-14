@@ -323,11 +323,5 @@ class ConfigImplicitsSpec extends Specification {
         confEscape.hasPath(k) must beTrue
       }
     }
-
-    "allow converting configurations into type which have the ConfigConvert typeclass" in {
-      case class Foo(k1: String, k2: String)
-      config.getConfig("map").to[Foo] must beSuccessfulTry.withValue(Foo("v1", "v2"))
-      config.getConfig("map").to[Map[String, String]] must beSuccessfulTry.withValue(Map("k1" -> "v1", "k2" -> "v2"))
-    }
   }
 }

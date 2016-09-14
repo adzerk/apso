@@ -20,7 +20,6 @@ object ProjectBuild extends Build {
       "com.amazonaws"                  % "aws-java-sdk-ec2"          % "1.11.27"        % "provided",
       "com.amazonaws"                  % "aws-java-sdk-s3"           % "1.11.27"        % "provided",
       "com.chuusai"                   %% "shapeless"                 % "2.3.1",
-      "com.github.melrief"            %% "pureconfig"                % "0.2.2",
       "com.github.nscala-time"        %% "nscala-time"               % "2.12.0"         % "provided",
       "com.hierynomus"                 % "sshj"                      % "0.17.2",
       "com.j256.simplejmx"             % "simplejmx"                 % "1.12",
