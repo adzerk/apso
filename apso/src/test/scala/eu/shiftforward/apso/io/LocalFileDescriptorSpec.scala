@@ -1,10 +1,10 @@
 package eu.shiftforward.apso.io
 
-import java.io.File
+import java.io.{ File, InputStream }
 import java.nio.file.Files
 import java.util.UUID
-import org.specs2.mutable.Specification
 
+import org.specs2.mutable.Specification
 import scala.io.Source
 import scala.util.Try
 
@@ -142,17 +142,34 @@ class LocalFileDescriptorSpec extends Specification {
     }
 
     "Upload file correctly to a file" in {
-      val fd1 = LocalFileDescriptor("/tmp") / randomFolder / randomString
-      val fd2 = LocalFileDescriptor("/tmp") / randomFolder / randomString
+      "From another file" in {
+        val fd1 = LocalFileDescriptor("/tmp") / randomFolder / randomString
+        val fd2 = LocalFileDescriptor("/tmp") / randomFolder / randomString
 
-      val file1 = fd1 / "one"
-      file1.write("hello world")
+        val file1 = fd1 / "one"
+        file1.write("hello world")
 
-      val file2 = fd2 / "two"
-      file2.exists must beFalse
+        val file2 = fd2 / "two"
+        file2.exists must beFalse
 
-      file2.upload(file1)
-      file2.readString must beEqualTo("hello world")
+        file2.upload(file1)
+        file2.readString must beEqualTo("hello world")
+      }
+
+      "From an InputStream" in {
+        val fd = LocalFileDescriptor("/tmp") / randomFolder / randomString
+
+        val inputStream = new InputStream {
+          val buffer = "hello world".iterator.map(_.toInt)
+          override def read(): Int = if (buffer.isEmpty) -1 else buffer.next()
+        }
+
+        val file = fd / "two"
+        file.exists must beFalse
+
+        file.upload(inputStream, None)
+        file.readString must beEqualTo("hello world")
+      }
     }
 
     "Do not upload file to a directory" in {

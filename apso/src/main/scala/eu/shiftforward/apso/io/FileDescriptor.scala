@@ -52,6 +52,16 @@ trait FileDescriptor {
   def upload(localTarget: LocalFileDescriptor): Boolean
 
   /**
+   * Uploads an input stream to this file's location.
+   * The target must point to a file.
+   *
+   * @param inputStream the input stream that should be uploaded.
+   * @param length the input stream length (leaving this as `None` can have performance implications)
+   * @return `true` if the upload was successful, `false` otherwise.
+   */
+  def upload(inputStream: InputStream, length: Option[Long]): Boolean
+
+  /**
    * Returns an input stream for the contents of this file.
    * @return an input stream for the contents of this file.
    */

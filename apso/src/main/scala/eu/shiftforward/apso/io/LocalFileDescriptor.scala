@@ -97,6 +97,25 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
     }
   }
 
+  def upload(inputStream: InputStream, length: Option[Long]): Boolean = {
+    if (isDirectory) {
+      throw new Exception("File descriptor points to a directory")
+    } else {
+
+      parent().mkdirs()
+
+      val result = Try(Files.copy(inputStream, normalizedPath,
+        StandardCopyOption.REPLACE_EXISTING))
+
+      result match {
+        case Success(_) =>
+        case Failure(ex) => log.warn("File copy failed ({})", ex.toString)
+      }
+
+      result.isSuccess
+    }
+  }
+
   def stream() = new FileInputStream(file)
 
   override def list: Iterator[LocalFileDescriptor] = {
