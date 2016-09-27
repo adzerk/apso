@@ -21,17 +21,22 @@ class ProxySupportSpec extends Specification with Specs2RouteTest with ProxySupp
     val (interface, port) = Utils.temporaryServerHostnameAndPort()
     Http().bindAndHandle(Flow.fromFunction(serverResponse), interface, port)
 
+    val proxy = new Proxy(interface, port)
+
     val routes = {
       // format: OFF
       (get | post) {
         path("get-path") {
           complete("get-reply")
         } ~
-        path("get-path-proxied") {
+        path("get-path-proxied-single") {
           proxySingleTo(Uri(s"http://$interface:$port/remote-proxy"))
         } ~
-        pathPrefix("get-path-proxied-unmatched") {
+        pathPrefix("get-path-proxied-single-unmatched") {
           proxySingleToUnmatchedPath(Uri(s"http://$interface:$port/remote-proxy"))
+        } ~
+        pathPrefix("get-path-proxied") {
+          proxy.proxyTo(Uri(s"http://$interface:$port/remote-proxy"))
         }
       }
       // format: ON
@@ -43,7 +48,41 @@ class ProxySupportSpec extends Specification with Specs2RouteTest with ProxySupp
 
   "A proxy support directive" should {
 
-    "proxy requests" in new MockServer {
+    "proxy single requests" in new MockServer {
+      Get("/get-path") ~> routes ~> check {
+        status == OK
+        responseAs[String] must be_==("get-reply")
+      }
+      Get("/get-path-proxied-single") ~> routes ~> check {
+        status == OK
+        responseAs[String] must be_==("/remote-proxy")
+      }
+      Post("/get-path-proxied-single") ~> routes ~> check {
+        status == OK
+        responseAs[String] must be_==("/remote-proxy")
+      }
+    }
+
+    "proxy single requests using unmatched path" in new MockServer {
+      Get("/get-path") ~> routes ~> check {
+        status == OK
+        responseAs[String] must be_==("get-reply")
+      }
+      Get("/get-path-proxied-single-unmatched/other/path/parts") ~> routes ~> check {
+        status == OK
+        responseAs[String] must be_==("/remote-proxy/other/path/parts")
+      }
+      Post("/get-path-proxied-single-unmatched/other/path/parts") ~> routes ~> check {
+        status == OK
+        responseAs[String] must be_==("/remote-proxy/other/path/parts")
+      }
+      Get("/get-path-proxied-single-unmatched/other/path/parts?foo=bar") ~> routes ~> check {
+        status == OK
+        responseAs[String] must be_==("/remote-proxy/other/path/parts?foo=bar")
+      }
+    }
+
+    "proxy requests using a dedicated Proxy object" in new MockServer {
       Get("/get-path") ~> routes ~> check {
         status == OK
         responseAs[String] must be_==("get-reply")
@@ -55,25 +94,6 @@ class ProxySupportSpec extends Specification with Specs2RouteTest with ProxySupp
       Post("/get-path-proxied") ~> routes ~> check {
         status == OK
         responseAs[String] must be_==("/remote-proxy")
-      }
-    }
-
-    "proxy requests using unmatched path" in new MockServer {
-      Get("/get-path") ~> routes ~> check {
-        status == OK
-        responseAs[String] must be_==("get-reply")
-      }
-      Get("/get-path-proxied-unmatched/other/path/parts") ~> routes ~> check {
-        status == OK
-        responseAs[String] must be_==("/remote-proxy/other/path/parts")
-      }
-      Post("/get-path-proxied-unmatched/other/path/parts") ~> routes ~> check {
-        status == OK
-        responseAs[String] must be_==("/remote-proxy/other/path/parts")
-      }
-      Get("/get-path-proxied-unmatched/other/path/parts?foo=bar") ~> routes ~> check {
-        status == OK
-        responseAs[String] must be_==("/remote-proxy/other/path/parts?foo=bar")
       }
     }
 
