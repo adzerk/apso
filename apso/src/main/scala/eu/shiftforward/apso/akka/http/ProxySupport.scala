@@ -99,21 +99,21 @@ trait ProxySupport extends ClientIPDirectives {
     }
   }
 
+  private[this] lazy val defaultQueueSize =
+    ConfigFactory.load.getInt("akka.http.host-connection-pool.max-open-requests")
+
   /**
    * A representation of a reverse proxy for a remote host. This class internally materializes a flow that is
    * continuously active and ready to route incoming requests.
    *
    * @param host the target host
    * @param port the target port
-   * @param customQueueSize the maximum size of the queue of pending backend requests
+   * @param reqQueueSize the maximum size of the queue of pending backend requests
    */
-  class Proxy(host: String, port: Int, customQueueSize: Option[Int] = None)(implicit system: ActorSystem, mat: Materializer)
+  class Proxy(host: String, port: Int, reqQueueSize: Int = defaultQueueSize)(implicit system: ActorSystem, mat: Materializer)
       extends Logging {
 
     import system.dispatcher
-
-    private[this] val reqQueueSize = customQueueSize.getOrElse(
-      ConfigFactory.load.getInt("akka.http.host-connection-pool.max-open-requests"))
 
     private[this] lazy val source = Source.queue[(HttpRequest, Promise[RouteResult])](
       reqQueueSize, OverflowStrategy.dropNew)
