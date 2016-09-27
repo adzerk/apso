@@ -13,6 +13,7 @@ import akka.http.scaladsl.server.{ Directive1, Route, RouteResult }
 import akka.stream.QueueOfferResult.{ Dropped, Enqueued, QueueClosed, Failure => OfferFailure }
 import akka.stream.scaladsl.{ Keep, Sink, Source }
 import akka.stream.{ Materializer, OverflowStrategy }
+import com.typesafe.config.ConfigFactory
 
 import eu.shiftforward.apso.Logging
 
@@ -104,12 +105,15 @@ trait ProxySupport extends ClientIPDirectives {
    *
    * @param host the target host
    * @param port the target port
-   * @param reqQueueSize the maximum size of the queue of pending backend requests
+   * @param customQueueSize the maximum size of the queue of pending backend requests
    */
-  class Proxy(host: String, port: Int, reqQueueSize: Int = 65536)(implicit system: ActorSystem, mat: Materializer)
+  class Proxy(host: String, port: Int, customQueueSize: Option[Int] = None)(implicit system: ActorSystem, mat: Materializer)
       extends Logging {
 
     import system.dispatcher
+
+    private[this] val reqQueueSize = customQueueSize.getOrElse(
+      ConfigFactory.load.getInt("akka.http.host-connection-pool.max-open-requests"))
 
     private[this] lazy val source = Source.queue[(HttpRequest, Promise[RouteResult])](
       reqQueueSize, OverflowStrategy.dropNew)
