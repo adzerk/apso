@@ -1,6 +1,6 @@
 <p align="center"><img src="https://raw.githubusercontent.com/ShiftForward/apso/master/apso.png"/></p>
 
-# Apso
+# Apso [![Build Status](https://travis-ci.org/ShiftForward/apso.svg?branch=master)](https://travis-ci.org/ShiftForward/apso) [![Maven Central](https://img.shields.io/maven-central/v/eu.shiftforward/apso_2.11.svg)](https://maven-badges.herokuapp.com/maven-central/eu.shiftforward/apso_2.11)
 
 Apso is ShiftForward's utilities library. It provides a series of useful methods.
 
