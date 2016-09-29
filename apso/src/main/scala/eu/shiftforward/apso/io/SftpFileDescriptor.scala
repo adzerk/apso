@@ -320,8 +320,14 @@ object SftpFileDescriptor {
     }
   }
 
-  def apply(host: String, port: Int, url: String, username: String, password: Option[String], identity: Option[Identity])(
-    implicit d: DummyImplicit): SftpFileDescriptor = {
+  def apply(
+    host: String,
+    port: Int,
+    url: String,
+    username: String,
+    password: Option[String],
+    identity: Option[Identity])(implicit d: DummyImplicit): SftpFileDescriptor = {
+
     val (_, _, path) = splitMeta(url)
 
     val elements =
@@ -334,9 +340,15 @@ object SftpFileDescriptor {
     SftpFileDescriptor(host, port, username, password, elements, identity)
   }
 
-  def apply(host: String, port: Int, url: String, username: String, password: Option[String])(
-    implicit d: DummyImplicit): SftpFileDescriptor =
+  def apply(
+    host: String,
+    port: Int,
+    url: String,
+    username: String,
+    password: Option[String])(implicit d: DummyImplicit): SftpFileDescriptor = {
+
     apply(host, port, url, username, password, None)
+  }
 
   def apply(url: String, credentials: Option[(String, String, Either[Identity, String])]): SftpFileDescriptor = {
     val creds = credentials.getOrElse(throw new IllegalArgumentException(s"No credentials found."))

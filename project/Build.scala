@@ -1,7 +1,6 @@
-import sbt._
+import com.typesafe.sbt.SbtScalariform.autoImport._
 import sbt.Keys._
-import com.typesafe.sbt.SbtScalariform
-import com.typesafe.sbt.SbtScalariform.ScalariformKeys
+import sbt._
 import scalariform.formatter.preferences._
 
 object ProjectBuild extends Build {
@@ -17,15 +16,15 @@ object ProjectBuild extends Build {
     .settings(publishSettings: _*)
     .settings(apsoSettings: _*)
     .settings(libraryDependencies ++= Seq(
-      "com.amazonaws"                  % "aws-java-sdk-ec2"          % "1.11.27"        % "provided",
-      "com.amazonaws"                  % "aws-java-sdk-s3"           % "1.11.27"        % "provided",
-      "com.chuusai"                   %% "shapeless"                 % "2.3.1",
-      "com.github.nscala-time"        %% "nscala-time"               % "2.12.0"         % "provided",
+      "com.amazonaws"                  % "aws-java-sdk-ec2"          % "1.11.38"        % "provided",
+      "com.amazonaws"                  % "aws-java-sdk-s3"           % "1.11.38"        % "provided",
+      "com.chuusai"                   %% "shapeless"                 % "2.3.2",
+      "com.github.nscala-time"        %% "nscala-time"               % "2.14.0"         % "provided",
       "com.hierynomus"                 % "sshj"                      % "0.17.2",
       "com.j256.simplejmx"             % "simplejmx"                 % "1.12",
       "com.jcraft"                     % "jzlib"                     % "1.1.3",
       "com.twmacinta"                  % "fast-md5"                  % "2.7.1",
-      "com.typesafe"                   % "config"                    % "1.3.0"          % "provided",
+      "com.typesafe"                   % "config"                    % "1.3.1"          % "provided",
       "com.typesafe.akka"             %% "akka-actor"                % "2.4.10"         % "provided",
       "com.typesafe.akka"             %% "akka-http-experimental"    % "2.4.10"         % "provided",
       "io.github.andrebeat"           %% "scala-pool"                % "0.3.0",
@@ -34,17 +33,17 @@ object ProjectBuild extends Build {
       "io.spray"                      %% "spray-json"                % "1.3.2"          % "provided",
       "io.spray"                      %% "spray-routing-shapeless2"  % "1.3.3"          % "provided",
       "net.databinder.dispatch"       %% "dispatch-core"             % "0.11.3",
-      "org.bouncycastle"               % "bcpkix-jdk15on"            % "1.54",
-      "org.bouncycastle"               % "bcprov-jdk15on"            % "1.54",
-      "org.scalaz"                    %% "scalaz-core"               % "7.2.5"          % "provided",
+      "org.bouncycastle"               % "bcpkix-jdk15on"            % "1.55",
+      "org.bouncycastle"               % "bcprov-jdk15on"            % "1.55",
+      "org.scalaz"                    %% "scalaz-core"               % "7.2.6"          % "provided",
       "org.slf4j"                      % "slf4j-api"                 % "1.7.21",
       "com.typesafe.akka"             %% "akka-http-testkit"         % "2.4.10"         % "test",
       "io.spray"                      %% "spray-testkit"             % "1.3.3"          % "test",
       "junit"                          % "junit"                     % "4.12"           % "test",
       "org.scalacheck"                %% "scalacheck"                % "1.13.2"         % "test",
-      "org.specs2"                    %% "specs2-core"               % "3.8.4"          % "test",
-      "org.specs2"                    %% "specs2-scalacheck"         % "3.8.4"          % "test",
-      "org.specs2"                    %% "specs2-junit"              % "3.8.4"          % "test"))
+      "org.specs2"                    %% "specs2-core"               % "3.8.5"          % "test",
+      "org.specs2"                    %% "specs2-scalacheck"         % "3.8.5"          % "test",
+      "org.specs2"                    %% "specs2-junit"              % "3.8.5"          % "test"))
 
   lazy val apsoTestkit = Project("apso-testkit", file("apso-testkit"))
     .settings(commonSettings: _*)
@@ -54,8 +53,8 @@ object ProjectBuild extends Build {
       "com.typesafe.akka"             %% "akka-testkit"       % "2.4.10"         % "provided",
       "com.typesafe.akka"             %% "akka-http-testkit"  % "2.4.10"         % "provided",
       "org.slf4j"                      % "slf4j-api"          % "1.7.21",
-      "org.specs2"                    %% "specs2-core"        % "3.8.4"          % "provided",
-      "org.specs2"                    %% "specs2-junit"       % "3.8.4"          % "provided"
+      "org.specs2"                    %% "specs2-core"        % "3.8.5"          % "provided",
+      "org.specs2"                    %% "specs2-junit"       % "3.8.5"          % "provided"
   ))
 
   lazy val commonSettings = Defaults.coreDefaultSettings ++ formatSettings ++ Seq(
@@ -64,11 +63,12 @@ object ProjectBuild extends Build {
     scalaVersion := "2.11.8",
 
     resolvers ++= Seq(
-      "Sonatype Repository"           at "http://oss.sonatype.org/content/repositories/releases",
-      "Sonatype Snapshots Repository" at "http://oss.sonatype.org/content/repositories/snapshots",
+      Resolver.sonatypeRepo("releases"),
+      Resolver.sonatypeRepo("snapshots"),
+      Resolver.typesafeRepo("releases"),
+      Resolver.typesafeRepo("snapshots"),
       "Spray Repository"              at "http://repo.spray.io/",
       "Bintray Scalaz Releases"       at "http://dl.bintray.com/scalaz/releases",
-      "Typesafe Repository"           at "http://repo.typesafe.com/typesafe/releases/",
       "JCenter Repository"            at "http://jcenter.bintray.com/",
       "JAnalyse Repository"           at "http://www.janalyse.fr/repository/"),
 
@@ -87,14 +87,10 @@ object ProjectBuild extends Build {
 
   lazy val apsoTestkitSettings = Nil
 
-  lazy val formatSettings = SbtScalariform.scalariformSettings ++ Seq(
-    ScalariformKeys.preferences in Compile := formattingPreferences,
-    ScalariformKeys.preferences in Test := formattingPreferences)
-
-  def formattingPreferences =
-    FormattingPreferences()
-      .setPreference(AlignParameters, true)
-      .setPreference(DoubleIndentClassDeclaration, true)
+  lazy val formatSettings = Seq(
+    scalariformPreferences := scalariformPreferences.value
+      .setPreference(DanglingCloseParenthesis, Prevent)
+      .setPreference(DoubleIndentClassDeclaration, true))
 
   lazy val publishSettings = Seq(
     publishTo <<= version { (v: String) =>
@@ -108,7 +104,7 @@ object ProjectBuild extends Build {
     licenses := Seq("Apache License, Version 2.0" ->
       url("http://www.apache.org/licenses/LICENSE-2.0")),
     homepage := Some(url("https://github.com/ShiftForward/apso")),
-    pomExtra := (
+    pomExtra :=
       <scm>
         <url>https://github.com/ShiftForward/apso.git</url>
         <connection>scm:git:git@github.com:ShiftForward/apso.git</connection>
@@ -170,7 +166,7 @@ object ProjectBuild extends Build {
             <role>developer</role>
           </roles>
         </developer>
-      </developers>))
+      </developers>)
 
   lazy val noPublishing = Seq(
     publish := (),

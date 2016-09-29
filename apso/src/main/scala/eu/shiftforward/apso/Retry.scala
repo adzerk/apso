@@ -17,8 +17,10 @@ object Retry {
    * @tparam T the type of what the future completes with
    * @return the resulting `f` function
    */
-  def apply[T](maxRetries: Int = 10,
-               inBetweenSleep: Option[Long] = Some(100))(f: => Future[T])(implicit ec: ExecutionContext): Future[T] = {
+  def apply[T](
+    maxRetries: Int = 10,
+    inBetweenSleep: Option[Long] = Some(100))(f: => Future[T])(implicit ec: ExecutionContext): Future[T] = {
+
     maxRetries match {
       case 0 =>
         f

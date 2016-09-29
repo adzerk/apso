@@ -55,8 +55,7 @@ case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: 
    * @tparam A the type of the new field
    * @return a new instance of `JsonFormatBuilder` with the new field
    */
-  def optionalField[A](name: String)(
-    implicit jf: JsonFormat[A], ev: AppenderAux[Option[A], C, FC]): JsonFormatBuilder[ev.COut, ev.FCOut] =
+  def optionalField[A](name: String)(implicit jf: JsonFormat[A], ev: AppenderAux[Option[A], C, FC]): JsonFormatBuilder[ev.COut, ev.FCOut] =
     optionalField(name, jf)
 
   /**
@@ -136,20 +135,23 @@ case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: 
    * @tparam A the type of objects for which a `JSONFormat` is to be returned
    * @return a `JSONFormat` for objects of type `A`.
    */
-  def customJsonFormat[A](preRead: JsObject => JsObject, readFunc: C => A,
-                          writeFunc: A => C, postWrite: (A, JsObject) => JsObject): RootJsonFormat[A] =
-    new RootJsonFormat[A] {
-      def read(json: JsValue): A = {
-        val jsObject = preRead(json.asJsObject)
-        val fieldValues = aux.read(jsObject.fields, fields)
-        readFunc(fieldValues)
-      }
+  def customJsonFormat[A](
+    preRead: JsObject => JsObject,
+    readFunc: C => A,
+    writeFunc: A => C,
+    postWrite: (A, JsObject) => JsObject): RootJsonFormat[A] = new RootJsonFormat[A] {
 
-      def write(obj: A): JsValue = {
-        val fieldValues = writeFunc(obj)
-        postWrite(obj, JsObject(aux.write(fields, fieldValues)))
-      }
+    def read(json: JsValue): A = {
+      val jsObject = preRead(json.asJsObject)
+      val fieldValues = aux.read(jsObject.fields, fields)
+      readFunc(fieldValues)
     }
+
+    def write(obj: A): JsValue = {
+      val fieldValues = writeFunc(obj)
+      postWrite(obj, JsObject(aux.write(fields, fieldValues)))
+    }
+  }
 }
 
 /**
@@ -200,7 +202,7 @@ object JsonFormatBuilder {
     }
 
     implicit def hConsBuilder[A, AS <: HList, FC <: HList](implicit ev: FormatterAux[AS, FC]) =
-      new FormatterAux[A :: AS, Field[A]:: FC] {
+      new FormatterAux[A :: AS, Field[A] :: FC] {
         def read(obj: Map[String, JsValue], fa: Field[A] :: FC) =
           readValue(obj, fa.head) :: ev.read(obj, fa.tail)
 
@@ -237,7 +239,7 @@ object JsonFormatBuilder {
       }
 
     implicit def hConsAppender[A, A2, C <: HList, FC <: HList](implicit ev: AppenderAux[A, C, FC]) =
-      new AppenderAux[A, A2 :: C, Field[A2]:: FC] {
+      new AppenderAux[A, A2 :: C, Field[A2] :: FC] {
         type COut = A2 :: ev.COut
         type FCOut = Field[A2] :: ev.FCOut
         def formatter = hConsBuilder[A2, ev.COut, ev.FCOut](ev.formatter)
@@ -260,7 +262,7 @@ object JsonFormatBuilder {
   object ReplacerAux {
 
     implicit def hConsZeroUpdater[A, A2, C <: HList, FC <: HList](implicit aux: FormatterAux[C, FC]) =
-      new ReplacerAux[A2, A :: C, Field[A]:: FC, _0] {
+      new ReplacerAux[A2, A :: C, Field[A] :: FC, _0] {
         type COut = A2 :: C
         type FCOut = Field[A2] :: FC
         def formatter = hConsBuilder[A2, C, FC](aux)
@@ -268,7 +270,7 @@ object JsonFormatBuilder {
       }
 
     implicit def hConsSuccUpdater[A, A2, C <: HList, FC <: HList, N <: Nat](implicit ev: ReplacerAux[A2, C, FC, N]) =
-      new ReplacerAux[A2, A :: C, Field[A]:: FC, Succ[N]] {
+      new ReplacerAux[A2, A :: C, Field[A] :: FC, Succ[N]] {
         type COut = A :: ev.COut
         type FCOut = Field[A] :: ev.FCOut
         def formatter = hConsBuilder[A, ev.COut, ev.FCOut](ev.formatter)
@@ -291,7 +293,7 @@ object JsonFormatBuilder {
   object RemoverAux {
 
     implicit def hConsZeroRemover[A, C <: HList, FC <: HList](implicit aux: FormatterAux[C, FC]) =
-      new RemoverAux[A :: C, Field[A]:: FC, _0] {
+      new RemoverAux[A :: C, Field[A] :: FC, _0] {
         type COut = C
         type FCOut = FC
         def formatter = aux
@@ -299,7 +301,7 @@ object JsonFormatBuilder {
       }
 
     implicit def hConsSuccRemover[A, C <: HList, FC <: HList, N <: Nat](implicit ev: RemoverAux[C, FC, N]) =
-      new RemoverAux[A :: C, Field[A]:: FC, Succ[N]] {
+      new RemoverAux[A :: C, Field[A] :: FC, Succ[N]] {
         type COut = A :: ev.COut
         type FCOut = Field[A] :: ev.FCOut
         def formatter = hConsBuilder[A, ev.COut, ev.FCOut](ev.formatter)

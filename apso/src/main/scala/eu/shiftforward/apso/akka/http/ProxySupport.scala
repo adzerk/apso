@@ -63,14 +63,13 @@ trait ProxySupport extends ClientIPDirectives {
   def proxySingleTo(uri: Uri): Route = {
     extractActorSystem { implicit system =>
       extractMaterializer { implicit mat =>
-        optionalRemoteAddress { ip =>
-          ctx =>
-            val req = ctx.request.copy(
-              uri = uri,
-              headers = getHeaders(ip, ctx.request.headers.toList))
+        optionalRemoteAddress { ip => ctx =>
+          val req = ctx.request.copy(
+            uri = uri,
+            headers = getHeaders(ip, ctx.request.headers.toList))
 
-            import system.dispatcher
-            Http(system).singleRequest(req).map(Complete.apply)
+          import system.dispatcher
+          Http(system).singleRequest(req).map(Complete.apply)
         }
       }
     }
@@ -86,14 +85,13 @@ trait ProxySupport extends ClientIPDirectives {
   def proxySingleToUnmatchedPath(uri: Uri): Route = {
     extractActorSystem { implicit system =>
       extractMaterializer { implicit mat =>
-        optionalRemoteAddress { ip =>
-          ctx =>
-            val req = ctx.request.copy(
-              uri = uri.withPath(uri.path ++ ctx.unmatchedPath).withQuery(ctx.request.uri.query()),
-              headers = getHeaders(ip, ctx.request.headers.toList))
+        optionalRemoteAddress { ip => ctx =>
+          val req = ctx.request.copy(
+            uri = uri.withPath(uri.path ++ ctx.unmatchedPath).withQuery(ctx.request.uri.query()),
+            headers = getHeaders(ip, ctx.request.headers.toList))
 
-            import system.dispatcher
-            Http(system).singleRequest(req).map(Complete.apply)
+          import system.dispatcher
+          Http(system).singleRequest(req).map(Complete.apply)
         }
       }
     }
@@ -134,19 +132,18 @@ trait ProxySupport extends ClientIPDirectives {
      * @return a route that handles requests by proxying them to the given URI.
      */
     def proxyTo(uri: Uri): Route = {
-      optionalRemoteAddress { ip =>
-        ctx =>
-          val req = ctx.request.copy(uri = uri, headers = getHeaders(ip, ctx.request.headers.toList))
-          val promise = Promise[RouteResult]()
+      optionalRemoteAddress { ip => ctx =>
+        val req = ctx.request.copy(uri = uri, headers = getHeaders(ip, ctx.request.headers.toList))
+        val promise = Promise[RouteResult]()
 
-          queue.offer(req -> promise).flatMap {
-            case Enqueued => promise.future
-            case OfferFailure(ex) => Future.failed(new RuntimeException("Queue offering failed", ex))
-            case QueueClosed => Future.failed(new RuntimeException("Queue is completed before call!?"))
-            case Dropped =>
-              log.warn("Request queue for {}:{} is full", host, port)
-              Future.successful(Complete(HttpResponse(StatusCodes.ServiceUnavailable)))
-          }
+        queue.offer(req -> promise).flatMap {
+          case Enqueued => promise.future
+          case OfferFailure(ex) => Future.failed(new RuntimeException("Queue offering failed", ex))
+          case QueueClosed => Future.failed(new RuntimeException("Queue is completed before call!?"))
+          case Dropped =>
+            log.warn("Request queue for {}:{} is full", host, port)
+            Future.successful(Complete(HttpResponse(StatusCodes.ServiceUnavailable)))
+        }
       }
     }
   }

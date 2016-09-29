@@ -27,8 +27,9 @@ import eu.shiftforward.apso.io.InsistentInputStream
  *                    If the parameter is not supplied, they will be retrieved from the
  *                    [[eu.shiftforward.apso.aws.CredentialStore]].
  */
-class S3Bucket(val bucketName: String,
-               private val credentialsFactory: () => AWSCredentials = { () => CredentialStore.getCredentials })
+class S3Bucket(
+  val bucketName: String,
+  private val credentialsFactory: () => AWSCredentials = { () => CredentialStore.getCredentials })
     extends Logging with Serializable {
 
   @transient private[this] var _credentials: AWSCredentials = _
@@ -320,8 +321,7 @@ class S3Bucket(val bucketName: String,
       case Success(res) => Some(res)
       case Failure(e) if !handler(e) =>
         if (tries > 1) {
-          log.warn("Error during S3 operation. Retrying in {}ms ({} more times)",
-            sleepTime, tries - 1)
+          log.warn("Error during S3 operation. Retrying in {}ms ({} more times)", sleepTime, tries - 1)
           Thread.sleep(sleepTime)
         }
         retry(f, tries - 1, sleepTime)

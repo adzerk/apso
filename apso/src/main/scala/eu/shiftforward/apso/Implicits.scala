@@ -480,9 +480,10 @@ object Implicits {
         val scaled = seq.map { e => (e, valueFunc(e) * scale) }.toList
         val (small, large) = scaled.partition(_._2 < 1.0)
 
-        def alias(small: List[(T, Double)],
-                  large: List[(T, Double)],
-                  rest: List[(T, Double, Option[T])]): List[(T, Double, Option[T])] = {
+        def alias(
+          small: List[(T, Double)],
+          large: List[(T, Double)],
+          rest: List[(T, Double, Option[T])]): List[(T, Double, Option[T])] = {
 
           (small, large) match {
             case ((s, ps) :: ss, (l, pl) :: ll) =>

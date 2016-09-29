@@ -5,15 +5,15 @@ import scala.io.Source
 import org.specs2.mutable._
 
 class LazySequenceInputStreamSpec extends Specification {
+
   "A lazy sequence input stream" should {
+
     "combine input streams correctly (read byte-by-byte)" in {
       var open = 0
 
-      val streams = List[Byte](0, 1, 2, 3).map { byte =>
-        () => {
-          open += 1
-          new ByteArrayInputStream(Array[Byte](byte))
-        }
+      val streams = List[Byte](0, 1, 2, 3).map { byte => () =>
+        open += 1
+        new ByteArrayInputStream(Array[Byte](byte))
       }
 
       val is = new LazySequenceInputStream(streams)
@@ -29,8 +29,8 @@ class LazySequenceInputStreamSpec extends Specification {
     }
 
     "combine input streams correctly (read byte array)" in {
-      val streams = List[Byte](5, 1, 2, 3).map { byte =>
-        () => new ByteArrayInputStream(Array[Byte](byte))
+      val streams = List[Byte](5, 1, 2, 3).map { byte => () =>
+        new ByteArrayInputStream(Array[Byte](byte))
       }
 
       val is = new LazySequenceInputStream(streams)
@@ -46,8 +46,8 @@ class LazySequenceInputStreamSpec extends Specification {
     }
 
     "combine input streams correctly (read incomplete byte array)" in {
-      val streams = (1 to 12).map(_.toByte).grouped(4).toList.map {
-        bs => () => new ByteArrayInputStream(bs.toArray)
+      val streams = (1 to 12).map(_.toByte).grouped(4).toList.map { bs => () =>
+        new ByteArrayInputStream(bs.toArray)
       }
       val is = new LazySequenceInputStream(streams)
       val buf = new Array[Byte](9)
@@ -62,8 +62,8 @@ class LazySequenceInputStreamSpec extends Specification {
     }
 
     "combine input streams correctly (read interface)" in {
-      val streams = "testqwer".toSeq.map(_.toByte).grouped(4).toList.map {
-        bs => () => new ByteArrayInputStream(bs.toArray)
+      val streams = "testqwer".toSeq.map(_.toByte).grouped(4).toList.map { bs => () =>
+        new ByteArrayInputStream(bs.toArray)
       }
       val is = new LazySequenceInputStream(streams)
 
