@@ -83,8 +83,7 @@ abstract class Retrier[Req, Msg: ClassTag, Ack: ClassTag, Key](
     isAck: Ack => Boolean = { _: Ack => true },
     shouldRetry: Msg => Boolean = { _: Msg => true },
     retryDelay: FiniteDuration = 100.millis,
-    timeout: Option[FiniteDuration] = None)(
-        implicit context: ActorContext, self: ActorRef) {
+    timeout: Option[FiniteDuration] = None)(implicit context: ActorContext, self: ActorRef) {
 
   implicit val dispatcher = context.dispatcher
 

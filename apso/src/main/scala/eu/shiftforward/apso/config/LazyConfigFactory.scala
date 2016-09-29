@@ -22,9 +22,10 @@ object LazyConfigFactory {
 
   lazy val load: Config = load(ConfigParseOptions.defaults, ConfigResolveOptions.defaults)
 
-  def load(resourceBasename: String): Config =
-    load(ConfigFactory.parseResourcesAnySyntax(resourceBasename),
-      ConfigParseOptions.defaults, ConfigResolveOptions.defaults)
+  def load(resourceBasename: String): Config = load(
+    ConfigFactory.parseResourcesAnySyntax(resourceBasename),
+    ConfigParseOptions.defaults,
+    ConfigResolveOptions.defaults)
 
   def load(parseOptions: ConfigParseOptions, resolveOptions: ConfigResolveOptions): Config =
     load(defaultApplication(parseOptions), parseOptions, resolveOptions)

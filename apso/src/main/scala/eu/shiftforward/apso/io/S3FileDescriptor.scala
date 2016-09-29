@@ -11,9 +11,10 @@ import eu.shiftforward.apso.aws.{ S3Bucket, SerializableAWSCredentials }
 import eu.shiftforward.apso.config.FileDescriptorCredentials
 import scala.collection.concurrent.TrieMap
 
-case class S3FileDescriptor(bucket: S3Bucket,
-                            protected val elements: List[String],
-                            private var summary: Option[S3ObjectSummary] = None)
+case class S3FileDescriptor(
+  bucket: S3Bucket,
+  protected val elements: List[String],
+  private var summary: Option[S3ObjectSummary] = None)
     extends FileDescriptor with RemoteFileDescriptor with Logging {
 
   type Self = S3FileDescriptor

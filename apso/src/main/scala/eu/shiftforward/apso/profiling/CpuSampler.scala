@@ -20,9 +20,10 @@ import scala.collection.mutable
  * @param flushPeriod the period between each flush to log
  * @param logger the logger to which results are written
  */
-class CpuSampler(samplePeriod: Long = 100,
-                 flushPeriod: Long = 10000,
-                 logger: Logger = LoggerFactory.getLogger(getClass.getName)) extends Runnable {
+class CpuSampler(
+    samplePeriod: Long = 100,
+    flushPeriod: Long = 10000,
+    logger: Logger = LoggerFactory.getLogger(getClass.getName)) extends Runnable {
 
   private[this] val threadBean = ManagementFactory.getThreadMXBean
 

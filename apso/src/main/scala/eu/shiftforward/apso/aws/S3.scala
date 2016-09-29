@@ -79,9 +79,7 @@ class S3(credentials: AWSCredentials = CredentialStore.getCredentials) extends L
    * @return the first object in a bucket with the given prefix after the given marker wrapped in a
    *         `Some` if such an object exists, `None` otherwise.
    */
-  @inline def headObject(bucketName: String,
-                         prefix: String = null,
-                         marker: String = null): Option[S3ObjectSummary] =
+  @inline def headObject(bucketName: String, prefix: String = null, marker: String = null): Option[S3ObjectSummary] =
     objects(bucketName, prefix, marker).toStream.headOption
 
   /**
@@ -97,10 +95,11 @@ class S3(credentials: AWSCredentials = CredentialStore.getCredentials) extends L
    * @return a list with at most `maxKeys` objects in a bucket with the given prefix after the given
    *         marker.
    */
-  def objects(bucketName: String,
-              prefix: String = null,
-              marker: String = null,
-              maxKeys: Int = 1): Iterator[S3ObjectSummary] = {
+  def objects(
+    bucketName: String,
+    prefix: String = null,
+    marker: String = null,
+    maxKeys: Int = 1): Iterator[S3ObjectSummary] = {
 
     def loop(last: String, max: Int): Iterator[S3ObjectSummary] = {
       val req = new ListObjectsRequest(bucketName, prefix, last, null, max)
