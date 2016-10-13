@@ -85,12 +85,13 @@ object Implicits {
   }
 
   /**
-   * Creates a JsObject from a sequence of pairs of dot-separated paths with the corresponding
+   * Creates a JsObject from a sequence of pairs of dot-separated (or other separator) paths with the corresponding
    * leaf values (eg. `List(("root.leaf1", JsString("leafVal1")), ("root.leaf2", JsString("leafVal2")))`
-   * @param paths the sequence of dot-separated paths
+   * @param paths the sequence of dot-separated (or other separator) paths
+   * @param separatorRegex regex to use to separate fields
    * @return the resulting JsObject
    */
-  def fromFullPaths(paths: Seq[(String, JsValue)]): JsValue = {
+  def fromFullPaths(paths: Seq[(String, JsValue)], separatorRegex: String = "\\."): JsValue = {
     def createJsValue(keys: Seq[String], value: JsValue): JsValue = {
       keys match {
         case Nil => value
@@ -101,7 +102,7 @@ object Implicits {
     paths match {
       case Nil => JsObject()
       case (path, value) :: rem =>
-        createJsValue(path.split("\\.").toList, value).merge(fromFullPaths(rem))
+        createJsValue(path.split(separatorRegex).toList, value).merge(fromFullPaths(rem))
     }
   }
 }
