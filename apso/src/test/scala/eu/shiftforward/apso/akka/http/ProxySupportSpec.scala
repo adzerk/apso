@@ -2,12 +2,15 @@ package eu.shiftforward.apso.akka.http
 
 import java.net.InetAddress
 
+import scala.concurrent.duration._
+
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.RemoteAddress.IP
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers._
 import akka.http.scaladsl.model.{ HttpRequest, HttpResponse, Uri }
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.testkit.RouteTestTimeout
 import akka.stream.scaladsl.Flow
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
@@ -46,7 +49,9 @@ class ProxySupportSpec extends Specification with Specs2RouteTest with ProxySupp
   val localIp1 = IP(InetAddress.getByName("127.0.0.1"))
   val localIp2 = IP(InetAddress.getByName("127.0.0.2"))
 
-  "A proxy support directive" should {
+  implicit val timeout = RouteTestTimeout(5.seconds)
+
+  "An akka-http proxy support directive" should {
 
     "proxy single requests" in new MockServer {
       Get("/get-path") ~> routes ~> check {

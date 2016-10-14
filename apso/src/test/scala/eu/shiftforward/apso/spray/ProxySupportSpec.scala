@@ -59,7 +59,9 @@ class ProxySupportSpec
     }
   }
 
-  "A proxy support directive" should {
+  implicit val timeout = RouteTestTimeout(5.seconds)
+
+  "A spray proxy support directive" should {
 
     "proxy requests" in new MockServer {
       Get("/get-path") ~> routes ~> check {
