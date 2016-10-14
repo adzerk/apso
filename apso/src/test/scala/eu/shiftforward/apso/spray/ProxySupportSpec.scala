@@ -1,20 +1,24 @@
 package eu.shiftforward.apso.spray
 
 import scala.concurrent.duration._
+
 import akka.actor.{ Actor, Props }
 import akka.io.IO
+import akka.io.Tcp.Bound
 import akka.pattern.ask
+import org.specs2.concurrent.ExecutionEnv
+import org.specs2.matcher.MatchResult
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import spray.can.Http
+import spray.http.HttpHeaders._
 import spray.http.StatusCodes._
 import spray.http.{ HttpRequest, HttpResponse, Uri }
 import spray.routing._
 import spray.testkit.Specs2RouteTest
 import spray.util._
-import spray.http.HttpHeaders._
 
-class ProxySupportSpec
+class ProxySupportSpec(implicit ee: ExecutionEnv)
     extends Specification
     with Directives
     with Specs2RouteTest
@@ -40,7 +44,8 @@ class ProxySupportSpec
         }
       }
     }
-    IO(Http).ask(Http.Bind(testService, interface, port))(10.seconds).await
+
+    val boundFuture = IO(Http).ask(Http.Bind(testService, interface, port))(10.seconds)
 
     def routes = {
       // format: OFF
@@ -57,6 +62,9 @@ class ProxySupportSpec
       }
       // format: ON
     }
+
+    val isBound: PartialFunction[Any, MatchResult[Any]] = { case Bound(_) => ok }
+    boundFuture must beLike(isBound).awaitFor(10.seconds)
   }
 
   implicit val timeout = RouteTestTimeout(5.seconds)
