@@ -30,3 +30,5 @@ trait ClientIPDirectives {
       headerValuePF { case h if h.is("x-real-ip") => Option(h.value) } |
       provide(None)
 }
+
+object ClientIPDirectives extends ClientIPDirectives
