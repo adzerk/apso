@@ -2,24 +2,30 @@ package eu.shiftforward.apso.akka.http
 
 import java.net.InetAddress
 
+import scala.concurrent.Future
+import scala.concurrent.duration._
+
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.model.RemoteAddress.IP
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers._
 import akka.http.scaladsl.model.{ HttpRequest, HttpResponse, Uri }
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.testkit.RouteTestTimeout
 import akka.stream.scaladsl.Flow
+import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import spray.util.Utils
 
-class ProxySupportSpec extends Specification with Specs2RouteTest with ProxySupport {
+class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Specs2RouteTest with ProxySupport {
 
   trait MockServer extends Scope {
     def serverResponse(req: HttpRequest) = HttpResponse(entity = req.uri.toRelative.toString)
 
     val (interface, port) = Utils.temporaryServerHostnameAndPort()
-    Http().bindAndHandle(Flow.fromFunction(serverResponse), interface, port)
+    val boundFuture: Future[ServerBinding] = Http().bindAndHandle(Flow.fromFunction(serverResponse), interface, port)
 
     val proxy = new Proxy(interface, port)
 
@@ -41,12 +47,16 @@ class ProxySupportSpec extends Specification with Specs2RouteTest with ProxySupp
       }
       // format: ON
     }
+
+    boundFuture.map(_.localAddress.isUnresolved) must beFalse.awaitFor(10.seconds)
   }
 
   val localIp1 = IP(InetAddress.getByName("127.0.0.1"))
   val localIp2 = IP(InetAddress.getByName("127.0.0.2"))
 
-  "A proxy support directive" should {
+  implicit val timeout = RouteTestTimeout(5.seconds)
+
+  "An akka-http proxy support directive" should {
 
     "proxy single requests" in new MockServer {
       Get("/get-path") ~> routes ~> check {
