@@ -54,7 +54,7 @@ class InsistentInputStream(streamBuilder: () => InputStream, maxRetries: Int = 1
 
   def read(): Int = {
     val nextByte = readRetries(maxRetries, innerStream.read())
-    if (nextByte > 0) currPos += 1
+    if (nextByte >= 0) currPos += 1
     nextByte
   }
 
