@@ -283,10 +283,7 @@ class S3Bucket(
 
   def stream(key: String): InputStream = {
     log.info("Streaming 's3://{}/{}'", bucketName: Any, key: Any)
-    new InsistentInputStream(
-      () => s3.getObject(new GetObjectRequest(bucketName, sanitizeKey(key))).getObjectContent,
-      10,
-      Some(100.milliseconds))
+    s3.getObject(new GetObjectRequest(bucketName, sanitizeKey(key))).getObjectContent
   }
 
   private[this] def handler: PartialFunction[Throwable, Boolean] = {
