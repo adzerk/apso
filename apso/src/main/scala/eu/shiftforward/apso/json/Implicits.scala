@@ -102,7 +102,7 @@ object Implicits {
     paths match {
       case Nil => JsObject()
       case (path, value) :: rem =>
-        createJsValue(path.split(separatorRegex).toList, value).merge(fromFullPaths(rem))
+        createJsValue(path.split(separatorRegex).toList, value).merge(fromFullPaths(rem, separatorRegex))
     }
   }
 }

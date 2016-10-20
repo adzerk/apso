@@ -70,6 +70,20 @@ class ImplicitsSpec extends Specification {
       res mustEqual expected.parseJson
     }
 
+    "provide a method to create a json object from complete paths (with a custom separator)" in {
+      val res = fromFullPaths(
+        List(
+          "a-b-c" -> JsNumber(1),
+          "a-b-d-e" -> JsNumber(3),
+          "a-f" -> JsNumber(5),
+          "g" -> JsNumber(4)), "-")
+
+      val expected =
+        """{ "a": {"b": {"c": 1, "d": {"e": 3}}, "f": 5}, "g": 4 }"""
+
+      res mustEqual expected.parseJson
+    }
+
     "provide a method to get the key set of a JsObject" in {
       val obj = """{"a":1,"b":{"c":2},"d":null}""".parseJson.asJsObject
       obj.flattenedKeySet(".", ignoreNull = true) === Set("a", "b.c")
