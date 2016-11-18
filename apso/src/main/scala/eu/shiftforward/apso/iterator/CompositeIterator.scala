@@ -1,6 +1,6 @@
 package eu.shiftforward.apso.iterator
 
-import scala.collection.GenTraversableOnce
+import scala.collection.{ BufferedIterator, GenTraversableOnce }
 
 /**
  * An iterator that wraps a list of other iterators and iterates over its
@@ -8,12 +8,12 @@ import scala.collection.GenTraversableOnce
  * in a more efficient way than simply concatenating them, avoiding stack
  * overflows in particular. It supports appending of new iterators while keeping
  * its efficiency.
- * @param queue the list of iterators to compose
+ * @param iterators the list of iterators to compose
  * @tparam A the type of the elements to iterate over
  */
 class CompositeIterator[A](
     private[iterator] var current: Iterator[A] = Iterator.empty,
-    private[iterator] var iterators: IndexedSeq[Iterator[A]] = Vector()) extends Iterator[A] {
+    private[iterator] var iterators: IndexedSeq[Iterator[A]] = Vector()) extends Iterator[A] { self =>
 
   def hasNext: Boolean = {
     if (!current.hasNext) {
@@ -21,7 +21,7 @@ class CompositeIterator[A](
         current = it
         !current.hasNext
       }
-      if (!iterators.isEmpty) iterators = iterators.drop(1)
+      if (iterators.nonEmpty) iterators = iterators.drop(1)
     }
 
     current.hasNext
@@ -34,6 +34,20 @@ class CompositeIterator[A](
   override def ++[B >: A](that: => GenTraversableOnce[B]): CompositeIterator[B] =
     CompositeIterator[B](this, that.toIterator)
 
+  // This forces the head to be stored only on the current iterator
+  override def buffered: BufferedIterator[A] = {
+    current = current.buffered
+    iterators = iterators.map(_.buffered)
+    new BufferedIterator[A] {
+      def head: A =
+        if (hasNext) current.asInstanceOf[BufferedIterator[A]].head
+        else throw new NoSuchElementException("next on empty iterator")
+      def next(): A = self.next()
+      def hasNext: Boolean = self.hasNext
+      override def ++[B >: A](that: => GenTraversableOnce[B]): CompositeIterator[B] =
+        CompositeIterator[B](self, that.toIterator)
+    }
+  }
 }
 
 /**
@@ -54,10 +68,10 @@ object CompositeIterator {
 
             new CompositeIterator(
               current = c.current,
-              iterators = (c.iterators ++ iterators))
+              iterators = c.iterators ++ iterators)
 
           } else {
-            new CompositeIterator(current = c.current, iterators = (c.iterators :+ it))
+            new CompositeIterator(current = c.current, iterators = c.iterators :+ it)
           }
       }
     }.getOrElse(new CompositeIterator[A]())

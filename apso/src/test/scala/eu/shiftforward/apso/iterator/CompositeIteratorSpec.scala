@@ -23,6 +23,13 @@ class CompositeIteratorSpec extends Specification {
       ok
     }
 
+    "be bufferable" in {
+      val cit = (CompositeIterator[Int]() ++ a1 ++ a2 ++ a3).buffered
+      cit.head === concatExpected.head
+      cit.toList mustEqual concatExpected
+      ok
+    }
+
     "correctly serialize iterators to a single queue" in {
 
       "not create a recursive structure" in {
