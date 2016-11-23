@@ -20,14 +20,27 @@ class CompositeIteratorSpec extends Specification {
     "apply correctly concatenation (++)" in {
       val cit = CompositeIterator[Int]()
       (cit ++ a1 ++ a2 ++ a3).toList mustEqual concatExpected
-      ok
     }
 
-    "be bufferable" in {
+    "be bufferable (head)" in {
       val cit = (CompositeIterator[Int]() ++ a1 ++ a2 ++ a3).buffered
       cit.head === concatExpected.head
       cit.toList mustEqual concatExpected
-      ok
+    }
+
+    "be bufferable (filter)" in {
+      val cit = (CompositeIterator[Int]() ++ a1 ++ a2 ++ a3).buffered
+      cit.dropWhile(_ < 3).toList mustEqual concatExpected.dropWhile(_ < 3)
+    }
+
+    "be bufferable (takeWhile)" in {
+      val cit = (CompositeIterator[Int]() ++ a1 ++ a2 ++ a3).buffered
+      cit.filter(x => x < 5).toList mustEqual concatExpected.filter(x => x < 5)
+    }
+
+    "be bufferable (dropWhile)" in {
+      val cit = (CompositeIterator[Int]() ++ a1 ++ a2 ++ a3).buffered
+      cit.filter(x => x > 2 && x < 5).toList mustEqual concatExpected.filter(x => x > 2 && x < 5)
     }
 
     "correctly serialize iterators to a single queue" in {

@@ -1,6 +1,7 @@
 package eu.shiftforward.apso.iterator
 
-import scala.collection.{ BufferedIterator, GenTraversableOnce }
+import scala.collection.Iterator.empty
+import scala.collection.{ AbstractIterator, BufferedIterator, GenTraversableOnce, Iterator }
 
 /**
  * An iterator that wraps a list of other iterators and iterates over its
@@ -38,7 +39,7 @@ class CompositeIterator[A](
   override def buffered: BufferedIterator[A] = {
     current = current.buffered
     iterators = iterators.map(_.buffered)
-    new BufferedIterator[A] {
+    new AbstractIterator[A] with BufferedIterator[A] { buff =>
       def head: A =
         if (hasNext) current.asInstanceOf[BufferedIterator[A]].head
         else throw new NoSuchElementException("next on empty iterator")
@@ -46,6 +47,35 @@ class CompositeIterator[A](
       def hasNext: Boolean = self.hasNext
       override def ++[B >: A](that: => GenTraversableOnce[B]): CompositeIterator[B] =
         CompositeIterator[B](self, that.toIterator)
+
+      // Methods that implement their own buffering strategy, therefore need to be overriden
+      override def filter(p: (A) => Boolean): Iterator[A] =
+        new CompositeIterator[A](current.filter(p), iterators.map(_.filter(p)))
+
+      override def takeWhile(p: A => Boolean): Iterator[A] = new AbstractIterator[A] {
+        def hasNext: Boolean = buff.hasNext && p(buff.head)
+        def next(): A =
+          if (hasNext) buff.next()
+          else throw new NoSuchElementException("next on empty iterator")
+      }
+
+      override def dropWhile(p: A => Boolean): Iterator[A] = new AbstractIterator[A] {
+        def hasNext: Boolean = {
+          current = current.dropWhile(p)
+          if (!current.hasNext) {
+            iterators = iterators.dropWhile { it =>
+              current = it.dropWhile(p)
+              !current.hasNext
+            }
+            if (iterators.nonEmpty) iterators = iterators.drop(1)
+          }
+          current.hasNext
+        }
+        def next(): A =
+          if (hasNext) current.next()
+          else throw new NoSuchElementException("next on empty iterator")
+      }
+
     }
   }
 }
