@@ -3,17 +3,16 @@ package eu.shiftforward.apso.profiling
 import java.net.ServerSocket
 
 import com.j256.simplejmx.server.JmxServer
-import com.typesafe.config.Config
 import eu.shiftforward.apso.Logging
-import eu.shiftforward.apso.config.Implicits._
 
 import scala.util.{ Failure, Success, Try }
 
 trait SimpleJmx extends Logging {
-  def jmxConfig: Config
 
-  private lazy val jmxHost = jmxConfig.getStringOption("host")
-  private lazy val jmxPort = jmxConfig.getIntOption("port")
+  def jmxConfig: config.Jmx
+
+  private lazy val jmxHost = jmxConfig.host
+  private lazy val jmxPort = jmxConfig.port
 
   private def startJmx(port: Option[Int] = None) = {
     def randomPort = {
