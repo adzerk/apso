@@ -120,7 +120,7 @@ class S3Bucket(
 
     val listings = Iterator.iterate(s3.listObjects(bucketName, sanitizeKey(prefix))) { listing =>
       if (listing.isTruncated) {
-        log.info("Asking for another batch of objects...")
+        log.debug("Asking for another batch of objects...")
         s3.listNextBatchOfObjects(listing)
       } else null
     }
