@@ -1,23 +1,23 @@
 <p align="center"><img src="https://raw.githubusercontent.com/ShiftForward/apso/master/apso.png"/></p>
 
-# Apso [![Build Status](https://travis-ci.org/ShiftForward/apso.svg?branch=master)](https://travis-ci.org/ShiftForward/apso) [![Maven Central](https://img.shields.io/maven-central/v/eu.shiftforward/apso_2.11.svg)](https://maven-badges.herokuapp.com/maven-central/eu.shiftforward/apso_2.11)
+# Apso [![Build Status](https://travis-ci.org/ShiftForward/apso.svg?branch=master)](https://travis-ci.org/ShiftForward/apso) [![Maven Central](https://img.shields.io/maven-central/v/eu.shiftforward/apso_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/eu.shiftforward/apso_2.12)
 
 Apso is ShiftForward's utilities library. It provides a series of useful methods.
 
 ## Installation
 
-Apso's latest release is `0.9.9` and is built against Scala 2.11.8.
+Apso's latest release is `0.10.0` and is built against Scala 2.11 and Scala 2.12.
 
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "eu.shiftforward" %% "apso" % "0.9.9"
+libraryDependencies += "eu.shiftforward" %% "apso" % "0.10.0"
 ```
 
 The TestKit is available under the `apso-testkit` project. You can include it only for the `test` configuration:
 
 ```scala
-libraryDependencies += "eu.shiftforward" %% "apso-testkit" % "0.9.9" % "test"
+libraryDependencies += "eu.shiftforward" %% "apso-testkit" % "0.10.0" % "test"
 ```
 
 Please take into account that the library is still in an experimental stage and the interfaces might change for subsequent releases.
