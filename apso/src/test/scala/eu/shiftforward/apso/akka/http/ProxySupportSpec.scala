@@ -1,6 +1,6 @@
 package eu.shiftforward.apso.akka.http
 
-import java.net.InetAddress
+import java.net.{ InetAddress, ServerSocket }
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -17,15 +17,21 @@ import akka.stream.scaladsl.Flow
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
-import spray.util.Utils
 
 class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Specs2RouteTest with ProxySupport {
 
   trait MockServer extends Scope {
     def serverResponse(req: HttpRequest) = HttpResponse(entity = req.uri.toRelative.toString)
 
-    val (interface, port) = Utils.temporaryServerHostnameAndPort()
-    val boundFuture: Future[ServerBinding] = Http().bindAndHandle(Flow.fromFunction(serverResponse), interface, port)
+    private[this] def availablePort(): Int = {
+      val socket = new ServerSocket(0)
+      val port = socket.getLocalPort
+      socket.close()
+      port
+    }
+
+    val (interface, port) = ("localhost", availablePort())
+    val boundFuture = Http().bindAndHandle(Flow.fromFunction(serverResponse), interface, port)
 
     val proxy = new Proxy(interface, port)
 
