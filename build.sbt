@@ -23,7 +23,7 @@ lazy val apso = project.in(file("apso"))
     "io.spray"                      %% "spray-httpx"               % "1.3.4"          % "provided",
     "io.spray"                      %% "spray-json"                % "1.3.3"          % "provided",
     "io.spray"                      %% "spray-routing-shapeless23" % "1.3.4"          % "provided",
-    "net.databinder.dispatch"       %% "dispatch-core"             % "0.11.3",
+    "org.asynchttpclient"            % "async-http-client"         % "2.0.24",
     "org.bouncycastle"               % "bcpkix-jdk15on"            % "1.56",
     "org.bouncycastle"               % "bcprov-jdk15on"            % "1.56",
     "org.scalaz"                    %% "scalaz-core"               % "7.2.8"          % "provided",
