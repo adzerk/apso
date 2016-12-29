@@ -31,8 +31,8 @@ import eu.shiftforward.apso.Logging
 trait ProxySupport extends ClientIPDirectives {
 
   private[this] def getHeaders(ip: Option[RemoteAddress], headers: List[HttpHeader] = Nil) = {
-    // filter `Host` and `Timeout-Access` headers
-    val hs = headers.filterNot(header => header.is("host") || header.is("timeout-access"))
+    // filter `Host`, `Timeout-Access` and `Remote-Address` headers
+    val hs = headers.filterNot(header => header.is("host") || header.is("timeout-access") || header.is("remote-address"))
     // add `X-Forwarded-For` header
     ip.fold(hs)(addForwardedFor(_, hs))
   }
