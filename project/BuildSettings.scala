@@ -13,7 +13,8 @@ object BuildSettings {
   lazy val commonSettings = Defaults.coreDefaultSettings ++ formatSettings ++ Seq(
     organization := "eu.shiftforward",
     version := "0.9.9",
-    scalaVersion := "2.11.8",
+    scalaVersion := "2.12.1",
+    crossScalaVersions := List("2.11.8", "2.12.1"),
 
     resolvers ++= Seq(
       Resolver.sonatypeRepo("releases"),

@@ -10,12 +10,12 @@ class InsistentInputStreamSpec extends Specification {
 
     val testList = (1 to 100).map(_.toByte)
 
-    def testGoodInputStream() = new InputStream {
+    val testGoodInputStream = () => new InputStream {
       val iter = testList.iterator
       def read(): Int = iter.next()
     }
 
-    def testBuggyInputStream() = new InputStream {
+    val testBuggyInputStream = () => new InputStream {
       var fail = false
       val iter = testList.iterator
       def read(): Int = {
@@ -33,7 +33,7 @@ class InsistentInputStreamSpec extends Specification {
       def failNext() = fail = true
     }
 
-    def testBadInputStream() = new InputStream {
+    val testBadInputStream = () => new InputStream {
       val iter = testList.iterator
       def read(): Int = throw new Exception("bad read")
     }
