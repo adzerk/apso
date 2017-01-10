@@ -56,6 +56,7 @@ Please take into account that the library is still in an experimental stage and 
 - [Config](#config)
     - [LazyConfigFactory](#lazyconfigfactory)
     - [Implicits](#implicits)
+- [Encryption](#encryption)
 - [Hashing](#hashing)
 - [HTTP](#http)
 - [IO](#io)
@@ -732,6 +733,32 @@ fooConfigReader: eu.shiftforward.apso.config.ConfigReader[Foo] = <function2>
 scala> conf.get[Foo]("v4")
 res3: Foo = Foo(2,3)
 ```
+
+## Encryption
+
+Apso provides some simple utility classes to deal with encryption and decryption of data, and methods that ease the
+creation of the underlying Cyphers.
+
+The following shows the creation of `Encryptor` and `Decryptor` objects,
+by loading a `KeyStore` file holding a symmetric key, and its use to encrypt and
+decrypt data:
+
+```scala
+scala> val encryptor = Encryptor("AES", getClass.getResourceAsStream("/keystoreFile.jceks"), "keystorePass", "keyAlias", "keyPass")
+encryptor: Option[eu.shiftforward.apso.encryption.Encryptor] = Some(eu.shiftforward.apso.encryption.Encryptor@353912)
+
+scala> val decryptor = Decryptor("AES", getClass.getResourceAsStream("/keystoreFile.jceks"), "keystorePass", "keyAlias", "keyPass")
+decryptor: Option[eu.shiftforward.apso.encryption.Decryptor] = Some(eu.shiftforward.apso.encryption.Decryptor@68ccfc03)
+
+scala> val secretData = "secret_info"
+secretData: String = secret_info
+
+// encrypt data and encode it in base64; then decrypt it to string
+scala> decryptor.get.decryptToString(encryptor.get.encryptToSafeString(secretData).get)
+res6: Option[String] = Some(secret_info)
+
+```
+
 
 ## Hashing
 
