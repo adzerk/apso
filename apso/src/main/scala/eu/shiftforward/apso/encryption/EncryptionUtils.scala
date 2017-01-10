@@ -13,6 +13,10 @@ object BouncyCastleInitializer {
   def apply() = provider
 }
 
+/**
+ * Loads and provide a [[BouncyCastleProvider]] and provides utility methods to encode in base64, load keystores and create
+ * keys from raw password input.
+ */
 trait EncryptionUtils extends EncryptionErrorHandling {
   val provider = BouncyCastleInitializer()
 
@@ -29,7 +33,7 @@ trait EncryptionUtils extends EncryptionErrorHandling {
     }
 
   def paddedUrlSafebase64(bytes: Array[Byte], pad: Boolean = true): String = {
-    val b64 = Base64.encodeBase64URLSafeString(bytes)
+    val b64 = Base64.encodeBase64URLSafeString(bytes) // the url-safe alphabet does not pad data
     if (pad) EncryptionUtils.pad(b64) else b64
   }
 

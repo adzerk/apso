@@ -9,6 +9,11 @@ import org.apache.commons.codec.binary.Base64
 
 import eu.shiftforward.apso.Logging
 
+/**
+ * Utility class to handle encrypting data to string format and, optionally, handle base64 encoded data.
+ *
+ * @param encryptor the underlying Cipher object that allows to encrypt the data.
+ */
 class Encryptor(encryptor: Cipher) extends EncryptionErrorHandling with Logging {
   def apply(data: String) = encrypt(data)
 
@@ -25,6 +30,10 @@ class Encryptor(encryptor: Cipher) extends EncryptionErrorHandling with Logging 
     { ex: Throwable => log.warn(s"Error while trying to encrypt data: $data", ex) })
 }
 
+/**
+ * Provides the `apply` methods that allow to more easily create a [[Encryptor]] object by directly specifying the
+ * transformation and key, or a keystore holding the key parameters.
+ */
 object Encryptor extends EncryptionUtils with Logging {
 
   private def loadEncryptionCipher(transformation: String, key: Key): Option[Cipher] = handle(

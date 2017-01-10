@@ -9,6 +9,11 @@ import org.apache.commons.codec.binary.Base64
 
 import eu.shiftforward.apso.Logging
 
+/**
+ * Utility class to handle decrypting data to string format and, optionally, handle base64 encoded data.
+ *
+ * @param decryptor the underlying Cipher object that allows to decrypt the data.
+ */
 class Decryptor(decryptor: Cipher) extends EncryptionErrorHandling {
   def apply(s: String): Option[String] = decrypt(s)
 
@@ -22,6 +27,10 @@ class Decryptor(decryptor: Cipher) extends EncryptionErrorHandling {
   }
 }
 
+/**
+ * Provides the `apply` methods that allow to more easily create a [[Decryptor]] object by directly specifying the
+ * transformation and key, or a keystore holding the key parameters.
+ */
 object Decryptor extends EncryptionUtils with Logging {
 
   private def loadDecryptionCipher(transformation: String, key: Key): Option[Cipher] = handle(
