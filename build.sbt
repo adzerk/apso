@@ -20,6 +20,7 @@ lazy val apso = project.in(file("apso"))
     "com.typesafe.akka"             %% "akka-http"                 % "10.0.1"         % "provided",
     "io.github.andrebeat"           %% "scala-pool"                % "0.4.0",
     "io.spray"                      %% "spray-json"                % "1.3.3"          % "provided",
+    "commons-codec"                  % "commons-codec"             % "1.10",
     "org.asynchttpclient"            % "async-http-client"         % "2.0.24",
     "org.bouncycastle"               % "bcpkix-jdk15on"            % "1.56",
     "org.bouncycastle"               % "bcprov-jdk15on"            % "1.56",

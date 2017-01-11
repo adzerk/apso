@@ -12,7 +12,7 @@ object BuildSettings {
 
   lazy val commonSettings = Defaults.coreDefaultSettings ++ formatSettings ++ Seq(
     organization := "eu.shiftforward",
-    version := "0.10.0",
+    version := "0.10.1",
     scalaVersion := "2.12.1",
     crossScalaVersions := List("2.11.8", "2.12.1"),
 
@@ -42,7 +42,7 @@ object BuildSettings {
     publishTo := {
       val nexus = "https://oss.sonatype.org/"
       if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
-      else Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+      else Some("releases" at nexus + "service/local/staging/deploy/maven2")
     },
     pomIncludeRepository := { _ => false },
     licenses := Seq("Apache License, Version 2.0" ->
