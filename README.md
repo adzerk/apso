@@ -6,18 +6,18 @@ Apso is ShiftForward's utilities library. It provides a series of useful methods
 
 ## Installation
 
-Apso's latest release is `0.10.0` and is built against Scala 2.11 and Scala 2.12.
+Apso's latest release is `0.10.1` and is built against Scala 2.11 and Scala 2.12.
 
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "eu.shiftforward" %% "apso" % "0.10.0"
+libraryDependencies += "eu.shiftforward" %% "apso" % "0.10.1"
 ```
 
 The TestKit is available under the `apso-testkit` project. You can include it only for the `test` configuration:
 
 ```scala
-libraryDependencies += "eu.shiftforward" %% "apso-testkit" % "0.10.0" % "test"
+libraryDependencies += "eu.shiftforward" %% "apso-testkit" % "0.10.1" % "test"
 ```
 
 Please take into account that the library is still in an experimental stage and the interfaces might change for subsequent releases.
