@@ -1,38 +1,83 @@
 package eu.shiftforward.apso.http
 
-import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 
 import com.mashape.unirest.http.{ HttpResponse, Unirest }
 import com.mashape.unirest.request.{ HttpRequest, HttpRequestWithBody }
+import org.apache.http.client.config.{ CookieSpecs, RequestConfig }
+import org.apache.http.impl.client.DefaultRedirectStrategy
+import org.apache.http.impl.nio.client.HttpAsyncClients
+import org.apache.http.protocol.HttpContext
 import org.slf4j.LoggerFactory
 
 object W {
   case class Timeout(duration: FiniteDuration)
+
   private[this] lazy val log = LoggerFactory.getLogger("W")
   private[this] lazy val defaultTimeout = Timeout(10.seconds)
 
-  private[this] def javaHeaders(headers: Map[String, Seq[String]]) =
-    headers.flatMap { case (k, vs) => vs.map(k -> _) }.asJava
-
-  private[this] def exec(req: HttpRequest, timeout: FiniteDuration) = {
-    log.debug("{} {}", req.getHttpMethod, req.getUrl, null)
-    req.asStringAsync().get(timeout.length, timeout.unit)
+  private[this] object NeverRedirectStrategy extends DefaultRedirectStrategy {
+    override def isRedirected(
+      request: org.apache.http.HttpRequest,
+      response: org.apache.http.HttpResponse,
+      context: HttpContext) = false
   }
 
-  private[this] def exec(req: HttpRequestWithBody, body: String, timeout: FiniteDuration) = {
-    log.debug("{} {}", req.getHttpMethod, req.getUrl, null)
-    req.body(body).asStringAsync().get(timeout.length, timeout.unit)
+  private[this] val reqConfig = RequestConfig.custom
+    .setCookieSpec(CookieSpecs.STANDARD)
+    .build()
+
+  Unirest.setAsyncHttpClient(HttpAsyncClients.custom
+    .setDefaultRequestConfig(reqConfig)
+    .setRedirectStrategy(NeverRedirectStrategy)
+    .disableCookieManagement()
+    .build())
+
+  implicit private[this] class RichHttpRequest(val req: HttpRequest) {
+    def headers(headers: Map[String, Seq[String]]) = {
+      headers.foldLeft(req) {
+        case (acc, (k, vs)) =>
+          vs.foldLeft(acc) { (acc2, v) => acc2.header(k, v) }
+      }
+    }
+
+    def exec(timeout: FiniteDuration) = {
+      log.debug("{} {}", req.getHttpMethod, req.getUrl, null)
+      req.asStringAsync().get(timeout.length, timeout.unit)
+    }
+  }
+
+  implicit private[this] class RichHttpRequestWithBody(val req: HttpRequestWithBody) {
+    def headers(headers: Map[String, Seq[String]]) = {
+      headers.foldLeft(req) {
+        case (acc, (k, vs)) =>
+          vs.foldLeft(acc) { (acc2, v) => acc2.header(k, v) }
+      }
+    }
+
+    def exec(timeout: FiniteDuration) = {
+      log.debug("{} {}", req.getHttpMethod, req.getUrl, null)
+      req.asStringAsync().get(timeout.length, timeout.unit)
+    }
+
+    def exec(body: String, timeout: FiniteDuration) = {
+      log.debug("{} {}", req.getHttpMethod, req.getUrl, null)
+      req.body(body).asStringAsync().get(timeout.length, timeout.unit)
+    }
   }
 
   def get(req: String, headers: Map[String, Seq[String]] = Map())(implicit timeout: Timeout = defaultTimeout): HttpResponse[String] =
-    exec(Unirest.get(req).headers(javaHeaders(headers)), timeout.duration)
+    Unirest.get(req).headers(headers).exec(timeout.duration)
+
   def post(req: String, body: String, headers: Map[String, Seq[String]] = Map())(implicit timeout: Timeout = defaultTimeout): HttpResponse[String] =
-    exec(Unirest.post(req).headers(javaHeaders(headers)), body, timeout.duration)
+    Unirest.post(req).headers(headers).exec(body, timeout.duration)
+
   def put(req: String, body: String, headers: Map[String, Seq[String]] = Map())(implicit timeout: Timeout = defaultTimeout): HttpResponse[String] =
-    exec(Unirest.put(req).headers(javaHeaders(headers)), body, timeout.duration)
+    Unirest.put(req).headers(headers).exec(body, timeout.duration)
+
   def delete(req: String, headers: Map[String, Seq[String]] = Map())(implicit timeout: Timeout = defaultTimeout): HttpResponse[String] =
-    exec(Unirest.delete(req).headers(javaHeaders(headers)), timeout.duration)
+    Unirest.delete(req).headers(headers).exec(timeout.duration)
+
   def head(req: String, headers: Map[String, Seq[String]] = Map())(implicit timeout: Timeout = defaultTimeout): HttpResponse[String] =
-    exec(Unirest.head(req).headers(javaHeaders(headers)), timeout.duration)
+    Unirest.head(req).headers(headers).exec(timeout.duration)
 }
