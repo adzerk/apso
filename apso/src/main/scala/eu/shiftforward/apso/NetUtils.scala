@@ -3,15 +3,15 @@ package eu.shiftforward.apso
 import java.net.ServerSocket
 
 /**
-  * Object containing network utility methods.
-  */
+ * Object containing network utility methods.
+ */
 object NetUtils {
 
   /**
-    * Returns an unused port.
-    *
-    * @return an unused port.
-    */
+   * Returns an unused port.
+   *
+   * @return an unused port.
+   */
   def availablePort(): Int = {
     val socket = new ServerSocket(0)
     val port = socket.getLocalPort
