@@ -12,7 +12,7 @@ object BuildSettings {
 
   lazy val commonSettings = Defaults.coreDefaultSettings ++ formatSettings ++ Seq(
     organization := "eu.shiftforward",
-    version := "0.11.0",
+    version := "0.11.1",
     scalaVersion := "2.12.1",
     crossScalaVersions := List("2.11.8", "2.12.1"),
 
