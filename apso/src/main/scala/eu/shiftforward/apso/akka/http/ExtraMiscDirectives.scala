@@ -28,14 +28,21 @@ trait ExtraMiscDirectives {
         respondWithDefaultHeader(`Cache-Control`(`max-age`(60l * s), `must-revalidate`))
     }
 
+  /**
+   * Inserts a "Cache-Control" header, instructing the browser to cache the HTTP response for the supplied duration.
+   * The header key "max-age" specifies the number of seconds during which the browser should cache the HTTP response.
+   * In case the supplied duration is less than 1 second, this directive defaults to the minimum duration allowed,
+   * 1 second.
+   *
+   * @param maxAgeDuration the duration for how long to cache the HTTP response
+   * @return a Directive that inserts a Cache-Control header
+   */
   def cacheControlMaxAge(maxAgeDuration: Option[FiniteDuration]): Directive0 = {
     maxAgeDuration match {
       case None =>
         ExtraMiscDirectives.cacheControlNoCache
-      case Some(s) if s < 1.second =>
-        ExtraMiscDirectives.cacheControlNoCache
       case Some(s) =>
-        respondWithDefaultHeader(`Cache-Control`(`max-age`(s.toSeconds), `must-revalidate`))
+        respondWithDefaultHeader(`Cache-Control`(`max-age`(math.max(s.toSeconds, 1.second.toSeconds)), `must-revalidate`))
     }
   }
 

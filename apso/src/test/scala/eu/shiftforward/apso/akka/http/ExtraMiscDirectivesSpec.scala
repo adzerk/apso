@@ -29,9 +29,9 @@ class ExtraMiscDirectivesSpec extends Specification with Specs2RouteTest {
         response.headers must contain(`Cache-Control`(`max-age`(9001.seconds.toSeconds), `must-revalidate`))
       }
 
-      // minimum resolution is 1 second, otherwise a no cache header is assumed
+      // minimum resolution is 1 second
       Get("/") ~> maxAgeRoute(Some(10.millis)) ~> check {
-        response.headers must contain(`Cache-Control`(`no-cache`, `no-store`, `must-revalidate`))
+        response.headers must contain(`Cache-Control`(`max-age`(1.second.toSeconds), `must-revalidate`))
       }
 
       Get("/") ~> maxAgeRoute(None) ~> check {
