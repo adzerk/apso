@@ -11,13 +11,13 @@ Apso's latest release is built against Scala 2.11 and Scala 2.12.
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "eu.shiftforward" %% "apso" % "0.11.1"
+libraryDependencies += "eu.shiftforward" %% "apso" % "0.11.2"
 ```
 
 The TestKit is available under the `apso-testkit` project. You can include it only for the `test` configuration:
 
 ```scala
-libraryDependencies += "eu.shiftforward" %% "apso-testkit" % "0.11.1" % "test"
+libraryDependencies += "eu.shiftforward" %% "apso-testkit" % "0.11.2" % "test"
 ```
 
 Please take into account that the library is still in an experimental stage and the interfaces might change for subsequent releases.
@@ -1185,7 +1185,7 @@ The `ClientIPDirectives` trait exposes an `optionalRawClientIP` directive that e
 
 ### ExtraMiscDirectives
 
-The `ExtraMiscDirectives` trait exposes the directives `cacheControlMaxAge(inMinutes)` and `optionalRefererHost` to set the cache-control header to the supplied number of minutes and to extract the referer from the HTTP request header, respectively. The `ExtraMiscDirectives` companion object exposes a `cacheControlNoCache` directive to reply with the `no-cache` option in the `Cache-Control` header.
+The `ExtraMiscDirectives` trait exposes the directives `cacheControlMaxAge(maxAgeDuration)` and `optionalRefererHost` to set the cache-control header to the supplied finite duration (the minimum resolution is 1 second) to extract the referer from the HTTP request header, respectively. The `ExtraMiscDirectives` companion object exposes a `cacheControlNoCache` directive to reply with the `no-cache` option in the `Cache-Control` header.
 
 ### Implicits
 
