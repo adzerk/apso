@@ -1,5 +1,7 @@
 package eu.shiftforward.apso.akka.http
 
+import scala.concurrent.duration._
+
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.CacheDirectives._
 import akka.http.scaladsl.model.headers._
@@ -14,7 +16,7 @@ class ExtraMiscDirectivesSpec extends Specification with Specs2RouteTest {
 
     def noCacheRoute: Route = cacheControlNoCache(complete(OK))
 
-    def maxAgeRoute(age: Option[Long]): Route = cacheControlMaxAge(age)(complete(OK))
+    def maxAgeRoute(age: Option[FiniteDuration]): Route = cacheControlMaxAge(age)(complete(OK))
 
     "expose a no-cache control directive" in {
       Get("/") ~> noCacheRoute ~> check {
@@ -23,8 +25,13 @@ class ExtraMiscDirectivesSpec extends Specification with Specs2RouteTest {
     }
 
     "expose a max-age directive" in {
-      Get("/") ~> maxAgeRoute(Some(9001l)) ~> check {
-        response.headers must contain(`Cache-Control`(`max-age`(60l * 9001), `must-revalidate`))
+      Get("/") ~> maxAgeRoute(Some(9001.seconds)) ~> check {
+        response.headers must contain(`Cache-Control`(`max-age`(9001.seconds.toSeconds), `must-revalidate`))
+      }
+
+      // minimum resolution is 1 second, otherwise a no cache header is assumed
+      Get("/") ~> maxAgeRoute(Some(10.millis)) ~> check {
+        response.headers must contain(`Cache-Control`(`no-cache`, `no-store`, `must-revalidate`))
       }
 
       Get("/") ~> maxAgeRoute(None) ~> check {
