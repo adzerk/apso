@@ -8,7 +8,7 @@ import scala.util.Try
 import akka.http.scaladsl.model.headers.CacheDirectives._
 import akka.http.scaladsl.model.headers._
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.{ Directive0, Directive1 }
+import akka.http.scaladsl.server.{ Directive0, Directive1, RequestContext }
 
 /**
  * Exposes additional misc directives not present in [[spray.routing.directives.MiscDirectives]].
@@ -18,9 +18,9 @@ trait ExtraMiscDirectives {
   final val cacheControlNoCache: Directive0 =
     respondWithDefaultHeader(`Cache-Control`(`no-cache`, `no-store`, `must-revalidate`))
 
-  @deprecated("Use `eu.shiftforward.apso.akka.http.ExtraMiscDirectives.cacheControlMaxAge(Option[FiniteDuration])` " +
+  @deprecated("Use `eu.shiftforward.apso.akka.http.ExtraMiscDirectives.httpCacheFor(Option[FiniteDuration])` " +
     "instead", "2017/07/04")
-  def cacheControlMaxAge(inMinutes: Option[Long])(implicit d: DummyImplicit): Directive0 =
+  def cacheControlMaxAge(inMinutes: Option[Long]): Directive0 =
     inMinutes match {
       case None =>
         ExtraMiscDirectives.cacheControlNoCache
@@ -37,7 +37,7 @@ trait ExtraMiscDirectives {
    * @param maxAgeDuration the duration for how long to cache the HTTP response
    * @return a Directive that inserts a Cache-Control header
    */
-  def cacheControlMaxAge(maxAgeDuration: Option[FiniteDuration]): Directive0 = {
+  def httpCacheFor(maxAgeDuration: Option[FiniteDuration]): Directive0 = {
     maxAgeDuration match {
       case None =>
         ExtraMiscDirectives.cacheControlNoCache

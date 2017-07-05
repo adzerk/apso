@@ -16,7 +16,7 @@ class ExtraMiscDirectivesSpec extends Specification with Specs2RouteTest {
 
     def noCacheRoute: Route = cacheControlNoCache(complete(OK))
 
-    def maxAgeRoute(age: Option[FiniteDuration]): Route = cacheControlMaxAge(age)(complete(OK))
+    def maxAgeRoute(age: Option[FiniteDuration]): Route = httpCacheFor(age)(complete(OK))
 
     "expose a no-cache control directive" in {
       Get("/") ~> noCacheRoute ~> check {
