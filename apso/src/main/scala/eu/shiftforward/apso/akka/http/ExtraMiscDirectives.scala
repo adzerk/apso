@@ -18,16 +18,6 @@ trait ExtraMiscDirectives {
   final val cacheControlNoCache: Directive0 =
     respondWithDefaultHeader(`Cache-Control`(`no-cache`, `no-store`, `must-revalidate`))
 
-  @deprecated("Use `eu.shiftforward.apso.akka.http.ExtraMiscDirectives.httpCacheFor(Option[FiniteDuration])` " +
-    "instead", "2017/07/04")
-  def cacheControlMaxAge(inMinutes: Option[Long]): Directive0 =
-    inMinutes match {
-      case None =>
-        ExtraMiscDirectives.cacheControlNoCache
-      case Some(s) =>
-        respondWithDefaultHeader(`Cache-Control`(`max-age`(60l * s), `must-revalidate`))
-    }
-
   /**
    * Inserts a "Cache-Control" header, instructing the browser to cache the HTTP response for the supplied duration.
    * The header key "max-age" specifies the number of seconds during which the browser should cache the HTTP response.
@@ -37,12 +27,12 @@ trait ExtraMiscDirectives {
    * @param maxAgeDuration the duration for how long to cache the HTTP response
    * @return a Directive that inserts a Cache-Control header
    */
-  def httpCacheFor(maxAgeDuration: Option[FiniteDuration]): Directive0 = {
+  def cacheControlMaxAge(maxAgeDuration: Option[FiniteDuration]): Directive0 = {
     maxAgeDuration match {
       case None =>
         ExtraMiscDirectives.cacheControlNoCache
       case Some(s) =>
-        respondWithDefaultHeader(`Cache-Control`(`max-age`(math.max(s.toSeconds, 1.second.toSeconds)), `must-revalidate`))
+        respondWithDefaultHeader(`Cache-Control`(`max-age`(math.max(s.toSeconds, 1)), `must-revalidate`))
     }
   }
 
