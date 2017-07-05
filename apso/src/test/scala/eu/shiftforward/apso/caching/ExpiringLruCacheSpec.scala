@@ -30,6 +30,7 @@ import org.specs2.matcher.Matcher
 class ExpiringLruCacheSpec(implicit env: ExecutionEnv) extends Specification {
   implicit val system = ActorSystem()
   import system.dispatcher
+  val timeout = 15.seconds
 
   "An LruCache" should {
     "be initially empty" in {
@@ -118,7 +119,7 @@ class ExpiringLruCacheSpec(implicit env: ExecutionEnv) extends Specification {
               val value = Await.result(cache(ix) { // get (and maybe set) the cache value
                 Thread.sleep(0)
                 rand.nextInt(1000000) + 1
-              }, 3.seconds)
+              }, timeout)
               if (array(ix) == 0) array(ix) = value // update our view of the cache
               else if (array(ix) != value) failure("Cache view is inconsistent (track " + track + ", iteration " + i +
                 ", index " + ix + ": expected " + array(ix) + " but is " + value)
@@ -126,7 +127,7 @@ class ExpiringLruCacheSpec(implicit env: ExecutionEnv) extends Specification {
             array
           }
         }
-      }, 3.seconds)
+      }, timeout)
       val beConsistent: Matcher[Seq[Int]] = (
         (ints: Seq[Int]) ⇒ ints.filter(_ != 0).reduceLeft((a, b) ⇒ if (a == b) a else 0) != 0,
         (_: Seq[Int]) ⇒ "consistency check")
