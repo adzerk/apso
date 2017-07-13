@@ -23,6 +23,7 @@ object Implicits {
      * Returns this object wrapped in a `Some`.
      * @return this object wrapped in a `Some`.
      */
+    @deprecated("This will be removed in a future version", "2017/07/13")
     def some = Some(obj)
   }
 
@@ -39,6 +40,7 @@ object Implicits {
      * @return a sequence of strings of length `n` consisting of characters from
      *         this string.
      */
+    @deprecated("This will be removed in a future version", "2017/07/13")
     def enumerate(n: Int): IndexedSeq[String] = {
       require(n >= 0, "n must not be negative")
       val alphabet = s.split("").filterNot(_.isEmpty).toIndexedSeq
@@ -52,6 +54,7 @@ object Implicits {
      * @param ch the character used to fill the string
      * @return the padded string.
      */
+    @deprecated("This will be removed in a future version", "2017/07/13")
     def padLeft(length: Int, ch: Char) = {
       require(length >= 0, "length must not be negative")
       val sb = new StringBuilder(length)
@@ -65,6 +68,7 @@ object Implicits {
      * @return the UTF-8 byte array representation of this string with a
      *         trailing zero byte.
      */
+    @deprecated("This will be removed in a future version", "2017/07/13")
     def getBytesWithNullTerminator: Array[Byte] = {
       val stringBytes = s.getBytes("UTF-8")
       val buffer = new Array[Byte](stringBytes.size + 1)
@@ -102,6 +106,7 @@ object Implicits {
      *        split
      * @return a new sequence of `n` subsequences of this sequence.
      */
+    @deprecated("This will be removed in a future version", "2017/07/13")
     def split(n: Int): IndexedSeq[Seq[T]] = {
       require(n >= 0, "n must not be negative")
       if (n == 0) IndexedSeq.empty
@@ -121,6 +126,7 @@ object Implicits {
      * @return a subsequence of this sequence based on a percentage of the total
      *         number of elements.
      */
+    @deprecated("This will be removed in a future version", "2017/07/13")
     def sample(percentage: Double): Seq[T] = {
       require(percentage >= 0 && percentage <= 1, "percentage must be in [0, 1]")
       seq.take((seq.length * percentage).toInt)
@@ -132,6 +138,7 @@ object Implicits {
      * @param ord element ordering
      * @return an unordered sequence of the n smallest elements
      */
+    @deprecated("This will be removed in a future version", "2017/07/13")
     def takeSmallest(n: Int)(implicit ord: Ordering[T]): Seq[T] = quickSelect(seq, n)
 
     /**
@@ -140,6 +147,7 @@ object Implicits {
      * @param ord element ordering
      * @return an unordered sequence of the n largest elements
      */
+    @deprecated("This will be removed in a future version", "2017/07/13")
     def takeLargest(n: Int)(implicit ord: Ordering[T]): Seq[T] = takeSmallest(n)(ord.reverse)
   }
 
@@ -248,6 +256,7 @@ object Implicits {
      * @param p predicate
      * @return iterator with the results
      */
+    @deprecated("This will be removed in a future version", "2017/07/13")
     def bufferedTakeWhile(p: T => Boolean) = new BufferedIterator[T] {
       def hasNext = { thisIt.hasNext && p(thisIt.head) }
       def next() = (if (hasNext) thisIt else Iterator.empty.buffered).next()
@@ -276,6 +285,7 @@ object Implicits {
      * @return the merged map.
      * @todo check if this method is really useful / needed.
      */
+    @deprecated("This will be removed in a future version", "2017/07/13")
     def merge(that: Map[A, B])(f: (B, B) => B): Map[A, B] =
       map.foldLeft(map) {
         case (acc, (key, value)) =>
@@ -309,7 +319,7 @@ object Implicits {
      * @return the resulting map with the keys mapped with function `f`.
      */
     def mapKeys[C](f: A => C): Map[C, B] =
-      map.map({ case (k, v) => f(k) -> v }).toMap
+      map.map { case (k, v) => f(k) -> v }
   }
 
   /**
@@ -329,6 +339,7 @@ object Implicits {
      * @param zero the zero element, used as described above
      * @return the map of lists converted from this map.
      */
+    @deprecated("This will be removed in a future version", "2017/07/13")
     def sequenceOnMap(zero: Option[V] = None)(implicit dummy: DummyImplicit): Map[K, List[V]] =
       sequenceOnMap(zero.map(v => { _: Map[K, V] => v }))
 
@@ -345,6 +356,7 @@ object Implicits {
      *             being processed.
      * @return the map of lists converted from this map.
      */
+    @deprecated("This will be removed in a future version", "2017/07/13")
     def sequenceOnMap(zero: Option[Map[K, V] => V]): Map[K, List[V]] = {
       def construct(value: Option[V], zero: => Option[V]) = value match {
         case None => zero.toList
@@ -380,6 +392,7 @@ object Implicits {
      * @param other fallback
      * @return resulting future
      */
+    @deprecated("This will be removed in a future version", "2017/07/13")
     def ifNoneOrErrorFallbackTo[B >: A](other: => Future[Option[B]])(implicit ec: ExecutionContext) = f.flatMap {
       case None =>
         other

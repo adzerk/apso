@@ -12,6 +12,7 @@ import spray.json._
  *        deserialize its associated value
  * @tparam V the type of the value associated with this key
  */
+@deprecated("This will be removed in a future version", "2017/07/13")
 abstract class JsonHMapKey[V](val sym: Symbol)(implicit reg: JsonKeyRegistry, jsonFormat: JsonFormat[V]) extends HMapKey[V] {
   reg.keys += (sym -> this)
 

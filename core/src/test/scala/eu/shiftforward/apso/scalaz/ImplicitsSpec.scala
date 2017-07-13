@@ -7,6 +7,7 @@ import org.specs2.mutable._
 
 import eu.shiftforward.apso.scalaz.Implicits._
 
+@deprecated("This will be removed in a future version", "2017/07/13")
 class ImplicitsSpec extends Specification {
   "The ApsoTry" should {
     "be convertible to a Scalaz validation" in {

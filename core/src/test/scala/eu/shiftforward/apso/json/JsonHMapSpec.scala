@@ -7,6 +7,7 @@ import JsonHMap._
 import spray.json._
 import spray.json.DefaultJsonProtocol._
 
+@deprecated("This will be removed in a future version", "2017/07/13")
 class JsonHMapSpec extends Specification {
 
   "A JsonHMap" should {

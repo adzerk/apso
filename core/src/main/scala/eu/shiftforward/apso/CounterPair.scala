@@ -4,6 +4,7 @@ package eu.shiftforward.apso
  * Factory and extractor for packing two numbers in the range of an unsigned
  * short (0 to 65535) in an `Int`.
  */
+@deprecated("This will be removed in a future version", "2017/07/13")
 object CounterPair {
 
   /**

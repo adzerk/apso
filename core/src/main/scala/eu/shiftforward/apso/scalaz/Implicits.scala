@@ -6,6 +6,7 @@ import scalaz.{ Failure, Success, Validation }
 /**
  * Object containing implicit classes and methods related to scalaz.
  */
+@deprecated("This will be removed in a future version", "2017/07/13")
 object Implicits {
 
   /**

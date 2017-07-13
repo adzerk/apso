@@ -4,6 +4,7 @@ import org.specs2.mutable.Specification
 import org.specs2.ScalaCheck
 import org.scalacheck.Gen._
 
+@deprecated("This will be removed in a future version", "2017/07/13")
 class CounterPairSpec extends Specification with ScalaCheck {
   "A counter pair" should {
     "store two unsigned shorts" ! prop {

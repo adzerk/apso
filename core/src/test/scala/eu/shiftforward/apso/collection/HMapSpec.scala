@@ -3,6 +3,7 @@ package eu.shiftforward.apso.collection
 import eu.shiftforward.apso.CustomMatchers
 import org.specs2.mutable.Specification
 
+@deprecated("This will be removed in a future version", "2017/07/13")
 class HMapSpec extends Specification with CustomMatchers {
 
   "An HMap" should {

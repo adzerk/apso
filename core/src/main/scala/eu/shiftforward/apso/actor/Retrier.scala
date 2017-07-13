@@ -9,6 +9,7 @@ import Retrier._
 /**
  * Companion object for `Retrier`, containing extension methods for actor `Receive` actions.
  */
+@deprecated("This will be removed in a future version", "2017/07/13")
 object Retrier {
   private case class Retry(to: ActorRef, msg: Any)
   private case class Timeout(groupId: Long)
@@ -77,6 +78,7 @@ object Retrier {
  * @tparam Ack the type of the ACK messages
  * @tparam Key the type of identifier or object that links a sent message to its ACK
  */
+@deprecated("This will be removed in a future version", "2017/07/13")
 abstract class Retrier[Req, Msg: ClassTag, Ack: ClassTag, Key](
     msgKeyFunc: Msg => Key,
     ackKeyFunc: Ack => Key,
