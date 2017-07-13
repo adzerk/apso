@@ -4,7 +4,7 @@ import com.amazonaws.auth.AWSCredentials
 import com.amazonaws.services.s3.{ AmazonS3, AmazonS3Client }
 import com.amazonaws.services.s3.model._
 import eu.shiftforward.apso.Logging
-import scala.collection.convert.WrapAsScala._
+import scala.collection.JavaConverters._
 
 /**
  * A representation of Amazon's S3 service. This class wraps an
@@ -24,7 +24,7 @@ class S3(credentials: AWSCredentials = CredentialStore.getCredentials) extends L
    * Returns a list of all the buckets listable with this object's credentials.
    * @return a list of all the buckets listable with this object's credentials.
    */
-  def buckets: Seq[Bucket] = client.listBuckets()
+  def buckets: Seq[Bucket] = client.listBuckets.asScala
 
   /**
    * Returns the representation of an object in a bucket, if it exists.
@@ -66,7 +66,7 @@ class S3(credentials: AWSCredentials = CredentialStore.getCredentials) extends L
    */
   def bucketTags(bucketName: String): Map[String, String] = {
     Option(client.getBucketTaggingConfiguration(bucketName))
-      .map(_.getTagSet.getAllTags.toMap).getOrElse(Map())
+      .map(_.getTagSet.getAllTags.asScala.toMap).getOrElse(Map())
   }
 
   /**
@@ -103,10 +103,10 @@ class S3(credentials: AWSCredentials = CredentialStore.getCredentials) extends L
 
     def loop(last: String, max: Int): Iterator[S3ObjectSummary] = {
       val req = new ListObjectsRequest(bucketName, prefix, last, null, max)
-      val objs = client.listObjects(req).getObjectSummaries
+      val objs = client.listObjects(req).getObjectSummaries.asScala
 
       if (objs.length == max || objs.length < 1000) objs.toIterator
-      else objs.toIterator ++ loop(objs.get(objs.length - 1).getKey, max - 1000)
+      else objs.toIterator ++ loop(objs.last.getKey, max - 1000)
     }
     loop(marker, maxKeys)
   }

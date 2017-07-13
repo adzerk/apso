@@ -7,7 +7,7 @@ import com.typesafe.config._
 import com.typesafe.config.impl.Parseable
 
 import eu.shiftforward.apso.config.Implicits._
-import scala.collection.convert.WrapAsJava._
+import scala.collection.JavaConverters._
 
 /**
  * Contains static methods for creating `Config` instances in a lazy way.
@@ -178,7 +178,7 @@ object LazyConfigFactory {
     }
 
     if (validationProblems.nonEmpty)
-      throw new ConfigException.ValidationFailed(validationProblems)
+      throw new ConfigException.ValidationFailed(validationProblems.asJava)
 
     lazy val config = baseConfig.withFallback(settings)
   }
