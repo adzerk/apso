@@ -3,8 +3,7 @@ package eu.shiftforward.apso.aws
 import java.io.{ ByteArrayInputStream, File, FileOutputStream, InputStream }
 import java.util.concurrent.{ Executors, ThreadFactory }
 
-import scala.collection.JavaConversions._
-import scala.concurrent.duration._
+import scala.collection.JavaConverters._
 import scala.util.{ Failure, Success, Try }
 
 import com.amazonaws.{ AmazonClientException, AmazonServiceException, ClientConfiguration }
@@ -15,7 +14,6 @@ import com.amazonaws.services.s3.transfer.TransferManager
 import com.typesafe.config.ConfigFactory
 
 import eu.shiftforward.apso.Logging
-import eu.shiftforward.apso.io.InsistentInputStream
 
 /**
  * A representation of an Amazon's S3 bucket. This class wraps an
@@ -71,7 +69,7 @@ class S3Bucket(
       // always wait for transfers to finish.
       // (This code is copy-pasted from the AWS SDK with the addition of the `setDaemon` call).
       val executor = Executors.newFixedThreadPool(10, new ThreadFactory() {
-        var threadCount = 1;
+        var threadCount = 1
         def newThread(r: Runnable) = {
           val thread = new Thread(r)
           thread.setDaemon(true)
@@ -125,7 +123,7 @@ class S3Bucket(
       } else null
     }
 
-    val objects = listings.takeWhile(_ != null).flatMap(_.getObjectSummaries)
+    val objects = listings.takeWhile(_ != null).flatMap(_.getObjectSummaries.asScala)
     if (includeDirectories) objects else objects.filterNot(_.getKey.endsWith("/"))
   }
 
@@ -200,7 +198,7 @@ class S3Bucket(
       new ListObjectsRequest()
         .withBucketName(bucketName)
         .withMaxKeys(2)
-        .withPrefix(key)).getObjectSummaries
+        .withPrefix(key)).getObjectSummaries.asScala
   }.exists { _.exists(_.getKey.startsWith(key + "/")) }
 
   /**

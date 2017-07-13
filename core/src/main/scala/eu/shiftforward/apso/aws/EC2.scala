@@ -4,7 +4,7 @@ import com.amazonaws.auth.AWSCredentials
 import com.amazonaws.services.ec2.{ AmazonEC2, AmazonEC2Client }
 import com.amazonaws.services.ec2.model._
 import eu.shiftforward.apso.Logging
-import scala.collection.convert.WrapAsScala._
+import scala.collection.JavaConverters._
 
 /**
  * A representation of Amazon's EC2 service. This class wraps an
@@ -27,8 +27,8 @@ class EC2(credentials: AWSCredentials = CredentialStore.getCredentials) extends 
    *         instance exists, `None` otherwise.
    */
   def instance(id: String): Option[Instance] = client.describeInstances(
-    new DescribeInstancesRequest().withInstanceIds(id)).getReservations.headOption.
-    flatMap(_.getInstances.headOption)
+    new DescribeInstancesRequest().withInstanceIds(id)).getReservations.asScala.headOption.
+    flatMap(_.getInstances.asScala.headOption)
 
   /**
    * Returns all the currently running instances in EC2.
@@ -36,7 +36,7 @@ class EC2(credentials: AWSCredentials = CredentialStore.getCredentials) extends 
    */
   def instances(): Seq[Instance] = {
     val instanceData = client.describeInstances()
-    instanceData.getReservations.flatMap(_.getInstances)
+    instanceData.getReservations.asScala.flatMap(_.getInstances.asScala)
   }
 
   /**
@@ -79,6 +79,6 @@ object EC2 {
      * @return the value associated with the given key wrapped in a `Some` if the tag exists, `None`
      *         otherwise.
      */
-    def tagValue(key: String) = instance.getTags.find(_.getKey == key).map(_.getValue)
+    def tagValue(key: String) = instance.getTags.asScala.find(_.getKey == key).map(_.getValue)
   }
 }

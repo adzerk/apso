@@ -5,7 +5,7 @@ import com.github.nscala_time.time.Imports.{ Duration => _, _ }
 
 import scala.annotation.implicitNotFound
 import scala.concurrent.duration._
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.util.Try
 
 import eu.shiftforward.apso.io.LocalFileDescriptor
@@ -110,7 +110,7 @@ object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
      * @param path the path in the config
      * @return the value as a list wrapped in a `Some` if one is defined and `None` if not.
      */
-    def getListOption(path: String) = extractOption(conf, path, _.getList(_).toList)
+    def getListOption(path: String) = extractOption(conf, path, _.getList(_).asScala.toList)
 
     /**
      * Gets the value as a boolean list wrapped in a `Some` if one is defined and `None` if not. This method throws an
@@ -119,7 +119,7 @@ object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
      * @param path the path in the config
      * @return the value as a boolean list wrapped in a `Some` if one is defined and `None` if not.
      */
-    def getBooleanListOption(path: String) = extractOption(conf, path, _.getBooleanList(_).toList)
+    def getBooleanListOption(path: String) = extractOption(conf, path, _.getBooleanList(_).asScala.toList)
 
     /**
      * Gets the value as a string list wrapped in a `Some` if one is defined and `None` if not. This method throws an
@@ -128,7 +128,7 @@ object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
      * @param path the path in the config
      * @return the value as a string list wrapped in a `Some` if one is defined and `None` if not.
      */
-    def getStringListOption(path: String) = extractOption(conf, path, _.getStringList(_).toList)
+    def getStringListOption(path: String) = extractOption(conf, path, _.getStringList(_).asScala.toList)
 
     /**
      * Gets the value as a int list wrapped in a `Some` if one is defined and `None` if not. This method throws an
@@ -137,7 +137,7 @@ object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
      * @param path the path in the config
      * @return the value as a int list wrapped in a `Some` if one is defined and `None` if not.
      */
-    def getIntListOption(path: String) = extractOption(conf, path, _.getIntList(_).toList)
+    def getIntListOption(path: String) = extractOption(conf, path, _.getIntList(_).asScala.toList)
 
     /**
      * Gets the value as a double list wrapped in a `Some` if one is defined and `None` if not. This method throws an
@@ -146,7 +146,7 @@ object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
      * @param path the path in the config
      * @return the value as a double list wrapped in a `Some` if one is defined and `None` if not.
      */
-    def getDoubleListOption(path: String) = extractOption(conf, path, _.getDoubleList(_).toList)
+    def getDoubleListOption(path: String) = extractOption(conf, path, _.getDoubleList(_).asScala.toList)
 
     /**
      * Gets the value as a long list wrapped in a `Some` if one is defined and `None` if not. This method throws an
@@ -155,7 +155,7 @@ object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
      * @param path the path in the config
      * @return the value as a long list wrapped in a `Some` if one is defined and `None` if not.
      */
-    def getLongListOption(path: String) = extractOption(conf, path, _.getLongList(_).toList)
+    def getLongListOption(path: String) = extractOption(conf, path, _.getLongList(_).asScala.toList)
 
     /**
      * Gets the value as a duration list wrapped in a `Some` if one is defined and `None` if not. This method throws an
@@ -164,7 +164,7 @@ object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
      * @param path the path in the config
      * @return the value as a duration list wrapped in a `Some` if one is defined and `None` if not.
      */
-    def getDurationListOption(path: String) = extractOption(conf, path, _.getDurationList(_, SECONDS).map(_.toLong.seconds).toList)
+    def getDurationListOption(path: String) = extractOption(conf, path, _.getDurationList(_, SECONDS).asScala.map(_.toLong.seconds).toList)
 
     /**
      * Gets the value as a config list wrapped in a `Some` if one is defined and `None` if not. This method throws an
@@ -173,7 +173,7 @@ object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
      * @param path the path in the config
      * @return the value as a config list wrapped in a `Some` if one is defined and `None` if not.
      */
-    def getConfigListOption(path: String) = extractOption(conf, path, _.getConfigList(_).toList)
+    def getConfigListOption(path: String) = extractOption(conf, path, _.getConfigList(_).asScala.toList)
 
     /**
      * Gets the percentage value as a double wrapped in a `Some` if it is defined and `None` if not.
@@ -286,8 +286,8 @@ object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
      */
     def getTypedList[T](path: String): List[T] =
       (for (
-        entry <- conf.getList(path)
-      ) yield entry.unwrapped().asInstanceOf[T]).toList
+        entry <- conf.getList(path).asScala
+      ) yield entry.unwrapped.asInstanceOf[T]).toList
 
     /**
      * Converts the config into a Map[String, T]
@@ -297,7 +297,7 @@ object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
      * @throws ConfigException if the value cannot be read as type `T`
      */
     def toMap[T](implicit configReader: ConfigReader[T]): Map[String, T] = {
-      conf.root.keySet().map { k =>
+      conf.root.keySet.asScala.map { k =>
         val quotedKey = ConfigUtil.joinPath(k)
         quotedKey -> configReader(conf, quotedKey)
       }.toMap
@@ -311,7 +311,7 @@ object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
      */
     def toFlattenedMap[T](implicit configReader: ConfigReader[T]): Map[String, T] = {
       (for (
-        entry <- conf.entrySet()
+        entry <- conf.entrySet.asScala
       ) yield (entry.getKey, configReader(conf, entry.getKey))).toMap
     }
 
@@ -323,7 +323,7 @@ object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
     def toConfigMap: Map[String, Config] = {
       val configRegex = "(\"[^\"]*\")|([^\\.]+)".r
       (for {
-        entry <- conf.entrySet()
+        entry <- conf.entrySet.asScala
         key <- configRegex.findFirstMatchIn(entry.getKey).flatMap(_.subgroups.flatMap(Option(_)).headOption)
         value <- Try(conf.getConfig(key)).toOption
       } yield { key -> value }).toMap
@@ -361,17 +361,17 @@ object ConfigReader {
     implicit val configConfigReader = configReader[Config](_.getConfig(_))
 
     // ConfigReaders implicits for lists
-    implicit val boolListConfigReader = configReader[List[Boolean]](_.getBooleanList(_).toList.map(Boolean.unbox))
-    implicit val stringListConfigReader = configReader[List[String]](_.getStringList(_).toList)
-    implicit val intListConfigReader = configReader[List[Int]](_.getIntList(_).toList.map(Int.unbox))
-    implicit val doubleListConfigReader = configReader[List[Double]](_.getDoubleList(_).toList.map(Double.unbox))
-    implicit val longListConfigReader = configReader[List[Long]](_.getLongList(_).toList.map(Long.unbox))
+    implicit val boolListConfigReader = configReader[List[Boolean]](_.getBooleanList(_).asScala.toList.map(Boolean.unbox))
+    implicit val stringListConfigReader = configReader[List[String]](_.getStringList(_).asScala.toList)
+    implicit val intListConfigReader = configReader[List[Int]](_.getIntList(_).asScala.toList.map(Int.unbox))
+    implicit val doubleListConfigReader = configReader[List[Double]](_.getDoubleList(_).asScala.toList.map(Double.unbox))
+    implicit val longListConfigReader = configReader[List[Long]](_.getLongList(_).asScala.toList.map(Long.unbox))
     implicit val durationListConfigReader =
-      configReader[List[Duration]](_.getDurationList(_).map(durationToFiniteDuration).toList)
+      configReader[List[Duration]](_.getDurationList(_).asScala.map(durationToFiniteDuration).toList)
     implicit val finiteDurationListConfigReader =
-      configReader[List[FiniteDuration]](_.getDurationList(_).map(durationToFiniteDuration).toList)
-    implicit val javaDurationListConfigReader = configReader[List[java.time.Duration]](_.getDurationList(_).toList)
-    implicit val configListConfigReader = configReader[List[Config]](_.getConfigList(_).toList)
+      configReader[List[FiniteDuration]](_.getDurationList(_).asScala.map(durationToFiniteDuration).toList)
+    implicit val javaDurationListConfigReader = configReader[List[java.time.Duration]](_.getDurationList(_).asScala.toList)
+    implicit val configListConfigReader = configReader[List[Config]](_.getConfigList(_).asScala.toList)
 
     implicit def durationToFiniteDuration(d: java.time.Duration): FiniteDuration = Duration.fromNanos(d.toNanos)
   }

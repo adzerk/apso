@@ -7,7 +7,7 @@ import org.specs2.mutable.SpecificationLike
 
 import scala.concurrent.duration._
 
-@deprecated("Use https://github.com/ruippeixotog/akka-testkit-specs2 instead")
+@deprecated("Use https://github.com/ruippeixotog/akka-testkit-specs2 instead", "2017/01/27")
 trait ActorMatchers extends SpecificationLike {
 
   def receive(msg: Any): Matcher[TestKitBase] = { probe: TestKitBase =>
