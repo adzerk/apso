@@ -14,6 +14,7 @@ import ConfigReader.{ BasicConfigReaders, ExtendedConfigReaders }
 /**
  * Provides useful extension methods for `Config` instances.
  */
+@deprecated("Use https://github.com/pureconfig/pureconfig instead", "2017/07/13")
 object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
 
   @inline private[this] def extractOption[A](conf: Config, path: String, f: (Config, String) => A) =
@@ -336,9 +337,11 @@ object Implicits extends BasicConfigReaders with ExtendedConfigReaders {
  *
  * @tparam T the type to be returned
  */
+@deprecated("Use https://github.com/pureconfig/pureconfig instead", "2017/07/13")
 @implicitNotFound(msg = "Could not find a way to read a ${T} from a Config. You might want to import or implement a ConfigReader[${T}]")
 trait ConfigReader[+T] extends ((Config, String) => T)
 
+@deprecated("Use https://github.com/pureconfig/pureconfig instead", "2017/07/13")
 object ConfigReader {
   def configReader[T](f: (Config, String) => T): ConfigReader[T] =
     new ConfigReader[T] {

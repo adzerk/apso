@@ -6,6 +6,7 @@ import org.specs2.mutable.Specification
 import scala.concurrent.duration._
 import scala.util.Success
 
+@deprecated("Use https://github.com/pureconfig/pureconfig instead", "2017/07/13")
 class ConfigImplicitsSpec extends Specification {
 
   "An ApsoConfig" should {
