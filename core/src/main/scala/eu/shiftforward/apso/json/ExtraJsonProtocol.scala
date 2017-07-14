@@ -5,12 +5,11 @@ import java.net.URI
 import scala.concurrent.duration._
 import scala.util.{ Failure, Success, Try }
 
-import com.github.nscala_time.time.Imports._
+import org.joda.time.{ DateTime, Interval, LocalDate }
+
 import com.typesafe.config.{ Config, ConfigFactory, ConfigRenderOptions }
 import spray.json.DefaultJsonProtocol._
 import spray.json._
-
-import eu.shiftforward.apso.config.Implicits._
 
 /**
  * Provides additional JsonFormats not available in the [[spray.json.DefaultJsonProtocol]].
@@ -27,7 +26,7 @@ trait ExtraTimeJsonProtocol {
     def read(json: JsValue) = {
 
       def tryToParseDuration(duration: String) =
-        Try(ConfigFactory.parseString(s"d=$duration").get[FiniteDuration]("d")) match {
+        Try(Duration.fromNanos(ConfigFactory.parseString(s"d=$duration").getDuration("d").toNanos)) match {
           case Success(d) => d
           case Failure(t) => deserializationError("Expected a Number or a unit-annotated String", t)
         }
@@ -109,7 +108,7 @@ trait ExtraMiscJsonProtocol {
     override def write(date: LocalDate): JsValue = date.toString.toJson
 
     override def read(json: JsValue): LocalDate = json match {
-      case JsString(date) => date.toLocalDate
+      case JsString(date) => new LocalDate(date)
       case _ =>
         deserializationError("The value for a 'LocalDate' has an invalid type - it must be a String.")
     }
