@@ -1,6 +1,5 @@
 package eu.shiftforward.apso.iterator
 
-import scala.collection.Iterator.empty
 import scala.collection.{ AbstractIterator, BufferedIterator, GenTraversableOnce, Iterator }
 
 /**

@@ -394,7 +394,7 @@ final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Lo
   }
 
   final override def equals(that: Any) = {
-    def equalsInner[A, B](m1: DeboxMap[A, B], m2: DeboxMap[A, B]) = {
+    def equalsInner(m1: DeboxMap[A, B], m2: DeboxMap[A, B]) = {
       var equals = true
       m1.foreach {
         case (k, v) =>

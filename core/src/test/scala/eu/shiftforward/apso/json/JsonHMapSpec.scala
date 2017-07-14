@@ -1,7 +1,6 @@
 package eu.shiftforward.apso.json
 
 import org.specs2.mutable.Specification
-import eu.shiftforward.apso.collection.{ HMap, HMapKey }
 
 import JsonHMap._
 import spray.json._

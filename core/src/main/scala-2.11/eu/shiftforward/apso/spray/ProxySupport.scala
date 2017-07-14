@@ -5,7 +5,6 @@ import akka.io.IO
 import spray.can.Http
 import spray.http.{ HttpHeader, HttpRequest, RemoteAddress, Uri }
 import spray.http.HttpHeaders.{ `Remote-Address`, `X-Forwarded-For` }
-import spray.routing.directives.HeaderDirectives._
 import spray.routing.{ Directive1, RequestContext, Route }
 
 /**

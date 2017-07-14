@@ -2,11 +2,9 @@ package eu.shiftforward.apso.akka.http
 
 import java.net.{ InetAddress, ServerSocket }
 
-import scala.concurrent.Future
 import scala.concurrent.duration._
 
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.model.RemoteAddress.IP
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers._

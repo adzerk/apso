@@ -1,6 +1,6 @@
 package eu.shiftforward.apso.io
 
-import com.typesafe.config.{ Config, ConfigFactory }
+import com.typesafe.config.ConfigFactory
 
 import eu.shiftforward.apso.Logging
 import io.github.andrebeat.pool.Pool
@@ -11,7 +11,6 @@ import net.schmizz.sshj._
 import net.schmizz.sshj.common.SSHException
 import net.schmizz.sshj.sftp.{ FileAttributes, FileMode, Response, SFTPClient, SFTPException }
 import net.schmizz.sshj.transport.verification._
-import net.schmizz.sshj.xfer.scp.SCPFileTransfer
 import scala.collection.JavaConverters._
 import scala.concurrent.duration.Duration
 import scala.util.{ Properties, Try }

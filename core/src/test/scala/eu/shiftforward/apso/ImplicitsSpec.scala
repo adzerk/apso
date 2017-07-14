@@ -1,7 +1,6 @@
 package eu.shiftforward.apso
 
 import scala.concurrent.Future
-import scala.concurrent.duration._
 import scala.util.{ Random, Try }
 
 import org.scalacheck.Arbitrary._
@@ -13,7 +12,7 @@ import org.specs2.mutable._
 import eu.shiftforward.apso.Implicits._
 
 @deprecated("Some of classes tested here will be removed later", "2017/07/13")
-class ImplicitsSpec(implicit env: ExecutionEnv) extends Specification with ScalaCheck with FutureExtraMatchers {
+class ImplicitsSpec(implicit ee: ExecutionEnv) extends Specification with ScalaCheck with FutureExtraMatchers {
 
   "An ApsoAny" should {
 

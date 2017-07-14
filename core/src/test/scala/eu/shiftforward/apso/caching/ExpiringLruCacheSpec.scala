@@ -27,7 +27,7 @@ import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mutable.Specification
 import org.specs2.matcher.Matcher
 
-class ExpiringLruCacheSpec(implicit env: ExecutionEnv) extends Specification {
+class ExpiringLruCacheSpec(implicit ee: ExecutionEnv) extends Specification {
   implicit val system = ActorSystem()
   import system.dispatcher
   val timeout = 15.seconds

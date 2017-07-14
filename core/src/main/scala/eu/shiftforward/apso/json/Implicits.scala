@@ -4,7 +4,6 @@ import spray.json.DefaultJsonProtocol._
 import spray.json._
 import eu.shiftforward.apso.Implicits._
 
-import scala.reflect.ClassTag
 import scala.util.Try
 
 /**
