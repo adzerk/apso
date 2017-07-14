@@ -3,6 +3,7 @@ package eu.shiftforward.apso.config
 import com.typesafe.config.{ ConfigException, ConfigFactory }
 import org.specs2.mutable.Specification
 
+@deprecated("Some of methods tested here will be removed later", "2017/07/13")
 class LazyConfigFactorySpec extends Specification {
   sequential
 

@@ -2,8 +2,6 @@ package eu.shiftforward.apso.io
 
 import java.io.InputStream
 
-import com.typesafe.config.{ ConfigFactory, Config }
-
 import scala.io.Source
 
 /**
@@ -178,13 +176,13 @@ object FileDescriptor {
    * @param uri the URI
    * @return the specific file descriptor given the supported protocols
    */
-  def apply(uri: String): FileDescriptor = apply(uri, ConfigFactory.empty)
+  def apply(uri: String): FileDescriptor = apply(uri, config.Credentials())
 
-  def apply(uri: String, credentialsConfig: Config): FileDescriptor = {
+  def apply(uri: String, credentialsConfig: config.Credentials): FileDescriptor = {
     protocol(uri) match {
       case ("file", path) => LocalFileDescriptor(path)
-      case ("s3", path) => S3FileDescriptor(path, credentialsConfig)
-      case ("sftp", path) => SftpFileDescriptor(path, credentialsConfig)
+      case ("s3", path) => S3FileDescriptor(path, credentialsConfig.s3)
+      case ("sftp", path) => SftpFileDescriptor(path, credentialsConfig.sftp)
       case _ => throw new UnsupportedOperationException("Protocol not supported")
     }
   }
