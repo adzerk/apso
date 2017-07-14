@@ -25,7 +25,6 @@ import eu.shiftforward.apso.Logging
  *                    If the parameter is not supplied, they will be retrieved from the
  *                    [[eu.shiftforward.apso.aws.CredentialStore]].
  */
-@deprecated("This will be removed in a future version", "2017/07/13")
 class S3Bucket(
   val bucketName: String,
   private val credentialsFactory: () => AWSCredentials = { () => CredentialStore.getCredentials })
