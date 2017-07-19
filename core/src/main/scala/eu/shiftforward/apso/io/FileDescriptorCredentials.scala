@@ -5,12 +5,15 @@ package eu.shiftforward.apso.io
  *
  * The config file must follow the following structure:
  *
+ * {{{
  * {
- *   default = $protocolCredentials
- *    ids {
- *      id1 = $protocolCredentials
- *     id2 = $protocolCredentials
- *    }
+ *   default = <protocolCredentials>
+ *   ids {
+ *     id1 = <protocolCredentials>
+ *     id2 = <protocolCredentials>
+ *   }
+ * }
+ * }}}
  *
  * The `default` is optional and is used as a fallback when the
  * file descriptor id matches none of the credentials ids.
