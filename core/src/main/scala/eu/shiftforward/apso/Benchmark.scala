@@ -3,6 +3,7 @@ package eu.shiftforward.apso
 /**
  * Utility object for measuring the running time of a block of code.
  */
+@deprecated("This will be removed in a future version", "2017/07/13")
 object Benchmark {
 
   /**

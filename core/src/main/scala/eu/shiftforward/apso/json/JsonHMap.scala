@@ -10,6 +10,7 @@ import spray.json.DefaultJsonProtocol._
  * `JsonKeyRegistry` must be present both when a key is created and when a
  * conversion is to be done between a map and JSON.
  */
+@deprecated("This will be removed in a future version", "2017/07/13")
 trait JsonKeyRegistry {
 
   /**
@@ -21,6 +22,7 @@ trait JsonKeyRegistry {
 /**
  * Object that defines an `HMap` with JSON (de)serialization capabilities.
  */
+@deprecated("This will be removed in a future version", "2017/07/13")
 object JsonHMap {
 
   /**

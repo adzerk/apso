@@ -1,12 +1,12 @@
 package eu.shiftforward.apso.json
 
 import org.specs2.mutable.Specification
-import eu.shiftforward.apso.collection.{ HMap, HMapKey }
 
 import JsonHMap._
 import spray.json._
 import spray.json.DefaultJsonProtocol._
 
+@deprecated("This will be removed in a future version", "2017/07/13")
 class JsonHMapSpec extends Specification {
 
   "A JsonHMap" should {

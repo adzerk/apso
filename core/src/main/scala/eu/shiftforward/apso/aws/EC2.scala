@@ -13,6 +13,7 @@ import scala.collection.JavaConverters._
  * @param credentials optional AWS credentials to use. If the parameter is not supplied, they will
  *                    be retrieved from the [[eu.shiftforward.apso.aws.CredentialStore]].
  */
+@deprecated("This will be removed in a future version", "2017/07/13")
 class EC2(credentials: AWSCredentials = CredentialStore.getCredentials) extends Logging {
 
   /**

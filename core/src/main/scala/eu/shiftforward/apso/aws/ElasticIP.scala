@@ -8,6 +8,7 @@ import com.amazonaws.auth.AWSCredentials
  * Representation of an AWS Elastic IP address.
  * @param ip the IPv4 address
  */
+@deprecated("This will be removed in a future version", "2017/07/13")
 class ElasticIP(ip: String, credentials: AWSCredentials = CredentialStore.getCredentials) {
 
   private[this] lazy val ec2 = new AmazonEC2Client(credentials)

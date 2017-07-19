@@ -8,6 +8,7 @@ import scala.collection.mutable.ListBuffer
  * @param entries a list of key-value pairs present in the map
  * @tparam KeyType the type of keys used in this map
  */
+@deprecated("This will be removed in a future version", "2017/07/13")
 class HMap[KeyType[_] <: HMapKey[_]](val entries: ListBuffer[(KeyType[V], V) forSome { type V }]) {
 
   /**

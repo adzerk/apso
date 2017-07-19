@@ -3,6 +3,7 @@ package eu.shiftforward.apso
 /**
  * Wrapper around Scala's process library that facilitates the launching of shell commands.
  */
+@deprecated("This will be removed in a future version", "2017/07/13")
 case object ShellRun {
 
   /**

@@ -8,6 +8,7 @@ import scala.collection.GenTraversableOnce
  * @param iterators the array of iterators
  * @tparam A the type of the elements to iterate over
  */
+@deprecated("This will be removed in a future version", "2017/07/13")
 class RoundRobinIterator[A](private[this] val iterators: Array[Iterator[A]]) extends Iterator[A] {
   private[this] val nIterators = iterators.length
   private[this] var current = 0

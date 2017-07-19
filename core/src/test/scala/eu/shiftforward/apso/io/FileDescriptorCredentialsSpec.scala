@@ -1,66 +1,28 @@
 package eu.shiftforward.apso.io
 
-import com.typesafe.config.{ ConfigFactory, Config }
-import eu.shiftforward.apso.CustomMatchers
-import eu.shiftforward.apso.config.FileDescriptorCredentials
 import org.specs2.mutable.Specification
+
+import eu.shiftforward.apso.CustomMatchers
 
 class FileDescriptorCredentialsSpec extends Specification with CustomMatchers {
 
-  val fdCredentials = new FileDescriptorCredentials[(String, String)] {
-    def protocol: String = "test-protocol"
+  val fdCredentials = new FileDescriptorCredentials[config.Credentials.Sftp.Entry, (String, String)] {
     def id(path: String): String = path
-    def createCredentials(id: String, fdConfig: Config): (String, String) =
-      (fdConfig.getString("username"), fdConfig.getString("password"))
+
+    def createCredentials(id: String, fdConfig: config.Credentials.Sftp.Entry): (String, String) = fdConfig match {
+      case config.Credentials.Sftp.Entry.Basic(username, password) => (username, password)
+      case _ => throw new Exception
+    }
   }
 
-  val baseConfig = ConfigFactory.parseString(
-    """
-      |test-protocol {
-      |  credentials = [{
-      |    id = "foo"
-      |    creds {
-      |      username = "foo-username"
-      |      password = "foo-password"
-      |    }
-      |  },{
-      |    ids = ["bar", "zed"]
-      |    creds {
-      |      username = "barzed-username"
-      |      password = "barzed-password"
-      |    }
-      |  },{
-      |    id = "a"
-      |    ids = ["b", "c"]
-      |    creds {
-      |      username = "ids-username"
-      |      password = "ids-password"
-      |    }
-      |  },{
-      |    id = "repeated"
-      |    creds {
-      |      username = "repeated-username"
-      |      password = "repeated-password"
-      |    }
-      |  },{
-      |    id = "repeated"
-      |    creds {
-      |      username = "repeated-2-username"
-      |      password = "repeated-2-password"
-      |    }
-      |  }]
-      |}
-    """.stripMargin)
+  val baseConfig = config.Credentials.Sftp(
+    ids = Map(
+      "foo" -> config.Credentials.Sftp.Entry.Basic("foo-username", "foo-password"),
+      "bar" -> config.Credentials.Sftp.Entry.Basic("barzed-username", "barzed-password"),
+      "zed" -> config.Credentials.Sftp.Entry.Basic("barzed-username", "barzed-password")))
 
-  val withDefaultConfig = ConfigFactory.parseString(
-    """
-      |test-protocol.default {
-      |  username = "default-username"
-      |  password = "default-password"
-      |}
-    """.stripMargin)
-
-  val testConfig = baseConfig.withFallback(withDefaultConfig)
+  val testConfig = baseConfig.copy(
+    default = Some(config.Credentials.Sftp.Entry.Basic("default-username", "default-password")))
 
   "A FileDescriptorCredential" should {
 
@@ -90,22 +52,6 @@ class FileDescriptorCredentialsSpec extends Specification with CustomMatchers {
       val path = "missing"
       val creds = fdCredentials.read(baseConfig, path)
       creds must beNone
-    }
-
-    "read the array notation over the single notation in the config when both are defined" in {
-      val path = "b"
-      val creds = fdCredentials.read(baseConfig, path)
-      creds must beSome(("ids-username", "ids-password"))
-
-      val path2 = "a"
-      val creds2 = fdCredentials.read(baseConfig, path2)
-      creds2 must beNone
-    }
-
-    "if the fd's is matched multiple times in the config, read the first appearance" in {
-      val path = "repeated"
-      val creds = fdCredentials.read(testConfig, path)
-      creds must beSome(("repeated-username", "repeated-password"))
     }
 
     "do not read the credentials if the given id is empty" in {

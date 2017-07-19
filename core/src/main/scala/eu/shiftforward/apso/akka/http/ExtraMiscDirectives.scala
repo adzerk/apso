@@ -11,7 +11,7 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{ Directive0, Directive1 }
 
 /**
- * Exposes additional misc directives not present in [[spray.routing.directives.MiscDirectives]].
+ * Exposes additional misc directives not present in [[akka.http.scaladsl.server.directives.MiscDirectives]].
  */
 trait ExtraMiscDirectives {
 

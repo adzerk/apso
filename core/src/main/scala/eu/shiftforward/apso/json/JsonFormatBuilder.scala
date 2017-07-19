@@ -4,7 +4,6 @@ import eu.shiftforward.apso.json.JsonFormatBuilder._
 import eu.shiftforward.apso.json.JsonFormatBuilder.Field
 import shapeless._
 import spray.json._
-import spray.json.DefaultJsonProtocol._
 
 /**
  * A type-safe way to construct a `JSONFormat` by incrementally adding, removing or updating fields.

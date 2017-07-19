@@ -87,6 +87,7 @@ object LazyConfigFactory {
   /**
    * A `Config` builder providing a DSL for retireving and modifying configs.
    */
+  @deprecated("Use pureconfig for loading the root object and then manipulate domain objects directly", "2017/07/13")
   trait Builder {
 
     /**
@@ -159,17 +160,21 @@ object LazyConfigFactory {
    * @param path the target path of the default config
    * @return a `LazyConfigFactory.Builder` targeted at the given path of the default config.
    */
+  @deprecated("Use pureconfig for loading the root object and then manipulate domain objects directly", "2017/07/13")
   def loadAt(path: String): Builder = new AtPathBuilder(path)
 
+  @deprecated("Use pureconfig for loading the root object and then manipulate domain objects directly", "2017/07/13")
   private[this] class AtPathBuilder(path: String) extends Builder {
     lazy val config = load.getConfig(path)
   }
 
+  @deprecated("Use pureconfig for loading the root object and then manipulate domain objects directly", "2017/07/13")
   private[this] class WithOverridesBuilder(baseConfig: Config, overrides: Config) extends Builder {
     baseConfig.checkValid(overrides)
     lazy val config = overrides.withFallback(baseConfig)
   }
 
+  @deprecated("Use pureconfig for loading the root object and then manipulate domain objects directly", "2017/07/13")
   private[this] class WithSettingsBuilder(baseConfig: Config, settings: Config) extends Builder {
     val validationProblems = settings.toFlattenedMap[Unit].keys.toSeq.collect {
       case path if baseConfig.hasPath(path) =>

@@ -1,10 +1,8 @@
 package eu.shiftforward.apso.io
 
-import com.typesafe.config.{ Config, ConfigFactory }
+import com.typesafe.config.ConfigFactory
 
 import eu.shiftforward.apso.Logging
-import eu.shiftforward.apso.config.FileDescriptorCredentials
-import eu.shiftforward.apso.config.Implicits._
 import io.github.andrebeat.pool.Pool
 import java.io.{ File, FileNotFoundException, IOException, InputStream }
 import java.util.concurrent.ConcurrentHashMap
@@ -13,8 +11,8 @@ import net.schmizz.sshj._
 import net.schmizz.sshj.common.SSHException
 import net.schmizz.sshj.sftp.{ FileAttributes, FileMode, Response, SFTPClient, SFTPException }
 import net.schmizz.sshj.transport.verification._
-import net.schmizz.sshj.xfer.scp.SCPFileTransfer
 import scala.collection.JavaConverters._
+import scala.concurrent.duration.Duration
 import scala.util.{ Properties, Try }
 
 import net.schmizz.sshj.xfer.InMemorySourceFile
@@ -91,10 +89,9 @@ case class SftpFileDescriptor(
 
   protected def withFileAttributes[A](f: FileAttributes => A): A = fileAttributes match {
     case Some(fa) => f(fa)
-    case None => {
+    case None =>
       _fileAttributes = Some(sftp(_.stat(path)))
       withFileAttributes(f)
-    }
   }
 
   def size = withFileAttributes(_.getSize)
@@ -211,11 +208,10 @@ case class SftpFileDescriptor(
 }
 
 object SftpFileDescriptor {
-  private[this] val config = ConfigFactory.load()
-  private[this] val maxConnections =
-    config.getInt("apso.io.file-descriptor.sftp.max-connections-per-host")
-  private[this] val maxIdleTime =
-    config.getDuration("apso.io.file-descriptor.sftp.max-idle-time")
+  private[this] val fdConf = ConfigFactory.load()
+  private[this] val maxConnections = fdConf.getInt("apso.io.file-descriptor.sftp.max-connections-per-host")
+  private[this] val maxIdleTime = Duration.fromNanos(
+    fdConf.getDuration("apso.io.file-descriptor.sftp.max-idle-time").toNanos)
 
   private[this] val connectionPools = new ConcurrentHashMap[String, Pool[SftpClient]]()
 
@@ -302,21 +298,16 @@ object SftpFileDescriptor {
     }
   }
 
-  private[this] val credentials = new FileDescriptorCredentials[(String, String, Either[Identity, String])] {
-    final val protocol = "sftp"
+  private[this] val credentials = new FileDescriptorCredentials[config.Credentials.Sftp.Entry, (String, String, Either[Identity, String])] {
     def id(path: String) = splitMeta(path)._1
 
-    def createCredentials(hostname: String, sftpConfig: Config): (String, String, Either[Identity, String]) = {
-      val username = sftpConfig.getString("username")
-
-      val creds =
-        sftpConfig.getStringOption("keypair-file").map { fname =>
-          Left((new File(Properties.userHome + "/.ssh/" + fname), sftpConfig.getStringOption("passphrase")))
-        }
-          .orElse(sftpConfig.getStringOption("password").map(Right(_)))
-          .getOrElse(throw new IllegalArgumentException("Error parsing SFTP URI. No keypair file or password provided."))
-
-      (hostname, username, creds)
+    def createCredentials(hostname: String, sftpConfig: config.Credentials.Sftp.Entry): (String, String, Either[Identity, String]) = {
+      sftpConfig match {
+        case config.Credentials.Sftp.Entry.Basic(username, password) =>
+          (hostname, username, Right(password))
+        case config.Credentials.Sftp.Entry.PublicKey(username, keypairFile, passphrase) =>
+          (hostname, username, Left((new File(Properties.userHome + "/.ssh/" + keypairFile), passphrase)))
+      }
     }
   }
 
@@ -362,6 +353,6 @@ object SftpFileDescriptor {
     }
   }
 
-  def apply(path: String, credentialsConfig: Config): SftpFileDescriptor =
+  def apply(path: String, credentialsConfig: config.Credentials.Sftp): SftpFileDescriptor =
     apply(path, credentials.read(credentialsConfig, path))
 }

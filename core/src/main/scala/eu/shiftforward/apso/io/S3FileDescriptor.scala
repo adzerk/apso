@@ -4,11 +4,9 @@ import java.io.InputStream
 
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.s3.model.S3ObjectSummary
-import com.typesafe.config.Config
 
 import eu.shiftforward.apso.Logging
 import eu.shiftforward.apso.aws.{ S3Bucket, SerializableAWSCredentials }
-import eu.shiftforward.apso.config.FileDescriptorCredentials
 import scala.collection.concurrent.TrieMap
 
 case class S3FileDescriptor(
@@ -144,7 +142,7 @@ object S3FileDescriptor {
    * @param credentialsConfig the config containing the credentials
    * @return a s3 file descriptor
    */
-  def apply(path: String, credentialsConfig: Config): S3FileDescriptor =
+  def apply(path: String, credentialsConfig: config.Credentials.S3): S3FileDescriptor =
     apply(path, credentials.read(credentialsConfig, path))
 
   /**
@@ -187,13 +185,11 @@ object S3FileDescriptor {
   /**
    * Credential extractor for a s3 bucket from the credential config
    */
-  val credentials = new FileDescriptorCredentials[SerializableAWSCredentials] {
+  val credentials = new FileDescriptorCredentials[config.Credentials.S3.Entry, SerializableAWSCredentials] {
     def id(path: String) = path.split("/").headOption.mkString
-    val protocol = "s3"
-    def createCredentials(id: String, s3Config: Config) = {
-      new SerializableAWSCredentials(
-        s3Config.getString("access-key"),
-        s3Config.getString("secret-key"))
+
+    def createCredentials(id: String, s3Config: config.Credentials.S3.Entry) = {
+      new SerializableAWSCredentials(s3Config.accessKey, s3Config.secretKey)
     }
   }
 

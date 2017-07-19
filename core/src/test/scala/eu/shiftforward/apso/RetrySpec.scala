@@ -5,7 +5,7 @@ import org.specs2.mutable.Specification
 
 import scala.concurrent.Future
 
-class RetrySpec(implicit env: ExecutionEnv) extends Specification with FutureExtraMatchers {
+class RetrySpec(implicit ee: ExecutionEnv) extends Specification with FutureExtraMatchers {
 
   "A Retry mechanism" should {
 

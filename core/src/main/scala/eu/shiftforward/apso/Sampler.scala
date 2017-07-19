@@ -7,6 +7,7 @@ import scala.math._
  * @tparam T the type of the elements of the sequence
  * @todo move the type parameter T to the apply method.
  */
+@deprecated("This will be removed in a future version", "2017/07/13")
 trait Sampler[T] {
 
   /**
@@ -35,6 +36,7 @@ trait Sampler[T] {
  * @param base the base to use for calculating the ratios, as described above
  * @tparam T the type of the elements of the sequence
  */
+@deprecated("This will be removed in a future version", "2017/07/13")
 case class ExpSampler[T](base: Double = 2.0) extends Sampler[T] {
   def samplingFor(level: Int) = 1.0 / pow(base, level)
 }
@@ -45,6 +47,7 @@ case class ExpSampler[T](base: Double = 2.0) extends Sampler[T] {
  * @param list the sampling ratios to use in which sampling level
  * @tparam T the type of the elements of the sequence
  */
+@deprecated("This will be removed in a future version", "2017/07/13")
 case class ListSampler[T](list: Double*) extends Sampler[T] {
   def samplingFor(level: Int) = list(level)
 }
@@ -55,6 +58,7 @@ case class ListSampler[T](list: Double*) extends Sampler[T] {
  * a sampling ratio below the minimum defined use that minimum.
  * @tparam T the type of the elements of the sequence
  */
+@deprecated("This will be removed in a future version", "2017/07/13")
 trait FallbackToMinimum[T] extends Sampler[T] {
 
   /**

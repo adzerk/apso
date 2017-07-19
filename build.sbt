@@ -59,6 +59,35 @@ lazy val testkit = project.in(file("testkit"))
       "org.specs2"                    %% "specs2-core"        % "3.8.6"          % "provided",
       "org.specs2"                    %% "specs2-junit"       % "3.8.6"          % "provided"))
 
+lazy val commonScalacOptions = {
+  val allVersionScalacOptions = Seq(
+    "-encoding", "UTF-8",
+    "-language:existentials",
+    "-language:higherKinds",
+    "-language:implicitConversions",
+    "-deprecation",
+    "-feature",
+    "-unchecked",
+    "-Ywarn-dead-code",
+    "-Ywarn-unused-import")
+
+  val scala211ScalacOptions = allVersionScalacOptions ++ Seq(
+    "-Xlint:-adapted-args,-nullary-override,_")
+
+  // Scala 2.12.2 has excessive warnings about unused implicits. See https://github.com/scala/bug/issues/10270
+  val scala212ScalacOptions = allVersionScalacOptions ++ Seq(
+    "-Xlint:-unused,-nullary-override,-adapted-args,_",
+    "-Ywarn-unused:-params")
+
+  Def.task {
+    scalacOptions.value ++ (CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, 12)) => scala212ScalacOptions
+      case Some((2, 11)) => scala211ScalacOptions
+      case _ => Nil // for the aggregation project
+    })
+  }
+}
+
 lazy val commonSettings = Seq(
   resolvers ++= Seq(
     Resolver.sonatypeRepo("snapshots"),
@@ -72,14 +101,7 @@ lazy val commonSettings = Seq(
     .setPreference(DanglingCloseParenthesis, Prevent)
     .setPreference(DoubleIndentClassDeclaration, true),
 
-  scalacOptions ++= Seq(
-    "-deprecation",
-    "-unchecked",
-    "-feature",
-    "-language:existentials",
-    "-language:higherKinds",
-    "-language:implicitConversions",
-    "-language:reflectiveCalls"),
+  scalacOptions := commonScalacOptions.value,
 
   publishTo := {
     val nexus = "https://oss.sonatype.org/"

@@ -20,7 +20,7 @@ import akka.actor.ActorSystem
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mutable.Specification
 
-class SimpleLruCacheSpec(implicit env: ExecutionEnv) extends Specification {
+class SimpleLruCacheSpec(implicit ee: ExecutionEnv) extends Specification {
   implicit val system = ActorSystem()
   import system.dispatcher
 

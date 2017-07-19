@@ -5,6 +5,7 @@ package eu.shiftforward.apso.collection
  * @constructor the default constructor.
  * @tparam V the type of the value associated with this key
  */
+@deprecated("This will be removed in a future version", "2017/07/13")
 class HMapKey[V] {
 
   /**

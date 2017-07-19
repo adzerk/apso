@@ -8,6 +8,7 @@ import scala.collection.mutable.ListBuffer
  * @param it the decorated iterator
  * @tparam A the type of the elements
  */
+@deprecated("This will be removed in a future version", "2017/07/13")
 class ExtendedIterator[A](it: Iterator[A]) extends Iterator[A] {
   private[this] val onEndHook = ListBuffer.empty[() => Unit]
 

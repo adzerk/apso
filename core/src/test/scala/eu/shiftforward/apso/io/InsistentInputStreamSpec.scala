@@ -6,6 +6,11 @@ import org.specs2.mutable._
 
 class InsistentInputStreamSpec extends Specification {
 
+  abstract class FailNextInputStream extends InputStream {
+    var fail = false
+    def failNext() = fail = true
+  }
+
   "An InsistentInputStream" should {
 
     val testList = (1 to 100).map(_.toByte)
@@ -15,8 +20,7 @@ class InsistentInputStreamSpec extends Specification {
       def read(): Int = iter.next()
     }
 
-    val testBuggyInputStream = () => new InputStream {
-      var fail = false
+    val testBuggyInputStream = () => new FailNextInputStream {
       val iter = testList.iterator
       def read(): Int = {
         if (fail) {
@@ -30,7 +34,6 @@ class InsistentInputStreamSpec extends Specification {
         iter.drop(l.toInt)
         l
       }
-      def failNext() = fail = true
     }
 
     val testBadInputStream = () => new InputStream {

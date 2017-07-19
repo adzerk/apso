@@ -2,6 +2,7 @@ package eu.shiftforward.apso.iterator
 
 import org.specs2.mutable._
 
+@deprecated("This will be removed in a future version", "2017/07/13")
 class ExtendedIteratorSpec extends Specification {
 
   "An ExtendedIterator" should {

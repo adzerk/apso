@@ -1,6 +1,6 @@
 package eu.shiftforward.apso.io
 
-import java.io.{ FileInputStream, InputStream, FileWriter, File }
+import java.io.{ FileInputStream, InputStream, FileWriter }
 import java.nio.file.{ StandardCopyOption, Files, Path, Paths }
 
 import eu.shiftforward.apso.Logging
