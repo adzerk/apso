@@ -1,4 +1,4 @@
-pomExtra := {
+pomExtra in ThisBuild := {
   <scm>
     <url>https://github.com/ShiftForward/apso.git</url>
     <connection>scm:git:git@github.com:ShiftForward/apso.git</connection>
