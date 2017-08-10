@@ -33,6 +33,7 @@ object LazyConfigFactory {
   def load(config: Config, parseOptions: ConfigParseOptions, resolveOptions: ConfigResolveOptions): Config =
     defaultOverrides(parseOptions).
       withFallback(config).
+      withFallback(defaultEnvReference(parseOptions)).
       withFallback(defaultReference(parseOptions)).
       resolve(resolveOptions)
 
@@ -75,6 +76,14 @@ object LazyConfigFactory {
 
   def defaultReference(parseOptions: ConfigParseOptions) =
     Parseable.newResources("reference.conf", parseOptions).parse.toConfig
+
+  def defaultEnvReference(parseOptions: ConfigParseOptions) = {
+    val configEnv = Option(System.getProperty("apso.configloader.env"))
+      .orElse(Option(System.getenv("CONFIG_ENV")))
+      .getOrElse("development")
+
+    Parseable.newResources(s"$configEnv.conf", parseOptions).parse.toConfig
+  }
 
   private[this] implicit def stringAsConfig(str: String): Config =
     ConfigFactory.parseString(str)
