@@ -5,7 +5,7 @@ import java.net.URI
 import scala.concurrent.duration._
 
 import com.typesafe.config.{ Config, ConfigFactory }
-import org.joda.time.{ DateTime, Interval, LocalDate }
+import org.joda.time.{ DateTime, Interval, LocalDate, Period }
 import org.specs2.mutable.Specification
 import spray.json._
 
@@ -44,6 +44,18 @@ class ExtraJsonProtocolSpec extends Specification {
       interval.toJson.compactPrint mustEqual intervalJsonString
       intervalJsonString.parseJson.convertTo[Interval] mustEqual interval
       """{"invalidObject":true}""".parseJson.convertTo[Interval] must throwA[DeserializationException]
+    }
+
+    "provide a JsonFormat for Period" in {
+      val pStrings = Seq("P1D", "P1M2D", "P1M2DT10H30M")
+      pStrings.forall { s =>
+        val period = new Period(s)
+        period.toJson mustEqual JsString(s)
+        s""""$s"""".parseJson.convertTo[Period] mustEqual period
+      }
+
+      """"garbage"""".parseJson.convertTo[Period] must throwA[DeserializationException]
+      """"PXD"""".parseJson.convertTo[Period] must throwA[DeserializationException]
     }
 
     "provide a JsonFormat for URI" in {

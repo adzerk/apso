@@ -5,7 +5,7 @@ import java.net.URI
 import scala.concurrent.duration._
 import scala.util.{ Failure, Success, Try }
 
-import org.joda.time.{ DateTime, Interval, LocalDate }
+import org.joda.time.{ DateTime, Interval, LocalDate, Period }
 
 import com.typesafe.config.{ Config, ConfigFactory, ConfigRenderOptions }
 import spray.json.DefaultJsonProtocol._
@@ -69,6 +69,17 @@ trait ExtraTimeJsonProtocol {
               "Required fields: 'startMillis' and 'endMillis'.")
       }
     }
+  }
+
+  implicit object PeriodJsonFormat extends JsonFormat[Period] {
+    def write(p: Period): JsValue = p.toString.toJson
+
+    def read(v: JsValue): Period =
+      v match {
+        case JsString(v) =>
+          Try(new Period(v)).getOrElse(deserializationError(s"Could not parse Period: $v"))
+        case other => deserializationError(s"Expected String with Period, got: $other")
+      }
   }
 }
 
