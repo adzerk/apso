@@ -114,15 +114,35 @@ case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: 
     JsonFormatBuilder(ev.remove(fields))(ev.formatter)
 
   /**
-   * Returns a `JSONFormat` for objects of a type using the current list of fields defined.
+   * Returns a `JSONReader` for objects of a type using the current list of fields defined and custom transformations.
    *
+   * @param preRead a function transforming the JSON content before reads
    * @param readFunc a function converting the list of fields to an instance of `A`
-   * @param writeFunc a function extracting the list of fields from an instance of `A`
    * @tparam A the type of objects for which a `JSONFormat` is to be returned
-   * @return a `JSONFormat` for objects of type `A`.
+   * @return a `JSONReader` for objects of type `A`.
    */
-  def jsonFormat[A](readFunc: C => A, writeFunc: A => C): RootJsonFormat[A] =
-    customJsonFormat(identity, readFunc, writeFunc, { (a, json) => json })
+  def customJsonReader[A](preRead: JsObject => JsObject, readFunc: C => A): RootJsonReader[A] = new RootJsonReader[A] {
+    def read(json: JsValue): A = {
+      val jsObject = preRead(json.asJsObject)
+      val fieldValues = aux.read(jsObject.fields, fields)
+      readFunc(fieldValues)
+    }
+  }
+
+  /**
+   * Returns a `JSONWriter` for objects of a type using the current list of fields defined and custom transformations.
+   *
+   * @param writeFunc a function extracting the list of fields from an instance of `A`
+   * @param postWrite a function transforming the JSON content after writes
+   * @tparam A the type of objects for which a `JSONFormat` is to be returned
+   * @return a `JSONWriter` for objects of type `A`.
+   */
+  def customJsonWriter[A](writeFunc: A => C, postWrite: (A, JsObject) => JsObject): RootJsonWriter[A] = new RootJsonWriter[A] {
+    def write(obj: A): JsValue = {
+      val fieldValues = writeFunc(obj)
+      postWrite(obj, JsObject(aux.write(fields, fieldValues)))
+    }
+  }
 
   /**
    * Returns a `JSONFormat` for objects of a type using the current list of fields defined and custom transformations.
@@ -140,17 +160,41 @@ case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: 
     writeFunc: A => C,
     postWrite: (A, JsObject) => JsObject): RootJsonFormat[A] = new RootJsonFormat[A] {
 
-    def read(json: JsValue): A = {
-      val jsObject = preRead(json.asJsObject)
-      val fieldValues = aux.read(jsObject.fields, fields)
-      readFunc(fieldValues)
-    }
+    val reader: RootJsonReader[A] = customJsonReader(preRead, readFunc)
+    val writer: RootJsonWriter[A] = customJsonWriter(writeFunc, postWrite)
 
-    def write(obj: A): JsValue = {
-      val fieldValues = writeFunc(obj)
-      postWrite(obj, JsObject(aux.write(fields, fieldValues)))
-    }
+    def read(json: JsValue): A = reader.read(json)
+    def write(obj: A): JsValue = writer.write(obj)
   }
+
+  /**
+   * Returns a `JSONReader` for objects of a type using the current list of fields defined.
+   *
+   * @param readFunc a function converting the list of fields to an instance of `A`
+   * @tparam A the type of objects for which a `JSONFormat` is to be returned
+   * @return a `JSONFormat` for objects of type `A`.
+   */
+  def jsonReader[A](readFunc: C => A): RootJsonReader[A] = customJsonReader(identity, readFunc)
+
+  /**
+   * Returns a `JSONWriter` for objects of a type using the current list of fields defined.
+   *
+   * @param writeFunc a function extracting the list of fields from an instance of `A`
+   * @tparam A the type of objects for which a `JSONFormat` is to be returned
+   * @return a `JSONFormat` for objects of type `A`.
+   */
+  def jsonWriter[A](writeFunc: A => C): RootJsonWriter[A] = customJsonWriter(writeFunc, { (_, json) => json })
+
+  /**
+   * Returns a `JSONFormat` for objects of a type using the current list of fields defined.
+   *
+   * @param readFunc a function converting the list of fields to an instance of `A`
+   * @param writeFunc a function extracting the list of fields from an instance of `A`
+   * @tparam A the type of objects for which a `JSONFormat` is to be returned
+   * @return a `JSONFormat` for objects of type `A`.
+   */
+  def jsonFormat[A](readFunc: C => A, writeFunc: A => C): RootJsonFormat[A] =
+    customJsonFormat(identity, readFunc, writeFunc, { (_, json) => json })
 }
 
 /**
