@@ -96,5 +96,24 @@ class JsonFormatBuilderSpec extends Specification {
       Test4(Some(3), None).toJson(jf1) mustEqual """{ "a": 3 }""".parseJson
       Test4(None, None).toJson(jf1) mustEqual """{ }""".parseJson
     }
+
+    "allow using single JSON Readers and JSON Writers" in {
+      val builder = JsonFormatBuilder()
+        .optionalField[Int]("a")
+        .optionalField[String]("b")
+
+      val jr = builder.jsonReader[Test4]({ case a :: b :: HNil => Test4(a, b) })
+
+      """{ "a": 3, "b": "hello" }""".parseJson.convertTo[Test4](jr) mustEqual Test4(Some(3), Some("hello"))
+      """{ "a": 3 }""".parseJson.convertTo[Test4](jr) mustEqual Test4(Some(3), None)
+      """{ "a": 3, "b": null }""".parseJson.convertTo[Test4](jr) mustEqual Test4(Some(3), None)
+      """{ }""".parseJson.convertTo[Test4](jr) mustEqual Test4(None, None)
+
+      val jw = builder.jsonWriter[Test4]({ foo => foo.a :: foo.b :: HNil })
+
+      Test4(Some(3), Some("x")).toJson(jw) mustEqual """{ "a": 3, "b": "x" }""".parseJson
+      Test4(Some(3), None).toJson(jw) mustEqual """{ "a": 3 }""".parseJson
+      Test4(None, None).toJson(jw) mustEqual """{ }""".parseJson
+    }
   }
 }
