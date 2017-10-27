@@ -1,10 +1,10 @@
 package eu.shiftforward.apso.io
 
-import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.auth.{ AWSStaticCredentialsProvider, BasicAWSCredentials }
+
 import eu.shiftforward.apso.CustomMatchers
 import eu.shiftforward.apso.aws.S3Bucket
 import org.specs2.mutable.Specification
-
 import scala.util.Try
 
 class FileDescriptorSpec extends Specification with CustomMatchers {
@@ -41,7 +41,9 @@ class FileDescriptorSpec extends Specification with CustomMatchers {
       FileDescriptor("s3://test/path/path", fdConfig) match {
         case s3: S3FileDescriptor =>
           s3 must beSerializable
-          s3.bucket must beEqualTo(new S3Bucket("test", () => new BasicAWSCredentials("a", "b")))
+          s3.bucket must beEqualTo(new S3Bucket(
+            "test",
+            () => new AWSStaticCredentialsProvider(new BasicAWSCredentials("a", "b"))))
       }
     }
   }

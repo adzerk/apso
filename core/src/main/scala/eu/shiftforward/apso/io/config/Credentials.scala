@@ -1,8 +1,8 @@
 package eu.shiftforward.apso.io.config
 
 case class Credentials(
-  sftp: Credentials.Sftp = Credentials.Sftp(),
-  s3: Credentials.S3 = Credentials.S3())
+    sftp: Credentials.Sftp = Credentials.Sftp(),
+    s3: Credentials.S3 = Credentials.S3())
 
 object Credentials {
 

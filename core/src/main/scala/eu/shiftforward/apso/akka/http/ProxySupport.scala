@@ -30,7 +30,7 @@ import eu.shiftforward.apso.Logging
  */
 trait ProxySupport extends ClientIPDirectives {
 
-  private[this] def getHeaders(ip: Option[RemoteAddress], headers: List[HttpHeader] = Nil) = {
+  private[this] def getHeaders(ip: Option[RemoteAddress], headers: List[HttpHeader]) = {
     // filter `Host`, `Timeout-Access` and `Remote-Address` headers
     val hs = headers.filterNot(header => header.is("host") || header.is("timeout-access") || header.is("remote-address"))
     // add `X-Forwarded-For` header
@@ -109,7 +109,7 @@ trait ProxySupport extends ClientIPDirectives {
    * @param reqQueueSize the maximum size of the queue of pending backend requests
    */
   class Proxy(host: String, port: Int, reqQueueSize: Int = defaultQueueSize)(implicit system: ActorSystem, mat: Materializer)
-      extends Logging {
+    extends Logging {
 
     import system.dispatcher
 

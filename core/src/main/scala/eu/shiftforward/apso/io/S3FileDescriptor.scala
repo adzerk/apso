@@ -2,7 +2,7 @@ package eu.shiftforward.apso.io
 
 import java.io.InputStream
 
-import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.auth.{ AWSStaticCredentialsProvider, BasicAWSCredentials }
 import com.amazonaws.services.s3.model.S3ObjectSummary
 
 import eu.shiftforward.apso.Logging
@@ -10,10 +10,10 @@ import eu.shiftforward.apso.aws.{ S3Bucket, SerializableAWSCredentials }
 import scala.collection.concurrent.TrieMap
 
 case class S3FileDescriptor(
-  bucket: S3Bucket,
-  protected val elements: List[String],
-  private var summary: Option[S3ObjectSummary] = None)
-    extends FileDescriptor with RemoteFileDescriptor with Logging {
+    bucket: S3Bucket,
+    protected val elements: List[String],
+    private var summary: Option[S3ObjectSummary] = None)
+  extends FileDescriptor with RemoteFileDescriptor with Logging {
 
   type Self = S3FileDescriptor
 
@@ -174,7 +174,9 @@ object S3FileDescriptor {
   private def apply(path: String, credentials: Option[SerializableAWSCredentials]): S3FileDescriptor = {
     path.split('/').toList match {
       case s3bucket :: s3path =>
-        def newBucket = credentials.fold(new S3Bucket(s3bucket))(s3Cred => new S3Bucket(s3bucket, () => s3Cred))
+        def newBucket = credentials.fold(new S3Bucket(s3bucket)) { s3Cred =>
+          new S3Bucket(s3bucket, () => new AWSStaticCredentialsProvider(s3Cred))
+        }
         val s3BucketRef = s3Buckets.getOrElseUpdate(s3bucket, newBucket)
         S3FileDescriptor(s3BucketRef, s3path.filterNot(_.trim == ""))
 

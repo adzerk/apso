@@ -16,7 +16,6 @@ class JsonHMapSpec extends Specification {
     val Key1 = new JsonHMapKey[Int]('key1) {}
     val Key2 = new JsonHMapKey[String]('key2) {}
     val Key3 = new JsonHMapKey[List[Boolean]]('key3) {}
-    val Key4 = new JsonHMapKey[Int]('key4) {}
 
     "be correctly created from a list of key value pairs" in {
       val map = JsonHMap(Key1 -> 4, Key2 -> "s", Key3 -> List(false, true))
