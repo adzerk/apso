@@ -13,7 +13,6 @@ class LocalFileDescriptorSpec extends Specification {
   "A LocalFileDescriptor" should {
 
     val randomFolder = UUID.randomUUID().toString
-    val testingFolder = new File(s"/tmp/$randomFolder")
 
     def randomString = UUID.randomUUID().toString.take(10)
 

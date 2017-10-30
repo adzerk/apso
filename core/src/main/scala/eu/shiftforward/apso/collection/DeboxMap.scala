@@ -124,12 +124,12 @@ object DeboxMap {
  * @tparam B the type of the values
  */
 final class DeboxMap[@spec(Int, Long, Double, AnyRef) A: ClassTag, @spec(Int, Long, Double, AnyRef) B: ClassTag] protected[apso] (
-  ks: Array[A],
-  vs: Array[B],
-  bs: Array[Byte],
-  n: Int,
-  u: Int)
-    extends (A => B) with Serializable {
+    ks: Array[A],
+    vs: Array[B],
+    bs: Array[Byte],
+    n: Int,
+    u: Int)
+  extends (A => B) with Serializable {
 
   // set internals
   var keys: Array[A] = ks

@@ -60,7 +60,7 @@ class CpuSampler(
     lastFlush = System.currentTimeMillis()
   }
 
-  private[this] def aggregateAll(timestamp: Long = System.currentTimeMillis()): Iterator[Entry] = {
+  private[this] def aggregateAll(timestamp: Long): Iterator[Entry] = {
     val acc = mutable.Map[StackTraceElement, Int]()
 
     val total = entries.length

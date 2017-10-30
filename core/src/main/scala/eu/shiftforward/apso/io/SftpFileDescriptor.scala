@@ -47,14 +47,14 @@ import net.schmizz.sshj.xfer.InMemorySourceFile
  * therefore it is possible to provide credentials for a specific `hostname`.
  */
 case class SftpFileDescriptor(
-  host: String,
-  port: Int,
-  username: String,
-  password: Option[String],
-  elements: List[String],
-  identity: Option[SftpFileDescriptor.Identity],
-  @transient private var _fileAttributes: Option[FileAttributes] = None)
-    extends FileDescriptor with RemoteFileDescriptor with Logging {
+    host: String,
+    port: Int,
+    username: String,
+    password: Option[String],
+    elements: List[String],
+    identity: Option[SftpFileDescriptor.Identity],
+    @transient private var _fileAttributes: Option[FileAttributes] = None)
+  extends FileDescriptor with RemoteFileDescriptor with Logging {
 
   type Self = SftpFileDescriptor
 

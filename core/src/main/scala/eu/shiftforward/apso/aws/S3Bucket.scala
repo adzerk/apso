@@ -8,9 +8,10 @@ import scala.util.{ Failure, Success, Try }
 
 import com.amazonaws.{ AmazonClientException, AmazonServiceException, ClientConfiguration }
 import com.amazonaws.auth._
-import com.amazonaws.services.s3.AmazonS3Client
+import com.amazonaws.client.builder.ExecutorFactory
+import com.amazonaws.services.s3.{ AmazonS3, AmazonS3ClientBuilder }
 import com.amazonaws.services.s3.model._
-import com.amazonaws.services.s3.transfer.TransferManager
+import com.amazonaws.services.s3.transfer.{ TransferManager, TransferManagerBuilder }
 import com.typesafe.config.ConfigFactory
 
 import eu.shiftforward.apso.Logging
@@ -21,39 +22,35 @@ import eu.shiftforward.apso.Logging
  * and pulling files to and from a bucket.
  *
  * @param bucketName the name of the bucket
- * @param credentialsFactory optional AWS credentials factory to use (since AWSCredentials are not serializable).
+ * @param credentialsProvider optional AWS credentials provider to use (since AWSCredentials are not serializable).
  *                    If the parameter is not supplied, they will be retrieved from the
  *                    [[eu.shiftforward.apso.aws.CredentialStore]].
  */
 class S3Bucket(
-  val bucketName: String,
-  private val credentialsFactory: () => AWSCredentials = { () => CredentialStore.getCredentials })
-    extends Logging with Serializable {
-
-  @transient private[this] var _credentials: AWSCredentials = _
-
-  private def credentials = {
-    if (_credentials == null) _credentials = credentialsFactory()
-    _credentials
-  }
+    val bucketName: String,
+    private val credentialsProvider: () => AWSCredentialsProvider = () => CredentialStore)
+  extends Logging with Serializable {
 
   private[this] lazy val config = ConfigFactory.load()
 
   private[this] lazy val configPrefix = "aws.s3"
-
   private[this] lazy val endpoint = Try(config.getString(configPrefix + ".endpoint")).getOrElse("s3.amazonaws.com")
-  private[this] lazy val region = Try(config.getString(configPrefix + ".region")).getOrElse(null)
 
-  @transient private[this] var _s3: AmazonS3Client = _
+  @transient private[this] var _s3: AmazonS3 = _
 
   private[this] def s3 = {
     if (_s3 == null) {
       val defaultConfig = new ClientConfiguration()
         .withTcpKeepAlive(true)
-      _s3 = new AmazonS3Client(credentials, defaultConfig)
+
+      _s3 = AmazonS3ClientBuilder.standard
+        .withCredentials(credentialsProvider())
+        .withClientConfiguration(defaultConfig)
+        .build()
+
       _s3.setEndpoint(endpoint)
-      if (!_s3.doesBucketExist(bucketName)) {
-        _s3.createBucket(bucketName, Region.fromValue(region))
+      if (!_s3.doesBucketExistV2(bucketName)) {
+        _s3.createBucket(bucketName)
       }
     }
     _s3
@@ -79,7 +76,8 @@ class S3Bucket(
         }
       })
 
-      _transferManager = new TransferManager(s3, executor)
+      val executorFactory = new ExecutorFactory { def newExecutor() = executor }
+      _transferManager = TransferManagerBuilder.standard.withS3Client(s3).withExecutorFactory(executorFactory).build()
     }
     _transferManager
   }
@@ -325,9 +323,7 @@ class S3Bucket(
     }
 
   override def equals(obj: Any): Boolean = obj match {
-    case b: S3Bucket => b.bucketName == bucketName &&
-      b.credentials.getAWSAccessKeyId == credentials.getAWSAccessKeyId &&
-      b.credentials.getAWSSecretKey == credentials.getAWSSecretKey
+    case b: S3Bucket => b.bucketName == bucketName
     case _ => false
   }
 }

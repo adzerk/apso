@@ -30,7 +30,7 @@ trait IterableInterval extends IndexedSeq[DateTime] {
  *        sequence
  */
 case class SteppedInterval(interval: ReadableInterval, step: Period)
-    extends IterableInterval {
+  extends IterableInterval {
 
   lazy val length: Int = {
     var i = (interval.toDurationMillis / step.toDurationFrom(interval.getStart).millis).toInt
@@ -54,7 +54,7 @@ case class SteppedInterval(interval: ReadableInterval, step: Period)
  *        affect an empty interval
  */
 case class EmptySteppedInterval(step: Period)
-    extends IterableInterval {
+  extends IterableInterval {
 
   def length = 0
   def apply(idx: Int) = throw new IndexOutOfBoundsException
