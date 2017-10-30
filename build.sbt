@@ -1,4 +1,5 @@
 import scalariform.formatter.preferences._
+import ReleaseTransformations._
 
 organization in ThisBuild := "eu.shiftforward"
 
@@ -86,12 +87,24 @@ lazy val commonSettings = Seq(
   pomIncludeRepository := { _ => false },
 
   licenses := Seq("Apache License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
-  homepage := Some(url("https://github.com/ShiftForward/apso")),
-  releasePublishArtifactsAction := PgpKeys.publishSigned.value)
+  homepage := Some(url("https://github.com/ShiftForward/apso")))
 
-releaseProcess := releaseProcess.value ++ Seq[ReleaseStep](
-  releaseStepCommandAndRemaining("sonatypeReleaseAll"))
+// do not publish the root project
+skip in publish := true
 
-releaseCrossBuild := true
 releaseTagComment := s"Release ${(version in ThisBuild).value}"
 releaseCommitMessage := s"Set version to ${(version in ThisBuild).value}"
+
+releaseProcess := Seq[ReleaseStep](
+  checkSnapshotDependencies,
+  inquireVersions,
+  runClean,
+  releaseStepCommandAndRemaining("+test"),
+  setReleaseVersion,
+  commitReleaseVersion,
+  tagRelease,
+  releaseStepCommandAndRemaining("+publishSigned"),
+  setNextVersion,
+  commitNextVersion,
+  pushChanges,
+  releaseStepCommandAndRemaining("sonatypeReleaseAll"))
