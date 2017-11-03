@@ -33,6 +33,7 @@ Please take into account that the library is still in an experimental stage and 
 - [ProgressBar](#progressbar)
 - [Reflect](#reflect)
 - [Retry](#retry)
+- [TryWith](#trywith)
 - [Sampler](#sampler)
     - [ExpSampler](#expsampler)
     - [ListSampler](#listsampler)
@@ -243,9 +244,11 @@ res1: eu.shiftforward.apso.Reflect.type = eu.shiftforward.apso.Reflect$@3b1dbca
 
 ## Retry
 
-The `Retry` object provides a method to retry a given `Future` a given number of times until it succeeds or the specified maximum number of retries is reached:
+The `Retry` object provides a method to retry methods or `Future`s a given number of times until they succeed or the specified maximum number of retries is reached:
 
 ```scala
+scala> import scala.concurrent.Future
+import scala.concurrent.Future
 scala> import eu.shiftforward.apso.Retry
 import eu.shiftforward.apso.Retry
 
@@ -270,8 +273,63 @@ scala> def f: Future[Int] = {
      | }
 f: scala.concurrent.Future[Int]
 
-scala> Retry(10)(f).onComplete(println)
+scala> Retry.retryFuture(10)(f).onComplete(println)
 Success(6)
+
+scala> var attempts = 0
+var attempts = 0
+
+scala> def m() = {
+     |   attempts += 1
+     |   if(attempts > 5)
+     |       attempts
+     |   else
+     |       throw new Exception()
+     | }
+     
+scala> println(Retry.retry(10)(m))
+Success(6)
+```
+
+## TryWith
+
+The `TryWith` object mimics the [try-with-resources](https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html) 
+construct from Java world, or a loan pattern, where a given function can try to use a `Closeable` 
+resource which shall automatically disposed off and closed properly afterwards.
+
+```scala
+scala> import java.io.Closeable
+import eu.shiftforward.apso.TryWith
+
+scala> import eu.shiftforward.apso.TryWith
+import eu.shiftforward.apso.TryWith
+
+scala> def buildResource = new Closeable {
+     |     override def toString: String = "good resource"
+     |     def close(): Unit = {
+     |       println("Resource is now Closed")
+     |     }
+     |   }
+
+scala>
+    |   def goodHandler(resource: Closeable) = {
+    |     println(resource)
+    |   }
+
+scala>
+     |   def badHandler(resource: Closeable) = {
+     |     throw new Exception()
+     |
+  }
+
+scala> TryWith(buildResource)(goodHandler)
+good resource
+Resource is now Closed
+res2: scala.util.Try[Unit] = Success(())
+
+scala> TryWith(buildResource)(badHandler)
+Resource is now Closed
+res3: scala.util.Try[Nothing] = Failure(java.lang.Exception)
 ```
 
 ## Sampler
