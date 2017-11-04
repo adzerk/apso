@@ -1,7 +1,5 @@
 package eu.shiftforward.apso
 
-import java.io.Closeable
-
 import scala.util.control.NonFatal
 import scala.util.{ Failure, Try }
 
@@ -11,7 +9,7 @@ import scala.util.{ Failure, Try }
  * Closeable resource which shall be disposed off and closed properly afterwards.
  */
 object TryWith {
-  def apply[C <: Closeable, R](resource: => C)(f: C => R): Try[R] = {
+  def apply[C <: AutoCloseable, R](resource: => C)(f: C => R): Try[R] = {
     Try(resource).flatMap(resourceInstance => {
       try {
         val returnValue = f(resourceInstance)
