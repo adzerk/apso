@@ -4,7 +4,7 @@ import scala.annotation.tailrec
 import scala.collection.generic.CanBuildFrom
 import scala.compat.Platform
 import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.Random
+import scala.util.{ Random, Try }
 
 import eu.shiftforward.apso.iterator.MergedBufferedIterator
 
@@ -565,12 +565,25 @@ object Implicits {
   final implicit class ApsoCloseable[U <: AutoCloseable](val res: U) extends AnyVal {
 
     /**
-     * Uses this resouce and closes it afterwards.
+     * Uses this resource and closes it afterwards.
      * @param f the block of code to execute using this resource
      * @tparam T the return type of the code block.
      * @return the value returned by the code block.
      */
+    @deprecated("This will be removed in a future version. Please use `tryUse()` instead", "2017/10/31")
     def use[T](f: U => T): T =
       try { f(res) } finally { res.close() }
+
+    /**
+     * Uses this resource and closes it afterwards.
+     *
+     * Any exception thrown by the code block or during the call to `close()` of the `AutoCloseable` resource
+     * is caught and presented as a `Failure` in return value.
+     *
+     * @param f the block of code to execute using this resource
+     * @tparam T the return type of the code block.
+     * @return a `Try` of the value returned by the code block.
+     */
+    def tryUse[T](f: U => T): Try[T] = TryWith(res)(f)
   }
 }
