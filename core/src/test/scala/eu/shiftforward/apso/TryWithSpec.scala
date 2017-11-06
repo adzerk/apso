@@ -43,10 +43,10 @@ class TryWithSpec extends Specification {
         def close(): Unit = throw inCloseException
       })(_ => throw ex)
 
-      result must beEqualTo(Failure(ex))
-
-      val Failure(returnedException) = result
-      returnedException.getSuppressed must beEqualTo(Array(inCloseException))
+      result must beAFailedTry.which { returnedException =>
+        returnedException mustEqual ex
+        returnedException.getSuppressed must beEqualTo(Array(inCloseException))
+      }
     }
 
     "propagate errors getting the resource" in {
