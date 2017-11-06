@@ -570,9 +570,7 @@ object Implicits {
      * @tparam T the return type of the code block.
      * @return the value returned by the code block.
      */
-    @deprecated("This will be removed in a future version. Please use `tryUse()` instead", "2017/10/31")
-    def use[T](f: U => T): T =
-      try { f(res) } finally { res.close() }
+    def use[T](f: U => T): T = TryWith(res)(f).get
 
     /**
      * Uses this resource and closes it afterwards.
