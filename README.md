@@ -281,10 +281,10 @@ var attempts = 0
 
 scala> def m() = {
      |   attempts += 1
-     |   if(attempts > 5)
-     |       attempts
+     |   if (attempts > 5)
+     |     attempts
      |   else
-     |       throw new Exception()
+     |     throw new Exception()
      | }
      
 scala> println(Retry.retry(10)(m))
@@ -305,22 +305,19 @@ scala> import eu.shiftforward.apso.TryWith
 import eu.shiftforward.apso.TryWith
 
 scala> def buildResource = new Closeable {
-     |     override def toString: String = "good resource"
-     |     def close(): Unit = {
-     |       println("Resource is now Closed")
-     |     }
+     |   override def toString: String = "good resource"
+     |   def close(): Unit = {
+     |     println("Resource is now Closed")
      |   }
+     | }
 
-scala>
-    |   def goodHandler(resource: Closeable) = {
-    |     println(resource)
-    |   }
+scala> def goodHandler(resource: Closeable) = {
+     |   println(resource)
+     | }
 
-scala>
-     |   def badHandler(resource: Closeable) = {
-     |     throw new Exception()
-     |
-  }
+scala> def badHandler(resource: Closeable) = {
+     |   throw new Exception()
+     | }
 
 scala> TryWith(buildResource)(goodHandler)
 good resource
