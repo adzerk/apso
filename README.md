@@ -295,7 +295,7 @@ Success(6)
 
 The `TryWith` object mimics the [try-with-resources](https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html) 
 construct from Java world, or a loan pattern, where a given function can try to use a `Closeable` 
-resource which shall automatically disposed off and closed properly afterwards.
+resource which shall automatically be disposed off and closed properly afterwards.
 
 ```scala
 scala> import java.io.Closeable
