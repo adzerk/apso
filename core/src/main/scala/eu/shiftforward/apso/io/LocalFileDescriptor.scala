@@ -183,7 +183,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
    */
   def write(str: String): Unit = {
     parent().mkdirs()
-    new FileWriter(path).use(_.write(str))
+    new FileWriter(path).tryUse(_.write(str))
   }
 
   /**

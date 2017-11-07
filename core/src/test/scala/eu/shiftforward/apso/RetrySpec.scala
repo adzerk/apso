@@ -12,7 +12,7 @@ class RetrySpec(implicit ee: ExecutionEnv) extends Specification with FutureExtr
     "retry a future number of times" in {
       var attempts = 0
 
-      Retry(10) {
+      Retry.retryFuture(10) {
         Future {
           attempts = attempts + 1
           attempts
@@ -26,7 +26,7 @@ class RetrySpec(implicit ee: ExecutionEnv) extends Specification with FutureExtr
       var attempts = 0
       val retries = 10
 
-      val f = Retry[Any](retries) {
+      val f = Retry.retryFuture[Any](retries) {
         Future {
           attempts = attempts + 1
           throw new RuntimeException("Doomed")
@@ -36,6 +36,32 @@ class RetrySpec(implicit ee: ExecutionEnv) extends Specification with FutureExtr
       eventually {
         f must throwAn[RuntimeException].await
       }
+
+      attempts must beEqualTo(1 + retries) // 1 attempt + 10 retries
+    }
+
+    "retry a given function a number of times" in {
+      var attempts = 0
+
+      Retry.retry(10) {
+        attempts = attempts + 1
+        if (attempts <= 3) throw new RuntimeException("Doomed")
+        else attempts
+      }
+
+      attempts must beEqualTo(4).eventually
+    }
+
+    "retry a doomed function a number of times until it fails" in {
+      var attempts = 0
+      val retries = 10
+
+      val f = Retry.retry[Any](retries) {
+        attempts = attempts + 1
+        throw new RuntimeException("Doomed")
+      }
+
+      eventually(f must beAFailedTry)
 
       attempts must beEqualTo(1 + retries) // 1 attempt + 10 retries
     }
