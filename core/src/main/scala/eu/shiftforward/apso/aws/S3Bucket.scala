@@ -34,7 +34,7 @@ class S3Bucket(
   private[this] lazy val config = ConfigFactory.load()
 
   private[this] lazy val configPrefix = "aws.s3"
-  private[this] lazy val endpoint = Try(config.getString(configPrefix + ".endpoint")).getOrElse("s3.amazonaws.com")
+  private[this] lazy val region = Try(config.getString(configPrefix + ".region"))
 
   @transient private[this] var _s3: AmazonS3 = _
 
@@ -46,11 +46,14 @@ class S3Bucket(
       _s3 = AmazonS3ClientBuilder.standard
         .withCredentials(credentialsProvider())
         .withClientConfiguration(defaultConfig)
+        .withForceGlobalBucketAccessEnabled(true)
         .build()
 
-      _s3.setEndpoint(endpoint)
       if (!_s3.doesBucketExistV2(bucketName)) {
-        _s3.createBucket(bucketName)
+        _s3.createBucket(
+          new CreateBucketRequest(
+            bucketName,
+            region.map(Region.fromValue).getOrElse(Region.US_Standard)))
       }
     }
     _s3
