@@ -36,6 +36,19 @@ class InsistentInputStreamSpec extends Specification {
       }
     }
 
+    val testOptimizedBuggyInputStream = (offset: Long) => new FailNextInputStream {
+      val iter = testList.drop(offset.toInt).iterator
+      def read(): Int = {
+        if (fail) {
+          fail = false
+          throw new Exception("bad read")
+        } else {
+          iter.next()
+        }
+      }
+      override def skip(l: Long) = throw new Exception("unoptimized skip")
+    }
+
     val testBadInputStream = () => new InputStream {
       val iter = testList.iterator
       def read(): Int = throw new Exception("bad read")
@@ -83,6 +96,33 @@ class InsistentInputStreamSpec extends Specification {
       buggyStream.failNext()
       stream.read(testBuffer, 1, 2) === 2
       testBuffer === Array[Byte](6, 11, 12)
+    }
+
+    "retry reads when a inner stream is buggy using an optimized skip" in {
+      val buggyStream = testOptimizedBuggyInputStream(3)
+
+      buggyStream.read() === 4
+      buggyStream.failNext()
+      buggyStream.read() must throwAn[Exception]
+
+      val stream = new InsistentInputStream(testBuggyInputStream)
+      val testBuffer = Array[Byte](0, 0, 0)
+
+      stream.read() === 1
+      buggyStream.failNext()
+      stream.read() === 2
+      buggyStream.failNext()
+      stream.read() === 3
+      stream.read() === 4
+      buggyStream.failNext()
+      stream.read(testBuffer) === 3
+      testBuffer === Array[Byte](5, 6, 7)
+      buggyStream.failNext()
+      stream.read() === 8
+      stream.read() === 9
+      buggyStream.failNext()
+      stream.read(testBuffer, 1, 2) === 2
+      testBuffer === Array[Byte](5, 10, 11)
     }
 
     "fail after the retry limit is exceeded" in {
