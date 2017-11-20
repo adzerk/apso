@@ -61,9 +61,10 @@ trait FileDescriptor {
 
   /**
    * Returns an input stream for the contents of this file.
+   * @param offset bytes to skip before reading the file.
    * @return an input stream for the contents of this file.
    */
-  def stream(): InputStream
+  def stream(offset: Long = 0L): InputStream
 
   /**
    * Returns an iterator with the lines of this file.

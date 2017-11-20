@@ -169,11 +169,12 @@ case class SftpFileDescriptor(
       Try(sftp(_.put(sourceFile, path))).isSuccess
   }
 
-  def stream() = new InputStream {
+  def stream(offset: Long = 0L) = new InputStream {
     private[this] val sftpLease = sftpClient()
     private[this] val sftp = sftpLease.get()
     private[this] val remoteFile = sftp.open(path)
     private[this] val inner = new remoteFile.RemoteFileInputStream()
+    if (offset > 0) inner.skip(offset)
 
     def read() = inner.read()
 

@@ -116,7 +116,11 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
     }
   }
 
-  def stream() = new FileInputStream(file)
+  def stream(offset: Long = 0L) = {
+    val is = new FileInputStream(file)
+    if (offset > 0L) is.skip(offset)
+    is
+  }
 
   override def list: Iterator[LocalFileDescriptor] = {
     if (isDirectory) {
