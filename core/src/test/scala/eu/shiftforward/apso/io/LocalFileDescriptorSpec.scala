@@ -187,7 +187,10 @@ class LocalFileDescriptorSpec extends Specification {
     "Stream a file as bytes or lines" in {
       val fd1 = LocalFileDescriptor("/tmp") / randomFolder / randomString
       fd1.write("1\n2\n3\n4")
+
       Source.fromInputStream(fd1.stream()).mkString === "1\n2\n3\n4"
+      Source.fromInputStream(fd1.stream(2)).mkString === "2\n3\n4"
+
       fd1.lines().toList === List("1", "2", "3", "4")
     }
 
