@@ -67,7 +67,7 @@ case class S3FileDescriptor(
     }
   }
 
-  def stream() = bucket.stream(builtPath)
+  def stream(offset: Long = 0L) = bucket.stream(builtPath, offset)
 
   override def cd(pathString: String): S3FileDescriptor = {
     val newPath = pathString.split("/").map(_.trim).toList.foldLeft(elements) {

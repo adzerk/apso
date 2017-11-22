@@ -280,9 +280,12 @@ class S3Bucket(
     outputStream.close()
   }.isDefined
 
-  def stream(key: String): InputStream = {
-    log.info("Streaming 's3://{}/{}'", bucketName: Any, key: Any)
-    s3.getObject(new GetObjectRequest(bucketName, sanitizeKey(key))).getObjectContent
+  def stream(key: String, offset: Long = 0L): InputStream = {
+    log.info("Streaming 's3://{}/{}' starting at {}", bucketName, key, offset.toString)
+    val req =
+      if (offset > 0) new GetObjectRequest(bucketName, sanitizeKey(key)).withRange(offset)
+      else new GetObjectRequest(bucketName, sanitizeKey(key))
+    s3.getObject(req).getObjectContent
   }
 
   private[this] def handler: PartialFunction[Throwable, Boolean] = {
