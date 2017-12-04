@@ -1,5 +1,6 @@
 package eu.shiftforward.apso.akka.http
 
+import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ Future, Promise }
 import scala.util.{ Failure, Success, Try }
 
@@ -92,6 +93,57 @@ trait ProxySupport extends ClientIPDirectives {
 
           import system.dispatcher
           Http(system).singleRequest(req).map(Complete.apply)
+        }
+      }
+    }
+  }
+
+  /**
+   * Proxies a single request to a destination URI.
+   * The response in not streamed, but converted to a strict entity with a set timeout.
+   *
+   * @param uri the target URI
+   * @param timeout maximum time to wait for the full response.
+   * @return a route that handles requests by proxying them to the given URI.
+   */
+  def proxySingleToStrict(uri: Uri, timeout: FiniteDuration): Route = {
+    extractActorSystem { implicit system =>
+      extractMaterializer { implicit mat =>
+        optionalRemoteAddress { ip => ctx =>
+          val req = ctx.request.copy(
+            uri = uri,
+            headers = getHeaders(ip, ctx.request.headers.toList))
+
+          import system.dispatcher
+          Http(system).singleRequest(req)
+            .flatMap(r => r.entity.toStrict(timeout).map(e => r.withEntity(e)))
+            .map(Complete.apply)
+        }
+      }
+    }
+  }
+
+  /**
+   * Proxies a single request to a destination base URI. The target URI is created by concatenating the base URI with
+   * the unmatched path.
+   * The response in not streamed, but converted to a strict entity with a set timeout.
+   *
+   * @param uri the target base URI
+   * @param timeout maximum time to wait for the full response.
+   * @return a route that handles requests by proxying them to the given URI.
+   */
+  def proxySingleToUnmatchedPathStrict(uri: Uri, timeout: FiniteDuration): Route = {
+    extractActorSystem { implicit system =>
+      extractMaterializer { implicit mat =>
+        optionalRemoteAddress { ip => ctx =>
+          val req = ctx.request.copy(
+            uri = uri.withPath(uri.path ++ ctx.unmatchedPath).withQuery(ctx.request.uri.query()),
+            headers = getHeaders(ip, ctx.request.headers.toList))
+
+          import system.dispatcher
+          Http(system).singleRequest(req)
+            .flatMap(r => r.entity.toStrict(timeout).map(e => r.withEntity(e)))
+            .map(Complete.apply)
         }
       }
     }

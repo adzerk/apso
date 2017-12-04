@@ -39,8 +39,14 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
         path("get-path") {
           complete("get-reply")
         } ~
+        path("get-path-proxied-single-strict") {
+          proxySingleToStrict(Uri(s"http://$interface:$port/remote-proxy"), 10.seconds)
+        } ~
         path("get-path-proxied-single") {
           proxySingleTo(Uri(s"http://$interface:$port/remote-proxy"))
+        } ~
+        pathPrefix("get-path-proxied-single-unmatched-strict") {
+          proxySingleToUnmatchedPathStrict(Uri(s"http://$interface:$port/remote-proxy"), 10.seconds)
         } ~
         pathPrefix("get-path-proxied-single-unmatched") {
           proxySingleToUnmatchedPath(Uri(s"http://$interface:$port/remote-proxy"))
@@ -67,11 +73,21 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
         status == OK
         responseAs[String] must be_==("get-reply")
       }
+
       Get("/get-path-proxied-single") ~> routes ~> check {
         status == OK
         responseAs[String] must be_==("/remote-proxy")
       }
       Post("/get-path-proxied-single") ~> routes ~> check {
+        status == OK
+        responseAs[String] must be_==("/remote-proxy")
+      }
+
+      Get("/get-path-proxied-single-strict") ~> routes ~> check {
+        status == OK
+        responseAs[String] must be_==("/remote-proxy")
+      }
+      Post("/get-path-proxied-single-strict") ~> routes ~> check {
         status == OK
         responseAs[String] must be_==("/remote-proxy")
       }
@@ -82,6 +98,7 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
         status == OK
         responseAs[String] must be_==("get-reply")
       }
+
       Get("/get-path-proxied-single-unmatched/other/path/parts") ~> routes ~> check {
         status == OK
         responseAs[String] must be_==("/remote-proxy/other/path/parts")
@@ -91,6 +108,19 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
         responseAs[String] must be_==("/remote-proxy/other/path/parts")
       }
       Get("/get-path-proxied-single-unmatched/other/path/parts?foo=bar") ~> routes ~> check {
+        status == OK
+        responseAs[String] must be_==("/remote-proxy/other/path/parts?foo=bar")
+      }
+
+      Get("/get-path-proxied-single-unmatched-strict/other/path/parts") ~> routes ~> check {
+        status == OK
+        responseAs[String] must be_==("/remote-proxy/other/path/parts")
+      }
+      Post("/get-path-proxied-single-unmatched-strict/other/path/parts") ~> routes ~> check {
+        status == OK
+        responseAs[String] must be_==("/remote-proxy/other/path/parts")
+      }
+      Get("/get-path-proxied-single-unmatched-strict/other/path/parts?foo=bar") ~> routes ~> check {
         status == OK
         responseAs[String] must be_==("/remote-proxy/other/path/parts?foo=bar")
       }
