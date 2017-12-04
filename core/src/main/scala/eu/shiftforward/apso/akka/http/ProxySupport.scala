@@ -10,7 +10,7 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{ `Remote-Address`, `X-Forwarded-For` }
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.RouteResult.Complete
-import akka.http.scaladsl.server.{ Directive1, Route, RouteResult }
+import akka.http.scaladsl.server.{ Directive1, RequestContext, Route, RouteResult }
 import akka.stream.QueueOfferResult.{ Dropped, Enqueued, QueueClosed, Failure => OfferFailure }
 import akka.stream.scaladsl.{ Keep, Sink, Source }
 import akka.stream.{ Materializer, OverflowStrategy }
@@ -55,25 +55,33 @@ trait ProxySupport extends ClientIPDirectives {
   private[this] val optionalRemoteAddress: Directive1[Option[RemoteAddress]] =
     headerValuePF { case `Remote-Address`(address) => Some(address) } | provide(None)
 
+  private[this] def proxy(strictTimeout: Option[FiniteDuration] = None)(reqBuilder: (Option[RemoteAddress], RequestContext) => HttpRequest): Route = {
+    extractActorSystem { implicit system =>
+      extractMaterializer { implicit mat =>
+        optionalRemoteAddress { ip => ctx =>
+          val req = reqBuilder(ip, ctx)
+          import system.dispatcher
+          strictTimeout match {
+            case None => Http(system).singleRequest(req).map(Complete.apply)
+            case Some(t) => Http(system).singleRequest(req)
+              .flatMap(r => r.entity.toStrict(t).map(e => r.withEntity(e)))
+              .map(Complete.apply)
+          }
+        }
+      }
+    }
+  }
+
   /**
    * Proxies a single request to a destination URI.
    *
    * @param uri the target URI
    * @return a route that handles requests by proxying them to the given URI.
    */
-  def proxySingleTo(uri: Uri): Route = {
-    extractActorSystem { implicit system =>
-      extractMaterializer { implicit mat =>
-        optionalRemoteAddress { ip => ctx =>
-          val req = ctx.request.copy(
-            uri = uri,
-            headers = getHeaders(ip, ctx.request.headers.toList))
-
-          import system.dispatcher
-          Http(system).singleRequest(req).map(Complete.apply)
-        }
-      }
-    }
+  def proxySingleTo(uri: Uri): Route = proxy() {
+    case (ip, ctx) => ctx.request.copy(
+      uri = uri,
+      headers = getHeaders(ip, ctx.request.headers.toList))
   }
 
   /**
@@ -83,19 +91,10 @@ trait ProxySupport extends ClientIPDirectives {
    * @param uri the target base URI
    * @return a route that handles requests by proxying them to the given URI.
    */
-  def proxySingleToUnmatchedPath(uri: Uri): Route = {
-    extractActorSystem { implicit system =>
-      extractMaterializer { implicit mat =>
-        optionalRemoteAddress { ip => ctx =>
-          val req = ctx.request.copy(
-            uri = uri.withPath(uri.path ++ ctx.unmatchedPath).withQuery(ctx.request.uri.query()),
-            headers = getHeaders(ip, ctx.request.headers.toList))
-
-          import system.dispatcher
-          Http(system).singleRequest(req).map(Complete.apply)
-        }
-      }
-    }
+  def proxySingleToUnmatchedPath(uri: Uri): Route = proxy() {
+    case (ip, ctx) => ctx.request.copy(
+      uri = uri.withPath(uri.path ++ ctx.unmatchedPath).withQuery(ctx.request.uri.query()),
+      headers = getHeaders(ip, ctx.request.headers.toList))
   }
 
   /**
@@ -106,21 +105,10 @@ trait ProxySupport extends ClientIPDirectives {
    * @param timeout maximum time to wait for the full response.
    * @return a route that handles requests by proxying them to the given URI.
    */
-  def proxySingleToStrict(uri: Uri, timeout: FiniteDuration): Route = {
-    extractActorSystem { implicit system =>
-      extractMaterializer { implicit mat =>
-        optionalRemoteAddress { ip => ctx =>
-          val req = ctx.request.copy(
-            uri = uri,
-            headers = getHeaders(ip, ctx.request.headers.toList))
-
-          import system.dispatcher
-          Http(system).singleRequest(req)
-            .flatMap(r => r.entity.toStrict(timeout).map(e => r.withEntity(e)))
-            .map(Complete.apply)
-        }
-      }
-    }
+  def proxySingleToStrict(uri: Uri, timeout: FiniteDuration): Route = proxy(Some(timeout)) {
+    case (ip, ctx) => ctx.request.copy(
+      uri = uri,
+      headers = getHeaders(ip, ctx.request.headers.toList))
   }
 
   /**
@@ -132,21 +120,10 @@ trait ProxySupport extends ClientIPDirectives {
    * @param timeout maximum time to wait for the full response.
    * @return a route that handles requests by proxying them to the given URI.
    */
-  def proxySingleToUnmatchedPathStrict(uri: Uri, timeout: FiniteDuration): Route = {
-    extractActorSystem { implicit system =>
-      extractMaterializer { implicit mat =>
-        optionalRemoteAddress { ip => ctx =>
-          val req = ctx.request.copy(
-            uri = uri.withPath(uri.path ++ ctx.unmatchedPath).withQuery(ctx.request.uri.query()),
-            headers = getHeaders(ip, ctx.request.headers.toList))
-
-          import system.dispatcher
-          Http(system).singleRequest(req)
-            .flatMap(r => r.entity.toStrict(timeout).map(e => r.withEntity(e)))
-            .map(Complete.apply)
-        }
-      }
-    }
+  def proxySingleToUnmatchedPathStrict(uri: Uri, timeout: FiniteDuration): Route = proxy(Some(timeout)) {
+    case (ip, ctx) => ctx.request.copy(
+      uri = uri.withPath(uri.path ++ ctx.unmatchedPath).withQuery(ctx.request.uri.query()),
+      headers = getHeaders(ip, ctx.request.headers.toList))
   }
 
   private[this] lazy val defaultQueueSize =
