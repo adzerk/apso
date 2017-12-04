@@ -105,7 +105,7 @@ trait ProxySupport extends ClientIPDirectives {
    * @param timeout maximum time to wait for the full response.
    * @return a route that handles requests by proxying them to the given URI.
    */
-  def proxySingleToStrict(uri: Uri, timeout: FiniteDuration): Route = proxy(Some(timeout)) {
+  def strictProxySingleTo(uri: Uri, timeout: FiniteDuration): Route = proxy(Some(timeout)) {
     case (ip, ctx) => ctx.request.copy(
       uri = uri,
       headers = getHeaders(ip, ctx.request.headers.toList))
@@ -120,7 +120,7 @@ trait ProxySupport extends ClientIPDirectives {
    * @param timeout maximum time to wait for the full response.
    * @return a route that handles requests by proxying them to the given URI.
    */
-  def proxySingleToUnmatchedPathStrict(uri: Uri, timeout: FiniteDuration): Route = proxy(Some(timeout)) {
+  def strictProxySingleToUnmatchedPath(uri: Uri, timeout: FiniteDuration): Route = proxy(Some(timeout)) {
     case (ip, ctx) => ctx.request.copy(
       uri = uri.withPath(uri.path ++ ctx.unmatchedPath).withQuery(ctx.request.uri.query()),
       headers = getHeaders(ip, ctx.request.headers.toList))
