@@ -136,8 +136,9 @@ trait ProxySupport extends ClientIPDirectives {
    * @param host the target host
    * @param port the target port
    * @param reqQueueSize the maximum size of the queue of pending backend requests
+   * @param strictTimeout maximum time to wait for the full response.
    */
-  class Proxy(host: String, port: Int, reqQueueSize: Int = defaultQueueSize)(implicit system: ActorSystem, mat: Materializer)
+  class Proxy(host: String, port: Int, reqQueueSize: Int = defaultQueueSize, strictTimeout: Option[FiniteDuration] = None)(implicit system: ActorSystem, mat: Materializer)
     extends Logging {
 
     import system.dispatcher
@@ -145,7 +146,20 @@ trait ProxySupport extends ClientIPDirectives {
     private[this] lazy val source = Source.queue[(HttpRequest, Promise[RouteResult])](
       reqQueueSize, OverflowStrategy.dropNew)
 
-    private[this] lazy val flow = Http().cachedHostConnectionPool[Promise[RouteResult]](host, port)
+    private[this] lazy val flow = strictTimeout match {
+      case None => Http().cachedHostConnectionPool[Promise[RouteResult]](host, port)
+      case Some(t) => Http().cachedHostConnectionPool[Promise[RouteResult]](host, port)
+        .flatMapConcat {
+          case (res, p) =>
+            if (res.isFailure) Source.single((res, p))
+            else {
+              val fut = Future.fromTry(res)
+                .flatMap(r => r.entity.toStrict(t).map(e => r.withEntity(e)))
+                .map(Success.apply)
+              Source.fromFuture(fut).zip(Source.single(p))
+            }
+        }
+    }
 
     private[this] lazy val sink = Sink.foreach[(Try[HttpResponse], Promise[RouteResult])] {
       case ((Success(resp), p)) => p.success(Complete(resp))
