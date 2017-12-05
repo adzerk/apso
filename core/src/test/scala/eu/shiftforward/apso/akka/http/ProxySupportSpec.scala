@@ -32,6 +32,7 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
     val boundFuture = Http().bindAndHandle(Flow.fromFunction(serverResponse), interface, port)
 
     val proxy = new Proxy(interface, port)
+    val strictProxy = new Proxy(interface, port, strictTimeout = Some(10.seconds))
 
     val routes = {
       // format: OFF
@@ -39,11 +40,20 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
         path("get-path") {
           complete("get-reply")
         } ~
+        path("get-path-proxied-single-strict") {
+          strictProxySingleTo(Uri(s"http://$interface:$port/remote-proxy"), 10.seconds)
+        } ~
         path("get-path-proxied-single") {
           proxySingleTo(Uri(s"http://$interface:$port/remote-proxy"))
         } ~
+        pathPrefix("get-path-proxied-single-unmatched-strict") {
+          strictProxySingleToUnmatchedPath(Uri(s"http://$interface:$port/remote-proxy"), 10.seconds)
+        } ~
         pathPrefix("get-path-proxied-single-unmatched") {
           proxySingleToUnmatchedPath(Uri(s"http://$interface:$port/remote-proxy"))
+        } ~
+        pathPrefix("get-path-proxied-strict") {
+          strictProxy.proxyTo(Uri(s"http://$interface:$port/remote-proxy"))
         } ~
         pathPrefix("get-path-proxied") {
           proxy.proxyTo(Uri(s"http://$interface:$port/remote-proxy"))
@@ -67,11 +77,21 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
         status == OK
         responseAs[String] must be_==("get-reply")
       }
+
       Get("/get-path-proxied-single") ~> routes ~> check {
         status == OK
         responseAs[String] must be_==("/remote-proxy")
       }
       Post("/get-path-proxied-single") ~> routes ~> check {
+        status == OK
+        responseAs[String] must be_==("/remote-proxy")
+      }
+
+      Get("/get-path-proxied-single-strict") ~> routes ~> check {
+        status == OK
+        responseAs[String] must be_==("/remote-proxy")
+      }
+      Post("/get-path-proxied-single-strict") ~> routes ~> check {
         status == OK
         responseAs[String] must be_==("/remote-proxy")
       }
@@ -82,6 +102,7 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
         status == OK
         responseAs[String] must be_==("get-reply")
       }
+
       Get("/get-path-proxied-single-unmatched/other/path/parts") ~> routes ~> check {
         status == OK
         responseAs[String] must be_==("/remote-proxy/other/path/parts")
@@ -94,6 +115,19 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
         status == OK
         responseAs[String] must be_==("/remote-proxy/other/path/parts?foo=bar")
       }
+
+      Get("/get-path-proxied-single-unmatched-strict/other/path/parts") ~> routes ~> check {
+        status == OK
+        responseAs[String] must be_==("/remote-proxy/other/path/parts")
+      }
+      Post("/get-path-proxied-single-unmatched-strict/other/path/parts") ~> routes ~> check {
+        status == OK
+        responseAs[String] must be_==("/remote-proxy/other/path/parts")
+      }
+      Get("/get-path-proxied-single-unmatched-strict/other/path/parts?foo=bar") ~> routes ~> check {
+        status == OK
+        responseAs[String] must be_==("/remote-proxy/other/path/parts?foo=bar")
+      }
     }
 
     "proxy requests using a dedicated Proxy object" in new MockServer {
@@ -101,11 +135,21 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
         status == OK
         responseAs[String] must be_==("get-reply")
       }
+
       Get("/get-path-proxied") ~> routes ~> check {
         status == OK
         responseAs[String] must be_==("/remote-proxy")
       }
       Post("/get-path-proxied") ~> routes ~> check {
+        status == OK
+        responseAs[String] must be_==("/remote-proxy")
+      }
+
+      Get("/get-path-proxied-strict") ~> routes ~> check {
+        status == OK
+        responseAs[String] must be_==("/remote-proxy")
+      }
+      Post("/get-path-proxied-strict") ~> routes ~> check {
         status == OK
         responseAs[String] must be_==("/remote-proxy")
       }

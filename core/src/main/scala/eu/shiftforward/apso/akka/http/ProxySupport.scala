@@ -1,5 +1,6 @@
 package eu.shiftforward.apso.akka.http
 
+import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ Future, Promise }
 import scala.util.{ Failure, Success, Try }
 
@@ -9,7 +10,7 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{ `Remote-Address`, `X-Forwarded-For` }
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.RouteResult.Complete
-import akka.http.scaladsl.server.{ Directive1, Route, RouteResult }
+import akka.http.scaladsl.server.{ Directive1, RequestContext, Route, RouteResult }
 import akka.stream.QueueOfferResult.{ Dropped, Enqueued, QueueClosed, Failure => OfferFailure }
 import akka.stream.scaladsl.{ Keep, Sink, Source }
 import akka.stream.{ Materializer, OverflowStrategy }
@@ -54,25 +55,33 @@ trait ProxySupport extends ClientIPDirectives {
   private[this] val optionalRemoteAddress: Directive1[Option[RemoteAddress]] =
     headerValuePF { case `Remote-Address`(address) => Some(address) } | provide(None)
 
+  private[this] def proxy(strictTimeout: Option[FiniteDuration] = None)(reqBuilder: (Option[RemoteAddress], RequestContext) => HttpRequest): Route = {
+    extractActorSystem { implicit system =>
+      extractMaterializer { implicit mat =>
+        optionalRemoteAddress { ip => ctx =>
+          val req = reqBuilder(ip, ctx)
+          import system.dispatcher
+          strictTimeout match {
+            case None => Http(system).singleRequest(req).map(Complete.apply)
+            case Some(t) => Http(system).singleRequest(req)
+              .flatMap(r => r.entity.toStrict(t).map(e => r.withEntity(e)))
+              .map(Complete.apply)
+          }
+        }
+      }
+    }
+  }
+
   /**
    * Proxies a single request to a destination URI.
    *
    * @param uri the target URI
    * @return a route that handles requests by proxying them to the given URI.
    */
-  def proxySingleTo(uri: Uri): Route = {
-    extractActorSystem { implicit system =>
-      extractMaterializer { implicit mat =>
-        optionalRemoteAddress { ip => ctx =>
-          val req = ctx.request.copy(
-            uri = uri,
-            headers = getHeaders(ip, ctx.request.headers.toList))
-
-          import system.dispatcher
-          Http(system).singleRequest(req).map(Complete.apply)
-        }
-      }
-    }
+  def proxySingleTo(uri: Uri): Route = proxy() {
+    case (ip, ctx) => ctx.request.copy(
+      uri = uri,
+      headers = getHeaders(ip, ctx.request.headers.toList))
   }
 
   /**
@@ -82,19 +91,39 @@ trait ProxySupport extends ClientIPDirectives {
    * @param uri the target base URI
    * @return a route that handles requests by proxying them to the given URI.
    */
-  def proxySingleToUnmatchedPath(uri: Uri): Route = {
-    extractActorSystem { implicit system =>
-      extractMaterializer { implicit mat =>
-        optionalRemoteAddress { ip => ctx =>
-          val req = ctx.request.copy(
-            uri = uri.withPath(uri.path ++ ctx.unmatchedPath).withQuery(ctx.request.uri.query()),
-            headers = getHeaders(ip, ctx.request.headers.toList))
+  def proxySingleToUnmatchedPath(uri: Uri): Route = proxy() {
+    case (ip, ctx) => ctx.request.copy(
+      uri = uri.withPath(uri.path ++ ctx.unmatchedPath).withQuery(ctx.request.uri.query()),
+      headers = getHeaders(ip, ctx.request.headers.toList))
+  }
 
-          import system.dispatcher
-          Http(system).singleRequest(req).map(Complete.apply)
-        }
-      }
-    }
+  /**
+   * Proxies a single request to a destination URI.
+   * The response in not streamed, but converted to a strict entity with a set timeout.
+   *
+   * @param uri the target URI
+   * @param timeout maximum time to wait for the full response.
+   * @return a route that handles requests by proxying them to the given URI.
+   */
+  def strictProxySingleTo(uri: Uri, timeout: FiniteDuration): Route = proxy(Some(timeout)) {
+    case (ip, ctx) => ctx.request.copy(
+      uri = uri,
+      headers = getHeaders(ip, ctx.request.headers.toList))
+  }
+
+  /**
+   * Proxies a single request to a destination base URI. The target URI is created by concatenating the base URI with
+   * the unmatched path.
+   * The response in not streamed, but converted to a strict entity with a set timeout.
+   *
+   * @param uri the target base URI
+   * @param timeout maximum time to wait for the full response.
+   * @return a route that handles requests by proxying them to the given URI.
+   */
+  def strictProxySingleToUnmatchedPath(uri: Uri, timeout: FiniteDuration): Route = proxy(Some(timeout)) {
+    case (ip, ctx) => ctx.request.copy(
+      uri = uri.withPath(uri.path ++ ctx.unmatchedPath).withQuery(ctx.request.uri.query()),
+      headers = getHeaders(ip, ctx.request.headers.toList))
   }
 
   private[this] lazy val defaultQueueSize =
@@ -107,8 +136,9 @@ trait ProxySupport extends ClientIPDirectives {
    * @param host the target host
    * @param port the target port
    * @param reqQueueSize the maximum size of the queue of pending backend requests
+   * @param strictTimeout maximum time to wait for the full response.
    */
-  class Proxy(host: String, port: Int, reqQueueSize: Int = defaultQueueSize)(implicit system: ActorSystem, mat: Materializer)
+  class Proxy(host: String, port: Int, reqQueueSize: Int = defaultQueueSize, strictTimeout: Option[FiniteDuration] = None)(implicit system: ActorSystem, mat: Materializer)
     extends Logging {
 
     import system.dispatcher
@@ -116,7 +146,20 @@ trait ProxySupport extends ClientIPDirectives {
     private[this] lazy val source = Source.queue[(HttpRequest, Promise[RouteResult])](
       reqQueueSize, OverflowStrategy.dropNew)
 
-    private[this] lazy val flow = Http().cachedHostConnectionPool[Promise[RouteResult]](host, port)
+    private[this] lazy val flow = strictTimeout match {
+      case None => Http().cachedHostConnectionPool[Promise[RouteResult]](host, port)
+      case Some(t) => Http().cachedHostConnectionPool[Promise[RouteResult]](host, port)
+        .flatMapConcat {
+          case (res, p) =>
+            if (res.isFailure) Source.single((res, p))
+            else {
+              val fut = Future.fromTry(res)
+                .flatMap(r => r.entity.toStrict(t).map(e => r.withEntity(e)))
+                .map(Success.apply)
+              Source.fromFuture(fut).zip(Source.single(p))
+            }
+        }
+    }
 
     private[this] lazy val sink = Sink.foreach[(Try[HttpResponse], Promise[RouteResult])] {
       case ((Success(resp), p)) => p.success(Complete(resp))
