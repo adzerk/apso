@@ -169,6 +169,26 @@ trait ProxySupport extends ClientIPDirectives {
     private[this] lazy val queue = source.via(flow).toMat(sink)(Keep.left).run()
 
     /**
+     * Sends a manually crafted request to a destination URI.
+     *
+     * @param req the HTTP Request
+     * @param failOnDrop if the future should fail when the message is droped, or complete with a 503
+     * @return the request result.
+     */
+    def sendRequest(req: HttpRequest, failOnDrop: Boolean): Future[RouteResult] = {
+      val promise = Promise[RouteResult]()
+      queue.offer(req -> promise).flatMap {
+        case Enqueued => promise.future
+        case OfferFailure(ex) => Future.failed(new RuntimeException("Queue offering failed", ex))
+        case QueueClosed => Future.failed(new RuntimeException("Queue is completed before call!?"))
+        case Dropped =>
+          log.warn("Request queue for {}:{} is full", host, port)
+          if (failOnDrop) Future.failed(new RuntimeException("Droping request (Queue is full)"))
+          else Future.successful(Complete(HttpResponse(StatusCodes.ServiceUnavailable)))
+      }
+    }
+
+    /**
      * Proxies a request to a destination URI.
      *
      * @param uri the target URI
@@ -177,16 +197,7 @@ trait ProxySupport extends ClientIPDirectives {
     def proxyTo(uri: Uri): Route = {
       optionalRemoteAddress { ip => ctx =>
         val req = ctx.request.copy(uri = uri, headers = getHeaders(ip, ctx.request.headers.toList))
-        val promise = Promise[RouteResult]()
-
-        queue.offer(req -> promise).flatMap {
-          case Enqueued => promise.future
-          case OfferFailure(ex) => Future.failed(new RuntimeException("Queue offering failed", ex))
-          case QueueClosed => Future.failed(new RuntimeException("Queue is completed before call!?"))
-          case Dropped =>
-            log.warn("Request queue for {}:{} is full", host, port)
-            Future.successful(Complete(HttpResponse(StatusCodes.ServiceUnavailable)))
-        }
+        sendRequest(req, failOnDrop = false)
       }
     }
   }

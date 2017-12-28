@@ -1,7 +1,9 @@
 package eu.shiftforward.apso.akka.http
 
 import java.net.{ InetAddress, ServerSocket }
+import java.nio.charset.Charset
 
+import scala.concurrent.Future
 import scala.concurrent.duration._
 
 import akka.http.scaladsl.Http
@@ -10,6 +12,7 @@ import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers._
 import akka.http.scaladsl.model.{ HttpRequest, HttpResponse, Uri }
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.RouteResult.Complete
 import akka.http.scaladsl.testkit.RouteTestTimeout
 import akka.stream.scaladsl.Flow
 import org.specs2.concurrent.ExecutionEnv
@@ -153,6 +156,14 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
         status == OK
         responseAs[String] must be_==("/remote-proxy")
       }
+
+      proxy.sendRequest(Get("/proxied"), failOnDrop = false).flatMap {
+        case Complete(res) => res.entity.toStrict(10.seconds).map { r =>
+          val charset = r.contentType.charsetOption.map(_.nioCharset()).getOrElse(Charset.forName("UTF-8"))
+          r.data.decodeString(charset)
+        }
+        case _ => Future.failed(new Exception("Failed to parse result"))
+      } must be_==("/proxied").awaitFor(10.seconds)
     }
 
     "Modify the `X-Forwarded-For` header" in new MockServer {
