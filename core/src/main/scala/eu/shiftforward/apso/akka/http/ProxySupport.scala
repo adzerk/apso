@@ -172,7 +172,7 @@ trait ProxySupport extends ClientIPDirectives {
      * Sends a manually crafted request to a destination URI.
      *
      * @param req the HTTP Request
-     * @param failOnDrop if the future should fail when the message is droped, or complete with a 503
+     * @param failOnDrop if the future should fail when the message is dropped, or complete with a 503
      * @return the request result.
      */
     def sendRequest(req: HttpRequest, failOnDrop: Boolean): Future[RouteResult] = {
@@ -183,7 +183,7 @@ trait ProxySupport extends ClientIPDirectives {
         case QueueClosed => Future.failed(new RuntimeException("Queue is completed before call!?"))
         case Dropped =>
           log.warn("Request queue for {}:{} is full", host, port)
-          if (failOnDrop) Future.failed(new RuntimeException("Droping request (Queue is full)"))
+          if (failOnDrop) Future.failed(new RuntimeException("Dropping request (Queue is full)"))
           else Future.successful(Complete(HttpResponse(StatusCodes.ServiceUnavailable)))
       }
     }
