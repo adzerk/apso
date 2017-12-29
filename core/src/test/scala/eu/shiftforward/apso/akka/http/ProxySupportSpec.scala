@@ -2,14 +2,18 @@ package eu.shiftforward.apso.akka.http
 
 import java.net.{ InetAddress, ServerSocket }
 
+import scala.concurrent.Future
 import scala.concurrent.duration._
 
+import akka.NotUsed
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.RemoteAddress.IP
 import akka.http.scaladsl.model.StatusCodes._
+import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers._
-import akka.http.scaladsl.model.{ HttpRequest, HttpResponse, Uri }
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.RouteResult
+import akka.http.scaladsl.server.RouteResult.Complete
 import akka.http.scaladsl.testkit.RouteTestTimeout
 import akka.stream.scaladsl.Flow
 import org.specs2.concurrent.ExecutionEnv
@@ -29,7 +33,14 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
     }
 
     val (interface, port) = ("localhost", availablePort())
-    val boundFuture = Http().bindAndHandle(Flow.fromFunction(serverResponse), interface, port)
+
+    // Server that replies with the request relative URI and ignores DELETE requests
+    val boundFuture = {
+      val serverFlow: Flow[HttpRequest, HttpResponse, NotUsed] = Flow.apply[HttpRequest]
+        .filter(_.method != HttpMethods.DELETE)
+        .map(serverResponse)
+      Http().bindAndHandle(serverFlow, interface, port)
+    }
 
     val proxy = new Proxy(interface, port)
     val strictProxy = new Proxy(interface, port, strictTimeout = Some(10.seconds))
@@ -153,6 +164,26 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
         status == OK
         responseAs[String] must be_==("/remote-proxy")
       }
+
+      def parseResult(result: RouteResult): Future[String] = result match {
+        case Complete(res) if res.status.intValue() == 200 =>
+          res.entity.toStrict(10.seconds).map { r => r.data.utf8String }
+        case Complete(res) => Future.successful(res.status.intValue().toString)
+        case _ => Future.failed(new Exception("Failed to parse result"))
+      }
+
+      proxy.sendRequest(Get("/proxied"), failOnDrop = false)
+        .flatMap(parseResult) must be_==("/proxied").awaitFor(10.seconds)
+
+      val badProxy = new Proxy(interface, port, reqQueueSize = 1)
+      // Fill the bad proxy
+      (0 to 10).foreach(x => badProxy.sendRequest(Delete("/proxied-" + x), failOnDrop = false))
+
+      badProxy.sendRequest(Get("/proxied"), failOnDrop = true)
+        .failed.map(_.getMessage) must be_==("Dropping request (Queue is full)").awaitFor(10.seconds)
+
+      badProxy.sendRequest(Get("/proxied"), failOnDrop = false)
+        .flatMap(parseResult) must be_==("503").awaitFor(10.seconds)
     }
 
     "Modify the `X-Forwarded-For` header" in new MockServer {
