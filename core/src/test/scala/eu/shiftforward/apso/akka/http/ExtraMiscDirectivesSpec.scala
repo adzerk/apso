@@ -7,10 +7,9 @@ import akka.http.scaladsl.model.headers.CacheDirectives._
 import akka.http.scaladsl.model.headers._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import org.specs2.mutable.Specification
-import org.specs2.specification.AfterAll
+import net.ruippeixotog.akka.testkit.specs2.mutable.AkkaSpecificationLike
 
-class ExtraMiscDirectivesSpec extends Specification with Specs2RouteTest with AfterAll {
+class ExtraMiscDirectivesSpec extends Specs2RouteTest with AkkaSpecificationLike {
 
   "The ExtraMiscDirectives" should {
     import ExtraMiscDirectives._
@@ -60,9 +59,5 @@ class ExtraMiscDirectivesSpec extends Specification with Specs2RouteTest with Af
         responseAs[String] mustEqual None.toString
       }
     }
-  }
-
-  override def afterAll(): Unit = {
-    cleanUp()
   }
 }
