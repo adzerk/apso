@@ -8,8 +8,9 @@ import akka.http.scaladsl.model.headers._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import org.specs2.mutable.Specification
+import org.specs2.specification.AfterAll
 
-class ExtraMiscDirectivesSpec extends Specification with Specs2RouteTest {
+class ExtraMiscDirectivesSpec extends Specification with Specs2RouteTest with AfterAll {
 
   "The ExtraMiscDirectives" should {
     import ExtraMiscDirectives._
@@ -59,5 +60,9 @@ class ExtraMiscDirectivesSpec extends Specification with Specs2RouteTest {
         responseAs[String] mustEqual None.toString
       }
     }
+  }
+
+  override def afterAll(): Unit = {
+    cleanUp()
   }
 }

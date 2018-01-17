@@ -19,8 +19,9 @@ package eu.shiftforward.apso.caching
 import akka.actor.ActorSystem
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mutable.Specification
+import org.specs2.specification.AfterAll
 
-class SimpleLruCacheSpec(implicit ee: ExecutionEnv) extends Specification {
+class SimpleLruCacheSpec(implicit ee: ExecutionEnv) extends Specification with AfterAll {
   implicit val system = ActorSystem()
   import system.dispatcher
 
@@ -42,5 +43,9 @@ class SimpleLruCacheSpec(implicit ee: ExecutionEnv) extends Specification {
     cache.keys === Set(1, 2)
     cache.ascendingKeys().toList === List(2, 1)
     cache.ascendingKeys(Some(1)).toList === List(2)
+  }
+
+  override def afterAll(): Unit = {
+    system.terminate()
   }
 }

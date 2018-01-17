@@ -26,8 +26,9 @@ import scala.concurrent.duration._
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mutable.Specification
 import org.specs2.matcher.Matcher
+import org.specs2.specification.AfterAll
 
-class ExpiringLruCacheSpec(implicit ee: ExecutionEnv) extends Specification {
+class ExpiringLruCacheSpec(implicit ee: ExecutionEnv) extends Specification with AfterAll {
   implicit val system = ActorSystem()
   import system.dispatcher
   val timeout = 15.seconds
@@ -135,7 +136,9 @@ class ExpiringLruCacheSpec(implicit ee: ExecutionEnv) extends Specification {
     }
   }
 
-  step(system.terminate())
+  override def afterAll(): Unit = {
+    system.terminate()
+  }
 
   def lruCache[T](maxCapacity: Int = 500, initialCapacity: Int = 16,
     timeToLive: Duration = Duration.Inf, timeToIdle: Duration = Duration.Inf) =
