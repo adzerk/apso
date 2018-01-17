@@ -1,6 +1,6 @@
 package eu.shiftforward.apso.akka.http
 
-import java.net.{ InetAddress, ServerSocket }
+import java.net.InetAddress
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -16,21 +16,16 @@ import akka.http.scaladsl.server.RouteResult
 import akka.http.scaladsl.server.RouteResult.Complete
 import akka.http.scaladsl.testkit.RouteTestTimeout
 import akka.stream.scaladsl.Flow
+import net.ruippeixotog.akka.testkit.specs2.mutable.AkkaSpecificationLike
 import org.specs2.concurrent.ExecutionEnv
-import org.specs2.mutable.Specification
-import org.specs2.specification.{ AfterAll, Scope }
+import org.specs2.specification.Scope
 
-class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Specs2RouteTest with AfterAll with ProxySupport {
+import eu.shiftforward.apso.NetUtils._
+
+class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specs2RouteTest with AkkaSpecificationLike with ProxySupport {
 
   trait MockServer extends Scope {
     def serverResponse(req: HttpRequest) = HttpResponse(entity = req.uri.toRelative.toString)
-
-    private[this] def availablePort(): Int = {
-      val socket = new ServerSocket(0)
-      val port = socket.getLocalPort
-      socket.close()
-      port
-    }
 
     val (interface, port) = ("localhost", availablePort())
 
@@ -221,9 +216,5 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
         }
       }
     }
-  }
-
-  override def afterAll(): Unit = {
-    cleanUp()
   }
 }

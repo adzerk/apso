@@ -16,13 +16,10 @@
 
 package eu.shiftforward.apso.caching
 
-import akka.actor.ActorSystem
+import net.ruippeixotog.akka.testkit.specs2.mutable.AkkaSpecification
 import org.specs2.concurrent.ExecutionEnv
-import org.specs2.mutable.Specification
-import org.specs2.specification.AfterAll
 
-class SimpleLruCacheSpec(implicit ee: ExecutionEnv) extends Specification with AfterAll {
-  implicit val system = ActorSystem()
+class SimpleLruCacheSpec(implicit ee: ExecutionEnv) extends AkkaSpecification {
   import system.dispatcher
 
   "not cache exceptions" in {
@@ -43,9 +40,5 @@ class SimpleLruCacheSpec(implicit ee: ExecutionEnv) extends Specification with A
     cache.keys === Set(1, 2)
     cache.ascendingKeys().toList === List(2, 1)
     cache.ascendingKeys(Some(1)).toList === List(2)
-  }
-
-  override def afterAll(): Unit = {
-    system.terminate()
   }
 }

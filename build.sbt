@@ -35,6 +35,7 @@ lazy val core = project.in(file("core"))
       "org.slf4j"                                  % "slf4j-api"                      % "1.7.25",
       "com.typesafe.akka"                         %% "akka-http-testkit"              % "10.0.10"        % "test",
       "junit"                                      % "junit"                          % "4.12"           % "test",
+      "net.ruippeixotog"                          %% "akka-testkit-specs2"            % "0.2.3"          % "test",
       "org.scalacheck"                            %% "scalacheck"                     % "1.13.5"         % "test",
       "org.specs2"                                %% "specs2-core"                    % "4.0.1"          % "test",
       "org.specs2"                                %% "specs2-scalacheck"              % "4.0.1"          % "test",

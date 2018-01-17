@@ -19,17 +19,14 @@ package eu.shiftforward.apso.caching
 import java.util.Random
 import java.util.concurrent.CountDownLatch
 
-import akka.actor.ActorSystem
 import scala.concurrent.{ Await, Future, Promise }
 import scala.concurrent.duration._
 
+import net.ruippeixotog.akka.testkit.specs2.mutable.AkkaSpecification
 import org.specs2.concurrent.ExecutionEnv
-import org.specs2.mutable.Specification
 import org.specs2.matcher.Matcher
-import org.specs2.specification.AfterAll
 
-class ExpiringLruCacheSpec(implicit ee: ExecutionEnv) extends Specification with AfterAll {
-  implicit val system = ActorSystem()
+class ExpiringLruCacheSpec(implicit ee: ExecutionEnv) extends AkkaSpecification {
   import system.dispatcher
   val timeout = 15.seconds
 
@@ -134,10 +131,6 @@ class ExpiringLruCacheSpec(implicit ee: ExecutionEnv) extends Specification with
         (_: Seq[Int]) ⇒ "consistency check")
       forall(views.transpose)(_ must beConsistent)
     }
-  }
-
-  override def afterAll(): Unit = {
-    system.terminate()
   }
 
   def lruCache[T](maxCapacity: Int = 500, initialCapacity: Int = 16,
