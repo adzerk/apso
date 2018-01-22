@@ -105,7 +105,7 @@ class ExtraJsonProtocolSpec extends Specification {
     "provide a JsonFormat for a Map as a JsArray of json objects" in {
       implicit val mapFormat: RootJsonFormat[Map[Option[Int], String]] = mapJsArrayFormat[Option[Int], String]
 
-      val map = Map(None -> "none", Some(1) -> "one", Some(2) -> "two") // Map("one" -> 1, "two" -> 2, "three" -> 3)
+      val map = Map(None -> "none", Some(1) -> "one", Some(2) -> "two")
       val mapJsonString = """[{"key":null,"value":"none"},{"key":1,"value":"one"},{"key":2,"value":"two"}]"""
 
       map.toJson.compactPrint mustEqual mapJsonString
