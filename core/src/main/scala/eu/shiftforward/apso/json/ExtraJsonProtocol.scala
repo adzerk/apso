@@ -124,4 +124,16 @@ trait ExtraMiscJsonProtocol {
         deserializationError("The value for a 'LocalDate' has an invalid type - it must be a String.")
     }
   }
+
+  def mapJsArrayFormat[K: JsonFormat, V: JsonFormat]: RootJsonFormat[Map[K, V]] = new RootJsonFormat[Map[K, V]] {
+    def write(obj: Map[K, V]): JsValue = obj.map(o => JsObject(Map("key" -> o._1.toJson, "value" -> o._2.toJson))).toJson
+
+    def read(json: JsValue): Map[K, V] = json.convertTo[JsArray].elements.foldLeft(Map[K, V]()) { (map, e) =>
+      e.asJsObject.getFields("key", "value") match {
+        case Seq(k, v) =>
+          map ++ Map(k.convertTo[K] -> v.convertTo[V])
+        case other => deserializationError(s"Expected a json object with 'key' and 'value' as keys, got: $other")
+      }
+    }
+  }
 }

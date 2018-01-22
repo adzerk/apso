@@ -1000,7 +1000,8 @@ The `ExtraJsonProtocol` object combines three traits that provide extra `JsonFor
 
 * ExtraTimeJsonProtocol: `JsonFormat[FiniteDuration]` and `JsonFormat[Interval]`;
 * ExtraHttpJsonProtocol: `JsonFormat[URI]`;
-* ExtraMiscJsonProtocol: `JsonFormat[Config]`, `JsonFormat[DateTime]` and `JsonFormat[LocalDate]`.
+* ExtraMiscJsonProtocol: `JsonFormat[Config]`, `JsonFormat[DateTime]` and `JsonFormat[LocalDate]`. It also includes the non-implicit method `mapJsArrayFormat[K, V]` which serializes a map as an array of key-value objects. 
+Note that `spray-json`'s `JsonFormat` for maps has the same signature, so if you need to use both at the same time, you need to extend the `DefaultJsonProtocol` trait instead of importing it.
 
 ### JsValue
 
