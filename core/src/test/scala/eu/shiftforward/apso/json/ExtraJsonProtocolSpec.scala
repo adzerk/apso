@@ -103,7 +103,7 @@ class ExtraJsonProtocolSpec extends Specification {
     }
 
     "provide a JsonFormat for a Map as a JsArray of json objects" in {
-      implicit val mapFormat: RootJsonFormat[Map[String, Int]] = MapJsArrayFormat[String, Int]
+      implicit val mapFormat: RootJsonFormat[Map[String, Int]] = mapJsArrayFormat[String, Int]
 
       val map = Map("one" -> 1, "two" -> 2, "three" -> 3)
       val mapJsonString = """[{"key":"one","value":1},{"key":"two","value":2},{"key":"three","value":3}]"""
