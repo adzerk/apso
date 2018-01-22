@@ -103,16 +103,16 @@ class ExtraJsonProtocolSpec extends Specification {
     }
 
     "provide a JsonFormat for a Map as a JsArray of json objects" in {
-      implicit val mapFormat: RootJsonFormat[Map[String, Int]] = mapJsArrayFormat[String, Int]
+      implicit val mapFormat: RootJsonFormat[Map[Option[Int], String]] = mapJsArrayFormat[Option[Int], String]
 
-      val map = Map("one" -> 1, "two" -> 2, "three" -> 3)
-      val mapJsonString = """[{"key":"one","value":1},{"key":"two","value":2},{"key":"three","value":3}]"""
+      val map = Map(None -> "none", Some(1) -> "one", Some(2) -> "two") // Map("one" -> 1, "two" -> 2, "three" -> 3)
+      val mapJsonString = """[{"key":null,"value":"none"},{"key":1,"value":"one"},{"key":2,"value":"two"}]"""
 
       map.toJson.compactPrint mustEqual mapJsonString
-      mapJsonString.parseJson.convertTo[Map[String, Int]] mustEqual map
-      """{"key":"one","value":1}""".parseJson.convertTo[Map[String, Int]] must throwA[DeserializationException]
-      """[{"invalid":"one","value":1}]""".parseJson.convertTo[Map[String, Int]] must throwA[DeserializationException]
-      """[{"key":"one","invalid":1}]""".parseJson.convertTo[Map[String, Int]] must throwA[DeserializationException]
+      mapJsonString.parseJson.convertTo[Map[Option[Int], String]] mustEqual map
+      """{"key":1,"value":"one"}""".parseJson.convertTo[Map[Option[Int], String]] must throwA[DeserializationException]
+      """[{"invalid":1,"value":"one"}]""".parseJson.convertTo[Map[Option[Int], String]] must throwA[DeserializationException]
+      """[{"key":1,"invalid":"one"}]""".parseJson.convertTo[Map[Option[Int], String]] must throwA[DeserializationException]
     }
   }
 }

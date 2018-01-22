@@ -126,14 +126,14 @@ trait ExtraMiscJsonProtocol {
   }
 
   /**
-    * Serializes a map as an array of key-value objects.
-    * Note that `spray-json`'s `JsonFormat` for maps has the same signature, so if you need to use both at the same time,
-    * you need to extend the `DefaultJsonProtocol` trait instead of importing it.
-    *
-    * @tparam K the type of the keys of the map
-    * @tparam V the types of the value of the map
-    * @return an instance of `RootJsonFormat` for the map
-    */
+   * Serializes a map as an array of key-value objects.
+   * Note that `spray-json`'s `JsonFormat` for maps has the same signature, so if you need to use both at the same time,
+   * you need to extend the `DefaultJsonProtocol` trait instead of importing it.
+   *
+   * @tparam K the type of the keys of the map
+   * @tparam V the types of the value of the map
+   * @return an instance of `RootJsonFormat` for the map
+   */
   def mapJsArrayFormat[K: JsonFormat, V: JsonFormat]: RootJsonFormat[Map[K, V]] = new RootJsonFormat[Map[K, V]] {
     def write(obj: Map[K, V]): JsValue = obj.map(o => JsObject(Map("key" -> o._1.toJson, "value" -> o._2.toJson))).toJson
 
