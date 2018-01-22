@@ -8,6 +8,7 @@ import com.typesafe.config.{ Config, ConfigFactory }
 import org.joda.time.{ DateTime, Interval, LocalDate, Period }
 import org.specs2.mutable.Specification
 import spray.json._
+import spray.json.DefaultJsonProtocol._
 
 class ExtraJsonProtocolSpec extends Specification {
 
@@ -99,6 +100,19 @@ class ExtraJsonProtocolSpec extends Specification {
       localDate.toJson.compactPrint mustEqual localDateJsonString
       localDateJsonString.parseJson.convertTo[LocalDate] mustEqual localDate
       "true".parseJson.convertTo[LocalDate] must throwA[DeserializationException]
+    }
+
+    "provide a JsonFormat for a Map as a JsArray of json objects" in {
+      implicit val mapFormat: RootJsonFormat[Map[Option[Int], String]] = mapJsArrayFormat[Option[Int], String]
+
+      val map = Map(None -> "none", Some(1) -> "one", Some(2) -> "two")
+      val mapJsonString = """[{"key":null,"value":"none"},{"key":1,"value":"one"},{"key":2,"value":"two"}]"""
+
+      map.toJson.compactPrint mustEqual mapJsonString
+      mapJsonString.parseJson.convertTo[Map[Option[Int], String]] mustEqual map
+      """{"key":1,"value":"one"}""".parseJson.convertTo[Map[Option[Int], String]] must throwA[DeserializationException]
+      """[{"invalid":1,"value":"one"}]""".parseJson.convertTo[Map[Option[Int], String]] must throwA[DeserializationException]
+      """[{"key":1,"invalid":"one"}]""".parseJson.convertTo[Map[Option[Int], String]] must throwA[DeserializationException]
     }
   }
 }

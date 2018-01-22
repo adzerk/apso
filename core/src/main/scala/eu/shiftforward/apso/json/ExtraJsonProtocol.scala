@@ -124,4 +124,25 @@ trait ExtraMiscJsonProtocol {
         deserializationError("The value for a 'LocalDate' has an invalid type - it must be a String.")
     }
   }
+
+  /**
+   * Serializes a map as an array of key-value objects.
+   * Note that `spray-json`'s `JsonFormat` for maps has the same signature, so if you need to use both at the same time,
+   * you need to extend the `DefaultJsonProtocol` trait instead of importing it.
+   *
+   * @tparam K the type of the keys of the map
+   * @tparam V the types of the value of the map
+   * @return an instance of `RootJsonFormat` for the map
+   */
+  def mapJsArrayFormat[K: JsonFormat, V: JsonFormat]: RootJsonFormat[Map[K, V]] = new RootJsonFormat[Map[K, V]] {
+    def write(obj: Map[K, V]): JsValue = obj.map(o => JsObject(Map("key" -> o._1.toJson, "value" -> o._2.toJson))).toJson
+
+    def read(json: JsValue): Map[K, V] = json.convertTo[JsArray].elements.foldLeft(Map[K, V]()) { (map, e) =>
+      e.asJsObject.getFields("key", "value") match {
+        case Seq(k, v) =>
+          map ++ Map(k.convertTo[K] -> v.convertTo[V])
+        case other => deserializationError(s"Expected a json object with 'key' and 'value' as keys, got: $other")
+      }
+    }
+  }
 }
