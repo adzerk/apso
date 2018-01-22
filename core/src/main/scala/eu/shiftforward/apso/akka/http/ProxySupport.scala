@@ -182,7 +182,7 @@ trait ProxySupport extends ClientIPDirectives {
         case OfferFailure(ex) => Future.failed(new RuntimeException("Queue offering failed", ex))
         case QueueClosed => Future.failed(new RuntimeException("Queue is completed before call!?"))
         case Dropped =>
-          log.warn("Request queue for {}:{} is full", host, port)
+          log.warn(s"Request queue for $host:$port is full")
           if (failOnDrop) Future.failed(new RuntimeException("Dropping request (Queue is full)"))
           else Future.successful(Complete(HttpResponse(StatusCodes.ServiceUnavailable)))
       }

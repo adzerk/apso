@@ -71,7 +71,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
 
       result match {
         case Success(_) => if (safeDownloading) downloadFile.rename(localTarget)
-        case Failure(ex) => log.warn("File copy failed ({})", ex.toString)
+        case Failure(ex) => log.warn(s"File copy failed ($ex)")
       }
 
       result.isSuccess
@@ -90,7 +90,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
 
       result match {
         case Success(_) =>
-        case Failure(ex) => log.warn("File copy failed ({})", ex.toString)
+        case Failure(ex) => log.warn(s"File copy failed ($ex)")
       }
 
       result.isSuccess
@@ -109,7 +109,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
 
       result match {
         case Success(_) =>
-        case Failure(ex) => log.warn("File copy failed ({})", ex.toString)
+        case Failure(ex) => log.warn(s"File copy failed ($ex)")
       }
 
       result.isSuccess

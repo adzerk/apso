@@ -1,25 +1,25 @@
 package eu.shiftforward.apso
 
-import org.slf4j.LoggerFactory
+import org.apache.logging.log4j.scala.Logger
 
 /**
- * Trait to mixin a slf4j `Logger` object. The `Logger` object is initialized lazily.
+ * Trait to mixin a Log4j2 `Logger` object. The `Logger` object is initialized lazily.
  */
 trait Logging {
   /**
    * The `Logger` object. This logger will have the same name as the concrete class
    * into which this trait is mixed-in.
    */
-  lazy val log = LoggerFactory.getLogger(getClass.getName)
+  lazy val log = Logger(getClass)
 }
 
 /**
- * Trait to mixin a slf4j `Logger` object. The `Logger` object is initialized strictly.
+ * Trait to mixin a Log4j2 `Logger` object. The `Logger` object is initialized strictly.
  */
 trait StrictLogging {
   /**
    * The `Logger` object. This logger will have the same name as the concrete class
    * into which this trait is mixed-in.
    */
-  val log = LoggerFactory.getLogger(getClass.getName)
+  val log = Logger(getClass)
 }
