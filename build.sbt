@@ -32,6 +32,7 @@ lazy val core = project.in(file("core"))
       "org.bouncycastle"                           % "bcpkix-jdk15on"                 % "1.58",
       "org.bouncycastle"                           % "bcprov-jdk15on"                 % "1.58",
       "org.scalaz"                                %% "scalaz-core"                    % "7.2.16"         % "provided",
+      "org.apache.logging.log4j"                   % "log4j-api"                      % "2.10.0",
       "org.apache.logging.log4j"                  %% "log4j-api-scala"                % "11.0",
       "org.apache.logging.log4j"                   % "log4j-core"                     % "2.10.0"         % "test",
       "com.typesafe.akka"                         %% "akka-http-testkit"              % "10.0.10"        % "test",
@@ -49,6 +50,7 @@ lazy val testkit = project.in(file("testkit"))
     libraryDependencies ++= Seq(
       "com.typesafe.akka"             %% "akka-testkit"       % "2.5.6"          % "provided",
       "com.typesafe.akka"             %% "akka-http-testkit"  % "10.0.10"        % "provided",
+      "org.apache.logging.log4j"       % "log4j-api"          % "2.10.0",
       "org.apache.logging.log4j"      %% "log4j-api-scala"    % "11.0",
       "org.specs2"                    %% "specs2-core"        % "4.0.1"          % "provided",
       "org.specs2"                    %% "specs2-junit"       % "4.0.1"          % "provided"))
