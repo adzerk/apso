@@ -88,7 +88,13 @@ lazy val commonSettings = Seq(
   pomIncludeRepository := { _ => false },
 
   licenses := Seq("Apache License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
-  homepage := Some(url("https://github.com/ShiftForward/apso")))
+  homepage := Some(url("https://github.com/ShiftForward/apso")),
+  scmInfo := Some(
+    ScmInfo(
+      url("https://github.com/ShiftForward/apso"),
+      "scm:git@github.com:ShiftForward/apso.git"
+    )
+  ))
 
 // do not publish the root project
 skip in publish := true
