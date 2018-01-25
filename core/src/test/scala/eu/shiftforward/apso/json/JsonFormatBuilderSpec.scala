@@ -134,7 +134,6 @@ class JsonFormatBuilderSpec extends Specification {
       """{ "a": 3, "b": ["x", "y"], "c": 3.0 }""".parseJson.convertTo[Test](jf) mustEqual Test(0, List("x", "y"), 3.0)
       Test(0, List("x", "y"), 3.0).toJson(jf) mustEqual """{ "a": 0, "b": ["y"], "c": 1.5 }""".parseJson
       Try("""{ "a": "asd" }""".parseJson.convertTo[Test](jf)) must beFailedTry.withThrowable[Exception]("Caught error!")
-
     }
   }
 }
