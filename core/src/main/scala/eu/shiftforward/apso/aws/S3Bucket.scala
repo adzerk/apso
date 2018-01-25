@@ -115,7 +115,7 @@ class S3Bucket(
    * @return a list of objects in a bucket matching a given prefix.
    */
   def getObjectsWithMatchingPrefix(prefix: String, includeDirectories: Boolean = false): Iterator[S3ObjectSummary] = {
-    log.info("Finding files matching prefix '{}'...", prefix)
+    log.info(s"Finding files matching prefix '$prefix'...")
 
     val listings = Iterator.iterate(s3.listObjects(bucketName, sanitizeKey(prefix))) { listing =>
       if (listing.isTruncated) {
@@ -160,7 +160,7 @@ class S3Bucket(
    * @return true if the push was successful, false otherwise.
    */
   def push(key: String, inputStream: InputStream, length: Option[Long]): Boolean = retry {
-    log.info("Pushing to 's3://{}/{}'", bucketName: Any, key: Any)
+    log.info(s"Pushing to 's3://$bucketName/$key'")
     val metadata = new ObjectMetadata()
     length.foreach(metadata.setContentLength)
     transferManager
@@ -209,7 +209,7 @@ class S3Bucket(
    * @param acl the `CannedAccessControlList` to be applied to the Amazon S3 object
    */
   def setAcl(key: String, acl: CannedAccessControlList) {
-    log.info("Setting 's3://{}/{}' permissions to '{}'", bucketName, key, acl)
+    log.info(s"Setting 's3://$bucketName/$key' permissions to '$acl'")
     s3.setObjectAcl(bucketName, key, acl)
   }
 
@@ -220,7 +220,7 @@ class S3Bucket(
    * @return  true if the directory was created successfully, false otherwise.
    */
   def createDirectory(key: String): Boolean = retry {
-    log.info("Creating directory in 's3://{}/{}'", bucketName, key, null)
+    log.info(s"Creating directory in 's3://$bucketName/$key'")
 
     val emptyContent = new ByteArrayInputStream(Array[Byte]())
     val metadata = new ObjectMetadata()
@@ -255,7 +255,7 @@ class S3Bucket(
    * @return true if the pull was successful, false otherwise
    */
   def pull(key: String, destination: String): Boolean = retry {
-    log.info("Pulling 's3://{}/{}' to '{}'", bucketName, key, destination)
+    log.info(s"Pulling 's3://$bucketName/$key' to '$destination'")
 
     val s3Object = s3.getObject(new GetObjectRequest(bucketName, sanitizeKey(key)))
     val inputStream = s3Object.getObjectContent
@@ -273,7 +273,7 @@ class S3Bucket(
       read = inputStream.read(bytes)
     }
 
-    log.info("Downloaded 's3://{}/{}' to '{}'. Closing files.", bucketName, key, destination)
+    log.info(s"Downloaded 's3://$bucketName/$key' to '$destination'. Closing files.")
 
     inputStream.close()
     outputStream.flush()
@@ -281,7 +281,7 @@ class S3Bucket(
   }.isDefined
 
   def stream(key: String, offset: Long = 0L): InputStream = {
-    log.info("Streaming 's3://{}/{}' starting at {}", bucketName, key, offset.toString)
+    log.info(s"Streaming 's3://$bucketName/$key' starting at $offset")
     val req =
       if (offset > 0) new GetObjectRequest(bucketName, sanitizeKey(key)).withRange(offset)
       else new GetObjectRequest(bucketName, sanitizeKey(key))
@@ -320,7 +320,7 @@ class S3Bucket(
       case Success(res) => Some(res)
       case Failure(e) if !handler(e) =>
         if (tries > 1) {
-          log.warn("Error during S3 operation. Retrying in {}ms ({} more times)", sleepTime, tries - 1)
+          log.warn(s"Error during S3 operation. Retrying in ${sleepTime}ms (${tries - 1} more times)")
           Thread.sleep(sleepTime)
         }
         retry(f, tries - 1, sleepTime)

@@ -75,8 +75,8 @@ case class SftpFileDescriptor(
         case e: SFTPException if e.getStatusCode == Response.StatusCode.NO_SUCH_FILE =>
           throw new FileNotFoundException(toString)
         case e @ (_: SSHException | _: IOException) if retries > 0 =>
-          log.warn("[{}] {}. Retrying in 10 seconds...", host, e.getMessage, null)
-          log.debug("Failure cause: {}", e.getCause)
+          log.warn(s"[$host] ${e.getMessage}. Retrying in 10 seconds...")
+          log.debug(s"Failure cause: ${e.getCause}")
           Thread.sleep(10000)
           doConnect(retries - 1)
       }
@@ -132,7 +132,7 @@ case class SftpFileDescriptor(
     require(!localTarget.isDirectory, s"Local file descriptor can't point to a directory: ${localTarget.path}")
     require(!isDirectory, s"Remote file descriptor can't point to a directory: ${this.path}")
 
-    log.info("Downloading '{}' to '{}'", toString, localTarget.toString, null)
+    log.info(s"Downloading '$toString' to '$localTarget'")
 
     if (localTarget.parent().mkdirs()) {
       val downloadFile = if (safeDownloading) localTarget.sibling(_ + ".tmp") else localTarget
@@ -148,7 +148,7 @@ case class SftpFileDescriptor(
     require(!localTarget.isDirectory, s"Local file descriptor can't point to a directory: ${localTarget.path}")
     require(!exists || !isDirectory, s"Remote file descriptor can't point to a directory: ${this.path}")
 
-    log.info("Uploading '{}' to '{}'", localTarget.toString, toString, null)
+    log.info(s"Uploading '$localTarget' to '$toString'")
 
     parent().mkdirs() &&
       Try(sftp(_.put(localTarget.path, path))).isSuccess
@@ -157,7 +157,7 @@ case class SftpFileDescriptor(
   def upload(inputStream: InputStream, length: Option[Long]): Boolean = {
     require(!exists || !isDirectory, s"Remote file descriptor can't point to a directory: ${this.path}")
 
-    log.info("Uploading to '{}'", toString)
+    log.info(s"Uploading to '$toString'")
 
     val sourceFile = new InMemorySourceFile {
       override def getLength: Long = length.getOrElse(0)

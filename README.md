@@ -166,7 +166,7 @@ res0: (Int, Int) = (1,8)
 
 ## Logging
 
-The `Logging` and `StrictLogging` traits allows mixing in slf4j `Logger` objects. The difference between the two is that in the former the `Logger` object is initialized lazily, while in the latter it is initialized strictly:
+The `Logging` and `StrictLogging` traits allows mixing in Log4j2 `Logger` objects. The difference between the two is that in the former the `Logger` object is initialized lazily, while in the latter it is initialized strictly:
 
 ```scala
 scala> class A extends Logging {}

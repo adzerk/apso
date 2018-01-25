@@ -53,7 +53,7 @@ class InsistentInputStream(streamBuilder: (Long) => InputStream, maxRetries: Int
       case Failure(t) =>
         if (remainingTries <= 0) throw t
         else {
-          log.warn("Failed to read from stream: {}", t)
+          log.warn(s"Failed to read from stream: ${t.getMessage}")
           val nextRemainingTries = retryStreamCreation(remainingTries - 1)
           readRetries(nextRemainingTries, f)
         }

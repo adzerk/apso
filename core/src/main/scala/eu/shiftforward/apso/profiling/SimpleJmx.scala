@@ -36,7 +36,7 @@ trait SimpleJmx extends Logging {
 
   jmxServer match {
     case Success(jmx) =>
-      log.info("Bound JMX on port {}", jmx.getServerPort)
+      log.info(s"Bound JMX on port ${jmx.getServerPort}")
       sys.addShutdownHook(jmx.stop())
 
     case Failure(ex) =>
