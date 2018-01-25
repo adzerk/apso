@@ -1,9 +1,11 @@
 package eu.shiftforward.apso.json
 
-import eu.shiftforward.apso.json.JsonFormatBuilder._
-import eu.shiftforward.apso.json.JsonFormatBuilder.Field
+import scala.util.{ Failure, Success, Try }
+
 import shapeless._
 import spray.json._
+
+import eu.shiftforward.apso.json.JsonFormatBuilder._
 
 /**
  * A type-safe way to construct a `JSONFormat` by incrementally adding, removing or updating fields.
@@ -13,6 +15,9 @@ import spray.json._
  * @tparam FC the type of the `HList` of field definitions currently in this builder
  */
 case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: FormatterAux[C, FC]) {
+
+  type ReadFunc[+A] = C => A
+  type WriteFunc[-A] = A => C
 
   /**
    * Adds a field to this builder.
@@ -118,14 +123,17 @@ case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: 
    *
    * @param preRead a function transforming the JSON content before reads
    * @param readFunc a function converting the list of fields to an instance of `A`
+   * @param errorHandler a function to catch and possibly recover from errors
    * @tparam A the type of objects for which a `JSONFormat` is to be returned
    * @return a `JSONReader` for objects of type `A`.
    */
-  def customJsonReader[A](preRead: JsObject => JsObject, readFunc: C => A): RootJsonReader[A] = new RootJsonReader[A] {
+  def customJsonReader[A](preRead: JsObject => JsObject, readFunc: ReadFunc[A], errorHandler: (JsValue, Throwable) => A = defaultErrorHandler): RootJsonReader[A] = new RootJsonReader[A] {
     def read(json: JsValue): A = {
       val jsObject = preRead(json.asJsObject)
-      val fieldValues = aux.read(jsObject.fields, fields)
-      readFunc(fieldValues)
+      Try(aux.read(jsObject.fields, fields)) match {
+        case Success(x) => readFunc(x)
+        case Failure(t) => errorHandler(json, t)
+      }
     }
   }
 
@@ -137,7 +145,7 @@ case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: 
    * @tparam A the type of objects for which a `JSONFormat` is to be returned
    * @return a `JSONWriter` for objects of type `A`.
    */
-  def customJsonWriter[A](writeFunc: A => C, postWrite: (A, JsObject) => JsObject): RootJsonWriter[A] = new RootJsonWriter[A] {
+  def customJsonWriter[A](writeFunc: WriteFunc[A], postWrite: (A, JsObject) => JsObject): RootJsonWriter[A] = new RootJsonWriter[A] {
     def write(obj: A): JsValue = {
       val fieldValues = writeFunc(obj)
       postWrite(obj, JsObject(aux.write(fields, fieldValues)))
@@ -149,6 +157,7 @@ case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: 
    *
    * @param preRead a function transforming the JSON content before reads
    * @param readFunc a function converting the list of fields to an instance of `A`
+   * @param errorHandler a function to catch and possibly recover from errors
    * @param writeFunc a function extracting the list of fields from an instance of `A`
    * @param postWrite a function transforming the JSON content after writes
    * @tparam A the type of objects for which a `JSONFormat` is to be returned
@@ -156,11 +165,12 @@ case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: 
    */
   def customJsonFormat[A](
     preRead: JsObject => JsObject,
-    readFunc: C => A,
-    writeFunc: A => C,
-    postWrite: (A, JsObject) => JsObject): RootJsonFormat[A] = new RootJsonFormat[A] {
+    readFunc: ReadFunc[A],
+    writeFunc: WriteFunc[A],
+    postWrite: (A, JsObject) => JsObject,
+    errorHandler: (JsValue, Throwable) => A = defaultErrorHandler): RootJsonFormat[A] = new RootJsonFormat[A] {
 
-    val reader: RootJsonReader[A] = customJsonReader(preRead, readFunc)
+    val reader: RootJsonReader[A] = customJsonReader(preRead, readFunc, errorHandler)
     val writer: RootJsonWriter[A] = customJsonWriter(writeFunc, postWrite)
 
     def read(json: JsValue): A = reader.read(json)
@@ -174,7 +184,7 @@ case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: 
    * @tparam A the type of objects for which a `JSONFormat` is to be returned
    * @return a `JSONFormat` for objects of type `A`.
    */
-  def jsonReader[A](readFunc: C => A): RootJsonReader[A] = customJsonReader(identity, readFunc)
+  def jsonReader[A](readFunc: ReadFunc[A]): RootJsonReader[A] = customJsonReader(identity, readFunc)
 
   /**
    * Returns a `JSONWriter` for objects of a type using the current list of fields defined.
@@ -183,7 +193,7 @@ case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: 
    * @tparam A the type of objects for which a `JSONFormat` is to be returned
    * @return a `JSONFormat` for objects of type `A`.
    */
-  def jsonWriter[A](writeFunc: A => C): RootJsonWriter[A] = customJsonWriter(writeFunc, { (_, json) => json })
+  def jsonWriter[A](writeFunc: WriteFunc[A]): RootJsonWriter[A] = customJsonWriter(writeFunc, { (_, json) => json })
 
   /**
    * Returns a `JSONFormat` for objects of a type using the current list of fields defined.
@@ -193,14 +203,16 @@ case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: 
    * @tparam A the type of objects for which a `JSONFormat` is to be returned
    * @return a `JSONFormat` for objects of type `A`.
    */
-  def jsonFormat[A](readFunc: C => A, writeFunc: A => C): RootJsonFormat[A] =
-    customJsonFormat(identity, readFunc, writeFunc, { (_, json) => json })
+  def jsonFormat[A](readFunc: ReadFunc[A], writeFunc: WriteFunc[A]): RootJsonFormat[A] =
+    customJsonFormat[A](identity, readFunc, writeFunc, { (_: A, json: JsObject) => json })
 }
 
 /**
  * A companion object containing auxiliary types and factories for `JsonFormatBuilder`.
  */
 object JsonFormatBuilder {
+
+  private val defaultErrorHandler: (JsValue, Throwable) => Nothing = (_: JsValue, t: Throwable) => throw t
 
   private def optionJsonFormat[A](jf: JsonFormat[A]) = new JsonFormat[Option[A]] {
     def write(option: Option[A]) = option match {

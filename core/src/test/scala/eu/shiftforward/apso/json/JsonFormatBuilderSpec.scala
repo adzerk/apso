@@ -1,5 +1,7 @@
 package eu.shiftforward.apso.json
 
+import scala.util.Try
+
 import org.specs2.mutable.Specification
 import spray.json._
 import spray.json.DefaultJsonProtocol._
@@ -15,7 +17,7 @@ class JsonFormatBuilderSpec extends Specification {
 
   "A JsonFormatBuilder" should {
 
-    "allow contructing JSON formats by adding fields incrementally" in {
+    "allow constructing JSON formats by adding fields incrementally" in {
       val builder = JsonFormatBuilder()
         .field[Int]("a")
         .field[List[String]]("b")
@@ -114,6 +116,25 @@ class JsonFormatBuilderSpec extends Specification {
       Test4(Some(3), Some("x")).toJson(jw) mustEqual """{ "a": 3, "b": "x" }""".parseJson
       Test4(Some(3), None).toJson(jw) mustEqual """{ "a": 3 }""".parseJson
       Test4(None, None).toJson(jw) mustEqual """{ }""".parseJson
+    }
+
+    "allow defining custom JSON Formats with transformations and custom error handling" in {
+      val builder = JsonFormatBuilder()
+        .field[Int]("a")
+        .field[List[String]]("b")
+        .field[Double]("c", 0.0)
+
+      val jf = builder.customJsonFormat[Test](
+        { obj: JsObject => JsObject((obj.fields + ("a" -> 0.toJson)).toList: _*) },
+        { case a :: b :: c :: HNil => Test(a, b, c) },
+        { test: Test => test.a :: test.b.tail :: test.c :: HNil },
+        { (_: Test, obj: JsObject) => JsObject((obj.fields + ("c" -> 1.5.toJson)).toList: _*) },
+        (_: JsValue, _: Throwable) => throw new Exception("Caught error!"))
+
+      """{ "a": 3, "b": ["x", "y"], "c": 3.0 }""".parseJson.convertTo[Test](jf) mustEqual Test(0, List("x", "y"), 3.0)
+      Test(0, List("x", "y"), 3.0).toJson(jf) mustEqual """{ "a": 0, "b": ["y"], "c": 1.5 }""".parseJson
+      Try("""{ "a": "asd" }""".parseJson.convertTo[Test](jf)) must beFailedTry.withThrowable[Exception]("Caught error!")
+
     }
   }
 }
