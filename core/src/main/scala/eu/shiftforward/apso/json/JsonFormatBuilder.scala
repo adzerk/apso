@@ -129,8 +129,7 @@ case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: 
    */
   def customJsonReader[A](preRead: JsObject => JsObject, readFunc: ReadFunc[A], errorHandler: (JsValue, Throwable) => A = defaultErrorHandler): RootJsonReader[A] = new RootJsonReader[A] {
     def read(json: JsValue): A = {
-      val jsObject = preRead(json.asJsObject)
-      Try(aux.read(jsObject.fields, fields)) match {
+      Try(aux.read(preRead(json.asJsObject).fields, fields)) match {
         case Success(x) => readFunc(x)
         case Failure(t) => errorHandler(json, t)
       }

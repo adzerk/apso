@@ -129,11 +129,16 @@ class JsonFormatBuilderSpec extends Specification {
         { case a :: b :: c :: HNil => Test(a, b, c) },
         { test: Test => test.a :: test.b.tail :: test.c :: HNil },
         { (_: Test, obj: JsObject) => JsObject((obj.fields + ("c" -> 1.5.toJson)).toList: _*) },
-        (_: JsValue, _: Throwable) => throw new Exception("Caught error!"))
+        (json: JsValue, _: Throwable) =>
+          json match {
+            case JsString(str) => Test(0, List(str), 0.0)
+            case _ => throw new Exception("Caught error!")
+          })
 
       """{ "a": 3, "b": ["x", "y"], "c": 3.0 }""".parseJson.convertTo[Test](jf) mustEqual Test(0, List("x", "y"), 3.0)
       Test(0, List("x", "y"), 3.0).toJson(jf) mustEqual """{ "a": 0, "b": ["y"], "c": 1.5 }""".parseJson
       Try("""{ "a": "asd" }""".parseJson.convertTo[Test](jf)) must beFailedTry.withThrowable[Exception]("Caught error!")
+      """"string"""".parseJson.convertTo[Test](jf) mustEqual Test(0, List("string"), 0.0)
     }
   }
 }
