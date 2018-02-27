@@ -145,7 +145,7 @@ class S3Bucket(
    * @return true if the push was successful, false otherwise.
    */
   def push(key: String, file: File): Boolean = retry {
-    log.info("Pushing '{}' to 's3://{}/{}'", file.getPath, bucketName, key)
+    log.info(s"Pushing file '${file.getPath}' to 's3://$bucketName/$key'")
     transferManager
       .upload(new PutObjectRequest(bucketName, sanitizeKey(key), file))
       .waitForUploadResult()
