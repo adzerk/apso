@@ -22,5 +22,5 @@ object CounterPair {
    * @param data the integer from which the two numbers are to be unpacked
    * @return the pair of packed numbers wrapped into a `Some`.
    */
-  @inline def unapply(data: Int): Option[(Int, Int)] = Some(data & 0xFFFF, data >>> 16)
+  @inline def unapply(data: Int): Option[(Int, Int)] = Some((data & 0xFFFF, data >>> 16))
 }

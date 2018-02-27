@@ -224,7 +224,7 @@ object Implicits {
         case n: Integral[A] => n.quot
         case _ => sys.error("Numeric does not support division!")
       }
-      val res = it.foldLeft(num.zero, num.zero) { (acc, e) =>
+      val res = it.foldLeft((num.zero, num.zero)) { (acc, e) =>
         (num.plus(acc._1, e), num.plus(acc._2, num.one))
       }
       if (res._2 == num.zero)
