@@ -4,14 +4,14 @@ import java.net.URI
 
 import scala.concurrent.duration._
 
+import com.typesafe.config.{ Config, ConfigFactory }
 import io.circe._
 import io.circe.parser._
 import io.circe.syntax._
-import com.typesafe.config.{ Config, ConfigFactory }
 import org.joda.time.{ DateTime, Interval, LocalDate, Period }
 import org.specs2.mutable.Specification
-import spray.json._
 import spray.json.DefaultJsonProtocol._
+import spray.json._
 
 class ExtraJsonProtocolSpec extends Specification {
 
@@ -49,7 +49,7 @@ class ExtraJsonProtocolSpec extends Specification {
       parse(durationJsonString).right.flatMap(_.as[FiniteDuration]) must beRight(duration)
 
       def convert(v: String): Either[Error, FiniteDuration] =
-        parse(v).flatMap(_.as[FiniteDuration])
+        parse(v).right.flatMap(_.as[FiniteDuration])
 
       convert("""{"seconds": 2}""") must beRight(2.seconds)
       convert("""{"minutes": 2}""") must beRight(2.minutes)
@@ -101,11 +101,11 @@ class ExtraJsonProtocolSpec extends Specification {
       pStrings.forall { s =>
         val period = new Period(s)
         period.asJson.pretty(Printer.noSpaces) mustEqual s""""$s""""
-        parse(s""""$s"""").flatMap(_.as[Period]) must beRight(period)
+        parse(s""""$s"""").right.flatMap(_.as[Period]) must beRight(period)
       }
 
-      parse(""""garbage"""").flatMap(_.as[Period]) must beLeft
-      parse(""""PXD"""").flatMap(_.as[Period]) must beLeft
+      parse(""""garbage"""").right.flatMap(_.as[Period]) must beLeft
+      parse(""""PXD"""").right.flatMap(_.as[Period]) must beLeft
     }
 
     "provide a JsonFormat for URI" in {
@@ -123,9 +123,9 @@ class ExtraJsonProtocolSpec extends Specification {
       val uriJsonString = """"http://example.com""""
 
       uri.asJson.pretty(Printer.noSpaces) mustEqual uriJsonString
-      parse(uriJsonString).flatMap(_.as[URI]) must beRight(uri)
-      parse("true").flatMap(_.as[URI]) must beLeft
-      parse(""""{invalidUri}"""").flatMap(_.as[URI]) must beLeft
+      parse(uriJsonString).right.flatMap(_.as[URI]) must beRight(uri)
+      parse("true").right.flatMap(_.as[URI]) must beLeft
+      parse(""""{invalidUri}"""").right.flatMap(_.as[URI]) must beLeft
     }
 
     "provide a JsonFormat for Config" in {
@@ -154,8 +154,8 @@ class ExtraJsonProtocolSpec extends Specification {
       val configJsonString = """{"a":123,"b":{"x":"1d","y":"string"}}"""
 
       config.asJson.pretty(Printer.noSpaces) mustEqual configJsonString
-      parse(configJsonString).flatMap(_.as[Config]) must beRight(config)
-      parse("true").flatMap(_.as[Config]) must beLeft
+      parse(configJsonString).right.flatMap(_.as[Config]) must beRight(config)
+      parse("true").right.flatMap(_.as[Config]) must beLeft
     }
 
     "provide a JsonFormat for DateTime" in {
@@ -172,8 +172,8 @@ class ExtraJsonProtocolSpec extends Specification {
       val dateTimeJsonString = """"2016-01-01T00:00:00.000Z""""
 
       dateTime.asJson.pretty(Printer.noSpaces) mustEqual dateTimeJsonString
-      parse(dateTimeJsonString).flatMap(_.as[DateTime]) must beRight(dateTime)
-      parse("true").flatMap(_.as[DateTime]) must beLeft
+      parse(dateTimeJsonString).right.flatMap(_.as[DateTime]) must beRight(dateTime)
+      parse("true").right.flatMap(_.as[DateTime]) must beLeft
     }
 
     "provide a JsonFormat for LocalDate" in {
@@ -190,8 +190,8 @@ class ExtraJsonProtocolSpec extends Specification {
       val localDateJsonString = """"2016-01-01""""
 
       localDate.asJson.pretty(Printer.noSpaces) mustEqual localDateJsonString
-      parse(localDateJsonString).flatMap(_.as[LocalDate]) must beRight(localDate)
-      parse("true").flatMap(_.as[LocalDate]) must beLeft
+      parse(localDateJsonString).right.flatMap(_.as[LocalDate]) must beRight(localDate)
+      parse("true").right.flatMap(_.as[LocalDate]) must beLeft
     }
 
     "provide a JsonFormat for a Map as a JsArray of json objects" in {

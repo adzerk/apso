@@ -135,7 +135,7 @@ trait ExtraMiscJsonProtocol {
   }
 
   implicit val configEncoder: Encoder[Config] =
-    Encoder[Json].contramap(conf => parse(conf.root.render(ConfigRenderOptions.concise())).toTry.get)
+    Encoder[Json].contramap(conf => parse(conf.root.render(ConfigRenderOptions.concise())).fold(throw _, identity))
   implicit val configDecoder: Decoder[Config] =
     Decoder[Json].emapTry(json => Try(ConfigFactory.parseString(json.toString)))
 
