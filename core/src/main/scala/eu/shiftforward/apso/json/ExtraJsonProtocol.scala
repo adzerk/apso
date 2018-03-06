@@ -5,12 +5,10 @@ import java.net.URI
 import scala.concurrent.duration._
 import scala.util.{ Failure, Success, Try }
 
+import com.typesafe.config.{ Config, ConfigFactory, ConfigRenderOptions }
 import io.circe._
 import io.circe.parser._
-import io.circe.syntax._
 import org.joda.time.{ DateTime, Interval, LocalDate, Period }
-import com.typesafe.config.{ Config, ConfigFactory, ConfigRenderOptions }
-import io.circe.Decoder.Result
 import spray.json.DefaultJsonProtocol._
 import spray.json._
 
