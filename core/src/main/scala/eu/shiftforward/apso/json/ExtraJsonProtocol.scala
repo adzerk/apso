@@ -21,7 +21,7 @@ object ExtraJsonProtocol
   with ExtraMiscJsonProtocol
 
 trait ExtraTimeJsonProtocol {
-  def tryToParseDuration(duration: String): Try[FiniteDuration] =
+  private[this] def tryToParseDuration(duration: String): Try[FiniteDuration] =
     Try(Duration.fromNanos(ConfigFactory.parseString(s"d=$duration").getDuration("d").toNanos))
 
   implicit object FiniteDurationJsonFormat extends JsonFormat[FiniteDuration] {
