@@ -5,9 +5,10 @@ import java.net.URI
 import scala.concurrent.duration._
 import scala.util.{ Failure, Success, Try }
 
-import org.joda.time.{ DateTime, Interval, LocalDate, Period }
-
 import com.typesafe.config.{ Config, ConfigFactory, ConfigRenderOptions }
+import io.circe._
+import io.circe.parser._
+import org.joda.time.{ DateTime, Interval, LocalDate, Period }
 import spray.json.DefaultJsonProtocol._
 import spray.json._
 
@@ -20,23 +21,25 @@ object ExtraJsonProtocol
   with ExtraMiscJsonProtocol
 
 trait ExtraTimeJsonProtocol {
+  private[this] def tryToParseDuration(duration: String): Try[FiniteDuration] =
+    Try(Duration.fromNanos(ConfigFactory.parseString(s"d=$duration").getDuration("d").toNanos))
+
   implicit object FiniteDurationJsonFormat extends JsonFormat[FiniteDuration] {
     def write(dur: FiniteDuration) = JsObject("milliseconds" -> dur.toMillis.toJson)
 
     def read(json: JsValue) = {
-
-      def tryToParseDuration(duration: String) =
-        Try(Duration.fromNanos(ConfigFactory.parseString(s"d=$duration").getDuration("d").toNanos)) match {
-          case Success(d) => d
-          case Failure(t) => deserializationError("Expected a Number or a unit-annotated String", t)
-        }
-
       json match {
         case JsNumber(duration) =>
-          tryToParseDuration(duration.toString())
+          tryToParseDuration(duration.toString()) match {
+            case Success(d) => d
+            case Failure(t) => deserializationError("Expected a Number or a unit-annotated String", t)
+          }
 
         case JsString(duration) =>
-          tryToParseDuration(duration)
+          tryToParseDuration(duration) match {
+            case Success(d) => d
+            case Failure(t) => deserializationError("Expected a Number or a unit-annotated String", t)
+          }
 
         case j: JsObject =>
           j.fields.headOption match {
@@ -52,6 +55,17 @@ trait ExtraTimeJsonProtocol {
       }
     }
   }
+
+  implicit val finiteDurationEncoder: Encoder[FiniteDuration] =
+    Encoder.forProduct1("milliseconds")(_.toMillis)
+  implicit val finiteDurationDecoder: Decoder[FiniteDuration] =
+    Decoder[Long].emapTry(v => tryToParseDuration(v.toString)) or
+      Decoder[String].emapTry(v => tryToParseDuration(v)) or
+      Decoder.forProduct1[Long, FiniteDuration]("milliseconds")(_.millis) or
+      Decoder.forProduct1[Long, FiniteDuration]("seconds")(_.seconds) or
+      Decoder.forProduct1[Long, FiniteDuration]("minutes")(_.minutes) or
+      Decoder.forProduct1[Long, FiniteDuration]("hours")(_.hours) or
+      Decoder.forProduct1[Long, FiniteDuration]("days")(_.days)
 
   implicit object IntervalJsonFormat extends JsonFormat[Interval] {
     def write(i: Interval): JsValue =
@@ -71,6 +85,11 @@ trait ExtraTimeJsonProtocol {
     }
   }
 
+  implicit val intervalEncoder: Encoder[Interval] =
+    Encoder.forProduct2("startMillis", "endMillis")(int => (int.getStartMillis, int.getEndMillis))
+  implicit val intervalDecoder: Decoder[Interval] =
+    Decoder.forProduct2[Long, Long, Interval]("startMillis", "endMillis")(new Interval(_, _))
+
   implicit object PeriodJsonFormat extends JsonFormat[Period] {
     def write(p: Period): JsValue = p.toString.toJson
 
@@ -81,6 +100,11 @@ trait ExtraTimeJsonProtocol {
         case other => deserializationError(s"Expected String with Period, got: $other")
       }
   }
+
+  implicit val periodEncoder: Encoder[Period] =
+    Encoder[String].contramap(_.toString)
+  implicit val periodDecoder: Decoder[Period] =
+    Decoder[String].emapTry(v => Try(new Period(v)))
 }
 
 trait ExtraHttpJsonProtocol {
@@ -94,6 +118,11 @@ trait ExtraHttpJsonProtocol {
       case other => deserializationError("Expected String with URI, got: " + other)
     }
   }
+
+  implicit val uriEncoder: Encoder[URI] =
+    Encoder[String].contramap(_.toString)
+  implicit val uriDecoder: Decoder[URI] =
+    Decoder[String].emapTry(v => Try(new URI(v)))
 }
 
 trait ExtraMiscJsonProtocol {
@@ -105,6 +134,11 @@ trait ExtraMiscJsonProtocol {
     }
   }
 
+  implicit val configEncoder: Encoder[Config] =
+    Encoder[Json].contramap(conf => parse(conf.root.render(ConfigRenderOptions.concise())).fold(throw _, identity))
+  implicit val configDecoder: Decoder[Config] =
+    Decoder[Json].emapTry(json => Try(ConfigFactory.parseString(json.toString)))
+
   implicit object DateTimeFormat extends JsonFormat[DateTime] {
     override def write(date: DateTime): JsValue = JsString(date.toString)
 
@@ -115,6 +149,11 @@ trait ExtraMiscJsonProtocol {
     }
   }
 
+  implicit val dateTimeEncoder: Encoder[DateTime] =
+    Encoder[String].contramap(_.toString)
+  implicit val dateTimeDecoder: Decoder[DateTime] =
+    Decoder[String].emapTry(v => Try(new DateTime(v)))
+
   implicit object LocalDateFormat extends JsonFormat[LocalDate] {
     override def write(date: LocalDate): JsValue = date.toString.toJson
 
@@ -124,6 +163,11 @@ trait ExtraMiscJsonProtocol {
         deserializationError("The value for a 'LocalDate' has an invalid type - it must be a String.")
     }
   }
+
+  implicit val localDateEncoder: Encoder[LocalDate] =
+    Encoder[String].contramap(_.toString)
+  implicit val localDateDecoder: Decoder[LocalDate] =
+    Decoder[String].emapTry(v => Try(new LocalDate(v)))
 
   /**
    * Serializes a map as an array of key-value objects.
