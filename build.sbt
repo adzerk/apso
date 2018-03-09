@@ -12,8 +12,8 @@ lazy val core = project.in(file("core"))
   .settings(
     name := "apso",
     libraryDependencies ++= Seq(
-      "com.amazonaws"                              % "aws-java-sdk-ec2"               % "1.11.290"       % "provided",
-      "com.amazonaws"                              % "aws-java-sdk-s3"                % "1.11.290"       % "provided",
+      "com.amazonaws"                              % "aws-java-sdk-ec2"               % "1.11.221"       % "provided", // updating this to patch 290 or 292
+      "com.amazonaws"                              % "aws-java-sdk-s3"                % "1.11.221"       % "provided", // makes the travis build hang for more than 10min
       "com.chuusai"                               %% "shapeless"                      % "2.3.3",
       "com.github.nscala-time"                    %% "nscala-time"                    % "2.18.0",
       "com.googlecode.concurrentlinkedhashmap"     % "concurrentlinkedhashmap-lru"    % "1.4.2",
