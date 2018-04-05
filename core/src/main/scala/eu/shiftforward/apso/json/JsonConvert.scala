@@ -1,7 +1,9 @@
 package eu.shiftforward.apso.json
 
 import scala.collection.JavaConverters._
-import spray.json._
+
+import io.circe.{ Json, JsonNumber, JsonObject }
+import io.circe.syntax._
 
 /**
  * Object containing helpers for converting between JSON values and other
@@ -14,17 +16,17 @@ object JsonConvert {
    * @param obj the object to convert
    * @return the given object converted to a JSON value.
    */
-  def toJson(obj: Any): JsValue = obj match {
-    case null => JsNull
-    case str: String => JsString(str)
-    case n: Int => JsNumber(n)
-    case n: Double => JsNumber(n)
-    case map: Map[_, _] => JsObject(map.map { case (k, v) => (k.toString, toJson(v)) })
-    case map: java.util.Map[_, _] => JsObject(map.asScala.map({ case (k, v) => (k.toString, toJson(v)) }).toMap)
-    case t: TraversableOnce[_] => JsArray(t.map(toJson(_)).toVector)
-    case t: java.lang.Iterable[_] => JsArray(t.asScala.map(toJson(_)).toVector)
-    case n: Long => JsNumber(n)
-    case b: Boolean => JsBoolean(b)
-    case _ => JsString(obj.toString)
+  def toJson(obj: Any): Json = obj match {
+    case null => Json.Null
+    case str: String => str.asJson
+    case n: Int => n.asJson
+    case n: Double => n.asJson
+    case map: Map[_, _] => Json.fromJsonObject(JsonObject.fromIterable(map.map { case (k, v) => (k.toString, toJson(v)) }))
+    case map: java.util.Map[_, _] => Json.fromJsonObject(JsonObject.fromIterable(map.asScala.map({ case (k, v) => (k.toString, toJson(v)) }).toMap))
+    case t: TraversableOnce[_] => Json.fromValues(t.map(toJson).toVector)
+    case t: java.lang.Iterable[_] => Json.fromValues(t.asScala.map(toJson).toVector)
+    case n: Long => n.asJson
+    case b: Boolean => b.asJson
+    case _ => Json.fromString(obj.toString)
   }
 }
