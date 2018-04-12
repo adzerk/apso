@@ -1,6 +1,8 @@
 package eu.shiftforward.apso.json
 
 import org.specs2.mutable._
+import io.circe.syntax._
+import io.circe.parser._
 import spray.json.DefaultJsonProtocol._
 import spray.json._
 
@@ -82,6 +84,34 @@ class ImplicitsSpec extends Specification {
         """{ "a": {"b": {"c": 1, "d": {"e": 3}}, "f": 5}, "g": 4 }"""
 
       res mustEqual expected.parseJson
+    }
+
+    "provide a method to create a circe json object from complete paths" in {
+      val res = fromCirceFullPaths(
+        List(
+          "a.b.c" -> 1.asJson,
+          "a.b.d.e" -> 3.asJson,
+          "a.f" -> 5.asJson,
+          "g" -> 4.asJson))
+
+      val expected =
+        """{ "a": {"b": {"c": 1, "d": {"e": 3}}, "f": 5}, "g": 4 }"""
+
+      res mustEqual parse(expected).right.get
+    }
+
+    "provide a method to create a circe json object from complete paths (with a custom separator)" in {
+      val res = fromCirceFullPaths(
+        List(
+          "a-b-c" -> 1.asJson,
+          "a-b-d-e" -> 3.asJson,
+          "a-f" -> 5.asJson,
+          "g" -> 4.asJson), "-")
+
+      val expected =
+        """{ "a": {"b": {"c": 1, "d": {"e": 3}}, "f": 5}, "g": 4 }"""
+
+      res mustEqual parse(expected).right.get
     }
 
     "provide a method to get the key set of a JsObject" in {

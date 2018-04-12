@@ -1,10 +1,13 @@
 package eu.shiftforward.apso.json
 
+import scala.util.Try
+
+import io.circe.Json
 import spray.json.DefaultJsonProtocol._
 import spray.json._
+
 import eu.shiftforward.apso.Implicits._
 
-import scala.util.Try
 
 /**
  * Object containing implicit classes and methods related to JSON handling.
@@ -102,6 +105,28 @@ object Implicits {
       case Nil => JsObject()
       case (path, value) :: rem =>
         createJsValue(path.split(separatorRegex).toList, value).merge(fromFullPaths(rem, separatorRegex))
+    }
+  }
+
+  /**
+   * Creates a Json from a sequence of pairs of dot-separated (or other separator) paths with the corresponding
+   * leaf values (eg. `List(("root.leaf1", "leafVal1"), ("root.leaf2", "leafVal2"))`
+   * @param paths the sequence of dot-separated (or other separator) paths
+   * @param separatorRegex regex to use to separate fields
+   * @return the resulting Json object
+   */
+  def fromCirceFullPaths(paths: Seq[(String, Json)], separatorRegex: String = "\\."): Json = {
+    def createJson(keys: Seq[String], value: Json): Json = {
+      keys match {
+        case Nil => value
+        case h :: t => Json.obj(h -> createJson(t, value))
+      }
+    }
+
+    paths match {
+      case Nil => Json.obj()
+      case (path, value) :: rem =>
+        createJson(path.split(separatorRegex).toList, value).deepMerge(fromCirceFullPaths(rem, separatorRegex))
     }
   }
 }
