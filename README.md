@@ -1,8 +1,8 @@
-<p align="center"><img src="https://raw.githubusercontent.com/ShiftForward/apso/master/apso.png"/></p>
+<p align="center"><img src="https://raw.githubusercontent.com/velocidi/apso/master/apso.png"/></p>
 
-# Apso [![Build Status](https://travis-ci.org/ShiftForward/apso.svg?branch=master)](https://travis-ci.org/ShiftForward/apso) [![Maven Central](https://img.shields.io/maven-central/v/eu.shiftforward/apso_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/eu.shiftforward/apso_2.12)
+# Apso [![Build Status](https://travis-ci.org/velocidi/apso.svg?branch=master)](https://travis-ci.org/velocidi/apso) [![Maven Central](https://img.shields.io/maven-central/v/eu.shiftforward/apso_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/eu.shiftforward/apso_2.12)
 
-Apso is ShiftForward's utilities library. It provides a series of useful methods.
+Apso is Velocidi's Scala utilities library. It provides a series of useful methods.
 
 ## Installation
 
