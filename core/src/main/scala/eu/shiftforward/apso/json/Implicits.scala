@@ -2,12 +2,11 @@ package eu.shiftforward.apso.json
 
 import scala.util.Try
 
-import io.circe.Json
+import io.circe._
 import spray.json.DefaultJsonProtocol._
 import spray.json._
 
 import eu.shiftforward.apso.Implicits._
-
 
 /**
  * Object containing implicit classes and methods related to JSON handling.
@@ -84,6 +83,58 @@ object Implicits {
         case (k, v) => Set(k)
       }
     }
+  }
+
+  final implicit class ApsoJsonObject(val json: Json) extends AnyVal {
+    /**
+     * Returns a set of keys of this object where nested keys are separated by a separator character.
+     *
+     * Eg. {"a":1,"b":{"c":2},"d":null}.flattenedKeySet(".", ignoreNull = true) = Set("a","b.c")
+     *
+     * @param separator character separator to use
+     * @param ignoreNull if set, fields with a null value are ignored
+     * @return flattened key set
+     */
+    def flattenedKeySet(separator: String = ".", ignoreNull: Boolean = true): Set[String] = {
+      val fields = json.as[JsonObject].toOption.get.toMap.toSet
+      fields.flatMap {
+        case (k, v) if v.isObject => v.flattenedKeySet(separator, ignoreNull).map(k + separator + _)
+        case (_, v) if v.isNull && ignoreNull => Set.empty[String]
+        case (k, _) => Set(k)
+      }
+    }
+
+    /**
+     * Returns the value of the field on the end of the tree, separated by the separator character.
+     *
+     * Eg. {"a":{"b":1}}.getField("a.b") = 1
+     *
+     * @param fieldPath path from the root of the json object to the field
+     * @param separator character that separates each element of the path
+     * @tparam A type of the field value
+     * @return an option with the field value
+     */
+    def getField[A: Decoder](fieldPath: String, separator: Char = '.'): Option[A] =
+      getCursor(fieldPath, separator).as[A].toOption
+
+    /**
+     * Delete a field on a json object.
+     *
+     * Eg. {"a":1,"b":{"c":2},"d":null}.deleteField("b.c") = {"a":1,"b":{},"d":null}
+     *
+     * @param fieldPath path from the root of the json object to the field
+     * @param separator character that separates each element of the path
+     * @return an option with the json without the deleted value
+     */
+    def deleteField(fieldPath: String, separator: Char = '.'): Option[Json] =
+      getCursor(fieldPath, separator).delete.top
+
+    private[this] def getCursor(fieldPath: String, separator: Char): ACursor =
+      fieldPath.split(separator)
+        .foldLeft(json.hcursor: ACursor) {
+          case (cursor, field) =>
+            cursor.downField(field)
+        }
   }
 
   /**
