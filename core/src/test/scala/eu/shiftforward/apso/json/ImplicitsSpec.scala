@@ -6,7 +6,7 @@ import io.circe.parser._
 import spray.json.DefaultJsonProtocol._
 import spray.json._
 
-import eu.shiftforward.apso.json.Implicits.{ ApsoJsonObject => _, _ }
+import eu.shiftforward.apso.json.Implicits._
 
 class ImplicitsSpec extends Specification {
   "The Apso Json Implicits should" should {
@@ -115,6 +115,8 @@ class ImplicitsSpec extends Specification {
     }
 
     "provide a method to get the key set of a JsObject" in {
+      import eu.shiftforward.apso.json.Implicits.{ ApsoJsonObject => _, _ }
+
       val obj = """{"a":1,"b":{"c":2},"d":null}""".parseJson.asJsObject
       obj.flattenedKeySet(".", ignoreNull = true) === Set("a", "b.c")
       obj.flattenedKeySet(".", ignoreNull = false) === Set("a", "b.c", "d")
@@ -122,7 +124,7 @@ class ImplicitsSpec extends Specification {
     }
 
     "provide a method to get the key set of a JSON object" in {
-      import eu.shiftforward.apso.json.Implicits.{ ApsoJsonObject }
+      import eu.shiftforward.apso.json.Implicits.{ ApsoJsonJsObject => _ }
 
       val obj = parse("""{"a":1,"b":{"c":2},"d":null}""").right.get
       obj.flattenedKeySet(".", ignoreNull = true) === Set("a", "b.c")
@@ -132,7 +134,6 @@ class ImplicitsSpec extends Specification {
     }
 
     "provide a method to get a field from a JSON object" in {
-      import eu.shiftforward.apso.json.Implicits.ApsoJsonObject
 
       val obj = parse("""{"a":"abc","b":{"c":2},"d":null}""").right.get
       obj.getField[Int]("b.c") must beSome(2)
@@ -141,11 +142,11 @@ class ImplicitsSpec extends Specification {
     }
 
     "provide a method to delete a field from a JSON object" in {
-      import eu.shiftforward.apso.json.Implicits.ApsoJsonObject
-
       val obj = parse("""{"a":"abc","b":{"c":2},"d":null}""").right.get
-      obj.deleteField("b.c") must beSome(parse("""{"a":"abc","b":{},"d":null}""").right.get)
-      obj.deleteField("a") must beSome(parse("""{"b":{"c":2},"d":null}""").right.get)
+
+      obj.deleteField("b.c") must beEqualTo(parse("""{"a":"abc","b":{},"d":null}""").right.get)
+      obj.deleteField("a") must beEqualTo(parse("""{"b":{"c":2},"d":null}""").right.get)
+      obj.deleteField("") must throwAn[IllegalArgumentException]
     }
   }
 }

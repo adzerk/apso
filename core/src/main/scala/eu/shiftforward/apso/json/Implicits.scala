@@ -128,12 +128,15 @@ object Implicits {
      *
      * @param fieldPath path from the root of the json object to the field
      * @param separator character that separates each element of the path
-     * @return an option with the json without the deleted value
+     * @return the json without the deleted value
      */
-    def deleteField(fieldPath: String, separator: Char = '.'): Option[Json] =
-      getCursor(fieldPath, separator).delete.top
+    def deleteField(fieldPath: String, separator: Char = '.'): Json = {
+      require(fieldPath.nonEmpty, "The field path must have value.")
 
-    private[this] def getCursor(fieldPath: String, separator: Char): ACursor =
+      getCursor(fieldPath, separator).delete.top.get
+    }
+
+    def getCursor(fieldPath: String, separator: Char): ACursor =
       fieldPath.split(separator)
         .foldLeft(json.hcursor: ACursor) {
           case (cursor, field) =>
