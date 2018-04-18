@@ -119,7 +119,7 @@ object Implicits {
      * @return an option with the field value
      */
     def getField[A: Decoder](fieldPath: String, separator: Char = '.'): Option[A] =
-      getCursor(fieldPath, separator).as[A].toOption
+      getCursor(fieldPath, separator).as[A].fold(_ => None, Some(_))
 
     /**
      * Delete a field on a json object.
@@ -136,6 +136,13 @@ object Implicits {
       getCursor(fieldPath, separator).delete.top.get
     }
 
+    /**
+      * Returns a cursor on the field on the end of the tree, separated by the separator character.
+      *
+      * @param fieldPath path from the root of the json object to the field
+      * @param separator character that separates each element of the path
+      * @return cursor to the field value
+      */
     def getCursor(fieldPath: String, separator: Char): ACursor =
       fieldPath.split(separator)
         .foldLeft(json.hcursor: ACursor) {
