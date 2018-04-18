@@ -1,6 +1,8 @@
 package eu.shiftforward.apso.json
 
 import org.specs2.mutable._
+import io.circe.syntax._
+import io.circe.parser._
 import spray.json.DefaultJsonProtocol._
 import spray.json._
 
@@ -84,11 +86,65 @@ class ImplicitsSpec extends Specification {
       res mustEqual expected.parseJson
     }
 
+    "provide a method to create a circe json object from complete paths" in {
+      val res = fromCirceFullPaths(
+        List(
+          "a.b.c" -> 1.asJson,
+          "a.b.d.e" -> 3.asJson,
+          "a.f" -> 5.asJson,
+          "g" -> 4.asJson))
+
+      val expected =
+        """{ "a": {"b": {"c": 1, "d": {"e": 3}}, "f": 5}, "g": 4 }"""
+
+      res mustEqual parse(expected).fold(throw _, identity)
+    }
+
+    "provide a method to create a circe json object from complete paths (with a custom separator)" in {
+      val res = fromCirceFullPaths(
+        List(
+          "a-b-c" -> 1.asJson,
+          "a-b-d-e" -> 3.asJson,
+          "a-f" -> 5.asJson,
+          "g" -> 4.asJson), "-")
+
+      val expected =
+        """{ "a": {"b": {"c": 1, "d": {"e": 3}}, "f": 5}, "g": 4 }"""
+
+      res mustEqual parse(expected).fold(throw _, identity)
+    }
+
     "provide a method to get the key set of a JsObject" in {
       val obj = """{"a":1,"b":{"c":2},"d":null}""".parseJson.asJsObject
+
       obj.flattenedKeySet(".", ignoreNull = true) === Set("a", "b.c")
       obj.flattenedKeySet(".", ignoreNull = false) === Set("a", "b.c", "d")
       obj.flattenedKeySet("/", ignoreNull = true) === Set("a", "b/c")
+    }
+
+    "provide a method to get the key set of a JSON object" in {
+      val obj = parse("""{"a":1,"b":{"c":2},"d":null}""").fold(throw _, identity)
+
+      obj.flattenedKeySet(".", ignoreNull = true) === Set("a", "b.c")
+      obj.flattenedKeySet(".", ignoreNull = false) === Set("a", "b.c", "d")
+      obj.flattenedKeySet("/", ignoreNull = true) === Set("a", "b/c")
+      1.asJson.flattenedKeySet() === Set.empty
+    }
+
+    "provide a method to get a field from a JSON object" in {
+      val obj = parse("""{"a":"abc","b":{"c":2},"d":null}""").fold(throw _, identity)
+
+      obj.getField[Int]("b.c") must beSome(2)
+      obj.getField[Int]("b,c", ',') must beSome(2)
+      obj.getField[String]("a") must beSome("abc")
+    }
+
+    "provide a method to delete a field from a JSON object" in {
+      val obj = parse("""{"a":"abc","b":{"c":2},"d":null}""").fold(throw _, identity)
+
+      obj.deleteField("b.c") must beEqualTo(parse("""{"a":"abc","b":{},"d":null}""").fold(throw _, identity))
+      obj.deleteField("a") must beEqualTo(parse("""{"b":{"c":2},"d":null}""").fold(throw _, identity))
+      obj.deleteField("") must throwAn[IllegalArgumentException]
     }
   }
 }
