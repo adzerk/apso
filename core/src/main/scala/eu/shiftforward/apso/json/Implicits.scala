@@ -96,11 +96,15 @@ object Implicits {
      * @return flattened key set
      */
     def flattenedKeySet(separator: String = ".", ignoreNull: Boolean = true): Set[String] = {
-      val fields = json.as[JsonObject].toOption.get.toMap.toSet
-      fields.flatMap {
-        case (k, v) if v.isObject => v.flattenedKeySet(separator, ignoreNull).map(k + separator + _)
-        case (_, v) if v.isNull && ignoreNull => Set.empty[String]
-        case (k, _) => Set(k)
+      json.asObject match {
+        case None => Set.empty
+        case Some(jo) =>
+          val fields = jo.toMap.toSet
+          fields.flatMap {
+            case (k, v) if v.isObject => v.flattenedKeySet(separator, ignoreNull).map(k + separator + _)
+            case (_, v) if v.isNull && ignoreNull => Set.empty[String]
+            case (k, _) => Set(k)
+          }
       }
     }
 

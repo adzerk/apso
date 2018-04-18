@@ -97,7 +97,7 @@ class ImplicitsSpec extends Specification {
       val expected =
         """{ "a": {"b": {"c": 1, "d": {"e": 3}}, "f": 5}, "g": 4 }"""
 
-      res mustEqual parse(expected).right.get
+      res mustEqual parse(expected).toTry.get
     }
 
     "provide a method to create a circe json object from complete paths (with a custom separator)" in {
@@ -128,6 +128,7 @@ class ImplicitsSpec extends Specification {
       obj.flattenedKeySet(".", ignoreNull = true) === Set("a", "b.c")
       obj.flattenedKeySet(".", ignoreNull = false) === Set("a", "b.c", "d")
       obj.flattenedKeySet("/", ignoreNull = true) === Set("a", "b/c")
+      1.asJson.flattenedKeySet() === Set.empty
     }
 
     "provide a method to get a field from a JSON object" in {
