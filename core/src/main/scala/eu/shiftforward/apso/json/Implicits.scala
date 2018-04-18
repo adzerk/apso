@@ -137,12 +137,12 @@ object Implicits {
     }
 
     /**
-      * Returns a cursor on the field on the end of the tree, separated by the separator character.
-      *
-      * @param fieldPath path from the root of the json object to the field
-      * @param separator character that separates each element of the path
-      * @return cursor to the field value
-      */
+     * Returns a cursor on the field on the end of the tree, separated by the separator character.
+     *
+     * @param fieldPath path from the root of the json object to the field
+     * @param separator character that separates each element of the path
+     * @return cursor to the field value
+     */
     def getCursor(fieldPath: String, separator: Char): ACursor =
       fieldPath.split(separator)
         .foldLeft(json.hcursor: ACursor) {
