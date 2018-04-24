@@ -1,7 +1,7 @@
 package eu.shiftforward.apso
 
 import java.io._
-import org.specs2.matcher.{ Expectable, Matcher }
+import org.specs2.matcher.{ Expectable, MatchResult, Matcher }
 import org.specs2.mutable.SpecificationLike
 import scala.reflect.ClassTag
 
@@ -24,4 +24,10 @@ trait CustomMatchers extends SpecificationLike {
       result(v.value.exists(), v.value.getName + " exists", v.value.getName + " does not exist", v)
     }
   }
+
+  /**
+   * Return a successful MatchResult[T].
+   * This is useful to explicitly expose a value outside a Matcher which can later be accessed with `_.expectable.value`.
+   */
+  def offer[T](result: T): MatchResult[T] = Matcher.result(test = true, "ok", createExpectable(result))
 }
