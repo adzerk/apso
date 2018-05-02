@@ -30,7 +30,7 @@ lazy val core = project.in(file("core"))
       "io.circe"                                  %% "circe-core"                     % "0.9.1",
       "io.circe"                                  %% "circe-parser"                   % "0.9.1",
       "io.github.andrebeat"                       %% "scala-pool"                     % "0.4.1",
-      "io.spray"                                  %% "spray-json"                     % "1.3.4"          % "provided",
+      "io.spray"                                  %% "spray-json"                     % "1.3.4",
       "org.apache.logging.log4j"                   % "log4j-api"                      % "2.10.0",
       "org.apache.logging.log4j"                  %% "log4j-api-scala"                % "11.0",
       "org.bouncycastle"                           % "bcpkix-jdk15on"                 % "1.59",
