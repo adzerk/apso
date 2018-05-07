@@ -257,7 +257,7 @@ class S3Bucket(
    */
   def pull(key: String, destination: String): Boolean = retry {
     log.info(s"Pulling 's3://$bucketName/$key' to '$destination'")
-    TryWith(new S3ObjectDownloader(s3, bucketName, sanitizeKey(key), destination))(_.download())
+    TryWith(new S3ObjectDownloader(s3, bucketName, sanitizeKey(key), destination))(_.download()).get
     log.info(s"Downloaded 's3://$bucketName/$key' to '$destination'. Closing files.")
   }.isDefined
 
@@ -317,9 +317,9 @@ class S3Bucket(
 
 object S3Bucket {
   private class S3ObjectDownloader(s3: AmazonS3, bucketName: String, key: String, fileDestination: String) extends AutoCloseable {
-    private[this] lazy val s3Object: S3Object = s3.getObject(new GetObjectRequest(bucketName, key))
-    private[this] lazy val inputStream: S3ObjectInputStream = s3Object.getObjectContent
-    private[this] lazy val outputStream: BufferedOutputStream = {
+    private[this] val s3Object: S3Object = s3.getObject(new GetObjectRequest(bucketName, key))
+    private[this] val inputStream: S3ObjectInputStream = s3Object.getObjectContent
+    private[this] val outputStream: BufferedOutputStream = {
       val f = new File(fileDestination).getCanonicalFile
       f.getParentFile.mkdirs()
       new BufferedOutputStream(new FileOutputStream(f))
