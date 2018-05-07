@@ -342,6 +342,5 @@ object S3Bucket {
         read = inputStream.read(bytes)
       }
     }
-
   }
 }
