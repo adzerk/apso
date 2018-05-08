@@ -56,7 +56,7 @@ class CpuSampler(
    * @param timestamp the timestamp to use when writing the entries to the logger
    */
   def flush(timestamp: Long = System.currentTimeMillis()) {
-    aggregateAll(timestamp).foreach(logger.debug("{}", _))
+    aggregateAll(timestamp).foreach(t => logger.debug(s"$t"))
     lastFlush = System.currentTimeMillis()
   }
 
