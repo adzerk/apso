@@ -42,7 +42,7 @@ object W {
     }
 
     def exec(timeout: FiniteDuration) = {
-      log.debug("{} {}", req.getHttpMethod, req.getUrl, null)
+      log.debug(s"${req.getHttpMethod} ${req.getUrl}")
       req.asStringAsync().get(timeout.length, timeout.unit)
     }
   }
@@ -56,12 +56,12 @@ object W {
     }
 
     def exec(timeout: FiniteDuration) = {
-      log.debug("{} {}", req.getHttpMethod, req.getUrl, null)
+      log.debug(s"${req.getHttpMethod} ${req.getUrl}")
       req.asStringAsync().get(timeout.length, timeout.unit)
     }
 
     def exec(body: String, timeout: FiniteDuration) = {
-      log.debug("{} {}", req.getHttpMethod, req.getUrl, null)
+      log.debug(s"${req.getHttpMethod} ${req.getUrl}")
       req.body(body).asStringAsync().get(timeout.length, timeout.unit)
     }
   }
