@@ -1,6 +1,6 @@
 package eu.shiftforward.apso.aws
 
-import java.io.{ ByteArrayInputStream, File, FileOutputStream, InputStream }
+import java.io._
 import java.util.concurrent.{ Executors, ThreadFactory }
 
 import scala.collection.JavaConverters._
@@ -14,7 +14,8 @@ import com.amazonaws.services.s3.model._
 import com.amazonaws.services.s3.transfer.{ TransferManager, TransferManagerBuilder }
 import com.typesafe.config.ConfigFactory
 
-import eu.shiftforward.apso.Logging
+import eu.shiftforward.apso.aws.S3Bucket.S3ObjectDownloader
+import eu.shiftforward.apso.{ Logging, TryWith }
 
 /**
  * A representation of an Amazon's S3 bucket. This class wraps an
@@ -256,28 +257,8 @@ class S3Bucket(
    */
   def pull(key: String, destination: String): Boolean = retry {
     log.info(s"Pulling 's3://$bucketName/$key' to '$destination'")
-
-    val s3Object = s3.getObject(new GetObjectRequest(bucketName, sanitizeKey(key)))
-    val inputStream = s3Object.getObjectContent
-
-    val f = new File(destination).getCanonicalFile
-    f.getParentFile.mkdirs()
-    val outputStream = new FileOutputStream(f)
-
-    var read = 0
-    val bytes = new Array[Byte](1024)
-
-    read = inputStream.read(bytes)
-    while (read != -1) {
-      outputStream.write(bytes, 0, read)
-      read = inputStream.read(bytes)
-    }
-
+    TryWith(new S3ObjectDownloader(s3, bucketName, sanitizeKey(key), destination))(_.download()).get
     log.info(s"Downloaded 's3://$bucketName/$key' to '$destination'. Closing files.")
-
-    inputStream.close()
-    outputStream.flush()
-    outputStream.close()
   }.isDefined
 
   def stream(key: String, offset: Long = 0L): InputStream = {
@@ -331,5 +312,35 @@ class S3Bucket(
   override def equals(obj: Any): Boolean = obj match {
     case b: S3Bucket => b.bucketName == bucketName
     case _ => false
+  }
+}
+
+object S3Bucket {
+  private class S3ObjectDownloader(s3: AmazonS3, bucketName: String, key: String, fileDestination: String) extends AutoCloseable {
+    private[this] val s3Object: S3Object = s3.getObject(new GetObjectRequest(bucketName, key))
+    private[this] val inputStream: S3ObjectInputStream = s3Object.getObjectContent
+    private[this] val outputStream: BufferedOutputStream = {
+      val f = new File(fileDestination).getCanonicalFile
+      f.getParentFile.mkdirs()
+      new BufferedOutputStream(new FileOutputStream(f))
+    }
+
+    def close(): Unit = {
+      try inputStream.close() catch { case _: Throwable => }
+      try s3Object.close() catch { case _: Throwable => }
+      try outputStream.flush() catch { case _: Throwable => }
+      try outputStream.close() catch { case _: Throwable => }
+    }
+
+    def download(): Unit = {
+      var read = 0
+      val bytes = new Array[Byte](1024)
+
+      read = inputStream.read(bytes)
+      while (read != -1) {
+        outputStream.write(bytes, 0, read)
+        read = inputStream.read(bytes)
+      }
+    }
   }
 }
