@@ -181,18 +181,14 @@ class S3Bucket(
 
   /**
    * Checks if the file in the location specified by `key` in the bucket exists.
+   * It returns false if just checking for the bucket existence.
    *
    * @param key the remote pathname for the file
    * @return true if the file exists, false otherwise.
    */
   def exists(key: String): Boolean = retry {
-    try {
-      s3.getObjectMetadata(bucketName, key)
-    } catch {
-      case ex: AmazonS3Exception if ex.getStatusCode == 404 => false
-      case ex: Throwable => throw ex
-    }
-  }.isDefined
+    key.nonEmpty && s3.doesObjectExist(bucketName, key)
+  }.getOrElse(false)
 
   /**
    * Checks if the location specified by `key` is a directory.
