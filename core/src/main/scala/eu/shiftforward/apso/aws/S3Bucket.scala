@@ -186,7 +186,12 @@ class S3Bucket(
    * @return true if the file exists, false otherwise.
    */
   def exists(key: String): Boolean = retry {
-    s3.getObjectMetadata(bucketName, key)
+    try {
+      s3.getObjectMetadata(bucketName, key)
+    } catch {
+      case ex: AmazonS3Exception if ex.getStatusCode == 404 => false
+      case ex: Throwable => throw ex
+    }
   }.isDefined
 
   /**
