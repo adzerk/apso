@@ -205,6 +205,15 @@ class S3Bucket(
   }.exists { _.exists(_.getKey.startsWith(key + "/")) }
 
   /**
+   * Checks whether the bucket exists
+   *
+   * @return true if the bucket exists, false otherwise.
+   */
+  def isBucket: Boolean = retry {
+    s3.doesBucketExistV2(bucketName)
+  }.getOrElse(false)
+
+  /**
    * Sets an access control list on a given Amazon S3 object.
    *
    * @param key the remote pathname for the file
