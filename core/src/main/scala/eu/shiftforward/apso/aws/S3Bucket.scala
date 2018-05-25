@@ -209,7 +209,7 @@ class S3Bucket(
    *
    * @return true if the bucket exists, false otherwise.
    */
-  def isBucket: Boolean = retry {
+  def bucketExists: Boolean = retry {
     s3.doesBucketExistV2(bucketName)
   }.getOrElse(false)
 

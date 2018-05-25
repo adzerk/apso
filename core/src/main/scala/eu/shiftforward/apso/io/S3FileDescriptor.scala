@@ -111,11 +111,11 @@ case class S3FileDescriptor(
   }
 
   private lazy val isDirectoryRemote = bucket.isDirectory(builtPath)
-  private lazy val isBucketRoot = elements.isEmpty && bucket.isBucket
+  private lazy val isBucketAndExists = elements.isEmpty && bucket.bucketExists
   private var isDirectoryLocal = false
   def isDirectory: Boolean = isDirectoryLocal || isDirectoryRemote
 
-  def exists: Boolean = bucket.exists(builtPath) || isDirectory || isBucketRoot
+  def exists: Boolean = bucket.exists(builtPath) || isDirectory || isBucketAndExists
 
   def delete(): Boolean = bucket.delete(builtPath)
 
