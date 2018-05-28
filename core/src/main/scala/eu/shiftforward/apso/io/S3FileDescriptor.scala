@@ -87,8 +87,8 @@ case class S3FileDescriptor(
       }
     }
 
-    val s3Elements = listS3WithPrefix("", includeDirectories = true).map { info =>
-      removePrefix(elements, info.getKey.split("/").toList).head -> info
+    val s3Elements = listS3WithPrefix("", includeDirectories = true).flatMap { info =>
+      removePrefix(elements, info.getKey.split("/").toList).headOption.map(_ -> info)
     }.toMap
 
     s3Elements.map {
@@ -111,10 +111,11 @@ case class S3FileDescriptor(
   }
 
   private lazy val isDirectoryRemote = bucket.isDirectory(builtPath)
+  private lazy val isBucketAndExists = elements.isEmpty && bucket.bucketExists
   private var isDirectoryLocal = false
   def isDirectory: Boolean = isDirectoryLocal || isDirectoryRemote
 
-  def exists: Boolean = bucket.exists(builtPath)
+  def exists: Boolean = bucket.exists(builtPath) || isDirectory || isBucketAndExists
 
   def delete(): Boolean = bucket.delete(builtPath)
 

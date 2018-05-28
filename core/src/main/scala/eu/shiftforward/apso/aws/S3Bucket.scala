@@ -181,13 +181,14 @@ class S3Bucket(
 
   /**
    * Checks if the file in the location specified by `key` in the bucket exists.
+   * It returns false if just checking for the bucket existence.
    *
    * @param key the remote pathname for the file
    * @return true if the file exists, false otherwise.
    */
   def exists(key: String): Boolean = retry {
-    s3.getObjectMetadata(bucketName, key)
-  }.isDefined
+    key.nonEmpty && s3.doesObjectExist(bucketName, key)
+  }.getOrElse(false)
 
   /**
    * Checks if the location specified by `key` is a directory.
@@ -202,6 +203,15 @@ class S3Bucket(
         .withMaxKeys(2)
         .withPrefix(key)).getObjectSummaries.asScala
   }.exists { _.exists(_.getKey.startsWith(key + "/")) }
+
+  /**
+   * Checks whether the bucket exists
+   *
+   * @return true if the bucket exists, false otherwise.
+   */
+  def bucketExists: Boolean = retry {
+    s3.doesBucketExistV2(bucketName)
+  }.getOrElse(false)
 
   /**
    * Sets an access control list on a given Amazon S3 object.
