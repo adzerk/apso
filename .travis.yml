@@ -5,7 +5,7 @@ scala:
 jdk:
   - oraclejdk8
 script:
-  - sbt "set concurrentRestrictions in Global := Seq(Tags.limit(Tags.Compile, 1), Tags.limit(Tags.Test, 1))" -S-Xfatal-warnings ++$TRAVIS_SCALA_VERSION clean coverage test
+  - sbt -S-Xfatal-warnings ++$TRAVIS_SCALA_VERSION clean coverage test
 after_success:
   - sbt ++$TRAVIS_SCALA_VERSION coverageReport coverageAggregate coveralls
 cache:
