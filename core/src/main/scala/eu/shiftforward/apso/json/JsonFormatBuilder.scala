@@ -245,10 +245,9 @@ object JsonFormatBuilder {
   object FormatterAux {
 
     def readValue[T](obj: Map[String, JsValue], field: Field[T]) = (obj.get(field.name), field.default) match {
-      case (Some(JsNull), Some(v)) => v
-      case (Some(jsValue), _) => field.jf.read(jsValue)
-      case (None, Some(v)) => v
-      case (None, None) => throw new DeserializationException(s"Mandatory parameter ${field.name} is missing")
+      case (Some(jsValue), _) if jsValue != JsNull => field.jf.read(jsValue)
+      case (None | Some(JsNull), Some(v)) => v
+      case (None | Some(JsNull), None) => throw new DeserializationException(s"Mandatory parameter ${field.name} is missing")
     }
 
     implicit object HNilFormatter extends FormatterAux[HNil, HNil] {

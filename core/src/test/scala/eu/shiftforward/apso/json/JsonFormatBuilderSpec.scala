@@ -151,5 +151,17 @@ class JsonFormatBuilderSpec extends Specification {
 
       """{ "a": null }""".parseJson.convertTo[Foo](jr) mustEqual Foo(2)
     }
+
+    "throw a DeserializationException when a required field is missing" in {
+      case class Foo(a: Int)
+
+      val builder = JsonFormatBuilder()
+        .field[Int]("a")
+
+      val jr = builder.jsonReader({ case a :: HNil => Foo(a) })
+
+      """{ "a": null }""".parseJson.convertTo[Foo](jr) must throwA[DeserializationException]
+      """{}""".parseJson.convertTo[Foo](jr) must throwA[DeserializationException]
+    }
   }
 }
