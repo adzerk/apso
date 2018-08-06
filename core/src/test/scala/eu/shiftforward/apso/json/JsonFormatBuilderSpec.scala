@@ -140,5 +140,28 @@ class JsonFormatBuilderSpec extends Specification {
       Try("""{ "a": "asd" }""".parseJson.convertTo[Test](jf)) must beFailedTry.withThrowable[Exception]("Caught error!")
       """"string"""".parseJson.convertTo[Test](jf) mustEqual Test(0, List("string"), 0.0)
     }
+
+    "interpret null as empty values when a default value is supplied" in {
+      case class Foo(a: Int)
+
+      val builder = JsonFormatBuilder()
+        .field[Int]("a", 2)
+
+      val jr = builder.jsonReader({ case a :: HNil => Foo(a) })
+
+      """{ "a": null }""".parseJson.convertTo[Foo](jr) mustEqual Foo(2)
+    }
+
+    "throw a DeserializationException when a required field is missing" in {
+      case class Foo(a: Int)
+
+      val builder = JsonFormatBuilder()
+        .field[Int]("a")
+
+      val jr = builder.jsonReader({ case a :: HNil => Foo(a) })
+
+      """{ "a": null }""".parseJson.convertTo[Foo](jr) must throwA[DeserializationException]
+      """{}""".parseJson.convertTo[Foo](jr) must throwA[DeserializationException]
+    }
   }
 }
