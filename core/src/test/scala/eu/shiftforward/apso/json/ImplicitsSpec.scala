@@ -108,20 +108,20 @@ class ImplicitsSpec extends Specification {
     }
 
     "provide a method to get the flattened key-value set of a JSON Object" in {
-      val jsonString = """{"a":1,"b":{"c":2},"d":null}"""
+      val jsonString = """{"a":1,"b":{"c":2}, "b.c": 3, "d":null}"""
 
       "for spray-json JSON objects" in {
         val obj = jsonString.parseJson.asJsObject
 
-        obj.flattenedKeyValueSet(".") === Set("a" -> JsNumber(1), "b.c" -> JsNumber(2), "d" -> JsNull)
-        obj.flattenedKeyValueSet("/") === Set("a" -> JsNumber(1), "b/c" -> JsNumber(2), "d" -> JsNull)
+        obj.flattenedKeyValueSet(".") === Set("a" -> JsNumber(1), "b.c" -> JsNumber(2), "b.c" -> JsNumber(3), "d" -> JsNull)
+        obj.flattenedKeyValueSet("/") === Set("a" -> JsNumber(1), "b/c" -> JsNumber(2), "b.c" -> JsNumber(3), "d" -> JsNull)
       }
 
       "for circe JSON objects" in {
         val obj = parse(jsonString).fold(throw _, identity)
 
-        obj.flattenedKeyValueSet(".") === Set("a" -> Json.fromInt(1), "b.c" -> Json.fromInt(2), "d" -> Json.Null)
-        obj.flattenedKeyValueSet("/") === Set("a" -> Json.fromInt(1), "b/c" -> Json.fromInt(2), "d" -> Json.Null)
+        obj.flattenedKeyValueSet(".") === Set("a" -> Json.fromInt(1), "b.c" -> Json.fromInt(2), "b.c" -> Json.fromInt(3), "d" -> Json.Null)
+        obj.flattenedKeyValueSet("/") === Set("a" -> Json.fromInt(1), "b/c" -> Json.fromInt(2), "b.c" -> Json.fromInt(3), "d" -> Json.Null)
         1.asJson.flattenedKeyValueSet() === Set.empty
       }
     }
