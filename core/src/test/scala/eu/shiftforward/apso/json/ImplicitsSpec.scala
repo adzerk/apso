@@ -1,5 +1,6 @@
 package eu.shiftforward.apso.json
 
+import io.circe.Json
 import org.specs2.mutable._
 import io.circe.syntax._
 import io.circe.parser._
@@ -19,7 +20,7 @@ class ImplicitsSpec extends Specification {
       true.toJson.toValue === true
     }
 
-    "provide a merge method for json arrays" in {
+    "provide a merge method for JSON arrays" in {
       val source1 =
         """[1, 2, 3]"""
 
@@ -32,7 +33,7 @@ class ImplicitsSpec extends Specification {
       source1.parseJson.merge(source2.parseJson) mustEqual res.parseJson
     }
 
-    "provide a merge method for json objects" in {
+    "provide a merge method for JSON objects" in {
       val source1 =
         """{ "a": {"b": {"c": 1, "d": {"e": 3}}, "f": 5}, "g": 4 }"""
 
@@ -45,7 +46,7 @@ class ImplicitsSpec extends Specification {
       source1.parseJson.merge(source2.parseJson) mustEqual res.parseJson
     }
 
-    "provide a merge method for json objects, with conflicts" in {
+    "provide a merge method for JSON objects, with conflicts" in {
       val source1 =
         """{ "a": {"b": {"c": 1, "d": {"e": 3}}, "f": 5}, "g": 4 }"""
 
@@ -58,77 +59,92 @@ class ImplicitsSpec extends Specification {
       source1.parseJson.merge(source2.parseJson, failOnConflict = false) mustEqual res.parseJson
     }
 
-    "provide a method to create a json object from complete paths" in {
-      val res = fromFullPaths(
-        List(
-          "a.b.c" -> JsNumber(1),
-          "a.b.d.e" -> JsNumber(3),
-          "a.f" -> JsNumber(5),
-          "g" -> JsNumber(4)))
+    "provide a method to create a JSON object from complete paths" in {
+      val expected = """{ "a": {"b": {"c": 1, "d": {"e": 3}}, "f": 5}, "g": 4 }"""
 
-      val expected =
-        """{ "a": {"b": {"c": 1, "d": {"e": 3}}, "f": 5}, "g": 4 }"""
+      "create a spray-json JSON object from complete paths" in {
+        val res = fromFullPaths(
+          List(
+            "a.b.c" -> JsNumber(1),
+            "a.b.d.e" -> JsNumber(3),
+            "a.f" -> JsNumber(5),
+            "g" -> JsNumber(4)))
 
-      res mustEqual expected.parseJson
+        res mustEqual expected.parseJson
+      }
+
+      "create a circe JSON object from complete paths" in {
+        val res = fromCirceFullPaths(
+          List(
+            "a.b.c" -> 1.asJson,
+            "a.b.d.e" -> 3.asJson,
+            "a.f" -> 5.asJson,
+            "g" -> 4.asJson))
+
+        res mustEqual parse(expected).fold(throw _, identity)
+      }
+
+      "create a spray-json JSON object from complete paths (with a custom separator)" in {
+        val res = fromFullPaths(
+          List(
+            "a-b-c" -> JsNumber(1),
+            "a-b-d-e" -> JsNumber(3),
+            "a-f" -> JsNumber(5),
+            "g" -> JsNumber(4)), "-")
+
+        res mustEqual expected.parseJson
+      }
+
+      "create a circe JSON object from complete paths (with a custom separator)" in {
+        val res = fromCirceFullPaths(
+          List(
+            "a-b-c" -> 1.asJson,
+            "a-b-d-e" -> 3.asJson,
+            "a-f" -> 5.asJson,
+            "g" -> 4.asJson), "-")
+
+        res mustEqual parse(expected).fold(throw _, identity)
+      }
     }
 
-    "provide a method to create a json object from complete paths (with a custom separator)" in {
-      val res = fromFullPaths(
-        List(
-          "a-b-c" -> JsNumber(1),
-          "a-b-d-e" -> JsNumber(3),
-          "a-f" -> JsNumber(5),
-          "g" -> JsNumber(4)), "-")
+    "provide a method to get the flattened key-value set of a JSON Object" in {
+      val jsonString = """{"a":1,"b":{"c":2}, "b.c": 3, "d":null}"""
 
-      val expected =
-        """{ "a": {"b": {"c": 1, "d": {"e": 3}}, "f": 5}, "g": 4 }"""
+      "for spray-json JSON objects" in {
+        val obj = jsonString.parseJson.asJsObject
 
-      res mustEqual expected.parseJson
+        obj.flattenedKeyValueSet(".") === Set("a" -> JsNumber(1), "b.c" -> JsNumber(2), "b.c" -> JsNumber(3), "d" -> JsNull)
+        obj.flattenedKeyValueSet("/") === Set("a" -> JsNumber(1), "b/c" -> JsNumber(2), "b.c" -> JsNumber(3), "d" -> JsNull)
+      }
+
+      "for circe JSON objects" in {
+        val obj = parse(jsonString).fold(throw _, identity)
+
+        obj.flattenedKeyValueSet(".") === Set("a" -> Json.fromInt(1), "b.c" -> Json.fromInt(2), "b.c" -> Json.fromInt(3), "d" -> Json.Null)
+        obj.flattenedKeyValueSet("/") === Set("a" -> Json.fromInt(1), "b/c" -> Json.fromInt(2), "b.c" -> Json.fromInt(3), "d" -> Json.Null)
+        1.asJson.flattenedKeyValueSet() === Set.empty
+      }
     }
 
-    "provide a method to create a circe json object from complete paths" in {
-      val res = fromCirceFullPaths(
-        List(
-          "a.b.c" -> 1.asJson,
-          "a.b.d.e" -> 3.asJson,
-          "a.f" -> 5.asJson,
-          "g" -> 4.asJson))
+    "provide a method to get the key set of a JSON Object" in {
+      val jsonString = """{"a":1,"b":{"c":2},"d":null}"""
 
-      val expected =
-        """{ "a": {"b": {"c": 1, "d": {"e": 3}}, "f": 5}, "g": 4 }"""
+      "for spray-json JSON objects" in {
+        val obj = jsonString.parseJson.asJsObject
 
-      res mustEqual parse(expected).fold(throw _, identity)
-    }
+        obj.flattenedKeySet(".", ignoreNull = true) === Set("a", "b.c")
+        obj.flattenedKeySet(".", ignoreNull = false) === Set("a", "b.c", "d")
+        obj.flattenedKeySet("/", ignoreNull = true) === Set("a", "b/c")
+      }
 
-    "provide a method to create a circe json object from complete paths (with a custom separator)" in {
-      val res = fromCirceFullPaths(
-        List(
-          "a-b-c" -> 1.asJson,
-          "a-b-d-e" -> 3.asJson,
-          "a-f" -> 5.asJson,
-          "g" -> 4.asJson), "-")
+      "for circe JSON objects" in {
+        val obj = parse(jsonString).fold(throw _, identity)
 
-      val expected =
-        """{ "a": {"b": {"c": 1, "d": {"e": 3}}, "f": 5}, "g": 4 }"""
-
-      res mustEqual parse(expected).fold(throw _, identity)
-    }
-
-    "provide a method to get the key set of a JsObject" in {
-      val obj = """{"a":1,"b":{"c":2},"d":null}""".parseJson.asJsObject
-
-      obj.flattenedKeySet(".", ignoreNull = true) === Set("a", "b.c")
-      obj.flattenedKeySet(".", ignoreNull = false) === Set("a", "b.c", "d")
-      obj.flattenedKeySet("/", ignoreNull = true) === Set("a", "b/c")
-    }
-
-    "provide a method to get the key set of a JSON object" in {
-      val obj = parse("""{"a":1,"b":{"c":2},"d":null}""").fold(throw _, identity)
-
-      obj.flattenedKeySet(".", ignoreNull = true) === Set("a", "b.c")
-      obj.flattenedKeySet(".", ignoreNull = false) === Set("a", "b.c", "d")
-      obj.flattenedKeySet("/", ignoreNull = true) === Set("a", "b/c")
-      1.asJson.flattenedKeySet() === Set.empty
+        obj.flattenedKeySet(".", ignoreNull = true) === Set("a", "b.c")
+        obj.flattenedKeySet(".", ignoreNull = false) === Set("a", "b.c", "d")
+        obj.flattenedKeySet("/", ignoreNull = true) === Set("a", "b/c")
+        1.asJson.flattenedKeySet() === Set.empty
+      }
     }
 
     "provide a method to get a field from a JSON object" in {

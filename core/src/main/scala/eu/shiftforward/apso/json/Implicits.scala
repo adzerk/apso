@@ -67,25 +67,21 @@ object Implicits {
    */
   final implicit class ApsoJsonJsObject(val json: JsObject) extends AnyVal {
     /**
-     * Returns a set of keys of this object where nested keys are separated by a separator character.
+     * Returns a set of keys-value pairs of this object where nested keys are separated by a separator character.
      *
-     * Eg. {"a":1,"b":{"c":2},"d":null}.flattenedKeySet(".", ignoreNull = true) = Set("a","b.c")
+     * Eg. {"a":1,"b":{"c":2},"d":null}.flattenedKeySet(".") = Set("a" -> JsNumber(1),"b.c" -> JsNumber(2), "d" -> JsNull)
      *
      * @param separator character separator to use
-     * @param ignoreNull if set, fields with a null value are ignored
      * @return flattened key set
      */
-    def flattenedKeySet(separator: String = ".", ignoreNull: Boolean = true): Set[String] = {
+    def flattenedKeyValueSet(separator: String = "."): Set[(String, JsValue)] = {
       val fields = json.fields.toSet
       fields.flatMap {
-        case (k, v: JsObject) => v.flattenedKeySet(separator, ignoreNull).map(k + separator + _)
-        case (k, JsNull) if ignoreNull => Set.empty[String]
-        case (k, v) => Set(k)
+        case (k, v: JsObject) => v.flattenedKeyValueSet(separator).map { case (kk, vv) => (k + separator + kk) -> vv }
+        case (k, v) => Set(k -> v)
       }
     }
-  }
 
-  final implicit class ApsoJsonObject(val json: Json) extends AnyVal {
     /**
      * Returns a set of keys of this object where nested keys are separated by a separator character.
      *
@@ -95,18 +91,48 @@ object Implicits {
      * @param ignoreNull if set, fields with a null value are ignored
      * @return flattened key set
      */
-    def flattenedKeySet(separator: String = ".", ignoreNull: Boolean = true): Set[String] = {
+    def flattenedKeySet(separator: String = ".", ignoreNull: Boolean = true): Set[String] =
+      flattenedKeyValueSet(separator).filter {
+        case (_, JsNull) => !ignoreNull
+        case _ => true
+      }.map(_._1)
+  }
+
+  final implicit class ApsoJsonObject(val json: Json) extends AnyVal {
+
+    /**
+     * Returns a set of keys-value pairs of this object where nested keys are separated by a separator character.
+     *
+     * Eg. {"a":1,"b":{"c":2},"d":null}.flattenedKeySet(".") = Set("a" -> JNumber(1),"b.c" -> JNumber(2), "d" -> JNull)
+     *
+     * @param separator character separator to use
+     * @return flattened key set
+     */
+    def flattenedKeyValueSet(separator: String = "."): Set[(String, Json)] = {
       json.asObject match {
         case None => Set.empty
         case Some(jo) =>
           val fields = jo.toMap.toSet
           fields.flatMap {
-            case (k, v) if v.isObject => v.flattenedKeySet(separator, ignoreNull).map(k + separator + _)
-            case (_, v) if v.isNull && ignoreNull => Set.empty[String]
-            case (k, _) => Set(k)
+            case (k, v) if v.isObject => v.flattenedKeyValueSet(separator).map { case (kk, vv) => (k + separator + kk) -> vv }
+            case (k, v) => Set(k -> v)
           }
       }
     }
+
+    /**
+     * Returns a set of keys of this object where nested keys are separated by a separator character.
+     *
+     * Eg. {"a":1,"b":{"c":2},"d":null}.flattenedKeySet(".", ignoreNull = true) = Set("a","b.c")
+     *
+     * @param separator character separator to use
+     * @param ignoreNull if set, fields with a null value are ignored
+     * @return flattened key set
+     */
+    def flattenedKeySet(separator: String = ".", ignoreNull: Boolean = true): Set[String] =
+      flattenedKeyValueSet(separator).filter {
+        case (_, v) => !ignoreNull || !v.isNull
+      }.map(_._1)
 
     /**
      * Returns the value of the field on the end of the tree, separated by the separator character.
