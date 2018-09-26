@@ -1,7 +1,7 @@
 import scalariform.formatter.preferences._
 import ReleaseTransformations._
 
-organization in ThisBuild := "eu.shiftforward"
+organization in ThisBuild := "com.velocidi"
 
 scalaVersion in ThisBuild := "2.12.4"
 crossScalaVersions in ThisBuild := Seq("2.11.11", "2.12.4")
