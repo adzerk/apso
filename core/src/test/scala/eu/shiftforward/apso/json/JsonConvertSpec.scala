@@ -21,6 +21,7 @@ class JsonConvertSpec extends Specification with EitherMatchers {
       "by converting java objects to JSON" in {
         JsonConvert.toCirceJson(Map("a" -> 2, "b" -> Map(3 -> 7)).asJava) mustEqual parse("""{ "a": 2, "b": { "3": 7 }}""").right.get
         JsonConvert.toCirceJson(List(1, 2, 3, 4).asJava) mustEqual parse("""[1, 2, 3, 4]""").right.get
+        JsonConvert.toCirceJson(Array(1, 2, 3, 4)) mustEqual parse("""[1, 2, 3, 4]""").right.get
       }
     }
 
@@ -36,6 +37,7 @@ class JsonConvertSpec extends Specification with EitherMatchers {
       "by converting java objects to JSON" in {
         JsonConvert.toSprayJson(Map("a" -> 2, "b" -> Map(3 -> 7)).asJava) mustEqual """{ "a": 2, "b": { "3": 7 }}""".parseJson
         JsonConvert.toSprayJson(List(1, 2, 3, 4).asJava) mustEqual """[1, 2, 3, 4]""".parseJson
+        JsonConvert.toSprayJson(Array(1, 2, 3, 4)) mustEqual """[1, 2, 3, 4]""".parseJson
       }
     }
   }

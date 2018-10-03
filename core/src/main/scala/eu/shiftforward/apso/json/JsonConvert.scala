@@ -28,6 +28,7 @@ object JsonConvert {
     case map: java.util.Map[_, _] => Json.obj(map.asScala.map({ case (k, v) => (k.toString, toCirceJson(v)) }).toList: _*)
     case t: TraversableOnce[_] => Json.fromValues(t.map(toCirceJson).toVector)
     case t: java.lang.Iterable[_] => Json.fromValues(t.asScala.map(toCirceJson).toVector)
+    case arr: Array[_] => Json.fromValues(arr.toVector.map(toCirceJson))
     case _ => Json.fromString(obj.toString)
   }
 
@@ -47,6 +48,7 @@ object JsonConvert {
     case map: java.util.Map[_, _] => JsObject(map.asScala.map({ case (k, v) => (k.toString, toSprayJson(v)) }).toMap)
     case t: TraversableOnce[_] => JsArray(t.map(toSprayJson).toVector)
     case t: java.lang.Iterable[_] => JsArray(t.asScala.map(toSprayJson).toVector)
+    case arr: Array[_] => JsArray(arr.toVector.map(toSprayJson))
     case _ => JsString(obj.toString)
   }
 }
