@@ -1,10 +1,101 @@
 package eu.shiftforward.apso.collection
 
+import scala.reflect.ClassTag
+
+import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Prop.forAll
+import org.scalacheck.{ Arbitrary, Gen }
+import org.specs2.ScalaCheck
 import org.specs2.mutable._
 
-class DeboxMapSpec extends Specification {
+class DeboxMapSpec extends Specification with ScalaCheck {
+  type K = String
+  type V = Int
+
+  def genDeboxMap[A: Arbitrary: ClassTag, B: Arbitrary: ClassTag]: Gen[DeboxMap[A, B]] = {
+    import org.scalacheck.Gen._
+    for {
+      keys <- listOf(arbitrary[A])
+      values <- listOfN(keys.size, arbitrary[B])
+      removedKeys <- someOf(keys)
+    } yield if (keys.isEmpty)
+      DeboxMap.empty[A, B]
+    else {
+      val map = DeboxMap[A, B](keys.toArray, values.toArray)
+      // Remove some keys to have dirty blocks (state = 2)
+      removedKeys.foreach { k => map.remove(k) }
+      map
+    }
+  }
+
+  implicit def arbDeboxMap[A: Arbitrary: ClassTag, B: Arbitrary: ClassTag] = Arbitrary(genDeboxMap[A, B])
 
   "A DeboxMap" should {
+
+    "support the get, contains and equals methods" in forAll { (entries: Map[K, V]) =>
+      val map = DeboxMap.empty[K, V]
+      entries.foreach { case (k, v) => map.update(k, v) }
+      entries.forall {
+        case (k, v) =>
+          map.contains(k) == entries.contains(k) &&
+            map.get(k) == entries.get(k)
+      } && map.equals(map) && !map.equals(0)
+    }
+
+    "support the update method" in forAll { (map: DeboxMap[K, V], k: K, v: V) =>
+      map.update(k, v)
+      map.contains(k) && map.get(k) == Some(v)
+    }
+
+    "support the remove method" in forAll { (map: DeboxMap[K, V], k: K) =>
+      map.remove(k)
+      !map.contains(k) && map.get(k) == None
+    }
+
+    "support the remove and length methods" in forAll { (map: DeboxMap[K, V], k: K) =>
+      val initialLength = map.length
+      if (map.contains(k)) {
+        map.remove(k)
+        map.length == initialLength - 1
+      } else {
+        map.remove(k)
+        map.length == initialLength
+      }
+    }
+
+    "support the update and length methods" in forAll { (map: DeboxMap[K, V], k: K) =>
+      val initialLength = map.length
+      if (map.contains(k)) {
+        map.update(k, 0)
+        map.length == initialLength
+      } else {
+        map.update(k, 0)
+        map.length == initialLength + 1
+      }
+    }
+
+    "support the getOrElse method" in forAll { (map: DeboxMap[K, V], k: K, v: V) =>
+      (map.contains(k) && (map.getOrElse(k, v) == map.get(k).get)) ||
+        (!map.contains(k) && (map.getOrElse(k, v) == v))
+    }
+
+    "support the getOrElseUpdate method" in forAll { (map: DeboxMap[K, V], k: K, v: V) =>
+      if (map.contains(k)) {
+        val oldValue = map.get(k).get
+        map.getOrElseUpdate(k, v) == oldValue
+      } else {
+        map.getOrElseUpdate(k, v) == v && map.contains(k) && map.get(k).get == v
+      }
+    }
+
+    "support the foreach method" in forAll { (map: DeboxMap[K, V]) =>
+      val entries = scala.collection.mutable.ListBuffer.empty[(K, V)]
+      map.foreach { case (k, v) => entries.append((k, v)) }
+      entries.length == map.length && entries.forall {
+        case (k, v) =>
+          map.get(k) == Some(v)
+      }
+    }
 
     "have a working apply" in {
       val m = DeboxMap.empty[Int, Int]
