@@ -226,7 +226,7 @@ class LocalFileDescriptorSpec extends Specification {
       (1 to 3).map(n => dir2 / ("j" * n)).foreach(f => f.write(f.name))
 
       fd.listAllFilesWithPrefix("aaa/ggg").toList must haveSize(3)
-      fd.listAllFilesWithPrefix("") must haveSize(8)
+      fd.listAllFilesWithPrefix("").toList must haveSize(8)
       dir3.listAllFilesWithPrefix("") must beEmpty
     }
 

@@ -19,16 +19,22 @@ package com.velocidi.apso.caching
 import java.util.Random
 import java.util.concurrent.CountDownLatch
 
-import scala.concurrent.{ Await, Future, Promise }
 import scala.concurrent.duration._
+import scala.concurrent.{ Future, Promise }
 
-import net.ruippeixotog.akka.testkit.specs2.mutable.AkkaSpecification
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.matcher.Matcher
+import org.specs2.mutable.Specification
 
-class ExpiringLruCacheSpec(implicit ee: ExecutionEnv) extends AkkaSpecification {
-  import system.dispatcher
+class ExpiringLruCacheSpec(implicit ee: ExecutionEnv) extends Specification {
   val timeout = 15.seconds
+
+  def lruCache[T](maxCapacity: Int = 500, initialCapacity: Int = 16,
+    timeToLive: Duration = Duration.Inf, timeToIdle: Duration = Duration.Inf) =
+    new ExpiringLruCache[T](maxCapacity, initialCapacity, timeToLive, timeToIdle)
+
+  val beConsistent: Matcher[Seq[Int]] =
+    (ints: Seq[Int]) => ints.filter(_ != 0).reduceLeft((a, b) => if (a == b) a else 0) must not(be_===(0))
 
   "An LruCache" should {
     "be initially empty" in {
@@ -53,7 +59,7 @@ class ExpiringLruCacheSpec(implicit ee: ExecutionEnv) extends AkkaSpecification 
     "return Futures on uncached values during evaluation and replace these with the value afterwards" in {
       val cache = lruCache[String]()
       val latch = new CountDownLatch(1)
-      val future1 = cache(1) { (promise: Promise[String]) ⇒
+      val future1 = cache(1) { (promise: Promise[String]) =>
         Future {
           latch.await()
           promise.success("A")
@@ -107,34 +113,35 @@ class ExpiringLruCacheSpec(implicit ee: ExecutionEnv) extends AkkaSpecification 
     "be thread-safe" in {
       val cache = lruCache[Int](maxCapacity = 1000)
       // exercise the cache from 10 parallel "tracks" (threads)
-      val views = Await.result({
-        Future.traverse(Seq.tabulate(10)(identity)) { track ⇒
-          Future {
-            val array = Array.fill(1000)(0) // our view of the cache
-            val rand = new Random(track)
-            (1 to 10000) foreach { i ⇒
-              val ix = rand.nextInt(1000) // for a random index into the cache
-              val value = Await.result(cache(ix) { // get (and maybe set) the cache value
-                Thread.sleep(0)
-                rand.nextInt(1000000) + 1
-              }, timeout)
-              if (array(ix) == 0) array(ix) = value // update our view of the cache
-              else if (array(ix) != value) failure("Cache view is inconsistent (track " + track + ", iteration " + i +
-                ", index " + ix + ": expected " + array(ix) + " but is " + value)
+
+      val fs = Future.traverse(Seq.tabulate(10)(identity)) { track =>
+        Future {
+          val array = Array.fill(1000)(0)
+          val rand = new Random(track)
+          val fs = (1 to 10000).map { i =>
+            val ix = rand.nextInt(1000)
+            val res = cache(ix) {
+              Thread.sleep(0)
+              rand.nextInt(1000000) + 1
             }
-            array
+            res.flatMap { value =>
+              if (array(ix) == 0)
+                array(ix) = value
+              if (array(ix) != value) {
+                Future.failed(new Throwable("Cache view is inconsistent (track " + track + ", iteration " + i +
+                  ", index " + ix + ": expected " + array(ix) + " but is " + value))
+              } else
+                Future.successful(())
+            }
           }
+
+          Future.sequence(fs).map(_ => array)
         }
-      }, timeout)
-      val beConsistent: Matcher[Seq[Int]] = (
-        (ints: Seq[Int]) ⇒ ints.filter(_ != 0).reduceLeft((a, b) ⇒ if (a == b) a else 0) != 0,
-        (_: Seq[Int]) ⇒ "consistency check")
-      forall(views.transpose)(_ must beConsistent)
+      }
+
+      val views = fs.flatMap(s => Future.sequence(s))
+
+      views must beLike[Seq[Array[Int]]] { case v => forall(v.transpose)(_ must beConsistent) }.await(retries = 0, timeout = timeout)
     }
   }
-
-  def lruCache[T](maxCapacity: Int = 500, initialCapacity: Int = 16,
-    timeToLive: Duration = Duration.Inf, timeToIdle: Duration = Duration.Inf) =
-    new ExpiringLruCache[T](maxCapacity, initialCapacity, timeToLive, timeToIdle)
-
 }
