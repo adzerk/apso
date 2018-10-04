@@ -1,6 +1,6 @@
 <p align="center"><img src="https://raw.githubusercontent.com/velocidi/apso/master/apso.png"/></p>
 
-# Apso [![Build Status](https://travis-ci.org/velocidi/apso.svg?branch=master)](https://travis-ci.org/velocidi/apso) [![Maven Central](https://img.shields.io/maven-central/v/eu.shiftforward/apso_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/eu.shiftforward/apso_2.12)
+# Apso [![Build Status](https://travis-ci.org/velocidi/apso.svg?branch=master)](https://travis-ci.org/velocidi/apso) [![Maven Central](https://img.shields.io/maven-central/v/com.velocidi/apso_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/com.velocidi/apso_2.12)
 
 Apso is Velocidi's Scala utilities library. It provides a series of useful methods.
 
@@ -11,13 +11,13 @@ Apso's latest release is built against Scala 2.11 and Scala 2.12.
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "eu.shiftforward" %% "apso" % "0.12.10"
+libraryDependencies += "com.velocidi" %% "apso" % "0.12.10"
 ```
 
 The TestKit is available under the `apso-testkit` project. You can include it only for the `test` configuration:
 
 ```scala
-libraryDependencies += "eu.shiftforward" %% "apso-testkit" % "0.12.10" % "test"
+libraryDependencies += "com.velocidi" %% "apso-testkit" % "0.12.10" % "test"
 ```
 
 Please take into account that the library is still in an experimental stage and the interfaces might change for subsequent releases.
@@ -92,8 +92,8 @@ Please take into account that the library is still in an experimental stage and 
 The `Benchmark` object provides an apply method to measure the running time of a block of code.
 
 ```scala
-scala> import eu.shiftforward.apso.Benchmark
-import eu.shiftforward.apso.Benchmark
+scala> import com.velocidi.apso.Benchmark
+import com.velocidi.apso.Benchmark
 
 scala> Benchmark("test") { (0l to 100000000).sum }
 # Block "test" completed, time taken: 1 ms (0.001 s)
@@ -116,8 +116,8 @@ res1: Long = 5000000050000000
 The `CounterPair` object provides a method to pack two numbers in the range of an unsigned short in an `Int`.
 
 ```scala
-scala> import eu.shiftforward.apso.CounterPair
-import eu.shiftforward.apso.CounterPair
+scala> import com.velocidi.apso.CounterPair
+import com.velocidi.apso.CounterPair
 
 scala> CounterPair(1, 2)
 res0: Int = 131073
@@ -132,8 +132,8 @@ b: Int = 2
 The `Geo` object provides methods to compute distances in kilometers between two points on the planet Earth, calculated using the spherical [law of cosines](https://en.wikipedia.org/wiki/Great-circle_distance#Formulas). Coordinates are represented by a pair of `Double` for latitude and longitude.
 
 ```scala
-scala> import eu.shiftforward.apso.Geo
-import eu.shiftforward.apso.Geo
+scala> import com.velocidi.apso.Geo
+import com.velocidi.apso.Geo
 
 scala> Geo.distance((41.1617609, -8.6024716), (41.1763745, -8.5964861))
 res0: Double = 1.7004440762344684
@@ -143,7 +143,7 @@ You can also have the distance function curried if you are computing distances f
 
 ```scala
 scala> val distFromOffice = Geo.distanceFrom((41.1617609, -8.6024716))
-distToOffice: eu.shiftforward.apso.Geo.Coordinates => Double = <function1>
+distToOffice: com.velocidi.apso.Geo.Coordinates => Double = <function1>
 
 scala> distFromOffice((41.1763745, -8.5964861))
 res1: Double = 1.7004440762344684
@@ -157,8 +157,8 @@ res2: Double = 275.118392477037
 The JreVersionHelper object provides helper methods to check the two most significant parts of the JRE version at runtime:
 
 ```scala
-scala> import eu.shiftforward.apso.JreVersionHelper
-import eu.shiftforward.apso.JreVersionHelper
+scala> import com.velocidi.apso.JreVersionHelper
+import com.velocidi.apso.JreVersionHelper
 
 scala> JreVersionHelper.jreVersion
 res0: (Int, Int) = (1,8)
@@ -184,8 +184,8 @@ scala> a.log.info("test")
 The `OrderingHelper` object provides the `min` and `max` methods for comparing two instances of the same type:
 
 ```scala
-scala> import eu.shiftforward.apso.OrderingHelper._
-import eu.shiftforward.apso.OrderingHelper._
+scala> import com.velocidi.apso.OrderingHelper._
+import com.velocidi.apso.OrderingHelper._
 
 scala> min(2, 3)
 res0: Int = 2
@@ -199,11 +199,11 @@ res1: Int = 3
 The `ProgressBar` represents a widget to print a dynamic progress bar in a console.
 
 ```scala
-scala> import eu.shiftforward.apso.ProgressBar
-import eu.shiftforward.apso.ProgressBar
+scala> import com.velocidi.apso.ProgressBar
+import com.velocidi.apso.ProgressBar
 
 scala> val progress = ProgressBar(100)
-progress: eu.shiftforward.apso.ProgressBar = ProgressBar(100)
+progress: com.velocidi.apso.ProgressBar = ProgressBar(100)
 
 scala> progress.tick(1)
   1% [>                                                     ] / [ 0.19 ] ops/s
@@ -229,17 +229,17 @@ scala> progress.tick(30)
 The `Reflect` object contains helpers for reflection-related tasks, namely to create an instance of a given class given its fully qualified name and also to access singleton objects:
 
 ```scala
-scala> import eu.shiftforward.apso.Reflect
-import eu.shiftforward.apso.Reflect
+scala> import com.velocidi.apso.Reflect
+import com.velocidi.apso.Reflect
 
-scala> import eu.shiftforward.apso.collection._
-import eu.shiftforward.apso.collection._
+scala> import com.velocidi.apso.collection._
+import com.velocidi.apso.collection._
 
-scala> Reflect.newInstance[HMap[Nothing]]("eu.shiftforward.apso.collection.HMap")
-res0: eu.shiftforward.apso.collection.HMap[Nothing] = HMap()
+scala> Reflect.newInstance[HMap[Nothing]]("com.velocidi.apso.collection.HMap")
+res0: com.velocidi.apso.collection.HMap[Nothing] = HMap()
 
-scala> Reflect.companion[Reflect.type]("eu.shiftforward.apso.Reflect")
-res1: eu.shiftforward.apso.Reflect.type = eu.shiftforward.apso.Reflect$@3b1dbca
+scala> Reflect.companion[Reflect.type]("com.velocidi.apso.Reflect")
+res1: com.velocidi.apso.Reflect.type = com.velocidi.apso.Reflect$@3b1dbca
 ```
 
 ## Retry
@@ -249,8 +249,8 @@ The `Retry` object provides a method to retry methods or `Future`s a given numbe
 ```scala
 scala> import scala.concurrent.Future
 import scala.concurrent.Future
-scala> import eu.shiftforward.apso.Retry
-import eu.shiftforward.apso.Retry
+scala> import com.velocidi.apso.Retry
+import com.velocidi.apso.Retry
 
 scala> import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -299,10 +299,10 @@ resource which shall automatically be disposed off and closed properly afterward
 
 ```scala
 scala> import java.io.Closeable
-import eu.shiftforward.apso.TryWith
+import com.velocidi.apso.TryWith
 
-scala> import eu.shiftforward.apso.TryWith
-import eu.shiftforward.apso.TryWith
+scala> import com.velocidi.apso.TryWith
+import com.velocidi.apso.TryWith
 
 scala> def buildResource = new Closeable {
      |   override def toString: String = "good resource"
@@ -340,11 +340,11 @@ The following implementations of `Sampler` are available:
 The `ExpSampler` is a sampler in which sampling level ratios are distributed in an exponential way. Each sampling level corresponds to a sample with `1.0 / pow(base, level)` of the original size:
 
 ```scala
-scala> import eu.shiftforward.apso.ExpSampler
-import eu.shiftforward.apso.ExpSampler
+scala> import com.velocidi.apso.ExpSampler
+import com.velocidi.apso.ExpSampler
 
 scala> val s = ExpSampler[Int](2)
-s: eu.shiftforward.apso.ExpSampler[Int] = ExpSampler(2.0)
+s: com.velocidi.apso.ExpSampler[Int] = ExpSampler(2.0)
 
 scala> s(0)((0 to 15).toSeq)
 res0: Seq[Int] = Range(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
@@ -367,11 +367,11 @@ res4: Seq[Int] = Range(0)
 The `ListSampler` is a sampler in which the ratios for each sampling level are given explicitly as parameters:
 
 ```scala
-scala> import eu.shiftforward.apso.ListSampler
-import eu.shiftforward.apso.ListSampler
+scala> import com.velocidi.apso.ListSampler
+import com.velocidi.apso.ListSampler
 
 scala> val s = ListSampler[Int](0.5, 0.25, 0.125, 0.0625)
-s: eu.shiftforward.apso.ListSampler[Int] = ListSampler(WrappedArray(0.5, 0.25, 0.125, 0.0625))
+s: com.velocidi.apso.ListSampler[Int] = ListSampler(WrappedArray(0.5, 0.25, 0.125, 0.0625))
 
 scala> s(0)((0 to 15).toSeq)
 res0: Seq[Int] = Range(0, 1, 2, 3, 4, 5, 6, 7)
@@ -391,14 +391,14 @@ res3: Seq[Int] = Range(0)
 The `FallbackToMinimum` trait allows one to set a minimum ratio for any sampling level:
 
 ```scala
-scala> import eu.shiftforward.apso.ExpSampler
-import eu.shiftforward.apso.ExpSampler
+scala> import com.velocidi.apso.ExpSampler
+import com.velocidi.apso.ExpSampler
 
-scala> import eu.shiftforward.apso.FallbackToMinimum
-import eu.shiftforward.apso.FallbackToMinimum
+scala> import com.velocidi.apso.FallbackToMinimum
+import com.velocidi.apso.FallbackToMinimum
 
 scala> val s = new ExpSampler[Int](2) with FallbackToMinimum[Int] { val minSample = 0.5 }
-s: eu.shiftforward.apso.ExpSampler[Int] with eu.shiftforward.apso.FallbackToMinimum[Int] = ExpSampler(2.0)
+s: com.velocidi.apso.ExpSampler[Int] with com.velocidi.apso.FallbackToMinimum[Int] = ExpSampler(2.0)
 
 scala> s(0)((0 to 15).toSeq)
 res0: Seq[Int] = Range(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
@@ -480,8 +480,8 @@ In the previous example, every time a `Master` actor receives a `ChangeData` mes
 Apso provides implicit conversions from `String`, `Seq[_]`, `Map[_, _]`, `Seq[Map[_, _]]` and `AutoCloseable` to extended types that come packed with extended features.
 
 ```scala
-scala> import eu.shiftforward.apso.Implicits._
-import eu.shiftforward.apso.Implicits._
+scala> import com.velocidi.apso.Implicits._
+import com.velocidi.apso.Implicits._
 
 scala> "abcd".some
 res0: Some[String] = Some(abcd)
@@ -583,8 +583,8 @@ Apso provides a group of classes to ease the interaction with the Amazon Web Ser
 The `ConfigCredentialsProvider` is an `AWSCredentialsProvider` (from AWS SDK for Java) that retrieves credentials from a typesafe configuration, allowing customization of its `Config` object, as well as the access key and secret key paths:
 
 ```scala
-scala> import eu.shiftforward.apso.aws._
-import eu.shiftforward.apso.aws._
+scala> import com.velocidi.apso.aws._
+import com.velocidi.apso.aws._
 
 scala> import com.typesafe.config._
 import com.typesafe.config._
@@ -598,7 +598,7 @@ scala> val confProvider = ConfigCredentialsProvider(
      |   }"""),
      |   accessKeyPath = "aws.access-key",
      |   secretKeyPath = "aws.secret-key")
-confProvider: eu.shiftforward.apso.aws.ConfigCredentialsProvider = ConfigCredentialsProvider(Config(SimpleConfigObject({"aws":{"access-key":"<access-key>","secret-key":"<secret-key>"}})),aws.access-key,aws.secret-key)
+confProvider: com.velocidi.apso.aws.ConfigCredentialsProvider = ConfigCredentialsProvider(Config(SimpleConfigObject({"aws":{"access-key":"<access-key>","secret-key":"<secret-key>"}})),aws.access-key,aws.secret-key)
 
 scala> val credentials = confProvider.getCredentials
 credentials: com.amazonaws.auth.AWSCredentials = com.amazonaws.auth.BasicAWSCredentials@46056cef
@@ -640,27 +640,27 @@ The `SerializableAWSCredentials` class provides a serializable container for AWS
 
 ## Collections
 
-The `eu.shiftforward.apso.collection` package provides some helpful collections:
+The `com.velocidi.apso.collection` package provides some helpful collections:
 
 ### HMap
 
 The `HMap` is an implementation of an heterogeneous `Map`, where you declare the instances for the keys explicitly:
 
 ```scala
-scala> import eu.shiftforward.apso.collection._
-import eu.shiftforward.apso.collection._
+scala> import com.velocidi.apso.collection._
+import com.velocidi.apso.collection._
 
 scala> val Key1 = new HMapKey[Int]
-Key1: eu.shiftforward.apso.collection.HMapKey[Int] = eu.shiftforward.apso.collection.HMapKey@4eb14055
+Key1: com.velocidi.apso.collection.HMapKey[Int] = com.velocidi.apso.collection.HMapKey@4eb14055
 
 scala> val Key2 = new HMapKey[String]
-Key2: eu.shiftforward.apso.collection.HMapKey[String] = eu.shiftforward.apso.collection.HMapKey@13590b1e
+Key2: com.velocidi.apso.collection.HMapKey[String] = com.velocidi.apso.collection.HMapKey@13590b1e
 
 scala> val Key3 = new HMapKey[List[Boolean]]
-Key3: eu.shiftforward.apso.collection.HMapKey[List[Boolean]] = eu.shiftforward.apso.collection.HMapKey@7e384bb6
+Key3: com.velocidi.apso.collection.HMapKey[List[Boolean]] = com.velocidi.apso.collection.HMapKey@7e384bb6
 
 scala> val map = HMap(Key1 -> 4, Key2 -> "s", Key3 -> List(false, true))
-map: eu.shiftforward.apso.collection.HMap[eu.shiftforward.apso.collection.HMapKey] = HMap((eu.shiftforward.apso.collection.HMapKey@4eb14055,4), (eu.shiftforward.apso.collection.HMapKey@13590b1e,s), (eu.shiftforward.apso.collection.HMapKey@7e384bb6,List(false, true)))
+map: com.velocidi.apso.collection.HMap[com.velocidi.apso.collection.HMapKey] = HMap((com.velocidi.apso.collection.HMapKey@4eb14055,4), (com.velocidi.apso.collection.HMapKey@13590b1e,s), (com.velocidi.apso.collection.HMapKey@7e384bb6,List(false, true)))
 
 scala> map(Key1)
 res2: Int = 4
@@ -677,14 +677,14 @@ res4: List[Boolean] = List(false, true)
 The `Trie` class is an implementation of an immutable trie. An example usage follows:
 
 ```scala
-scala> import eu.shiftforward.apso.collection._
-import eu.shiftforward.apso.collection._
+scala> import com.velocidi.apso.collection._
+import com.velocidi.apso.collection._
 
 scala> val t = Trie[Char, Int]()
-t: eu.shiftforward.apso.collection.Trie[Char,Int] = Trie(None,Map())
+t: com.velocidi.apso.collection.Trie[Char,Int] = Trie(None,Map())
 
 scala> val nt = t.set("one", 1).set("two", 2).set("three", 3).set("four", 4)
-nt: eu.shiftforward.apso.collection.Trie[Char,Int] = Trie(None,Map(o -> Trie(None,Map(n -> Trie(None,Map(e -> Trie(Some(1),Map()))))), t -> Trie(None,Map(w -> Trie(None,Map(o -> Trie(Some(2),Map()))), h -> Trie(None,Map(r -> Trie(None,Map(e -> Trie(None,Map(e -> Trie(Some(3),Map()))))))))), f -> Trie(None,Map(o -> Trie(None,Map(u -> Trie(None,Map(r -> Trie(Some(4),Map())))))))))
+nt: com.velocidi.apso.collection.Trie[Char,Int] = Trie(None,Map(o -> Trie(None,Map(n -> Trie(None,Map(e -> Trie(Some(1),Map()))))), t -> Trie(None,Map(w -> Trie(None,Map(o -> Trie(Some(2),Map()))), h -> Trie(None,Map(r -> Trie(None,Map(e -> Trie(None,Map(e -> Trie(Some(3),Map()))))))))), f -> Trie(None,Map(o -> Trie(None,Map(u -> Trie(None,Map(r -> Trie(Some(4),Map())))))))))
 
 scala> nt.get("one")
 res0: Option[Int] = Some(1)
@@ -702,7 +702,7 @@ The `TypedMap` is a map that associates types with values. It can be used as fol
 
 ```scala
 scala> val m = TypedMap("one", 2, 3l)
-m: eu.shiftforward.apso.collection.TypedMap[Any] = Map(java.lang.String -> one, Int -> 2, Long -> 3)
+m: com.velocidi.apso.collection.TypedMap[Any] = Map(java.lang.String -> one, Int -> 2, Long -> 3)
 
 scala> m[String]
 res0: String = one
@@ -742,14 +742,14 @@ The `config.Implicits` object allows one to deserialize a config to a type which
 scala> import com.typesafe.config._
 import com.typesafe.config._
 
-scala> import eu.shiftforward.apso.config.ConfigReader.BasicConfigReaders._
-import eu.shiftforward.apso.config.ConfigReader.BasicConfigReaders._
+scala> import com.velocidi.apso.config.ConfigReader.BasicConfigReaders._
+import com.velocidi.apso.config.ConfigReader.BasicConfigReaders._
 
-scala> import eu.shiftforward.apso.config.Implicits._
-import eu.shiftforward.apso.config.Implicits._
+scala> import com.velocidi.apso.config.Implicits._
+import com.velocidi.apso.config.Implicits._
 
-scala> import eu.shiftforward.apso.config._
-import eu.shiftforward.apso.config._
+scala> import com.velocidi.apso.config._
+import com.velocidi.apso.config._
 
 scala> import scala.concurrent.duration._
 import scala.concurrent.duration._
@@ -783,7 +783,7 @@ scala> implicit val fooConfigReader = new ConfigReader[Foo] {
      |     Foo(conf.get[Int]("a"), conf.get[Int]("b"))
      |   }
      | }
-fooConfigReader: eu.shiftforward.apso.config.ConfigReader[Foo] = <function2>
+fooConfigReader: com.velocidi.apso.config.ConfigReader[Foo] = <function2>
 
 scala> conf.get[Foo]("v4")
 res3: Foo = Foo(2,3)
@@ -800,10 +800,10 @@ decrypt data:
 
 ```scala
 scala> val encryptor = Encryptor("AES", getClass.getResourceAsStream("/keystoreFile.jceks"), "keystorePass", "keyAlias", "keyPass")
-encryptor: Option[eu.shiftforward.apso.encryption.Encryptor] = Some(eu.shiftforward.apso.encryption.Encryptor@353912)
+encryptor: Option[com.velocidi.apso.encryption.Encryptor] = Some(com.velocidi.apso.encryption.Encryptor@353912)
 
 scala> val decryptor = Decryptor("AES", getClass.getResourceAsStream("/keystoreFile.jceks"), "keystorePass", "keyAlias", "keyPass")
-decryptor: Option[eu.shiftforward.apso.encryption.Decryptor] = Some(eu.shiftforward.apso.encryption.Decryptor@68ccfc03)
+decryptor: Option[com.velocidi.apso.encryption.Decryptor] = Some(com.velocidi.apso.encryption.Decryptor@68ccfc03)
 
 scala> val secretData = "secret_info"
 secretData: String = secret_info
@@ -820,8 +820,8 @@ res6: Option[String] = Some(secret_info)
 Apso provides utilities for various hashing functions.
 
 ```scala
-scala> import eu.shiftforward.apso.hashing.Implicits._
-import eu.shiftforward.apso.hashing.Implicits._
+scala> import com.velocidi.apso.hashing.Implicits._
+import com.velocidi.apso.hashing.Implicits._
 
 scala> "abcd".md5
 res0: String = e2fc714c4727ee9395f324cd2e7f331f
@@ -835,8 +835,8 @@ res1: Long = 7785666560123423118
 Apso provides a tiny wrapper for [Dispatch](http://dispatch.databinder.net/) with synchronous operations. It's called `W`, and the following shows some sample usage:
 
 ```scala
-scala> import eu.shiftforward.apso.http.W
-import eu.shiftforward.apso.http.W
+scala> import com.velocidi.apso.http.W
+import com.velocidi.apso.http.W
 
 scala> W.get("http://www.google.com/").getStatusCode
 res0: Int = 302
@@ -871,8 +871,8 @@ Apso introduces the concept of a `FileDescriptor`: a representation of a file st
 The `ResourceUtil` object provides methods to access files available through Java's runtime environment classpath:
 
 ```scala
-scala> import eu.shiftforward.apso.io.ResourceUtil
-import eu.shiftforward.apso.io.ResourceUtil
+scala> import com.velocidi.apso.io.ResourceUtil
+import com.velocidi.apso.io.ResourceUtil
 
 scala> ResourceUtil.getResourceURL("reference.conf")
 res0: String = /Users/jcazevedo/work/apso/apso/target/scala-2.11/classes/reference.conf
@@ -902,11 +902,11 @@ Apso provides some utility iterators.
 The `CircularIterator` is an iterator that iterates over its elements in a circular way. See the following for sample usage:
 
 ```scala
-scala> import eu.shiftforward.apso.iterator.CircularIterator
-import eu.shiftforward.apso.iterator.CircularIterator
+scala> import com.velocidi.apso.iterator.CircularIterator
+import com.velocidi.apso.iterator.CircularIterator
 
 scala> val circularIterator = CircularIterator(List(1, 2, 3).toIterator)
-circularIterator: eu.shiftforward.apso.iterator.CircularIterator[Int] = non-empty iterator
+circularIterator: com.velocidi.apso.iterator.CircularIterator[Int] = non-empty iterator
 
 scala> circularIterator.take(10).toList
 res0: List[Int] = List(1, 2, 3, 1, 2, 3, 1, 2, 3, 1)
@@ -917,11 +917,11 @@ res0: List[Int] = List(1, 2, 3, 1, 2, 3, 1, 2, 3, 1)
 The `CompositeIterator` is an iterator that wraps a list of other iterators and iterates over its elements sequentially. It handles compositions of a large number of iterators in a more efficient way than simply concatenating them, avoiding stack overflows in particular. It supports appending of new iterators while keeping its efficiency. See the following for sample usage:
 
 ```scala
-scala> import eu.shiftforward.apso.iterator.CompositeIterator
-import eu.shiftforward.apso.iterator.CompositeIterator
+scala> import com.velocidi.apso.iterator.CompositeIterator
+import com.velocidi.apso.iterator.CompositeIterator
 
 scala> val compositeIterator = CompositeIterator(List(1, 2, 3).toIterator, List(4, 5, 6).toIterator, List(7, 8, 9).toIterator)
-compositeIterator: eu.shiftforward.apso.iterator.CompositeIterator[Int] = non-empty iterator
+compositeIterator: com.velocidi.apso.iterator.CompositeIterator[Int] = non-empty iterator
 
 scala> compositeIterator.take(9).toList
 res0: List[Int] = List(1, 2, 3, 4, 5, 6, 7, 8, 9)
@@ -932,14 +932,14 @@ res0: List[Int] = List(1, 2, 3, 4, 5, 6, 7, 8, 9)
 The `ExtendedIterator` is a decorator for iterators, adding more control over its lifetime. See the following for sample usage:
 
 ```scala
-scala> import eu.shiftforward.apso.iterator.ExtendedIterator
-import eu.shiftforward.apso.iterator.ExtendedIterator
+scala> import com.velocidi.apso.iterator.ExtendedIterator
+import com.velocidi.apso.iterator.ExtendedIterator
 
 scala> val it = (0 to 15).toIterator
 it: Iterator[Int] = non-empty iterator
 
 scala> val extIt = new ExtendedIterator(it)
-extIt: eu.shiftforward.apso.iterator.ExtendedIterator[Int] = non-empty iterator
+extIt: com.velocidi.apso.iterator.ExtendedIterator[Int] = non-empty iterator
 
 scala> extIt.onEnd(println("finished"))
 
@@ -953,15 +953,15 @@ res1: Int = 16
 The `MergedBufferedIterator` is a collection of sorted `BufferedIterators` that allows traversing them in order, while also providing a `mergeSorted` method to merge with another sorted `BufferedIterator`. See the following for sample usage:
 
 ```scala
-scala> import eu.shiftforward.apso.iterator.MergedBufferedIterator
-import eu.shiftforward.apso.iterator.MergedBufferedIterator
+scala> import com.velocidi.apso.iterator.MergedBufferedIterator
+import com.velocidi.apso.iterator.MergedBufferedIterator
 
 scala> val it1 = MergedBufferedIterator(List(
      |   (0 to 3).toIterator.buffered,
      |   (0 to 8).toIterator.buffered,
      |   (0 to 15).toIterator.buffered,
      |   (0 to 11).toIterator.buffered))
-it1: eu.shiftforward.apso.iterator.MergedBufferedIterator[Int] = non-empty iterator
+it1: com.velocidi.apso.iterator.MergedBufferedIterator[Int] = non-empty iterator
 
 scala> it1.toList
 res0: List[Int] = List(0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 10, 10, 11, 11, 12, 13, 14, 15)
@@ -969,7 +969,7 @@ res0: List[Int] = List(0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 
 scala> val it2 = MergedBufferedIterator(List(
      |   Iterator(1, 3, 5).buffered,
      |   Iterator(2).buffered))
-it2: eu.shiftforward.apso.iterator.MergedBufferedIterator[Int] = non-empty iterator
+it2: com.velocidi.apso.iterator.MergedBufferedIterator[Int] = non-empty iterator
 
 scala> it2.mergeSorted(Iterator(4, 6).buffered).toList
 res1: List[Int] = List(1, 2, 3, 4, 5, 6)
@@ -980,11 +980,11 @@ res1: List[Int] = List(1, 2, 3, 4, 5, 6)
 The `RoundRobinIterator` is an iterator that wraps an array of other iterators and iterates over its elements in a round-robin way. See the following for sample usage:
 
 ```scala
-scala> import eu.shiftforward.apso.iterator.RoundRobinIterator
-import eu.shiftforward.apso.iterator.RoundRobinIterator
+scala> import com.velocidi.apso.iterator.RoundRobinIterator
+import com.velocidi.apso.iterator.RoundRobinIterator
 
 scala> val roundRobinIterator = RoundRobinIterator(List(1, 2, 3).toIterator, List(4, 5, 6).toIterator, List(7, 8, 9).toIterator)
-roundRobinIterator: eu.shiftforward.apso.iterator.RoundRobinIterator[Int] = non-empty iterator
+roundRobinIterator: com.velocidi.apso.iterator.RoundRobinIterator[Int] = non-empty iterator
 
 scala> roundRobinIterator.take(9).toList
 res0: List[Int] = List(1, 4, 7, 2, 5, 8, 3, 6, 9)
@@ -1008,8 +1008,8 @@ Note that `spray-json`'s `JsonFormat` for maps has the same signature, so if you
 The `json` package provides some implicits around [spray-json](https://github.com/spray/spray-json)'s `JsValue` to unwrap JSON values, merge two `JsValues` and create `JsValues` from a sequence of dot-separated paths with the corresponding leaf values. See the following for sample usage:
 
 ```scala
-scala> import eu.shiftforward.apso.json.Implicits._
-import eu.shiftforward.apso.json.Implicits._
+scala> import com.velocidi.apso.json.Implicits._
+import com.velocidi.apso.json.Implicits._
 
 scala> import spray.json.DefaultJsonProtocol._
 import spray.json.DefaultJsonProtocol._
@@ -1079,8 +1079,8 @@ res3: String =
 The `JsonConvert` object contains helpers for converting between JSON values and other structures. See the following for sample usage:
 
 ```scala
-scala> import eu.shiftforward.apso.json._
-import eu.shiftforward.apso.json._
+scala> import com.velocidi.apso.json._
+import com.velocidi.apso.json._
 
 scala> JsonConvert.toJson("abcd")
 res0: spray.json.JsValue = "abcd"
@@ -1097,8 +1097,8 @@ res2: spray.json.JsValue = {"1":2,"3":4}
 The `JsonFormatBuilder` class provides a type-safe way to construct a `JsonFormat` by incrementally adding, removing or updating fields. See the following for sample usage:
 
 ```scala
-scala> import eu.shiftforward.apso.json._
-import eu.shiftforward.apso.json._
+scala> import com.velocidi.apso.json._
+import com.velocidi.apso.json._
 
 scala> import shapeless._
 import shapeless._
@@ -1113,12 +1113,12 @@ scala> case class Test(a: Int, b: List[String], c: Double)
 defined class Test
 
 scala> val builder = JsonFormatBuilder().field[Int]("a").field[List[String]]("b")
-builder: eu.shiftforward.apso.json.JsonFormatBuilder[shapeless.::[Int,shapeless.::[List[String],shapeless.HNil]],shapeless.::[eu.shiftforward.apso.json.JsonFormatBuilder.Field[Int],shapeless.::[eu.shiftforward.apso.json.JsonFormatBuilder.Field[List[String]],shapeless.HNil]]] = JsonFormatBuilder(Field(a,spray.json.BasicFormats$IntJsonFormat$@50ef5db8,None) :: Field(b,spray.json.CollectionFormats$$anon$1@4bc54f85,None) :: HNil)
+builder: com.velocidi.apso.json.JsonFormatBuilder[shapeless.::[Int,shapeless.::[List[String],shapeless.HNil]],shapeless.::[com.velocidi.apso.json.JsonFormatBuilder.Field[Int],shapeless.::[com.velocidi.apso.json.JsonFormatBuilder.Field[List[String]],shapeless.HNil]]] = JsonFormatBuilder(Field(a,spray.json.BasicFormats$IntJsonFormat$@50ef5db8,None) :: Field(b,spray.json.CollectionFormats$$anon$1@4bc54f85,None) :: HNil)
 
 scala> val jf1 = builder.jsonFormat[Test](
      |   { case a :: b :: HNil => Test(a, b, -1.0) },
      |   { test => test.a :: test.b :: HNil })
-jf1: spray.json.RootJsonFormat[Test] = eu.shiftforward.apso.json.JsonFormatBuilder$$anon$1@70ae62e7
+jf1: spray.json.RootJsonFormat[Test] = com.velocidi.apso.json.JsonFormatBuilder$$anon$1@70ae62e7
 
 scala> """{ "a": 3, "b": ["x", "y"] }""".parseJson.convertTo[Test](jf1)
 res0: Test = Test(3,List(x, y),-1.0)
@@ -1130,12 +1130,12 @@ scala> Test(3, List("x", "y"), -1.0).toJson(jf1)
 res2: spray.json.JsValue = {"b":["x","y"],"a":3}
 
 scala> val builder2 = builder.field[Double]("c", 0.0)
-builder2: eu.shiftforward.apso.json.JsonFormatBuilder[shapeless.::[Int,shapeless.::[List[String],shapeless.::[Double,shapeless.HNil]]],shapeless.::[eu.shiftforward.apso.json.JsonFormatBuilder.Field[Int],shapeless.::[eu.shiftforward.apso.json.JsonFormatBuilder.Field[List[String]],shapeless.::[eu.shiftforward.apso.json.JsonFormatBuilder.Field[Double],shapeless.HNil]]]] = JsonFormatBuilder(Field(a,spray.json.BasicFormats$IntJsonFormat$@50ef5db8,None) :: Field(b,spray.json.CollectionFormats$$anon$1@4bc54f85,None) :: Field(c,spray.json.BasicFormats$DoubleJsonFormat$@73930900,Some(0.0)) :: HNil)
+builder2: com.velocidi.apso.json.JsonFormatBuilder[shapeless.::[Int,shapeless.::[List[String],shapeless.::[Double,shapeless.HNil]]],shapeless.::[com.velocidi.apso.json.JsonFormatBuilder.Field[Int],shapeless.::[com.velocidi.apso.json.JsonFormatBuilder.Field[List[String]],shapeless.::[com.velocidi.apso.json.JsonFormatBuilder.Field[Double],shapeless.HNil]]]] = JsonFormatBuilder(Field(a,spray.json.BasicFormats$IntJsonFormat$@50ef5db8,None) :: Field(b,spray.json.CollectionFormats$$anon$1@4bc54f85,None) :: Field(c,spray.json.BasicFormats$DoubleJsonFormat$@73930900,Some(0.0)) :: HNil)
 
 scala> val jf2 = builder2.jsonFormat[Test](
      |   { case a :: b :: c :: HNil => Test(a, b, c) },
      |   { test => test.a :: test.b :: test.c :: HNil })
-jf2: spray.json.RootJsonFormat[Test] = eu.shiftforward.apso.json.JsonFormatBuilder$$anon$1@6ce596d9
+jf2: spray.json.RootJsonFormat[Test] = com.velocidi.apso.json.JsonFormatBuilder$$anon$1@6ce596d9
 
 scala> """{ "a": 3, "b": ["x", "y"] }""".parseJson.convertTo[Test](jf2)
 res3: Test = Test(3,List(x, y),0.0)
@@ -1158,26 +1158,26 @@ import spray.json._
 scala> import spray.json.DefaultJsonProtocol._
 import spray.json.DefaultJsonProtocol._
 
-scala> import eu.shiftforward.apso.json._
-import eu.shiftforward.apso.json._
+scala> import com.velocidi.apso.json._
+import com.velocidi.apso.json._
 
-scala> import eu.shiftforward.apso.json.JsonHMap._
-import eu.shiftforward.apso.json.JsonHMap._
+scala> import com.velocidi.apso.json.JsonHMap._
+import com.velocidi.apso.json.JsonHMap._
 
-scala> import eu.shiftforward.apso.collection._
-import eu.shiftforward.apso.collection._
+scala> import com.velocidi.apso.collection._
+import com.velocidi.apso.collection._
 
 scala> implicit val reg = new JsonKeyRegistry {}
-reg: eu.shiftforward.apso.json.JsonKeyRegistry = $anon$1@4213d40
+reg: com.velocidi.apso.json.JsonKeyRegistry = $anon$1@4213d40
 
 scala> val Key1 = new JsonHMapKey[Int]('key1) {}
-Key1: eu.shiftforward.apso.json.JsonHMapKey[Int] = 'key1
+Key1: com.velocidi.apso.json.JsonHMapKey[Int] = 'key1
 
 scala> val Key2 = new JsonHMapKey[String]('key2) {}
-Key2: eu.shiftforward.apso.json.JsonHMapKey[String] = 'key2
+Key2: com.velocidi.apso.json.JsonHMapKey[String] = 'key2
 
 scala> val Key3 = new JsonHMapKey[List[Boolean]]('key3) {}
-Key3: eu.shiftforward.apso.json.JsonHMapKey[List[Boolean]] = 'key3
+Key3: com.velocidi.apso.json.JsonHMapKey[List[Boolean]] = 'key3
 
 scala> val json =
          """
@@ -1195,7 +1195,7 @@ json: String =
 }"
 
 scala> val map = json.asJson.convertTo[JsonHMap]
-map: eu.shiftforward.apso.json.JsonHMap.JsonHMap = HMap(('key3,List(false, true)), ('key2,s), ('key1,4))
+map: com.velocidi.apso.json.JsonHMap.JsonHMap = HMap(('key3,List(false, true)), ('key2,s), ('key1,4))
 ```
 
 ## Profiling
@@ -1215,8 +1215,8 @@ The `SimpleJmx` trait allows mixing in a simple JMX server. The JMX server is co
 The `scalaz` package provides implicit methods to convert between Scala's `Try` and Scalaz's `Validation`. See the following for a sample usage:
 
 ```scala
-scala> import eu.shiftforward.apso.scalaz.Implicits._
-import eu.shiftforward.apso.scalaz.Implicits._
+scala> import com.velocidi.apso.scalaz.Implicits._
+import com.velocidi.apso.scalaz.Implicits._
 
 scala> import scala.util._
 import scala.util._
@@ -1253,26 +1253,26 @@ The `ProxySupport` traits adds helper methods to proxy requests to a given uri, 
 
 ## Time
 
-The `eu.shiftforward.apso.time` package provides utilities to work with `DateTime` and `LocalDate`. It mainly adds support for better working with intervals. See the following sample usage:
+The `com.velocidi.apso.time` package provides utilities to work with `DateTime` and `LocalDate`. It mainly adds support for better working with intervals. See the following sample usage:
 
 ```scala
 scala> import com.github.nscala_time.time.Imports._
 import com.github.nscala_time.time.Imports._
 
-scala> import eu.shiftforward.apso.time._
-import eu.shiftforward.apso.time._
+scala> import com.velocidi.apso.time._
+import com.velocidi.apso.time._
 
-scala> import eu.shiftforward.apso.time.Implicits._
-import eu.shiftforward.apso.time.Implicits._
+scala> import com.velocidi.apso.time.Implicits._
+import com.velocidi.apso.time.Implicits._
 
 scala> (new DateTime("2012-01-01") to new DateTime("2012-01-01")).toList
 res0: List[com.github.nscala_time.time.Imports.DateTime] = List(2012-01-01T00:00:00.000Z)
 
 scala> (new DateTime("2012-02-01") until new DateTime("2012-03-01") by 1.day)
-res1: eu.shiftforward.apso.time.IterableInterval = SteppedInterval(2012-02-01T00:00:00.000Z, 2012-02-02T00:00:00.000Z, 2012-02-03T00:00:00.000Z, 2012-02-04T00:00:00.000Z, 2012-02-05T00:00:00.000Z, 2012-02-06T00:00:00.000Z, 2012-02-07T00:00:00.000Z, 2012-02-08T00:00:00.000Z, 2012-02-09T00:00:00.000Z, 2012-02-10T00:00:00.000Z, 2012-02-11T00:00:00.000Z, 2012-02-12T00:00:00.000Z, 2012-02-13T00:00:00.000Z, 2012-02-14T00:00:00.000Z, 2012-02-15T00:00:00.000Z, 2012-02-16T00:00:00.000Z, 2012-02-17T00:00:00.000Z, 2012-02-18T00:00:00.000Z, 2012-02-19T00:00:00.000Z, 2012-02-20T00:00:00.000Z, 2012-02-21T00:00:00.000Z, 2012-02-22T00:00:00.000Z, 2012-02-23T00:00:00.000Z, 2012-02-24T00:00:00.000Z, 2012-02-25T00:00:00.000Z, 2012-02-26T00:00:00.000Z, 2012-02-27T00:00:00.000Z, 2012-02-28T00:00:00.000Z, 20...
+res1: com.velocidi.apso.time.IterableInterval = SteppedInterval(2012-02-01T00:00:00.000Z, 2012-02-02T00:00:00.000Z, 2012-02-03T00:00:00.000Z, 2012-02-04T00:00:00.000Z, 2012-02-05T00:00:00.000Z, 2012-02-06T00:00:00.000Z, 2012-02-07T00:00:00.000Z, 2012-02-08T00:00:00.000Z, 2012-02-09T00:00:00.000Z, 2012-02-10T00:00:00.000Z, 2012-02-11T00:00:00.000Z, 2012-02-12T00:00:00.000Z, 2012-02-13T00:00:00.000Z, 2012-02-14T00:00:00.000Z, 2012-02-15T00:00:00.000Z, 2012-02-16T00:00:00.000Z, 2012-02-17T00:00:00.000Z, 2012-02-18T00:00:00.000Z, 2012-02-19T00:00:00.000Z, 2012-02-20T00:00:00.000Z, 2012-02-21T00:00:00.000Z, 2012-02-22T00:00:00.000Z, 2012-02-23T00:00:00.000Z, 2012-02-24T00:00:00.000Z, 2012-02-25T00:00:00.000Z, 2012-02-26T00:00:00.000Z, 2012-02-27T00:00:00.000Z, 2012-02-28T00:00:00.000Z, 20...
 
 scala> (new DateTime("2012-01-01") until new DateTime("2012-02-01") by 2.minutes)
-res2: eu.shiftforward.apso.time.IterableInterval = SteppedInterval(2012-01-01T00:00:00.000Z, 2012-01-01T00:02:00.000Z, 2012-01-01T00:04:00.000Z, 2012-01-01T00:06:00.000Z, 2012-01-01T00:08:00.000Z, 2012-01-01T00:10:00.000Z, 2012-01-01T00:12:00.000Z, 2012-01-01T00:14:00.000Z, 2012-01-01T00:16:00.000Z, 2012-01-01T00:18:00.000Z, 2012-01-01T00:20:00.000Z, 2012-01-01T00:22:00.000Z, 2012-01-01T00:24:00.000Z, 2012-01-01T00:26:00.000Z, 2012-01-01T00:28:00.000Z, 2012-01-01T00:30:00.000Z, 2012-01-01T00:32:00.000Z, 2012-01-01T00:34:00.000Z, 2012-01-01T00:36:00.000Z, 2012-01-01T00:38:00.000Z, 2012-01-01T00:40:00.000Z, 2012-01-01T00:42:00.000Z, 2012-01-01T00:44:00.000Z, 2012-01-01T00:46:00.000Z, 2012-01-01T00:48:00.000Z, 2012-01-01T00:50:00.000Z, 2012-01-01T00:52:00.000Z, 2012-01-01T00:54:00.000Z, 20...
+res2: com.velocidi.apso.time.IterableInterval = SteppedInterval(2012-01-01T00:00:00.000Z, 2012-01-01T00:02:00.000Z, 2012-01-01T00:04:00.000Z, 2012-01-01T00:06:00.000Z, 2012-01-01T00:08:00.000Z, 2012-01-01T00:10:00.000Z, 2012-01-01T00:12:00.000Z, 2012-01-01T00:14:00.000Z, 2012-01-01T00:16:00.000Z, 2012-01-01T00:18:00.000Z, 2012-01-01T00:20:00.000Z, 2012-01-01T00:22:00.000Z, 2012-01-01T00:24:00.000Z, 2012-01-01T00:26:00.000Z, 2012-01-01T00:28:00.000Z, 2012-01-01T00:30:00.000Z, 2012-01-01T00:32:00.000Z, 2012-01-01T00:34:00.000Z, 2012-01-01T00:36:00.000Z, 2012-01-01T00:38:00.000Z, 2012-01-01T00:40:00.000Z, 2012-01-01T00:42:00.000Z, 2012-01-01T00:44:00.000Z, 2012-01-01T00:46:00.000Z, 2012-01-01T00:48:00.000Z, 2012-01-01T00:50:00.000Z, 2012-01-01T00:52:00.000Z, 2012-01-01T00:54:00.000Z, 20...
 ```
 
 ## TestKit
