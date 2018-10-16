@@ -28,6 +28,8 @@ lazy val core = project.in(file("core"))
       "com.typesafe.akka"                         %% "akka-stream"                    % "2.5.14"         % "provided",
       "commons-codec"                              % "commons-codec"                  % "1.11",
       "io.circe"                                  %% "circe-core"                     % "0.9.3",
+      "io.circe"                                  %% "circe-generic"                  % "0.9.3",
+      "io.circe"                                  %% "circe-literal"                  % "0.9.3",
       "io.circe"                                  %% "circe-parser"                   % "0.9.3",
       "io.github.andrebeat"                       %% "scala-pool"                     % "0.4.1",
       "io.spray"                                  %% "spray-json"                     % "1.3.4",

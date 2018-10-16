@@ -2,6 +2,8 @@ package com.velocidi.apso.json
 
 import io.circe.Json
 import org.specs2.mutable._
+import io.circe.generic.semiauto._
+import io.circe.literal._
 import io.circe.syntax._
 import io.circe.parser._
 import spray.json.DefaultJsonProtocol._
@@ -156,11 +158,26 @@ class ImplicitsSpec extends Specification {
     }
 
     "provide a method to delete a field from a JSON object" in {
-      val obj = parse("""{"a":"abc","b":{"c":2},"d":null}""").fold(throw _, identity)
+      val obj = json"""{"a":"abc","b":{"c":2},"d":null}"""
 
-      obj.deleteField("b.c") must beEqualTo(parse("""{"a":"abc","b":{},"d":null}""").fold(throw _, identity))
-      obj.deleteField("a") must beEqualTo(parse("""{"b":{"c":2},"d":null}""").fold(throw _, identity))
+      obj.deleteField("b.c") must beEqualTo(json"""{"a":"abc","b":{},"d":null}""")
+      obj.deleteField("a") must beEqualTo(json"""{"b":{"c":2},"d":null}""")
       obj.deleteField("") must throwAn[IllegalArgumentException]
+    }
+
+    "provide extension methods for encoders" in {
+      case class Foo(a: Int, b: Option[String])
+      "which removes null values" in {
+        val encoderWithouNulls = deriveEncoder[Foo].withoutNulls
+
+        Foo(1, None).asJson(encoderWithouNulls) mustEqual json"""{ "a": 1 }"""
+      }
+
+      "which add fields" in {
+        val encoderWithExtraField = deriveEncoder[Foo].withExtraField("c", 2.asJson)
+
+        Foo(1, Some("x")).asJson(encoderWithExtraField) mustEqual json"""{ "a": 1, "b": "x", "c": 2 }"""
+      }
     }
   }
 }

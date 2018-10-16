@@ -220,4 +220,21 @@ object Implicits {
         createJson(path.split(separatorRegex).toList, value).deepMerge(fromCirceFullPaths(rem, separatorRegex))
     }
   }
+
+  final implicit class ApsoJsonEncoder[A](val encoder: Encoder[A]) extends AnyVal {
+    /**
+     * Returns an encoder that removes the json fields that are null.
+     * @return encoder that filters null fields.
+     */
+    def withoutNulls: Encoder[A] = encoder.mapJson(_.mapObject(_.filter(!_._2.isNull)))
+
+    /**
+     * Returns an encoder that adds an element to the root of the json object.
+     *
+     * @param key the key of the element
+     * @param value the value of the element
+     * @return encoder that adds element to the json
+     */
+    def withExtraField(key: String, value: Json): Encoder[A] = encoder.mapJson(_.mapObject(_.add(key, value)))
+  }
 }
