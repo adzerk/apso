@@ -61,11 +61,11 @@ trait ExtraTimeJsonProtocol {
   implicit val finiteDurationDecoder: Decoder[FiniteDuration] =
     Decoder[Long].emapTry(v => tryToParseDuration(v.toString)) or
       Decoder[String].emapTry(v => tryToParseDuration(v)) or
-      Decoder.forProduct1[Long, FiniteDuration]("milliseconds")(_.millis) or
-      Decoder.forProduct1[Long, FiniteDuration]("seconds")(_.seconds) or
-      Decoder.forProduct1[Long, FiniteDuration]("minutes")(_.minutes) or
-      Decoder.forProduct1[Long, FiniteDuration]("hours")(_.hours) or
-      Decoder.forProduct1[Long, FiniteDuration]("days")(_.days)
+      Decoder.forProduct1[FiniteDuration, Long]("milliseconds")(_.millis) or
+      Decoder.forProduct1[FiniteDuration, Long]("seconds")(_.seconds) or
+      Decoder.forProduct1[FiniteDuration, Long]("minutes")(_.minutes) or
+      Decoder.forProduct1[FiniteDuration, Long]("hours")(_.hours) or
+      Decoder.forProduct1[FiniteDuration, Long]("days")(_.days)
 
   implicit object IntervalJsonFormat extends JsonFormat[Interval] {
     def write(i: Interval): JsValue =
@@ -88,7 +88,7 @@ trait ExtraTimeJsonProtocol {
   implicit val intervalEncoder: Encoder[Interval] =
     Encoder.forProduct2("startMillis", "endMillis")(int => (int.getStartMillis, int.getEndMillis))
   implicit val intervalDecoder: Decoder[Interval] =
-    Decoder.forProduct2[Long, Long, Interval]("startMillis", "endMillis")(new Interval(_, _))
+    Decoder.forProduct2[Interval, Long, Long]("startMillis", "endMillis")(new Interval(_, _))
 
   implicit object PeriodJsonFormat extends JsonFormat[Period] {
     def write(p: Period): JsValue = p.toString.toJson
