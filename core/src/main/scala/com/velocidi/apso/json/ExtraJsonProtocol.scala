@@ -7,6 +7,7 @@ import scala.util.{ Failure, Success, Try }
 
 import com.typesafe.config.{ Config, ConfigFactory, ConfigRenderOptions }
 import io.circe._
+import io.circe.generic.semiauto.{ deriveDecoder, deriveEncoder }
 import io.circe.parser._
 import org.joda.time.{ DateTime, Interval, LocalDate, Period }
 import spray.json.DefaultJsonProtocol._
@@ -189,4 +190,29 @@ trait ExtraMiscJsonProtocol {
       }
     }
   }
+
+  /**
+   * Serializes a map as an array of key-value objects.
+   *
+   * @tparam K the type of the keys of the map
+   * @tparam V the types of the value of the map
+   * @return an instance of `Encoder` for the map
+   */
+  def mapJsonArrayEncoder[K: Encoder, V: Encoder]: Encoder[Map[K, V]] =
+    Encoder[List[MapEntry[K, V]]].contramap(_.toList.map { case (k, v) => MapEntry(k, v) })
+
+  /**
+   * Deserializes a map from array of key-value objects.
+   *
+   * @tparam K the type of the keys of the map
+   * @tparam V the types of the value of the map
+   * @return an instance of `Decoder` for the map
+   */
+  def mapJsonArrayDecoder[K: Decoder, V: Decoder]: Decoder[Map[K, V]] =
+    Decoder[List[MapEntry[K, V]]].map(_.flatMap(me => Some(me.key, me.value)).toMap)
+
+  private case class MapEntry[K, V](key: K, value: V)
+  private implicit def mapEntryEncoder[K: Encoder, V: Encoder]: Encoder[MapEntry[K, V]] = deriveEncoder[MapEntry[K, V]]
+  private implicit def mapEntryDecoder[K: Decoder, V: Decoder]: Decoder[MapEntry[K, V]] =
+    deriveDecoder[MapEntry[K, V]].validate(_.keys.map(k => k.exists(_ == "key") && k.exists(_ == "value")).get, "Expected a json object with 'key' and 'value' as keys")
 }
