@@ -170,10 +170,10 @@ case class SftpFileDescriptor(
   }
 
   def stream(offset: Long = 0L) = new InputStream {
-    private[this] val sftpLease = sftpClient()
-    private[this] val sftp = sftpLease.get()
-    private[this] val remoteFile = sftp.open(path)
-    private[this] val inner = new remoteFile.RemoteFileInputStream()
+    private[this] lazy val sftpLease = sftpClient()
+    private[this] lazy val sftp = sftpLease.get()
+    private[this] lazy val remoteFile = sftp.open(path)
+    private[this] lazy val inner = new remoteFile.RemoteFileInputStream()
     if (offset > 0) inner.skip(offset)
 
     def read() = inner.read()
