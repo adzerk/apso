@@ -213,6 +213,9 @@ object SftpFileDescriptor {
   private[this] val maxConnections = fdConf.getInt("apso.io.file-descriptor.sftp.max-connections-per-host")
   private[this] val maxIdleTime = Duration.fromNanos(
     fdConf.getDuration("apso.io.file-descriptor.sftp.max-idle-time").toNanos)
+  private[this] val leaseAcquireMaxDuration = Duration.fromNanos(
+    fdConf.getDuration("apso.io.file-descriptor.sftp.max-lease-acquire-duration").toNanos)
+  )
 
   private[this] val connectionPools = new ConcurrentHashMap[String, Pool[SftpClient]]()
 
@@ -284,9 +287,9 @@ object SftpFileDescriptor {
       } else p
     }
 
-    pool.tryAcquire(10.seconds) match {
+    pool.tryAcquire(leaseAcquireMaxDuration) match {
       case Some(lease) => lease
-      case None => throw new TimeoutException("Failed to acquire a SFTP client within 10 seconds.")
+      case None => throw new TimeoutException(s"Failed to acquire a SFTP client within ${leaseAcquireMaxDuration}.")
     }
   }
 
