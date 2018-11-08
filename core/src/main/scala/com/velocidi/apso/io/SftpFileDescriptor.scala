@@ -1,14 +1,14 @@
 package com.velocidi.apso.io
 
 import java.io._
-import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.{ ConcurrentHashMap, TimeoutException }
 
 import scala.collection.JavaConverters._
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration._
 import scala.util.{ Properties, Try }
 
 import com.typesafe.config.ConfigFactory
-import io.github.andrebeat.pool.Pool
+import io.github.andrebeat.pool.{ Lease, Pool }
 import net.schmizz.sshj._
 import net.schmizz.sshj.common.SSHException
 import net.schmizz.sshj.sftp._
@@ -265,7 +265,7 @@ object SftpFileDescriptor {
     port: Int,
     username: String,
     password: Option[String],
-    identity: Option[Identity]) = {
+    identity: Option[Identity]): Lease[SftpClient] = {
 
     val pool = {
       val p = connectionPools.get(host)
@@ -284,7 +284,10 @@ object SftpFileDescriptor {
       } else p
     }
 
-    pool.acquire()
+    pool.tryAcquire(10.seconds) match {
+      case Some(lease) => lease
+      case None => throw new TimeoutException("Failed to acquire a SFTP client within 10 seconds.")
+    }
   }
 
   type Identity = (File, Option[String]) // (key, passphrase)
