@@ -215,7 +215,6 @@ object SftpFileDescriptor {
     fdConf.getDuration("apso.io.file-descriptor.sftp.max-idle-time").toNanos)
   private[this] val leaseAcquireMaxDuration = Duration.fromNanos(
     fdConf.getDuration("apso.io.file-descriptor.sftp.max-lease-acquire-duration").toNanos)
-  )
 
   private[this] val connectionPools = new ConcurrentHashMap[String, Pool[SftpClient]]()
 
