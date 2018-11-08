@@ -214,5 +214,5 @@ trait ExtraMiscJsonProtocol {
   private case class MapEntry[K, V](key: K, value: V)
   private implicit def mapEntryEncoder[K: Encoder, V: Encoder]: Encoder[MapEntry[K, V]] = deriveEncoder[MapEntry[K, V]]
   private implicit def mapEntryDecoder[K: Decoder, V: Decoder]: Decoder[MapEntry[K, V]] =
-    deriveDecoder[MapEntry[K, V]].validate(_.keys.map(k => k.exists(_ == "key") && k.exists(_ == "value")).get, "Expected a json object with 'key' and 'value' as keys")
+    deriveDecoder[MapEntry[K, V]].validate(_.keys.exists(k => k.exists(_ == "key") && k.exists(_ == "value")), "Expected a json object with 'key' and 'value' as keys")
 }
