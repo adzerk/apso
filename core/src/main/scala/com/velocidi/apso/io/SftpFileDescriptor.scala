@@ -1,14 +1,14 @@
 package com.velocidi.apso.io
 
 import java.io._
-import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.{ ConcurrentHashMap, TimeoutException }
 
 import scala.collection.JavaConverters._
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration._
 import scala.util.{ Properties, Try }
 
 import com.typesafe.config.ConfigFactory
-import io.github.andrebeat.pool.Pool
+import io.github.andrebeat.pool.{ Lease, Pool }
 import net.schmizz.sshj._
 import net.schmizz.sshj.common.SSHException
 import net.schmizz.sshj.sftp._
@@ -170,10 +170,10 @@ case class SftpFileDescriptor(
   }
 
   def stream(offset: Long = 0L) = new InputStream {
-    private[this] val sftpLease = sftpClient()
-    private[this] val sftp = sftpLease.get()
-    private[this] val remoteFile = sftp.open(path)
-    private[this] val inner = new remoteFile.RemoteFileInputStream()
+    private[this] lazy val sftpLease = sftpClient()
+    private[this] lazy val sftp = sftpLease.get()
+    private[this] lazy val remoteFile = sftp.open(path)
+    private[this] lazy val inner = new remoteFile.RemoteFileInputStream()
     if (offset > 0) inner.skip(offset)
 
     def read() = inner.read()
@@ -213,6 +213,8 @@ object SftpFileDescriptor {
   private[this] val maxConnections = fdConf.getInt("apso.io.file-descriptor.sftp.max-connections-per-host")
   private[this] val maxIdleTime = Duration.fromNanos(
     fdConf.getDuration("apso.io.file-descriptor.sftp.max-idle-time").toNanos)
+  private[this] val leaseAcquireMaxDuration = Duration.fromNanos(
+    fdConf.getDuration("apso.io.file-descriptor.sftp.max-lease-acquire-duration").toNanos)
 
   private[this] val connectionPools = new ConcurrentHashMap[String, Pool[SftpClient]]()
 
@@ -265,7 +267,7 @@ object SftpFileDescriptor {
     port: Int,
     username: String,
     password: Option[String],
-    identity: Option[Identity]) = {
+    identity: Option[Identity]): Lease[SftpClient] = {
 
     val pool = {
       val p = connectionPools.get(host)
@@ -284,7 +286,10 @@ object SftpFileDescriptor {
       } else p
     }
 
-    pool.acquire()
+    pool.tryAcquire(leaseAcquireMaxDuration) match {
+      case Some(lease) => lease
+      case None => throw new TimeoutException(s"Failed to acquire a SFTP client within ${leaseAcquireMaxDuration}.")
+    }
   }
 
   type Identity = (File, Option[String]) // (key, passphrase)
