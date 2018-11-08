@@ -204,5 +204,19 @@ class ExtraJsonProtocolSpec extends Specification {
       """[{"invalid":1,"value":"one"}]""".parseJson.convertTo[Map[Option[Int], String]] must throwA[DeserializationException]
       """[{"key":1,"invalid":"one"}]""".parseJson.convertTo[Map[Option[Int], String]] must throwA[DeserializationException]
     }
+
+    "provide an Encoder and Decoder for a Map as an array of json objects" in {
+      implicit val mapEncoder: Encoder[Map[Option[Int], String]] = mapJsonArrayEncoder[Option[Int], String]
+      implicit val mapDecoder: Decoder[Map[Option[Int], String]] = mapJsonArrayDecoder[Option[Int], String]
+
+      val map = Map(None -> "none", Some(1) -> "one", Some(2) -> "two")
+      val mapJson = json"""[{"key":null,"value":"none"},{"key":1,"value":"one"},{"key":2,"value":"two"}]"""
+
+      map.asJson mustEqual mapJson
+      mapJson.as[Map[Option[Int], String]] must beRight(map)
+      json"""{"key":1,"value":"one"}""".as[Map[Option[Int], String]] must beLeft
+      json"""[{"invalid":1,"value":"one"}]""".as[Map[Option[Int], String]] must beLeft
+      json"""[{"key":1,"invalid":"one"}]""".as[Map[Option[Int], String]] must beLeft
+    }
   }
 }

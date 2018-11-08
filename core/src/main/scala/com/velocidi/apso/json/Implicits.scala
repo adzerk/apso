@@ -223,7 +223,7 @@ object Implicits {
 
   final implicit class ApsoJsonEncoder[A](val encoder: Encoder[A]) extends AnyVal {
     /**
-     * Returns an encoder that removes the json fields that are null.
+     * Returns an encoder that removes the json fields that are null, applied on the root of the json.
      * @return encoder that filters null fields.
      */
     def withoutNulls: Encoder[A] = encoder.mapJson(_.mapObject(_.filter(!_._2.isNull)))
