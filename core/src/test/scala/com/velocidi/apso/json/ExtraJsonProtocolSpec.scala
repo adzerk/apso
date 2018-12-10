@@ -13,6 +13,7 @@ import org.joda.time.{ DateTime, Interval, LocalDate, Period }
 import org.specs2.mutable.Specification
 import spray.json.DefaultJsonProtocol._
 import spray.json._
+import squants.market._
 
 class ExtraJsonProtocolSpec extends Specification {
 
@@ -190,6 +191,16 @@ class ExtraJsonProtocolSpec extends Specification {
       localDate.asJson.pretty(Printer.noSpaces) mustEqual localDateJsonString
       decode[LocalDate](localDateJsonString) must beRight(localDate)
       decode[LocalDate]("true") must beLeft
+    }
+
+    "provide an Encoder and Decoder for Currency" in {
+      implicit val moneyContext: MoneyContext = MoneyContext(EUR, defaultCurrencySet, Nil)
+      val currency: Currency = USD
+      val currencyString = """"USD""""
+
+      currency.asJson.noSpaces mustEqual currencyString
+      decode[Currency](currencyString) must beRight(currency)
+      decode[Currency]("EU") must beLeft
     }
 
     "provide a JsonFormat for a Map as a JsArray of json objects" in {
