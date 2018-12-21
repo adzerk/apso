@@ -2,12 +2,12 @@ package com.velocidi.apso.currencies
 
 import java.io.{ File, PrintWriter }
 
-import net.ruippeixotog.akka.testkit.specs2.mutable.AkkaSpecification
+import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 
 import com.velocidi.apso.io.LocalFileDescriptor
 
-class CurrencyRateSpec extends AkkaSpecification {
+class CurrencyRateSpec extends Specification {
 
   trait MockData extends Scope {
     def payload: String

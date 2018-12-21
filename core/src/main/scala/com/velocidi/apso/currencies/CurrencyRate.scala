@@ -1,9 +1,9 @@
 package com.velocidi.apso.currencies
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{ Failure, Success, Try }
 
-import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
-import io.circe.{Decoder, Encoder, parser}
+import io.circe.generic.semiauto.{ deriveDecoder, deriveEncoder }
+import io.circe.{ Decoder, Encoder, parser }
 
 import com.velocidi.apso.io.FileDescriptor
 

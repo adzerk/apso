@@ -1,11 +1,11 @@
 package com.velocidi.apso.currencies
 
-import net.ruippeixotog.akka.testkit.specs2.mutable.AkkaSpecification
+import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import squants.market._
 
 // TODO: this won't be necessary when https://github.com/typelevel/squants/pull/330 is accepted and released
-class SquantsImplicitsSpec extends AkkaSpecification {
+class SquantsImplicitsSpec extends Specification {
   val defaultCtx = MoneyContext(EUR, defaultCurrencySet, Nil)
 
   trait MockData extends Scope with SquantsImplicitConversions
