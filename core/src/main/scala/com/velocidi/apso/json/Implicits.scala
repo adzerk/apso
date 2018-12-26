@@ -159,7 +159,7 @@ object Implicits {
     def deleteField(fieldPath: String, separator: Char = '.'): Json = {
       require(fieldPath.nonEmpty, "The field path must have value.")
 
-      getCursor(fieldPath, separator).delete.top.get
+      getCursor(fieldPath, separator).delete.top.getOrElse(json)
     }
 
     /**

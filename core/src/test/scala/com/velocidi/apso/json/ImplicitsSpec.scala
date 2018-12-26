@@ -158,6 +158,8 @@ class ImplicitsSpec extends Specification {
 
       obj.deleteField("b.c") must beEqualTo(json"""{"a":"abc","b":{},"d":null}""")
       obj.deleteField("a") must beEqualTo(json"""{"b":{"c":2},"d":null}""")
+      obj.deleteField("e") must beEqualTo(obj)
+      obj.deleteField("b.c.d") must beEqualTo(obj)
       obj.deleteField("") must throwAn[IllegalArgumentException]
     }
 
