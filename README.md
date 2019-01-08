@@ -854,6 +854,8 @@ scala> W.head("http://www.google.com/").getStatusCode
 res4: Int = 302
 ```
 
+The POST and PUT methods can also receive the body as `JSON` (of [circe](https://github.com/circe/circe)), which adds the `Content-type` header accordingly.
+
 ## IO
 
 Apso provides methods to deal with IO-related features in the `io` package.

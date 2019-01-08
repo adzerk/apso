@@ -4,6 +4,7 @@ import scala.concurrent.duration._
 
 import com.mashape.unirest.http.{ HttpResponse, Unirest }
 import com.mashape.unirest.request.{ HttpRequest, HttpRequestWithBody }
+import io.circe.Json
 import org.apache.http.client.config.{ CookieSpecs, RequestConfig }
 import org.apache.http.impl.client.DefaultRedirectStrategy
 import org.apache.http.impl.nio.client.HttpAsyncClients
@@ -80,4 +81,16 @@ object W {
 
   def head(req: String, headers: Map[String, Seq[String]] = Map())(implicit timeout: Timeout = defaultTimeout): HttpResponse[String] =
     Unirest.head(req).headers(headers).exec(timeout.duration)
+
+  def post(req: String, body: Json)(implicit timeout: Timeout): HttpResponse[String] =
+    post(req, body.noSpaces, Map("Content-Type" -> Seq("application/json")))
+
+  def put(req: String, body: Json)(implicit timeout: Timeout): HttpResponse[String] =
+    put(req, body.noSpaces, Map("Content-Type" -> Seq("application/json")))
+
+  def post(req: String, body: Json, headers: Map[String, Seq[String]])(implicit timeout: Timeout): HttpResponse[String] =
+    post(req, body.noSpaces, headers.updated("Content-Type", Seq("application/json")))
+
+  def put(req: String, body: Json, headers: Map[String, Seq[String]])(implicit timeout: Timeout): HttpResponse[String] =
+    put(req, body.noSpaces, headers.updated("Content-Type", Seq("application/json")))
 }
