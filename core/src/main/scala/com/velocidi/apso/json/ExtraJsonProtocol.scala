@@ -9,7 +9,8 @@ import com.typesafe.config.{ Config, ConfigFactory, ConfigRenderOptions }
 import io.circe._
 import io.circe.generic.semiauto.{ deriveDecoder, deriveEncoder }
 import io.circe.parser._
-import org.joda.time.{ DateTime, Interval, LocalDate, Period }
+import org.joda.time.format.ISODateTimeFormat
+import org.joda.time.{ Duration => _, _ }
 import spray.json.DefaultJsonProtocol._
 import spray.json._
 import squants.market.{ Currency, MoneyContext }
@@ -144,7 +145,9 @@ trait ExtraMiscJsonProtocol {
     Decoder[Json].emapTry(json => Try(ConfigFactory.parseString(json.toString)))
 
   implicit object DateTimeFormat extends JsonFormat[DateTime] {
-    override def write(date: DateTime): JsValue = JsString(date.toString)
+    private val printer = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC)
+
+    override def write(date: DateTime): JsValue = JsString(printer.print(date))
 
     override def read(json: JsValue): DateTime = json match {
       case JsString(date) => new DateTime(date)
@@ -153,8 +156,12 @@ trait ExtraMiscJsonProtocol {
     }
   }
 
-  implicit val dateTimeEncoder: Encoder[DateTime] =
-    Encoder[String].contramap(_.toString)
+  implicit val dateTimeEncoder: Encoder[DateTime] = new Encoder[DateTime] {
+    private val stringEncoder = Encoder[String]
+    private val printer = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC)
+
+    def apply(a: DateTime): Json = stringEncoder.apply(printer.print(a))
+  }
   implicit val dateTimeDecoder: Decoder[DateTime] =
     Decoder[String].emapTry(v => Try(new DateTime(v)))
 
