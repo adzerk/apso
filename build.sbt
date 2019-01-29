@@ -21,7 +21,7 @@ lazy val core = project.in(file("core"))
       "com.j256.simplejmx"                         % "simplejmx"                      % "1.15",
       "com.jcraft"                                 % "jzlib"                          % "1.1.3",
       "com.mashape.unirest"                        % "unirest-java"                   % "1.4.9",
-      "com.twmacinta"                              % "fast-md5"                       % "2.7.1",
+      "com.joyent.util"                            % "fast-md5"                       % "2.7.1",
       "com.typesafe"                               % "config"                         % "1.3.3"          % "provided",
       "com.typesafe.akka"                         %% "akka-actor"                     % "2.5.18"         % "provided",
       "com.typesafe.akka"                         %% "akka-http"                      % "10.1.5"         % "provided",
