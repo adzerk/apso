@@ -70,7 +70,7 @@ class ExtraJsonProtocolSpec extends Specification {
       val interval = new Interval(1000, 2000)
       val intervalJsonString = """{"startMillis":1000,"endMillis":2000}"""
 
-      interval.toJson.compactPrint mustEqual intervalJsonString
+      interval.toJson mustEqual intervalJsonString.parseJson
       intervalJsonString.parseJson.convertTo[Interval] mustEqual interval
       """{"invalidObject":true}""".parseJson.convertTo[Interval] must throwA[DeserializationException]
     }

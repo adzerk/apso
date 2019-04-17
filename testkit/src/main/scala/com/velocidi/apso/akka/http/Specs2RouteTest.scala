@@ -1,6 +1,6 @@
 package com.velocidi.apso.akka.http
 
-import _root_.akka.http.scaladsl.testkit.{ RouteTest, TestFrameworkInterface }
+import akka.http.scaladsl.testkit.{ RouteTest, TestFrameworkInterface }
 import org.specs2.execute.{ Failure, FailureException }
 
 // until akka-http gets support
