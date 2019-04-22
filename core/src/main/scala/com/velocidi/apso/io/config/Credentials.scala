@@ -14,7 +14,7 @@ object Credentials {
   case class S3(default: Option[S3.Entry] = None, ids: Map[String, S3.Entry] = Map()) extends Protocol[S3.Entry]
 
   object S3 {
-    case class Entry(accessKey: String, secretKey: String)
+    case class Entry(accessKey: String, secretKey: String, roleArn: Option[String] = None)
   }
 
   case class Sftp(default: Option[Sftp.Entry] = None, ids: Map[String, Sftp.Entry] = Map()) extends Protocol[Sftp.Entry]

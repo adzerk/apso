@@ -1,9 +1,6 @@
 package com.velocidi.apso.aws
 
-import java.util.UUID
-
 import com.amazonaws.auth._
-import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder
 import com.typesafe.config.{ Config, ConfigFactory }
 
 /**
@@ -19,14 +16,10 @@ case class ConfigCredentialsProvider(
     roleArnPath: String = "aws.role-arn")
   extends AWSCredentialsProvider {
 
-  lazy val basicCredentialsProvider =
-    BasicAWSCredentialsProvider(config.getString(accessKeyPath), config.getString(secretKeyPath))
-  lazy val provider: AWSCredentialsProvider = if (config.hasPath(roleArnPath))
-    new STSAssumeRoleSessionCredentialsProvider.Builder(config.getString(roleArnPath), UUID.randomUUID().toString)
-      .withStsClient(AWSSecurityTokenServiceClientBuilder.standard().withCredentials(basicCredentialsProvider).build())
-      .build()
-  else
-    basicCredentialsProvider
+  lazy val provider = SerializableAWSCredentialsProvider(
+    config.getString(accessKeyPath),
+    config.getString(secretKeyPath),
+    if (config.hasPath(roleArnPath)) Some(config.getString(roleArnPath)) else None)
 
   def getCredentials: AWSCredentials =
     provider.getCredentials()

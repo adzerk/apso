@@ -4,11 +4,10 @@ import java.io.InputStream
 
 import scala.collection.concurrent.TrieMap
 
-import com.amazonaws.auth.{ AWSStaticCredentialsProvider, BasicAWSCredentials }
 import com.amazonaws.services.s3.model.S3ObjectSummary
 
 import com.velocidi.apso.Logging
-import com.velocidi.apso.aws.{ S3Bucket, SerializableAWSCredentials }
+import com.velocidi.apso.aws.{ S3Bucket, SerializableAWSCredentialsProvider }
 
 case class S3FileDescriptor(
     bucket: S3Bucket,
@@ -150,34 +149,24 @@ object S3FileDescriptor {
   /**
    * Creates an S3FileDescriptor from a path string extracting the bucket and the path
    * @param path the uri without the protocol, containing the bucket and path
-   * @param credentials credentials for accessing the s3 bucket
+   * @param credentialsProvider serializable credentials provider for accessing the s3 bucket
    * @return a s3 file descriptor
    */
-  def apply(path: String, credentials: BasicAWSCredentials): S3FileDescriptor = {
-    apply(path, Some(SerializableAWSCredentials(credentials)))
+  def apply(path: String, credentialsProvider: SerializableAWSCredentialsProvider): S3FileDescriptor = {
+    apply(path, Some(credentialsProvider))
   }
 
   /**
    * Creates an S3FileDescriptor from a path string extracting the bucket and the path
    * @param path the uri without the protocol, containing the bucket and path
-   * @param credentials serializable credentials for accessing the s3 bucket
+   * @param credentialsProvider optional credentials provider for accessing the s3 bucket
    * @return a s3 file descriptor
    */
-  def apply(path: String, credentials: SerializableAWSCredentials): S3FileDescriptor = {
-    apply(path, Some(credentials))
-  }
-
-  /**
-   * Creates an S3FileDescriptor from a path string extracting the bucket and the path
-   * @param path the uri without the protocol, containing the bucket and path
-   * @param credentials optional credentials for accessing the s3 bucket
-   * @return a s3 file descriptor
-   */
-  private def apply(path: String, credentials: Option[SerializableAWSCredentials]): S3FileDescriptor = {
+  private def apply(path: String, credentialsProvider: Option[SerializableAWSCredentialsProvider]): S3FileDescriptor = {
     path.split('/').toList match {
       case s3bucket :: s3path =>
-        def newBucket = credentials.fold(new S3Bucket(s3bucket)) { s3Cred =>
-          new S3Bucket(s3bucket, () => new AWSStaticCredentialsProvider(s3Cred))
+        def newBucket = credentialsProvider.fold(new S3Bucket(s3bucket)) { s3CredProvider =>
+          new S3Bucket(s3bucket, () => s3CredProvider)
         }
         val s3BucketRef = s3Buckets.getOrElseUpdate(s3bucket, newBucket)
         S3FileDescriptor(s3BucketRef, s3path.filterNot(_.trim == ""))
@@ -189,12 +178,11 @@ object S3FileDescriptor {
   /**
    * Credential extractor for a s3 bucket from the credential config
    */
-  val credentials = new FileDescriptorCredentials[config.Credentials.S3.Entry, SerializableAWSCredentials] {
+  val credentials = new FileDescriptorCredentials[config.Credentials.S3.Entry, SerializableAWSCredentialsProvider] {
     def id(path: String) = path.split("/").headOption.mkString
 
-    def createCredentials(id: String, s3Config: config.Credentials.S3.Entry) = {
-      new SerializableAWSCredentials(s3Config.accessKey, s3Config.secretKey)
-    }
+    def createCredentials(id: String, s3Config: config.Credentials.S3.Entry) =
+      SerializableAWSCredentialsProvider(s3Config.accessKey, s3Config.secretKey, s3Config.roleArn)
   }
 
   /**
