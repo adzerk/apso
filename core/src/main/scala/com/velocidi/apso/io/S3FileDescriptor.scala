@@ -111,7 +111,11 @@ case class S3FileDescriptor(
     S3FileDescriptor(bucket, elements.dropRight(1) :+ f(name))
   }
 
-  private lazy val isDirectoryRemote = bucket.isDirectory(builtPath)
+  private lazy val isDirectoryRemote = {
+    // the bucket itself is considered a directory
+    if (elements.isEmpty) true
+    else bucket.isDirectory(builtPath)
+  }
   private lazy val isBucketAndExists = elements.isEmpty && bucket.bucketExists
   private var isDirectoryLocal = false
   def isDirectory: Boolean = isDirectoryLocal || isDirectoryRemote
