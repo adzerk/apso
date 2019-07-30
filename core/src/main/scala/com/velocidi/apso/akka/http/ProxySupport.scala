@@ -34,12 +34,11 @@ trait ProxySupport extends ClientIPDirectives {
   private[this] def getHeaders(ip: Option[RemoteAddress], headers: List[HttpHeader]) = {
     // FIXME: Properly decide which headers to keep or filter out.
     //        If designing a proper transparent proxy trait, we should take care of which headers
-    //        get passed down. It may be worth looking into the RFC and even the Akka definition
-    //        of `SyntheticHeader`s.
+    //        get passed down. It may be worth looking into the RFC.
     //        - https://www.mnot.net/blog/2011/07/11/what_proxies_must_do
     //        - https://tools.ietf.org/html/draft-ietf-httpbis-p1-messaging-14#section-7.1.3
     //        - https://doc.akka.io/docs/akka-http/current/common/http-model.html
-    val hs = headers.filterNot(header => header.is("timeout-access") || header.is("remote-address"))
+    val hs = headers.filter(_.renderInRequests())
     // add `X-Forwarded-For` header
     ip.fold(hs)(addForwardedFor(_, hs))
   }
