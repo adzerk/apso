@@ -181,6 +181,15 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specs2RouteTest with A
         .flatMap(parseResult) must be_==("503").awaitFor(10.seconds)
     }
 
+    "do not send unwanted headers" in new MockServer {
+      override def serverResponse(req: HttpRequest) = HttpResponse(entity = req.headers.mkString("\n"))
+      Get("/get-path-proxied").withHeaders(Host("expecteddomain.com"), `Remote-Address`(localIp1), `Raw-Request-URI`("somedomain.com")) ~> routes ~> check {
+        responseAs[String] must not(contain("Remote-Address"))
+        responseAs[String] must not(contain("Raw-Request-URI"))
+        responseAs[String] must contain("Host: expecteddomain.com")
+      }
+    }
+
     "Modify the `X-Forwarded-For` header" in {
       trait CollectHeadersAndForwardedForMockServer extends MockServer {
         override def serverResponse(req: HttpRequest) = {
