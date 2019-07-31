@@ -181,23 +181,23 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specs2RouteTest with A
         .flatMap(parseResult) must be_==("503").awaitFor(10.seconds)
     }
 
-    "Modify the `X-Forwarded-For` header" in new MockServer {
-
-      override def serverResponse(req: HttpRequest) = {
-        val forwardedForIps = req.headers.collectFirst {
-          case `X-Forwarded-For`(ips) => ips
-        }.getOrElse(Seq.empty)
-        HttpResponse(entity = forwardedForIps.mkString(", "))
+    "Modify the `X-Forwarded-For` header" in {
+      trait CollectHeadersAndForwardedForMockServer extends MockServer {
+        override def serverResponse(req: HttpRequest) = {
+          val forwardedForIps = req.headers.collectFirst {
+            case `X-Forwarded-For`(ips) => ips
+          }.getOrElse(Seq.empty)
+          HttpResponse(entity = forwardedForIps.mkString(", "), headers = req.headers)
+        }
       }
 
-      "add `X-Forwarded-For` if request has `Remote-Address`" in {
+      "add `X-Forwarded-For` if request has `Remote-Address`" in new CollectHeadersAndForwardedForMockServer {
         Get("/get-path-proxied").withHeaders(`Remote-Address`(localIp1)) ~> routes ~> check {
-          status == OK
           responseAs[String] must be_==("127.0.0.1")
         }
       }
 
-      "update existing `X-Forwarded-For`" in {
+      "update existing `X-Forwarded-For`" in new CollectHeadersAndForwardedForMockServer {
         Get("/get-path-proxied").withHeaders(`Remote-Address`(localIp1), `X-Forwarded-For`(localIp2)) ~> routes ~> check {
           status == OK
           responseAs[String] must be_==("127.0.0.2, 127.0.0.1")
@@ -209,10 +209,10 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specs2RouteTest with A
         }
       }
 
-      "do not add `X-Forwarded-For` if no `Remote-Address`" in {
+      "do not add `X-Forwarded-For` if no `Remote-Address`" in new CollectHeadersAndForwardedForMockServer {
         Get("/get-path-proxied") ~> routes ~> check {
           status == OK
-          responseAs[String] must be_==("a")
+          responseAs[String] must beEmpty
         }
       }
     }
