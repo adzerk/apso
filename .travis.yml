@@ -3,7 +3,7 @@ scala:
   - 2.11.12
   - 2.12.7
 jdk:
-  - oraclejdk8
+  - openjdk8
 script:
   - sbt -S-Xfatal-warnings ++$TRAVIS_SCALA_VERSION clean coverage test
 after_success:
