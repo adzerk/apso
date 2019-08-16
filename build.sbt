@@ -67,8 +67,7 @@ lazy val commonSettings = Seq(
     Resolver.typesafeRepo("snapshots"),
     "Spray Repository"              at "http://repo.spray.io/",
     "Bintray Scalaz Releases"       at "http://dl.bintray.com/scalaz/releases",
-    "JCenter Repository"            at "http://jcenter.bintray.com/",
-    "JAnalyse Repository"           at "http://www.janalyse.fr/repository/"),
+    "JCenter Repository"            at "http://jcenter.bintray.com/"),
 
   scalariformPreferences := scalariformPreferences.value
     .setPreference(DanglingCloseParenthesis, Prevent)
