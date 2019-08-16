@@ -1,23 +1,18 @@
 package com.velocidi.apso.elasticsearch
 
 import scala.collection.mutable
-import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success, Try }
 
-import org.apache.http.auth.{ AuthScope, UsernamePasswordCredentials }
 import akka.actor._
 import akka.dispatch.ControlMessage
 import akka.event.Logging
-import org.apache.http.HttpHost
 import com.sksamuel.elastic4s.ElasticDsl._
-import com.sksamuel.elastic4s.http.JavaClient
 import com.sksamuel.elastic4s.requests.bulk.{ BulkResponse, BulkResponseItem }
 import com.sksamuel.elastic4s.requests.indexes.IndexRequest
 import com.sksamuel.elastic4s.{ ElasticClient, Indexable }
 import io.circe.Json
-import org.apache.http.impl.client.BasicCredentialsProvider
-import org.elasticsearch.client.RestClient
 
 import com.velocidi.apso.Logging
 
@@ -247,32 +242,13 @@ object ElasticsearchBulkInserter extends Logging {
   case object CheckElasticsearch extends ControlMessage
 
   def props(esConfig: config.Elasticsearch): Props = {
-    val protocol = if (esConfig.useHttps) "https" else "http"
-
-    val credsProvider = (esConfig.username, esConfig.password) match {
-      case (Some(user), Some(pass)) =>
-        val cred = new BasicCredentialsProvider()
-        cred.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(user, pass))
-        cred
-
-      case _ => null
-    }
-
-    val esClient = {
-      val restClient =
-        RestClient.builder(new HttpHost(esConfig.host, esConfig.port, protocol))
-          .setHttpClientConfigCallback(_.setDefaultCredentialsProvider(credsProvider))
-          .build()
-
-      ElasticClient(JavaClient.fromRestClient(restClient))
-    }
-
     val bulkInserterConfig = esConfig.bulkInserter.getOrElse {
       val fallback = config.Elasticsearch.BulkInserter(1.second, 10.seconds, 1000, 3)
       log.warn("Bulk inserter settings for sending documents to Elasticsearch were not found in the config. " +
         s"A default configuration will be used: $fallback")
       fallback
     }
-    Props(new ElasticsearchBulkInserter(bulkInserterConfig, esClient))
+
+    Props(new ElasticsearchBulkInserter(bulkInserterConfig, ElasticsearchUtil.buildEsClient(esConfig)))
   }
 }
