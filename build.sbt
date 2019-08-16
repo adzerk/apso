@@ -4,7 +4,6 @@ import ReleaseTransformations._
 organization in ThisBuild := "com.velocidi"
 
 scalaVersion in ThisBuild := "2.12.8"
-crossScalaVersions in ThisBuild := Seq("2.11.12", "2.12.8")
 
 lazy val core = project.in(file("core"))
   .dependsOn(testkit % "test")
@@ -116,11 +115,11 @@ releaseProcess := Seq[ReleaseStep](
   checkSnapshotDependencies,
   inquireVersions,
   runClean,
-  releaseStepCommandAndRemaining("+test"),
+  releaseStepCommandAndRemaining("test"),
   setReleaseVersion,
   commitReleaseVersion,
   tagRelease,
-  releaseStepCommandAndRemaining("+publishSigned"),
+  releaseStepCommandAndRemaining("publishSigned"),
   setNextVersion,
   commitNextVersion,
   pushChanges,
