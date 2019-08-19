@@ -11,8 +11,8 @@ lazy val core = project.in(file("core"))
   .settings(
     name := "apso",
     libraryDependencies ++= Seq(
-      "com.sksamuel.elastic4s"                    %% "elastic4s-core"                 % "7.1.2",
-      "com.sksamuel.elastic4s"                    %% "elastic4s-client-esjava"        % "7.1.2",
+      "com.sksamuel.elastic4s"                    %% "elastic4s-core"                 % "7.1.2"          % "provided",
+      "com.sksamuel.elastic4s"                    %% "elastic4s-client-esjava"        % "7.1.2"          % "provided",
       "com.amazonaws"                              % "aws-java-sdk-ec2"               % "1.11.553"       % "provided",
       "com.amazonaws"                              % "aws-java-sdk-s3"                % "1.11.553"       % "provided",
       "com.chuusai"                               %% "shapeless"                      % "2.3.3",
@@ -59,18 +59,18 @@ lazy val testkit = project.in(file("testkit"))
   .settings(
     name := "apso-testkit",
     libraryDependencies ++= Seq(
-      "com.sksamuel.elastic4s"        %% "elastic4s-core"                          % "7.1.2",
-      "com.sksamuel.elastic4s"        %% "elastic4s-client-esjava"                 % "7.1.2",
+      "com.sksamuel.elastic4s"        %% "elastic4s-core"                          % "7.1.2"           % "provided",
+      "com.sksamuel.elastic4s"        %% "elastic4s-client-esjava"                 % "7.1.2"           % "provided",
       // FIXME: netty-all conflicts with all non-bundle netty dependencies, which are needed by GRPC and possibly others.
       "org.codelibs"                  % "elasticsearch-cluster-runner"             % "7.1.1.0" excludeAll ExclusionRule(organization = "io.netty"),
       "com.sksamuel.elastic4s"        %% "elastic4s-testkit"                       % "7.1.2",
-      "com.typesafe.akka"             %% "akka-testkit"        % "2.5.22"          % "provided",
-      "com.typesafe.akka"             %% "akka-http-testkit"   % "10.1.8"          % "provided",
-      "com.typesafe.akka"             %% "akka-stream-testkit" % "2.5.22"          % "provided",
-      "org.apache.logging.log4j"       % "log4j-api"           % "2.11.2",
-      "org.apache.logging.log4j"      %% "log4j-api-scala"     % "11.0",
-      "org.specs2"                    %% "specs2-core"         % "4.5.1"           % "provided",
-      "org.specs2"                    %% "specs2-junit"        % "4.5.1"           % "provided"))
+      "com.typesafe.akka"             %% "akka-testkit"                            % "2.5.22"          % "provided",
+      "com.typesafe.akka"             %% "akka-http-testkit"                       % "10.1.8"          % "provided",
+      "com.typesafe.akka"             %% "akka-stream-testkit"                     % "2.5.22"          % "provided",
+      "org.apache.logging.log4j"       % "log4j-api"                               % "2.11.2",
+      "org.apache.logging.log4j"      %% "log4j-api-scala"                         % "11.0",
+      "org.specs2"                    %% "specs2-core"                             % "4.5.1"           % "provided",
+      "org.specs2"                    %% "specs2-junit"                            % "4.5.1"           % "provided"))
 
 lazy val commonSettings = Seq(
   resolvers ++= Seq(
