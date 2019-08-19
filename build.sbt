@@ -3,8 +3,7 @@ import ReleaseTransformations._
 
 organization in ThisBuild := "com.velocidi"
 
-scalaVersion in ThisBuild := "2.12.8"
-crossScalaVersions in ThisBuild := Seq("2.11.12", "2.12.8")
+scalaVersion in ThisBuild := "2.12.9"
 
 lazy val core = project.in(file("core"))
   .dependsOn(testkit % "test")
@@ -68,8 +67,7 @@ lazy val commonSettings = Seq(
     Resolver.typesafeRepo("snapshots"),
     "Spray Repository"              at "http://repo.spray.io/",
     "Bintray Scalaz Releases"       at "http://dl.bintray.com/scalaz/releases",
-    "JCenter Repository"            at "http://jcenter.bintray.com/",
-    "JAnalyse Repository"           at "http://www.janalyse.fr/repository/"),
+    "JCenter Repository"            at "http://jcenter.bintray.com/"),
 
   scalariformPreferences := scalariformPreferences.value
     .setPreference(DanglingCloseParenthesis, Prevent)
@@ -87,12 +85,6 @@ lazy val commonSettings = Seq(
     "-Ywarn-unused-import",
     "-Xlint:-adapted-args,-nullary-override,_"),
 
-  publishTo := {
-    val nexus = "https://oss.sonatype.org/"
-    if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
-    else Some("releases" at nexus + "service/local/staging/deploy/maven2")
-  },
-
   publishMavenStyle := true,
   publishArtifact in Test := false,
   pomIncludeRepository := { _ => false },
@@ -109,19 +101,12 @@ lazy val commonSettings = Seq(
 // do not publish the root project
 skip in publish := true
 
+publishTo in ThisBuild := {
+  val nexus = "https://oss.sonatype.org/"
+  if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
+  else Some("releases" at nexus + "service/local/staging/deploy/maven2")
+}
+
+releasePublishArtifactsAction := PgpKeys.publishSigned.value
 releaseTagComment := s"Release ${(version in ThisBuild).value}"
 releaseCommitMessage := s"Set version to ${(version in ThisBuild).value}"
-
-releaseProcess := Seq[ReleaseStep](
-  checkSnapshotDependencies,
-  inquireVersions,
-  runClean,
-  releaseStepCommandAndRemaining("+test"),
-  setReleaseVersion,
-  commitReleaseVersion,
-  tagRelease,
-  releaseStepCommandAndRemaining("+publishSigned"),
-  setNextVersion,
-  commitNextVersion,
-  pushChanges,
-  releaseStepCommandAndRemaining("sonatypeReleaseAll"))
