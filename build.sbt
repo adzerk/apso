@@ -96,6 +96,12 @@ lazy val commonSettings = Seq(
     "-Ywarn-unused-import",
     "-Xlint:-adapted-args,-nullary-override,_"),
 
+  publishTo := {
+    val nexus = "https://oss.sonatype.org/"
+    if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
+    else Some("releases" at nexus + "service/local/staging/deploy/maven2")
+  },
+
   publishMavenStyle := true,
   publishArtifact in Test := false,
   pomIncludeRepository := { _ => false },
@@ -112,12 +118,19 @@ lazy val commonSettings = Seq(
 // do not publish the root project
 skip in publish := true
 
-publishTo in ThisBuild := {
-  val nexus = "https://oss.sonatype.org/"
-  if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
-  else Some("releases" at nexus + "service/local/staging/deploy/maven2")
-}
-
-releasePublishArtifactsAction := PgpKeys.publishSigned.value
 releaseTagComment := s"Release ${(version in ThisBuild).value}"
 releaseCommitMessage := s"Set version to ${(version in ThisBuild).value}"
+
+releaseProcess := Seq[ReleaseStep](
+  checkSnapshotDependencies,
+  inquireVersions,
+  runClean,
+  releaseStepCommandAndRemaining("test"),
+  setReleaseVersion,
+  commitReleaseVersion,
+  tagRelease,
+  releaseStepCommandAndRemaining("publishSigned"),
+  setNextVersion,
+  commitNextVersion,
+  pushChanges,
+  releaseStepCommandAndRemaining("sonatypeReleaseAll"))
