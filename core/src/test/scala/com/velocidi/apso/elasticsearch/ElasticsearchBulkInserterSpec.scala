@@ -5,6 +5,7 @@ import scala.concurrent.duration._
 import akka.actor._
 import akka.testkit._
 import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.RequestSuccess
 import com.sksamuel.elastic4s.requests.searches._
 import io.circe.Json
 import io.circe.syntax._
@@ -36,7 +37,7 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpeci
     search(msgIndex)
 
   "An ElasticsearchBulkInserter" should {
-    Seq("test-index-1", "test-index-2", "test-index-3").foreach(ensureIndexExists)
+    Seq("test-index-1", "test-index-2", "test-index-3", "test-index-4").foreach(ensureIndexExists)
 
     "collect events and send them in bulk to Elasticsearch after a buffer is filled" in {
       val msgIndex = "test-index-1"
@@ -92,6 +93,40 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpeci
       esClient.execute(openIndex(msgIndex)).await
       probe must receiveWithin(15.seconds)(ElasticsearchUp)
       esClient.execute(searchQuery(msgIndex)).map(_.result.totalHits) must be_==(5).awaitFor(5.seconds).eventually(10, 2.seconds)
+    }
+
+    "correctly handle errors and retry document insertion errors" in {
+      val msgIndex = "test-index-4"
+      val probe = TestProbe()
+
+      val bulkInserter = system.actorOf(Props(new TestElasticsearchBulkInserter(
+        maxBufferSize = 2, esStateListener = probe.ref)).withDispatcher("flush-prio-dispatcher"))
+
+      probe must receiveWithin(10.seconds)(ElasticsearchUp)
+
+      // use a mapping that does not allow for extra fields other than the "name" one
+      esClient.execute(putMapping(msgIndex) rawSource """{"dynamic":"strict","properties":{"name":{"type":"text"}}}""") must
+        beAnInstanceOf[RequestSuccess[_]].awaitFor(5.seconds)
+
+      // insert a (valid) document
+      bulkInserter ! Insert(Json.obj("name" := "test1"), msgIndex)
+      bulkInserter ! Insert(Json.obj("name" := "test2"), msgIndex)
+      esClient.execute(searchQuery(msgIndex)).map(_.result.totalHits) must be_==(2).awaitFor(5.seconds).eventually(30, 2.seconds)
+
+      // try to insert a (invalid) document; this one should stay on the buffer for retry later on...
+      bulkInserter ! Insert(Json.obj("name" := "test3"), msgIndex)
+      bulkInserter ! Insert(Json.obj("name" := "test4", "other" := "dynamic_field_value"), msgIndex)
+      esClient.execute(searchQuery(msgIndex)).map(_.result.totalHits) must not(be_==(4).awaitFor(5.seconds).eventually(5, 2.seconds))
+      esClient.execute(searchQuery(msgIndex)).map(_.result.totalHits) must be_==(3).awaitFor(5.seconds).eventually(5, 2.seconds)
+
+      // now, change the mapping so that new fields are allowed...
+      esClient.execute(putMapping(msgIndex) rawSource """{"dynamic":true,"properties":{"name":{"type":"text"}}}""") must
+        beAnInstanceOf[RequestSuccess[_]].awaitFor(5.seconds)
+      bulkInserter ! Insert(Json.obj("name" := "test5"), msgIndex)
+      esClient.execute(searchQuery(msgIndex)).map(_.result.totalHits) must
+        be_==(5).awaitFor(5.seconds).eventually(30, 2.seconds)
+      esClient.execute(search(msgIndex) query matchQuery("other", "dynamic_field_value")).map(_.result.totalHits) must
+        be_==(1).awaitFor(5.seconds).eventually(30, 2.seconds)
     }
   }
 
