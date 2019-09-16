@@ -99,7 +99,7 @@ class ExtraJsonProtocolSpec extends Specification {
       val pStrings = Seq("P1D", "P1M2D", "P1M2DT10H30M")
       pStrings.forall { s =>
         val period = new Period(s)
-        period.asJson.pretty(Printer.noSpaces) mustEqual s""""$s""""
+        period.asJson.printWith(Printer.noSpaces) mustEqual s""""$s""""
         decode[Period](s""""$s"""") must beRight(period)
       }
 
@@ -188,7 +188,7 @@ class ExtraJsonProtocolSpec extends Specification {
       val localDate = new LocalDate("2016-01-01")
       val localDateJsonString = """"2016-01-01""""
 
-      localDate.asJson.pretty(Printer.noSpaces) mustEqual localDateJsonString
+      localDate.asJson.printWith(Printer.noSpaces) mustEqual localDateJsonString
       decode[LocalDate](localDateJsonString) must beRight(localDate)
       decode[LocalDate]("true") must beLeft
     }
