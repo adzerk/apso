@@ -39,7 +39,7 @@ lazy val core = project.in(file("core"))
       "org.bouncycastle"                           % "bcpkix-jdk15on"                 % "1.60",
       "org.bouncycastle"                           % "bcprov-jdk15on"                 % "1.60",
       "org.scalaz"                                %% "scalaz-core"                    % "7.2.27"         % "provided",
-      "org.typelevel"                             %% "squants"                        % "1.4.0",
+      "org.typelevel"                             %% "squants"                        % "1.5.0",
       // NOTICE: This is added because of the exclusion rules on "elasticsearch-cluster-runner".
       //         While it is important to exclude those libs because of clients of this apso lib, our tests
       //         require the presence of the netty dependencies.

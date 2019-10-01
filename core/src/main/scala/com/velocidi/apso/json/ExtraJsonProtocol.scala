@@ -15,8 +15,6 @@ import spray.json.DefaultJsonProtocol._
 import spray.json._
 import squants.market.{ Currency, MoneyContext }
 
-import com.velocidi.apso.currencies.SquantsImplicitConversions._
-
 /**
  * Provides additional JsonFormats not available in the [[spray.json.DefaultJsonProtocol]].
  */
@@ -180,13 +178,7 @@ trait ExtraMiscJsonProtocol {
   implicit val localDateDecoder: Decoder[LocalDate] =
     Decoder[String].emapTry(v => Try(new LocalDate(v)))
 
-  implicit def currencyDecoder(implicit moneyContext: MoneyContext): Decoder[Currency] =
-    Decoder[String].emap { code =>
-      // TODO: this can be improved when https://github.com/typelevel/squants/pull/330 is accepted and released
-      val currencyOpt = code.asCurrency
-      Either.cond(currencyOpt.isDefined, currencyOpt.get, s"'$code' is not a valid currency code.")
-    }
-
+  implicit def currencyDecoder(implicit moneyContext: MoneyContext): Decoder[Currency] = Decoder[String].emapTry(Currency(_))
   implicit val currencyEncoder: Encoder[Currency] = Encoder[String].contramap(_.toString)
 
   /**
