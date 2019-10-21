@@ -24,39 +24,24 @@ Please take into account that the library is still in an experimental stage and 
 
 ## Table of Contents
 
-- [Benchmark](#benchmark)
-- [CounterPair](#counterpair)
 - [Geo](#geo)
 - [JreVersionHelper](#jreversionhelper)
 - [Logging](#logging)
-- [OrderingHelper](#orderinghelper)
 - [ProgressBar](#progressbar)
 - [Reflect](#reflect)
 - [Retry](#retry)
 - [TryWith](#trywith)
-- [Sampler](#sampler)
-    - [ExpSampler](#expsampler)
-    - [ListSampler](#listsampler)
-    - [FallbackToMinimum](#fallbacktominimum)
-- [ShellRun](#shellrun)
-- [Retrier](#retrier)
 - [Implicits](#implicits)
 - [Amazon Web Services](#amazon-web-services)
     - [ConfigCredentialsProvider](#configcredentialsprovider)
     - [CredentialStore](#credentialstore)
-    - [EC2](#ec2)
-    - [ElasticIP](#elasticip)
-    - [InstanceMetadata](#instancemetadata)
-    - [S3](#s3)
     - [S3Bucket](#s3bucket)
     - [SerializableAWSCredentials](#serializableawscredentials)
 - [Collections](#collections)
-    - [HMap](#hmap)
     - [Trie](#trie)
     - [TypedMap](#typedmap)
 - [Config](#config)
     - [LazyConfigFactory](#lazyconfigfactory)
-    - [Implicits](#implicits)
 - [Encryption](#encryption)
 - [Hashing](#hashing)
 - [HTTP](#http)
@@ -66,19 +51,15 @@ Please take into account that the library is still in an experimental stage and 
 - [Iterators](#iterators)
     - [CircularIterator](#circulariterator)
     - [CompositeIterator](#compositeiterator)
-    - [ExtendedIterator](#extendediterator)
     - [MergedBufferedIterator](#mergedbufferediterator)
-    - [RoundRobinIterator](#roundrobiniterator)
 - [JSON](#json)
     - [ExtraJsonProtocol](#extrajsonprotocol)
     - [JsValue](#jsvalue)
     - [JsonConvert](#jsonconvert)
     - [JsonFormatBuilder](#jsonformatbuilder)
-    - [JsonHMap](#jsonhmap)
 - [Profiling](#profiling)
     - [CpuSampler](#cpusampler)
     - [SimpleJmx](#simplejmx)
-- [Scalaz](#scalaz)
 - [Spray](#spray)
     - [ClientIPDirectives](#clientipdirectives)
     - [ExtraMiscDirectives](#extramiscdirectives)
@@ -86,46 +67,6 @@ Please take into account that the library is still in an experimental stage and 
     - [ProxySupport](#proxysupport)
 - [Time](#time)
 - [TestKit](#testkit)
-
-## Benchmark
-
-The `Benchmark` object provides an apply method to measure the running time of a block of code.
-
-```scala
-scala> import com.velocidi.apso.Benchmark
-import com.velocidi.apso.Benchmark
-
-scala> Benchmark("test") { (0l to 100000000).sum }
-# Block "test" completed, time taken: 1 ms (0.001 s)
-res0: Int = 5000000050000000
-```
-
-It's also possible to customize the method (`String => Unit`) that is used to print the results of the benchmark (by default it's `println`). This can be particularly useful if you want to use a logging framework, for example:
-
-```scala
-scala> def info(s: String) = println(s"[INFO] $s")
-info: (s: String)Unit
-
-scala> Benchmark("test", info) { (0l to 100000000).sum }
-[INFO] # Block "test" completed, time taken: 0 ms (0.0 s)
-res1: Long = 5000000050000000
-```
-
-## CounterPair
-
-The `CounterPair` object provides a method to pack two numbers in the range of an unsigned short in an `Int`.
-
-```scala
-scala> import com.velocidi.apso.CounterPair
-import com.velocidi.apso.CounterPair
-
-scala> CounterPair(1, 2)
-res0: Int = 131073
-
-scala> CounterPair(a, b) = res0
-a: Int = 1
-b: Int = 2
-```
 
 ## Geo
 
@@ -177,21 +118,6 @@ a: A = A@58af6f21
 
 scala> a.log.info("test")
 ...
-```
-
-## OrderingHelper
-
-The `OrderingHelper` object provides the `min` and `max` methods for comparing two instances of the same type:
-
-```scala
-scala> import com.velocidi.apso.OrderingHelper._
-import com.velocidi.apso.OrderingHelper._
-
-scala> min(2, 3)
-res0: Int = 2
-
-scala> max(2, 3)
-res1: Int = 3
 ```
 
 ## ProgressBar
@@ -329,152 +255,6 @@ Resource is now Closed
 res3: scala.util.Try[Nothing] = Failure(java.lang.Exception)
 ```
 
-## Sampler
-
-The `Sampler` trait exposes a method to extract the first elements of a sequence given a sampling level. The sampling level is an integer and should map to a percentage.
-
-The following implementations of `Sampler` are available:
-
-### ExpSampler
-
-The `ExpSampler` is a sampler in which sampling level ratios are distributed in an exponential way. Each sampling level corresponds to a sample with `1.0 / pow(base, level)` of the original size:
-
-```scala
-scala> import com.velocidi.apso.ExpSampler
-import com.velocidi.apso.ExpSampler
-
-scala> val s = ExpSampler[Int](2)
-s: com.velocidi.apso.ExpSampler[Int] = ExpSampler(2.0)
-
-scala> s(0)((0 to 15).toSeq)
-res0: Seq[Int] = Range(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
-
-scala> s(1)((0 to 15).toSeq)
-res1: Seq[Int] = Range(0, 1, 2, 3, 4, 5, 6, 7)
-
-scala> s(2)((0 to 15).toSeq)
-res2: Seq[Int] = Range(0, 1, 2, 3)
-
-scala> s(3)((0 to 15).toSeq)
-res3: Seq[Int] = Range(0, 1)
-
-scala> s(4)((0 to 15).toSeq)
-res4: Seq[Int] = Range(0)
-```
-
-### ListSampler
-
-The `ListSampler` is a sampler in which the ratios for each sampling level are given explicitly as parameters:
-
-```scala
-scala> import com.velocidi.apso.ListSampler
-import com.velocidi.apso.ListSampler
-
-scala> val s = ListSampler[Int](0.5, 0.25, 0.125, 0.0625)
-s: com.velocidi.apso.ListSampler[Int] = ListSampler(WrappedArray(0.5, 0.25, 0.125, 0.0625))
-
-scala> s(0)((0 to 15).toSeq)
-res0: Seq[Int] = Range(0, 1, 2, 3, 4, 5, 6, 7)
-
-scala> s(1)((0 to 15).toSeq)
-res1: Seq[Int] = Range(0, 1, 2, 3)
-
-scala> s(2)((0 to 15).toSeq)
-res2: Seq[Int] = Range(0, 1)
-
-scala> s(3)((0 to 15).toSeq)
-res3: Seq[Int] = Range(0)
-```
-
-### FallbackToMinimum
-
-The `FallbackToMinimum` trait allows one to set a minimum ratio for any sampling level:
-
-```scala
-scala> import com.velocidi.apso.ExpSampler
-import com.velocidi.apso.ExpSampler
-
-scala> import com.velocidi.apso.FallbackToMinimum
-import com.velocidi.apso.FallbackToMinimum
-
-scala> val s = new ExpSampler[Int](2) with FallbackToMinimum[Int] { val minSample = 0.5 }
-s: com.velocidi.apso.ExpSampler[Int] with com.velocidi.apso.FallbackToMinimum[Int] = ExpSampler(2.0)
-
-scala> s(0)((0 to 15).toSeq)
-res0: Seq[Int] = Range(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
-
-scala> s(1)((0 to 15).toSeq)
-res1: Seq[Int] = Range(0, 1, 2, 3, 4, 5, 6, 7)
-
-scala> s(2)((0 to 15).toSeq)
-res2: Seq[Int] = Range(0, 1, 2, 3, 4, 5, 6, 7)
-
-scala> s(3)((0 to 15).toSeq)
-res3: Seq[Int] = Range(0, 1, 2, 3, 4, 5, 6, 7)
-```
-
-## ShellRun
-
-The `ShellRun` object wraps the Scala's process library, facilitating the launching of shell commands.
-
-```scala
-scala> ShellRun("ls")
-res0: String =
-"CHANGELOG
-README.md
-apso
-apso-testkit
-apso.png
-project
-sbt
-target
-"
-
-scala> ShellRun("ls", "-l")
-res1: String =
-"total 248
--rw-r--r--  1 jcazevedo  staff   5190 Oct 30 17:52 CHANGELOG
--rw-r--r--  1 jcazevedo  staff   6579 Oct 31 11:44 README.md
-drwxr-xr-x  4 jcazevedo  staff    136 Oct 30 18:14 apso
-drwxr-xr-x  4 jcazevedo  staff    136 Oct 30 18:15 apso-testkit
--rw-r--r--@ 1 jcazevedo  staff  91715 Oct 30 17:43 apso.png
-drwxr-xr-x  6 jcazevedo  staff    204 Oct 30 18:20 project
--rwxr-xr-x  1 jcazevedo  staff  16035 Sep 26 14:04 sbt
-drwxr-xr-x  8 jcazevedo  staff    272 Oct 30 18:14 target
-"
-```
-
-## Retrier
-
-The `Retrier` is a helper class for actors that need to retry some of the messages they send to other actors until a certain acknowledgement message (ACK) is received. Messages can be sent individually or in batches.
-
-This class is instantiated by providing functions that extract an identifier from sent messages and from ACK messages. This can be an arbitrary identifier, as long as it uniquely associates a received ACK with the original sent message. Optional per-message filtering functions can be given, as well as the frequency of the retries and an optional timeout. Finally, the `onComplete` method, which is executed after a message or group of messages is acknowledged, must be implemented.
-
-A `Retrier` can be used as follows:
-
-```scala
-case class ChangeData(reqId: Long, data: String)
-case class ChangeDataAck(reqId: Long)
-case class Replicate(reqId: Long, data: String)
-case class ReplicateAck(reqId: Long)
-
-class Master(val replica: ActorRef) extends Actor {
-  import Retrier._
-
-  val retrier = new Retrier[(ActorRef, ChangeData), Replicate, ReplicateAck, Long](_.reqId, _.reqId) {
-    def onComplete(req: (ActorRef, ChangeData)) = req._1 ! ChangeDataAck(req._2.reqId)
-  }
-
-  def receive: Receive = ({
-    case msg @ ChangeData(reqId, data) =>
-      // change data internally here
-      retrier.dispatch((sender, msg), Replicate(reqId, data), replica)
-    }: Receive).orRetryWith(retrier)
-}
-```
-
-In the previous example, every time a `Master` actor receives a `ChangeData` message, it sends a `Replicate` message to a replica actor and only responds to the original sender after an acknowledgement from the replica is received. The `Replicate` message is retried periodically.
-
 ## Implicits
 
 Apso provides implicit conversions from `String`, `Seq[_]`, `Map[_, _]`, `Seq[Map[_, _]]` and `AutoCloseable` to extended types that come packed with extended features.
@@ -482,33 +262,6 @@ Apso provides implicit conversions from `String`, `Seq[_]`, `Map[_, _]`, `Seq[Ma
 ```scala
 scala> import com.velocidi.apso.Implicits._
 import com.velocidi.apso.Implicits._
-
-scala> "abcd".some
-res0: Some[String] = Some(abcd)
-
-scala> "abcd".enumerate(2)
-res1: IndexedSeq[String] = Vector(aa, ab, ac, ad, ba, bb, bc, bd, ca, cb, cc, cd, da, db, dc, dd)
-
-scala> "abcd".padLeft(10, '0')
-res2: String = 000000abcd
-
-scala> "abcd".getBytesWithNullTerminator
-res3: Array[Byte] = Array(97, 98, 99, 100, 0)
-
-scala> Seq(1, 2, 3, 4).split(2)
-res4: IndexedSeq[Seq[Int]] = Vector(List(1, 2), List(3, 4))
-
-scala> Seq(1, 2, 3, 4, 5).split(2)
-res5: IndexedSeq[Seq[Int]] = Vector(List(1, 2, 3), List(4, 5))
-
-scala> Seq(1, 2, 3, 4).sample(0.8)
-res6: Seq[Int] = List(1, 2, 3)
-
-scala> scala.util.Random.shuffle((0 to 15)).takeSmallest(3)
-res7: Seq[Int] = List(0, 1, 2)
-
-scala> scala.util.Random.shuffle((0 to 15)).takeLargest(3)
-res8: Seq[Int] = List(15, 14, 13)
 
 scala> Seq(1, 3, 5).mergeSorted(Seq(2, 4))
 res9: Seq[Int] = List(1, 2, 3, 4, 5)
@@ -519,21 +272,6 @@ res10: Int = 7
 scala> Iterator(1, 3, 5).buffered.mergeSorted(Iterator(2, 4).buffered).toList
 res11: List[Int] = List(1, 2, 3, 4, 5)
 
-scala> val it = Iterator(1, 2, 3, 4, 5, 6, 7, 8).buffered
-it: scala.collection.BufferedIterator[Int] = non-empty iterator
-
-scala> it.bufferedTakeWhile(_ < 4).toList
-res12: List[Int] = List(1, 2, 3)
-
-scala> it.toList
-res13: List[Int] = List(4, 5, 6, 7, 8)
-
-scala> Map(1 -> 2, 3 -> 6).merge(Map(2 -> 4, 3 -> 5)) { (a, b) => b }
-res14: Map[Int,Int] = Map(1 -> 2, 3 -> 5)
-
-scala> Map(1 -> 2, 2 -> 4, 3 -> 6).merge(Map(2 -> 2, 3 -> 5)) { (a, b) => b }
-res15: Map[Int,Int] = Map(1 -> 2, 2 -> 2, 3 -> 5)
-
 scala> Map(1 -> 2, 3 -> 6).twoWayMerge(Map(2 -> 4, 3 -> 5)) { (a, b) => b }
 res16: Map[Int,Int] = Map(2 -> 4, 3 -> 5, 1 -> 2)
 
@@ -542,18 +280,6 @@ res17: Map[Int,Int] = Map(2 -> 2, 3 -> 5, 1 -> 2)
 
 scala> Map(1 -> 2, 2 -> 3).mapKeys(_ + 1)
 res18: Map[Int,Int] = Map(2 -> 2, 3 -> 3)
-
-scala> Seq(Map(1 -> 2, 2 -> 4), Map(3 -> 6, 4 -> 8)).sequenceOnMap()
-res19: Map[Int,List[Int]] = Map(1 -> List(2), 2 -> List(4), 3 -> List(6), 4 -> List(8))
-
-scala> Seq(Map(1 -> 2, 2 -> 3), Map(1 -> 3), Map(2 -> 4, 3 -> 5)).sequenceOnMap()
-res20: Map[Int,List[Int]] = Map(1 -> List(2, 3), 2 -> List(3, 4), 3 -> List(5))
-
-scala> Seq(Map(1 -> 2, 2 -> 4), Map(3 -> 6, 4 -> 8)).sequenceOnMap(zero = Some(0))
-res21: Map[Int,List[Int]] = Map(1 -> List(2, 0), 2 -> List(4, 0), 3 -> List(0, 6), 4 -> List(0, 8))
-
-scala> Future.successful[Option[Int]](None).ifNoneOrErrorFallbackTo(Future.successful[Option[Int]](Some(4))).onComplete(println)
-Success(Some(4))
 
 scala> scala.util.Random.choose((0 to 15).toSeq)
 res22: Option[Int] = Some(15)
@@ -614,22 +340,6 @@ res1: String = <secret-key>
 
 The `CredentialStore` object serves as an endpoint for the retrieval of AWS credentials from available configurations. It extends the chain in the `DefaultAWSCredentialsProviderChain` (from AWS SDK for Java) with the retrieval of AWS credentials through the default typesafe configuration file (typically `application.conf`).
 
-### EC2
-
-The `EC2` class wraps an instance of `AmazonEC2` (from AWS SDK for Java), providing a higher level interface for querying the currently running instances. It provides methods to easily access an instance by its `id`, as well as listing all currently running instances. A method to easily terminate an instance given its `id` is also provided. The `EC2` object provides an implicit conversion of an `Instance` to a `RichEC2Instance`, that enables the usage of methods `id` (to return the id of an instance) and `tagValue(key)` (to return the value of a tag).
-
-### ElasticIP
-
-The `ElasticIP` class provides a representation of an AWS elastic IP address. It publishes the method `associateTo(instance)` to allow easier association to an EC2 instance.
-
-### InstanceMetadata
-
-The `InstanceMetadata` object provides utilities for obtaining metadata about the EC2 instance the current process is running on. The methods are not expected to work if the JVM is not running on an EC2 instance.
-
-### S3
-
-The `S3` class wraps an instance of `AmazonS3Client` (from AWS SDK for Java), providing a higher level interface for querying information about buckets and their objects. It publishes methods to easily list the buckets under the object's credentials, as well as list the objects in a bucket, filtered by an optional prefix.
-
 ### S3Bucket
 
 The `S3Bucket` class wraps an instance of `AmazonS3Client` (from AWS SDK for Java) and exposes a higher level interface for pushing and pulling files to and from a bucket.
@@ -641,36 +351,6 @@ The `SerializableAWSCredentials` class provides a serializable container for AWS
 ## Collections
 
 The `com.velocidi.apso.collection` package provides some helpful collections:
-
-### HMap
-
-The `HMap` is an implementation of an heterogeneous `Map`, where you declare the instances for the keys explicitly:
-
-```scala
-scala> import com.velocidi.apso.collection._
-import com.velocidi.apso.collection._
-
-scala> val Key1 = new HMapKey[Int]
-Key1: com.velocidi.apso.collection.HMapKey[Int] = com.velocidi.apso.collection.HMapKey@4eb14055
-
-scala> val Key2 = new HMapKey[String]
-Key2: com.velocidi.apso.collection.HMapKey[String] = com.velocidi.apso.collection.HMapKey@13590b1e
-
-scala> val Key3 = new HMapKey[List[Boolean]]
-Key3: com.velocidi.apso.collection.HMapKey[List[Boolean]] = com.velocidi.apso.collection.HMapKey@7e384bb6
-
-scala> val map = HMap(Key1 -> 4, Key2 -> "s", Key3 -> List(false, true))
-map: com.velocidi.apso.collection.HMap[com.velocidi.apso.collection.HMapKey] = HMap((com.velocidi.apso.collection.HMapKey@4eb14055,4), (com.velocidi.apso.collection.HMapKey@13590b1e,s), (com.velocidi.apso.collection.HMapKey@7e384bb6,List(false, true)))
-
-scala> map(Key1)
-res2: Int = 4
-
-scala> map(Key2)
-res3: String = s
-
-scala> map(Key3)
-res4: List[Boolean] = List(false, true)
-```
 
 ### Trie
 
@@ -733,61 +413,6 @@ Apso provides methods to ease working with Typesafe's [config](https://github.co
 ### LazyConfigFactory
 
 The `LazyConfigFactory` object provides static methods for creating `Config` instances in a lazy way. The lazy way refers to the variable loading process. The usual process loads variables in config files eagerly (i.e. the path needs to be defined in the same file it is refered to). The loading process provided by `LazyConfigFactory` loads and merges all configuration files and only then resolves variables. This loading process introduces a third file (beyond the default ones - `application.conf` and `reference.conf`): `overrides.conf`. This file has priority over the `application.conf` file and can be used to specify keys that should always be overriden, e.g. by environment variables.
-
-### Implicits
-
-The `config.Implicits` object allows one to deserialize a config to a type which has a `ConfigReader` implicit in scope. Most of scala's standard library types already have a `ConfigReader` implemented. You can also implement your own `ConfigReaders`. See the following for an example usage:
-
-```scala
-scala> import com.typesafe.config._
-import com.typesafe.config._
-
-scala> import com.velocidi.apso.config.ConfigReader.BasicConfigReaders._
-import com.velocidi.apso.config.ConfigReader.BasicConfigReaders._
-
-scala> import com.velocidi.apso.config.Implicits._
-import com.velocidi.apso.config.Implicits._
-
-scala> import com.velocidi.apso.config._
-import com.velocidi.apso.config._
-
-scala> import scala.concurrent.duration._
-import scala.concurrent.duration._
-
-scala> val conf = ConfigFactory.parseString("""{
-     |   v1 = 2
-     |   v2 = 60s
-     |   v3 = "test"
-     |   v4 {
-     |     a = 2
-     |     b = 3
-     |   }
-     | }""")
-conf: com.typesafe.config.Config = Config(SimpleConfigObject({"v1":2,"v2":"60s","v3":"test","v4":{"a":2,"b":3}}))
-
-scala> conf.get[Int]("v1")
-res0: Int = 2
-
-scala> conf.get[FiniteDuration]("v2")
-res1: scala.concurrent.duration.FiniteDuration = 1 minute
-
-scala> conf.get[String]("v3")
-res2: String = test
-
-scala> case class Foo(a: Int, b: Int)
-defined class Foo
-
-scala> implicit val fooConfigReader = new ConfigReader[Foo] {
-     |   def apply(config: Config, key: String): Foo = {
-     |     val conf = config.get[Config](key)
-     |     Foo(conf.get[Int]("a"), conf.get[Int]("b"))
-     |   }
-     | }
-fooConfigReader: com.velocidi.apso.config.ConfigReader[Foo] = <function2>
-
-scala> conf.get[Foo]("v4")
-res3: Foo = Foo(2,3)
-```
 
 ## Encryption
 
@@ -929,27 +554,6 @@ scala> compositeIterator.take(9).toList
 res0: List[Int] = List(1, 2, 3, 4, 5, 6, 7, 8, 9)
 ```
 
-### ExtendedIterator
-
-The `ExtendedIterator` is a decorator for iterators, adding more control over its lifetime. See the following for sample usage:
-
-```scala
-scala> import com.velocidi.apso.iterator.ExtendedIterator
-import com.velocidi.apso.iterator.ExtendedIterator
-
-scala> val it = (0 to 15).toIterator
-it: Iterator[Int] = non-empty iterator
-
-scala> val extIt = new ExtendedIterator(it)
-extIt: com.velocidi.apso.iterator.ExtendedIterator[Int] = non-empty iterator
-
-scala> extIt.onEnd(println("finished"))
-
-scala> extIt.length
-finished
-res1: Int = 16
-```
-
 ### MergedBufferedIterator
 
 The `MergedBufferedIterator` is a collection of sorted `BufferedIterators` that allows traversing them in order, while also providing a `mergeSorted` method to merge with another sorted `BufferedIterator`. See the following for sample usage:
@@ -975,21 +579,6 @@ it2: com.velocidi.apso.iterator.MergedBufferedIterator[Int] = non-empty iterator
 
 scala> it2.mergeSorted(Iterator(4, 6).buffered).toList
 res1: List[Int] = List(1, 2, 3, 4, 5, 6)
-```
-
-### RoundRobinIterator
-
-The `RoundRobinIterator` is an iterator that wraps an array of other iterators and iterates over its elements in a round-robin way. See the following for sample usage:
-
-```scala
-scala> import com.velocidi.apso.iterator.RoundRobinIterator
-import com.velocidi.apso.iterator.RoundRobinIterator
-
-scala> val roundRobinIterator = RoundRobinIterator(List(1, 2, 3).toIterator, List(4, 5, 6).toIterator, List(7, 8, 9).toIterator)
-roundRobinIterator: com.velocidi.apso.iterator.RoundRobinIterator[Int] = non-empty iterator
-
-scala> roundRobinIterator.take(9).toList
-res0: List[Int] = List(1, 4, 7, 2, 5, 8, 3, 6, 9)
 ```
 
 ## JSON
@@ -1149,57 +738,6 @@ scala> Test(3, List("x", "y"), 0.0).toJson(jf2)
 res5: spray.json.JsValue = {"c":0.0,"b":["x","y"],"a":3}
 ```
 
-### JsonHMap
-
-The `JsonHMap` defines an heterogeneous map with JSON (de)serialization capabilities. See the following for sample usage:
-
-```scala
-scala> import spray.json._
-import spray.json._
-
-scala> import spray.json.DefaultJsonProtocol._
-import spray.json.DefaultJsonProtocol._
-
-scala> import com.velocidi.apso.json._
-import com.velocidi.apso.json._
-
-scala> import com.velocidi.apso.json.JsonHMap._
-import com.velocidi.apso.json.JsonHMap._
-
-scala> import com.velocidi.apso.collection._
-import com.velocidi.apso.collection._
-
-scala> implicit val reg = new JsonKeyRegistry {}
-reg: com.velocidi.apso.json.JsonKeyRegistry = $anon$1@4213d40
-
-scala> val Key1 = new JsonHMapKey[Int]('key1) {}
-Key1: com.velocidi.apso.json.JsonHMapKey[Int] = 'key1
-
-scala> val Key2 = new JsonHMapKey[String]('key2) {}
-Key2: com.velocidi.apso.json.JsonHMapKey[String] = 'key2
-
-scala> val Key3 = new JsonHMapKey[List[Boolean]]('key3) {}
-Key3: com.velocidi.apso.json.JsonHMapKey[List[Boolean]] = 'key3
-
-scala> val json =
-         """
-           |{
-           |  "key1": 4,
-           |  "key2": "s",
-           |  "key3": [ false, true ]
-           |}""".stripMargin
-json: String =
-"
-{
-  "key1": 4,
-  "key2": "s",
-  "key3": [ false, true ]
-}"
-
-scala> val map = json.asJson.convertTo[JsonHMap]
-map: com.velocidi.apso.json.JsonHMap.JsonHMap = HMap(('key3,List(false, true)), ('key2,s), ('key1,4))
-```
-
 ## Profiling
 
 The `profiling` package of apso provides utilities to help with profiling the running process.
@@ -1211,27 +749,6 @@ The `CpuSampler` is a lightweight configurable CPU profiler based on call stack 
 ### SimpleJmx
 
 The `SimpleJmx` trait allows mixing in a simple JMX server. The JMX server is configured through a `Config` object, where the parameters `host` and `port` can be set. When behind a firewall, both the `port` defined (the RMI registry port) and the `port + 1` port (the RMI server port) need to be open. In the event of a binding failure to the defined port, a retry is performed with a random port.
-
-## Scalaz
-
-The `scalaz` package provides implicit methods to convert between Scala's `Try` and Scalaz's `Validation`. See the following for a sample usage:
-
-```scala
-scala> import com.velocidi.apso.scalaz.Implicits._
-import com.velocidi.apso.scalaz.Implicits._
-
-scala> import scala.util._
-import scala.util._
-
-scala> import scalaz._
-import scalaz._
-
-scala> Try(2): Validation[Throwable, Int]
-res0: scalaz.Validation[Throwable,Int] = Success(2)
-
-scala> Try(throw new Exception()): Validation[Throwable, Int]
-res1: scalaz.Validation[Throwable,Int] = Failure(java.lang.Exception)
-```
 
 ## Spray
 
@@ -1284,5 +801,3 @@ Apso comes with a TestKit with extra useful matchers for [specs2](https://etorre
 * `CustomMatchers`: provides a matcher to check if an object is serializable and one to check if a file exists;
 * `FutureExtraMatchers`: provides extra matchers for futures and implicit conversions for awaitables;
 * `JreVersionTestHelper`: provides a wrapper for `AsResult` to only run a spec if a specific JRE version is satisfied;
-* `TestHelper`: provides a helper method to create a temporary directory that is deleted on exit;
-* `ActorMatchers`: provides various matchers to be used on akka's TestKit probes and check for different behaviours regarding the reception of messages.

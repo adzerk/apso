@@ -10,23 +10,6 @@ import scala.util.{ Failure, Success, Try }
 object Retry {
 
   /**
-   * Tries to perform a function `f` until it succeeds or until maximum retries is reached.
-   *
-   * @param maxRetries the number of retries, 10 by default
-   * @param inBetweenSleep the milliseconds to wait between attempts, 100 milliseconds by default
-   * @param f the function
-   * @param ec the implicit execution context
-   * @tparam T the type of what the future completes with
-   * @return the resulting `f` function
-   */
-  @deprecated("This will be removed in a future version. Please use `retryFuture()` instead", "2017/10/31")
-  def apply[T](
-    maxRetries: Int = 10,
-    inBetweenSleep: Option[Long] = Some(100))(f: => Future[T])(implicit ec: ExecutionContext): Future[T] = {
-    retryFuture(maxRetries, inBetweenSleep.map(_.millis))(f)
-  }
-
-  /**
    * Tries to perform a Future[T] until it succeeds or until maximum retries is reached.
    *
    * @param maxRetries the number of retries, 10 by default
