@@ -21,6 +21,7 @@ object Implicits {
    * Implicit class that provides new methods for `JsValues`.
    * @param json the `JsValue` to which the new methods are provided.
    */
+  @deprecated("This will be removed in a future version.", "2019/10/23")
   final implicit class ApsoJsonJsValue(val json: JsValue) extends AnyVal {
 
     /**
@@ -65,6 +66,7 @@ object Implicits {
    * Implicit class that provides new methods for `JsObjects`.
    * @param json the `JsObjects` to which the new methods are provided.
    */
+  @deprecated("This will be removed in a future version.", "2019/10/23")
   final implicit class ApsoJsonJsObject(val json: JsObject) extends AnyVal {
     /**
      * Returns a set of keys-value pairs of this object where nested keys are separated by a separator character.
@@ -184,6 +186,7 @@ object Implicits {
    * @param separatorRegex regex to use to separate fields
    * @return the resulting JsObject
    */
+  @deprecated("This will be removed in a future version.", "2019/10/23")
   def fromFullPaths(paths: Seq[(String, JsValue)], separatorRegex: String = "\\."): JsValue = {
     def createJsValue(keys: Seq[String], value: JsValue): JsValue = {
       keys match {

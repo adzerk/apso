@@ -14,6 +14,7 @@ import com.velocidi.apso.json.JsonFormatBuilder._
  * @tparam C the type of the `HList` of fields currently in this builder
  * @tparam FC the type of the `HList` of field definitions currently in this builder
  */
+@deprecated("This will be removed in a future version.", "2019/10/23")
 case class JsonFormatBuilder[C <: HList, FC <: HList](fields: FC)(implicit aux: FormatterAux[C, FC]) {
 
   type ReadFunc[+A] = C => A

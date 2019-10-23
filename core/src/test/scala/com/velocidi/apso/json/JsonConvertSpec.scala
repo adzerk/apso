@@ -7,6 +7,7 @@ import org.specs2.matcher.EitherMatchers
 import org.specs2.mutable.Specification
 import spray.json._
 
+@deprecated("Some methods here will be removed in a future version.", "2019/10/23")
 class JsonConvertSpec extends Specification with EitherMatchers {
   "JsonConvert" should {
     "be able to produce Spray Json models" in {
