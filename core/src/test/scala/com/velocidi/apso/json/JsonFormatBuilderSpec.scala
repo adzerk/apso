@@ -8,6 +8,7 @@ import spray.json.DefaultJsonProtocol._
 import shapeless._
 import shapeless.Nat._
 
+@deprecated("This will be removed in a future version.", "2019/10/23")
 class JsonFormatBuilderSpec extends Specification {
 
   case class Test(a: Int, b: List[String], c: Double)

@@ -37,6 +37,7 @@ object JsonConvert {
    * @param obj the object to convert
    * @return the given object converted to a spray-json JSON value.
    */
+  @deprecated("This will be removed in a future version.", "2019/10/23")
   def toSprayJson(obj: Any): JsValue = obj match {
     case null => JsNull
     case n: Int => JsNumber(n)

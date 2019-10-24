@@ -2,8 +2,6 @@ package com.velocidi.apso
 
 import scala.annotation.tailrec
 import scala.collection.generic.CanBuildFrom
-import scala.compat.Platform
-import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Random, Try }
 
 import com.velocidi.apso.iterator.MergedBufferedIterator
@@ -12,144 +10,6 @@ import com.velocidi.apso.iterator.MergedBufferedIterator
  * Object containing implicit classes and methods of general purpose.
  */
 object Implicits {
-
-  /**
-   * Implicit class that provides new methods for any object.
-   * @param obj the object to which the new methods are provided.
-   */
-  final implicit class ApsoAny[T](val obj: T) extends AnyVal {
-
-    /**
-     * Returns this object wrapped in a `Some`.
-     * @return this object wrapped in a `Some`.
-     */
-    @deprecated("This will be removed in a future version", "2017/07/13")
-    def some = Some(obj)
-  }
-
-  /**
-   * Implicit class that provides new methods for strings.
-   * @param s the string to which the new methods are provided.
-   */
-  final implicit class ApsoString(val s: String) extends AnyVal {
-
-    /**
-     * Enumerates all the strings of a given length using the characters of this
-     * string as alphabet.
-     * @param n the number of letters of each returned string
-     * @return a sequence of strings of length `n` consisting of characters from
-     *         this string.
-     */
-    @deprecated("This will be removed in a future version", "2017/07/13")
-    def enumerate(n: Int): IndexedSeq[String] = {
-      require(n >= 0, "n must not be negative")
-      val alphabet = s.split("").filterNot(_.isEmpty).toIndexedSeq
-      if (alphabet.isEmpty || n == 0) IndexedSeq.empty[String]
-      else Iterable.fill(n)(alphabet) reduceLeft { (a, b) => for (a <- a; b <- b) yield a + b }
-    }
-
-    /**
-     * Pads this string on the left to a given length.
-     * @param length the length to which this string is to be padded
-     * @param ch the character used to fill the string
-     * @return the padded string.
-     */
-    @deprecated("This will be removed in a future version", "2017/07/13")
-    def padLeft(length: Int, ch: Char) = {
-      require(length >= 0, "length must not be negative")
-      val sb = new StringBuilder(length)
-      (1 to length - s.length).foreach { i => sb.append(ch) }
-      sb.append(s).toString()
-    }
-
-    /**
-     * Returns the UTF-8 byte array representation of this string with a
-     * trailing zero byte.
-     * @return the UTF-8 byte array representation of this string with a
-     *         trailing zero byte.
-     */
-    @deprecated("This will be removed in a future version", "2017/07/13")
-    def getBytesWithNullTerminator: Array[Byte] = {
-      val stringBytes = s.getBytes("UTF-8")
-      val buffer = new Array[Byte](stringBytes.size + 1)
-      Platform.arraycopy(stringBytes, 0, buffer, 0, stringBytes.size)
-      buffer
-    }
-  }
-
-  @tailrec
-  private[this] def quickSelect[T](seq: Seq[T], n: Int, prepend: Seq[T] = Seq.empty)(implicit ord: Ordering[T]): Seq[T] = {
-    if (seq.isEmpty || n <= 0) Seq.empty
-    else if (n >= seq.length) seq
-    else {
-      val pivot = seq.head
-      val (left, right) = seq.tail.partition { x => ord.lt(x, pivot) }
-      val fullLeftSize = left.length + 1 // size of left + pivot
-      if (left.length > n) quickSelect(left, n, prepend)
-      else if (fullLeftSize >= n) prepend ++ (left :+ pivot).take(n)
-      else quickSelect(right, n - fullLeftSize, prepend ++ left :+ pivot)
-    }
-  }
-
-  /**
-   * Implicit class that provides new methods for sequences.
-   * @param seq the sequence to which the new methods are provided
-   */
-  final implicit class ApsoSeq[T](val seq: Seq[T]) extends AnyVal {
-
-    /**
-     * Partitions this sequence into a given number of subsequences. It is
-     * guaranteed that the sequence is split into subsquences as even as
-     * possible; if the split is uneven, the first `this.length % n`
-     * subsequences contain one more element than the remaining ones.
-     * @param n the number of subsequences into which this sequence must be
-     *        split
-     * @return a new sequence of `n` subsequences of this sequence.
-     */
-    @deprecated("This will be removed in a future version", "2017/07/13")
-    def split(n: Int): IndexedSeq[Seq[T]] = {
-      require(n >= 0, "n must not be negative")
-      if (n == 0) IndexedSeq.empty
-      else {
-        val q = seq.length / n
-        val r = seq.length % n
-        val indices = for (i <- 0 to n) yield q * i + math.min(i, r)
-        for (i <- 0 until n) yield seq.slice(indices(i), indices(i + 1))
-      }
-    }
-
-    /**
-     * Returns a subsequence of this sequence based on a percentage of the total
-     * number of elements.
-     * @param percentage the percentage of elements of this sequence that the
-     *        returned sequence must contain
-     * @return a subsequence of this sequence based on a percentage of the total
-     *         number of elements.
-     */
-    @deprecated("This will be removed in a future version", "2017/07/13")
-    def sample(percentage: Double): Seq[T] = {
-      require(percentage >= 0 && percentage <= 1, "percentage must be in [0, 1]")
-      seq.take((seq.length * percentage).toInt)
-    }
-
-    /**
-     * Returns a set containing the n smallest elements of this sequence
-     * @param n number of elements to extract
-     * @param ord element ordering
-     * @return an unordered sequence of the n smallest elements
-     */
-    @deprecated("This will be removed in a future version", "2017/07/13")
-    def takeSmallest(n: Int)(implicit ord: Ordering[T]): Seq[T] = quickSelect(seq, n)
-
-    /**
-     * Returns a set containing the n largest elements of this sequence
-     * @param n number of elements to extract
-     * @param ord element ordering
-     * @return an unordered sequence of the n largest elements
-     */
-    @deprecated("This will be removed in a future version", "2017/07/13")
-    def takeLargest(n: Int)(implicit ord: Ordering[T]): Seq[T] = takeSmallest(n)(ord.reverse)
-  }
 
   /**
    * Implicit class that provides new methods for sequences for which their concrete type is
@@ -250,18 +110,6 @@ object Implicits {
      */
     def mergeSorted[U >: T](thatIt: BufferedIterator[U])(implicit ord: Ordering[U]): BufferedIterator[U] =
       MergedBufferedIterator(List(thatIt)).mergeSorted(thisIt)
-
-    /**
-     * Safer version of takeWhile that can be applied in succession
-     * @param p predicate
-     * @return iterator with the results
-     */
-    @deprecated("This will be removed in a future version", "2017/07/13")
-    def bufferedTakeWhile(p: T => Boolean) = new BufferedIterator[T] {
-      def hasNext = { thisIt.hasNext && p(thisIt.head) }
-      def next() = (if (hasNext) thisIt else Iterator.empty.buffered).next()
-      def head = thisIt.head
-    }
   }
 
   /**
@@ -269,28 +117,6 @@ object Implicits {
    * @param map the map to which the new methods are provided.
    */
   final implicit class ApsoMap[A, B](val map: Map[A, B]) extends AnyVal {
-
-    /**
-     * Merges a given map into this map. The map is constructed as follows:
-     * <ul>
-     *   <li>Keys present in this map but not in `that` map are present in the
-     *       merged map;
-     *   <li>Keys present in both maps are present in the merged map with a
-     *       value given by `f(thisValue, thatValue)`;
-     *   <li>Keys present in `that` map but not in this map are <b>not</b>
-     *       present in the merged map.
-     * </ul>
-     * @param that the map to be merged into this map
-     * @param f the function used to merge two values with the same key
-     * @return the merged map.
-     * @todo check if this method is really useful / needed.
-     */
-    @deprecated("This will be removed in a future version", "2017/07/13")
-    def merge(that: Map[A, B])(f: (B, B) => B): Map[A, B] =
-      map.foldLeft(map) {
-        case (acc, (key, value)) =>
-          if (that.contains(key)) acc + (key -> f(value, that(key))) else acc
-      }
 
     /**
      * Merges a given map with this map. The map is constructed as follows:
@@ -320,85 +146,6 @@ object Implicits {
      */
     def mapKeys[C](f: A => C): Map[C, B] =
       map.map { case (k, v) => f(k) -> v }
-  }
-
-  /**
-   * Implicit class that provides new methods for sequences of maps.
-   * @param list the sequence of maps to which the new methods are provided.
-   */
-  final implicit class ApsoListMap[K, V](val list: Seq[Map[K, V]]) extends AnyVal {
-
-    /**
-     * Converts this list of maps into a map of lists. The order of the elements
-     * is kept between structures. If a zero element is given, maps which do not
-     * contain certain keys are filled with the zero element, which effectively
-     * implies that all the lists in the given map will have the same length,
-     * corresponding to the size of the set of all keys. If a zero element is
-     * not given, only the elements present in this map are packed into the
-     * lists of the resulting map.
-     * @param zero the zero element, used as described above
-     * @return the map of lists converted from this map.
-     */
-    @deprecated("This will be removed in a future version", "2017/07/13")
-    def sequenceOnMap(zero: Option[V] = None)(implicit dummy: DummyImplicit): Map[K, List[V]] =
-      sequenceOnMap(zero.map(v => { _: Map[K, V] => v }))
-
-    /**
-     * Converts this list of maps into a map of lists. The order of the elements
-     * is kept between structures. If a zero element is given, maps which do not
-     * contain certain keys are filled with the zero element, which is created by passing
-     * the whole original map to the zero function. This implies that all the lists in
-     * the given map will have the same length, corresponding to the size of the set of
-     * all keys. If a zero element is not given, only the elements present in this map
-     * are packed into the lists of the resulting map.
-     *
-     * @param zero a function that creates the zero element, based on the original map
-     *             being processed.
-     * @return the map of lists converted from this map.
-     */
-    @deprecated("This will be removed in a future version", "2017/07/13")
-    def sequenceOnMap(zero: Option[Map[K, V] => V]): Map[K, List[V]] = {
-      def construct(value: Option[V], zero: => Option[V]) = value match {
-        case None => zero.toList
-        case Some(v) => List(v)
-      }
-
-      val keysOpt = list.view.map(_.keys).reduceOption(_ ++ _)
-
-      keysOpt.map { keys =>
-        list.foldLeft(Map[K, List[V]]()) { (acc, innerMap) =>
-          keys.foldLeft(acc) {
-            case (acc, key) =>
-              acc + (key -> (acc.getOrElse(key, Nil) :::
-                construct(innerMap.get(key), zero.map(z => z(innerMap)))))
-          }
-        }
-      } getOrElse {
-        Map()
-      }
-    }
-  }
-
-  /**
-   * Implicit class to extend the original scala Future[Option].
-   *
-   * @param f future to convert
-   */
-  implicit class ApsoOptionalFuture[A](val f: Future[Option[A]]) extends AnyVal {
-
-    /**
-     * If this future returns None or fails, fallback to another future
-     *
-     * @param other fallback
-     * @return resulting future
-     */
-    @deprecated("This will be removed in a future version", "2017/07/13")
-    def ifNoneOrErrorFallbackTo[B >: A](other: => Future[Option[B]])(implicit ec: ExecutionContext) = f.flatMap {
-      case None =>
-        other
-      case res =>
-        Future.successful(res)
-    } recoverWith PartialFunction[Throwable, Future[Option[B]]] { _ => other }
   }
 
   /**

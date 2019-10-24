@@ -1,88 +1,15 @@
 package com.velocidi.apso
 
-import scala.concurrent.Future
-import scala.util.{ Random, Try }
+import scala.util.Random
 
-import org.scalacheck.Arbitrary._
-import org.scalacheck.Gen._
 import org.specs2.ScalaCheck
-import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mutable._
 
 import com.velocidi.apso.Implicits._
 
-@deprecated("Some of classes tested here will be removed later", "2017/07/13")
-class ImplicitsSpec(implicit ee: ExecutionEnv) extends Specification with ScalaCheck with FutureExtraMatchers {
-
-  "An ApsoAny" should {
-
-    "wrap itself as a Some" in {
-      1.some === Some(1)
-      "A".some === Some("A")
-      List(1, 2, 3).some === Some(List(1, 2, 3))
-    }
-
-  }
-
-  "An ApsoString" should {
-
-    "enumerate all strings of a given length using the inner string alphabet" in {
-      "".enumerate(-1) must throwAn[IllegalArgumentException]
-      "".enumerate(0) must beEmpty
-      "".enumerate(5) must beEmpty
-      "aba".enumerate(0) must beEmpty
-      "aba".enumerate(1).toSet === Set("a", "b")
-      "aba".enumerate(3).toSet === Set("aaa", "aab", "aba", "abb", "baa", "bab", "bba", "bbb")
-    }
-
-    "pad a string with a certain character to the left" in {
-      "".padLeft(-1, ' ') must throwAn[IllegalArgumentException]
-      "".padLeft(0, ' ') === ""
-      "".padLeft(3, ' ') === "   "
-      "".padLeft(3, 'x') === "xxx"
-      "abc".padLeft(0, ' ') === "abc"
-      "abc".padLeft(1, ' ') === "abc"
-      "abc".padLeft(6, ' ') === "   abc"
-      "abc".padLeft(6, 'x') === "xxxabc"
-    }
-
-    "return itself as a null-terminated byte array" in {
-      val emptyString = "".getBytesWithNullTerminator
-      emptyString.length === 1
-      emptyString(0) === 0.toByte
-      val normalString = "abc".getBytesWithNullTerminator
-      normalString.length === 4
-      normalString(0) === 'a'.toByte
-      normalString(1) === 'b'.toByte
-      normalString(2) === 'c'.toByte
-      normalString(3) === 0.toByte
-    }
-
-  }
+class ImplicitsSpec extends Specification with ScalaCheck with FutureExtraMatchers {
 
   "An ApsoSeq" should {
-
-    "split itself into subsequences" in {
-      List.empty.split(3) === Vector(Nil, Nil, Nil)
-      List(1, 2, 3, 4).split(-1) must throwAn[IllegalArgumentException]
-      List(1, 2, 3, 4).split(0) must beEmpty
-      List(1, 2, 3, 4).split(1) === Vector(List(1, 2, 3, 4))
-      List(1, 2, 3, 4).split(2) === Vector(List(1, 2), List(3, 4))
-      List(1, 2, 3, 4).split(3) === Vector(List(1, 2), List(3), List(4))
-      List(1, 2, 3, 4).split(4) === Vector(List(1), List(2), List(3), List(4))
-      List(1, 2, 3, 4).split(5) === Vector(List(1), List(2), List(3), List(4), Nil)
-    }
-
-    "sample a percentage of itself" ! prop {
-      (list: List[Int], percentage: Double) =>
-        if (percentage < 0.0 || percentage > 1.0) {
-          Try(list.sample(percentage)).isFailure
-        } else {
-          val sample = list.sample(percentage)
-          sample.size == list.size * percentage
-          sample.toSet.subsetOf(list.toSet)
-        }
-    }.setGen2(frequency(4 -> choose(0.0, 1.0), 1 -> arbDouble.arbitrary))
 
     "merge two sorted collections" in {
       List(1, 5, 6).mergeSorted[Int, List[Int]](List.empty[Int]) === List(1, 5, 6)
@@ -106,12 +33,6 @@ class ImplicitsSpec(implicit ee: ExecutionEnv) extends Specification with ScalaC
 
       Seq(Impl1(3)).mergeSorted(Seq(Impl2(5))) === Seq(Impl1(3), Impl2(5))
       Seq(Impl1(3)).mergeSorted(Seq(Impl2(5))) must beAnInstanceOf[Seq[Base]]
-    }
-
-    "support taking the n smallest/largest values" ! prop {
-      (s: List[Int], t: Int) =>
-        s.takeSmallest(t).sorted == s.sorted.take(t) &&
-          s.takeLargest(t).sorted.reverse == s.sorted.reverse.take(t)
     }
   }
 
@@ -166,28 +87,9 @@ class ImplicitsSpec(implicit ee: ExecutionEnv) extends Specification with ScalaC
       List(1, 4, 7).iterator.buffered.mergeSorted(List(2, 5, 8).iterator.buffered).mergeSorted(List(3, 6, 9).iterator.buffered).toList ===
         List(1, 2, 3, 4, 5, 6, 7, 8, 9)
     }
-
-    "have a bufferedTakeWhile operation" in {
-      val iter = List(5, 6, 7, 8, 9, 10).iterator.buffered
-      iter.bufferedTakeWhile(_ < 4).toList === List()
-      iter.toList == List(5, 6, 7, 8, 9, 10)
-
-      val iter2 = List(5, 6, 7, 8, 9, 10).iterator.buffered
-      iter2.bufferedTakeWhile(_ < 7).toList === List(5, 6)
-      iter2.bufferedTakeWhile(_ < 10).toList === List(7, 8, 9)
-      iter2.toList === List(10)
-    }
   }
 
   "An ApsoMap" should {
-
-    "support the merge method" in {
-      val m1 = Map(1 -> 1, 2 -> 2, 3 -> 3)
-      val m2 = Map(3 -> 3, 4 -> 4, 5 -> 5)
-
-      m1.merge(m2)(_ + _) ===
-        Map(1 -> 1, 2 -> 2, 3 -> 6)
-    }
 
     "support the twoWayMerge method" in {
       val m1 = Map(1 -> 1, 2 -> 2, 3 -> 3)
@@ -202,54 +104,6 @@ class ImplicitsSpec(implicit ee: ExecutionEnv) extends Specification with ScalaC
       m.mapKeys(_ * 2) ===
         Map(2 -> 2, 6 -> 4, 10 -> 6, 14 -> 8)
     }
-  }
-
-  "An ApsoListMap" should {
-
-    "convert correctly a list of maps into a map of lists" in {
-      List[Map[Int, Int]]().sequenceOnMap() === Map[Int, List[Int]]()
-
-      List(Map(1 -> 2), Map(1 -> 3), Map(2 -> 3)).sequenceOnMap() ===
-        Map(1 -> List(2, 3), 2 -> List(3))
-
-      List(Map(1 -> "c", 2 -> "b", 3 -> "a")).sequenceOnMap() ===
-        Map(1 -> List("c"), 2 -> List("b"), 3 -> List("a"))
-
-      List(Map(1 -> "c", 2 -> "b", 3 -> "a"), Map(1 -> "c2", 4 -> "aa")).sequenceOnMap() ===
-        Map(1 -> List("c", "c2"), 2 -> List("b"), 3 -> List("a"), 4 -> List("aa"))
-    }
-
-    "convert correctly a list of maps into a map of lists with a zero value" in {
-      List[Map[Int, Int]]().sequenceOnMap(Some(0)) === Map[Int, List[Int]]()
-
-      List(Map(1 -> 2), Map(1 -> 3), Map(2 -> 3)).sequenceOnMap(Some(0)) ===
-        Map(1 -> List(2, 3, 0), 2 -> List(0, 0, 3))
-
-      List(Map(1 -> "c", 2 -> "b", 3 -> "a")).sequenceOnMap(Some("")) ===
-        Map(1 -> List("c"), 2 -> List("b"), 3 -> List("a"))
-
-      List(Map(1 -> "c", 2 -> "b", 3 -> "a"), Map(1 -> "c2", 4 -> "aa")).sequenceOnMap(Some("")) ===
-        Map(1 -> List("c", "c2"), 2 -> List("b", ""), 3 -> List("a", ""), 4 -> List("", "aa"))
-    }
-  }
-
-  "An ApsoOptionalFuture" should {
-
-    "fallback on None" in {
-      val f = Future.successful(None).ifNoneOrErrorFallbackTo(Future.successful(Some(())))
-      f must beSome.await.eventually
-    }
-
-    "fallback on Exception" in {
-      val f = Future.failed(new Exception).ifNoneOrErrorFallbackTo(Future.successful(Some(())))
-      f must beSome.await.eventually
-    }
-
-    "don't fallback on Some" in {
-      val f = Future.successful(Some(1)).ifNoneOrErrorFallbackTo(Future.successful(Some(2)))
-      f must beSome(1).await.eventually
-    }
-
   }
 
   "An ApsoRandom" should {

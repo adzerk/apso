@@ -10,6 +10,7 @@ import spray.json._
 
 import com.velocidi.apso.json.Implicits._
 
+@deprecated("Some methods tested here will be removed in a future version.", "2019/10/23")
 class ImplicitsSpec extends Specification {
   "The Apso Json Implicits should" should {
 

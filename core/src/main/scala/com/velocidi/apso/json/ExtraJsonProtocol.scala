@@ -27,6 +27,7 @@ trait ExtraTimeJsonProtocol {
   private[this] def tryToParseDuration(duration: String): Try[FiniteDuration] =
     Try(Duration.fromNanos(ConfigFactory.parseString(s"d=$duration").getDuration("d").toNanos))
 
+  @deprecated("This will be removed in a future version.", "2019/10/23")
   implicit object FiniteDurationJsonFormat extends JsonFormat[FiniteDuration] {
     def write(dur: FiniteDuration) = JsObject("milliseconds" -> dur.toMillis.toJson)
 
@@ -70,6 +71,7 @@ trait ExtraTimeJsonProtocol {
       Decoder.forProduct1[FiniteDuration, Long]("hours")(_.hours) or
       Decoder.forProduct1[FiniteDuration, Long]("days")(_.days)
 
+  @deprecated("This will be removed in a future version.", "2019/10/23")
   implicit object IntervalJsonFormat extends JsonFormat[Interval] {
     def write(i: Interval): JsValue =
       JsObject(
@@ -93,6 +95,7 @@ trait ExtraTimeJsonProtocol {
   implicit val intervalDecoder: Decoder[Interval] =
     Decoder.forProduct2[Interval, Long, Long]("startMillis", "endMillis")(new Interval(_, _))
 
+  @deprecated("This will be removed in a future version.", "2019/10/23")
   implicit object PeriodJsonFormat extends JsonFormat[Period] {
     def write(p: Period): JsValue = p.toString.toJson
 
@@ -112,6 +115,7 @@ trait ExtraTimeJsonProtocol {
 
 trait ExtraHttpJsonProtocol {
 
+  @deprecated("This will be removed in a future version.", "2019/10/23")
   implicit object URIFormat extends JsonFormat[URI] {
     def write(uri: URI) = JsString(uri.toString)
 
@@ -129,6 +133,7 @@ trait ExtraHttpJsonProtocol {
 }
 
 trait ExtraMiscJsonProtocol {
+  @deprecated("This will be removed in a future version.", "2019/10/23")
   implicit object ConfigJsonFormat extends JsonFormat[Config] {
     def write(conf: Config): JsValue = conf.root.render(ConfigRenderOptions.concise()).parseJson
     def read(json: JsValue): Config = Try(ConfigFactory.parseString(json.toString)) match {
@@ -142,6 +147,7 @@ trait ExtraMiscJsonProtocol {
   implicit val configDecoder: Decoder[Config] =
     Decoder[Json].emapTry(json => Try(ConfigFactory.parseString(json.toString)))
 
+  @deprecated("This will be removed in a future version.", "2019/10/23")
   implicit object DateTimeFormat extends JsonFormat[DateTime] {
     private val printer = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC)
 
@@ -163,6 +169,7 @@ trait ExtraMiscJsonProtocol {
   implicit val dateTimeDecoder: Decoder[DateTime] =
     Decoder[String].emapTry(v => Try(new DateTime(v)))
 
+  @deprecated("This will be removed in a future version.", "2019/10/23")
   implicit object LocalDateFormat extends JsonFormat[LocalDate] {
     override def write(date: LocalDate): JsValue = date.toString.toJson
 
@@ -190,6 +197,7 @@ trait ExtraMiscJsonProtocol {
    * @tparam V the types of the value of the map
    * @return an instance of `RootJsonFormat` for the map
    */
+  @deprecated("This will be removed in a future version.", "2019/10/23")
   def mapJsArrayFormat[K: JsonFormat, V: JsonFormat]: RootJsonFormat[Map[K, V]] = new RootJsonFormat[Map[K, V]] {
     def write(obj: Map[K, V]): JsValue = obj.map(o => JsObject(Map("key" -> o._1.toJson, "value" -> o._2.toJson))).toJson
 

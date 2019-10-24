@@ -15,6 +15,7 @@ import spray.json.DefaultJsonProtocol._
 import spray.json._
 import squants.market._
 
+@deprecated("Some of the methods tested here will be removed in a future version.", "2019/10/23")
 class ExtraJsonProtocolSpec extends Specification {
 
   "The object ExtraJsonProtocol" should {
