@@ -1,7 +1,9 @@
 package com.velocidi.apso.io
 
 import java.io.ByteArrayInputStream
+
 import scala.io.Source
+
 import org.specs2.mutable._
 
 class LazySequenceInputStreamSpec extends Specification {

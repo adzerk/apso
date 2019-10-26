@@ -8,6 +8,8 @@ import org.specs2.mutable.Specification
 import scala.io.Source
 import scala.util.Try
 
+import org.specs2.mutable.Specification
+
 class LocalFileDescriptorSpec extends Specification {
 
   "A LocalFileDescriptor" should {

@@ -89,6 +89,29 @@ lazy val json = project.in(file("apso-json"))
       "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test",
       "org.specs2"                                %% "specs2-junit"                   % "4.5.1"          % "test"))
 
+lazy val aws = project.in(file("apso-aws"))
+  .dependsOn(core)
+  .settings(commonSettings: _*)
+  .settings(
+    name := "apso-aws",
+    libraryDependencies ++= Seq(
+      "com.amazonaws"                              % "aws-java-sdk-ec2"               % "1.11.553"       % "provided",
+      "com.amazonaws"                              % "aws-java-sdk-s3"                % "1.11.553"       % "provided",
+      "com.typesafe"                               % "config"                         % "1.3.4"          % "provided",
+      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test"))
+
+lazy val io = project.in(file("apso-io"))
+  .dependsOn(aws)
+  .dependsOn(testkit % "test")
+  .settings(commonSettings: _*)
+  .settings(
+    name := "apso-io",
+    libraryDependencies ++= Seq(
+      "com.sksamuel.elastic4s"                    %% "elastic4s-core"                 % "7.1.2"          % "provided",
+      "com.amazonaws"                              % "aws-java-sdk-s3"                % "1.11.553"       % "provided",
+      "com.typesafe"                               % "config"                         % "1.3.4"          % "provided",
+      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test"))
+
 lazy val commonSettings = Seq(
   resolvers ++= Seq(
     Resolver.sonatypeRepo("snapshots"),
