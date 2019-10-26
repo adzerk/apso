@@ -1,10 +1,10 @@
 package com.velocidi.apso.json
 
-import io.circe.Json
-import org.specs2.mutable._
+import io.circe._
 import io.circe.generic.semiauto._
 import io.circe.literal._
 import io.circe.syntax._
+import org.specs2.mutable.Specification
 import spray.json.DefaultJsonProtocol._
 import spray.json._
 

@@ -3,10 +3,10 @@ package com.velocidi.apso.json
 import scala.util.Try
 
 import org.specs2.mutable.Specification
-import spray.json._
-import spray.json.DefaultJsonProtocol._
 import shapeless._
 import shapeless.Nat._
+import spray.json.DefaultJsonProtocol._
+import spray.json._
 
 @deprecated("This will be removed in a future version.", "2019/10/23")
 class JsonFormatBuilderSpec extends Specification {

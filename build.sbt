@@ -72,6 +72,23 @@ lazy val testkit = project.in(file("testkit"))
       "org.specs2"                    %% "specs2-core"                             % "4.5.1"           % "provided",
       "org.specs2"                    %% "specs2-junit"                            % "4.5.1"           % "provided"))
 
+lazy val json = project.in(file("apso-json"))
+  .dependsOn(core)
+  .settings(commonSettings: _*)
+  .settings(
+    name := "apso-json",
+    libraryDependencies ++= Seq(
+      "com.github.nscala-time"                    %% "nscala-time"                    % "2.22.0",
+      "com.typesafe"                               % "config"                         % "1.3.4"          % "provided",
+      "io.circe"                                  %% "circe-core"                     % "0.12.1",
+      "io.circe"                                  %% "circe-generic"                  % "0.12.1",
+      "io.circe"                                  %% "circe-literal"                  % "0.12.1",
+      "io.circe"                                  %% "circe-parser"                   % "0.12.1",
+      "io.spray"                                  %% "spray-json"                     % "1.3.5",
+      "org.typelevel"                             %% "squants"                        % "1.5.0",
+      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test",
+      "org.specs2"                                %% "specs2-junit"                   % "4.5.1"          % "test"))
+
 lazy val commonSettings = Seq(
   resolvers ++= Seq(
     Resolver.sonatypeRepo("snapshots"),

@@ -2,7 +2,7 @@ package com.velocidi.apso.json
 
 import scala.collection.JavaConverters._
 
-import io.circe.parser.parse
+import io.circe.parser._
 import org.specs2.matcher.EitherMatchers
 import org.specs2.mutable.Specification
 import spray.json._
