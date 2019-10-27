@@ -74,6 +74,7 @@ lazy val testkit = project.in(file("testkit"))
 
 lazy val json = project.in(file("apso-json"))
   .dependsOn(core)
+  .dependsOn(collections)
   .settings(commonSettings: _*)
   .settings(
     name := "apso-json",
@@ -111,6 +112,16 @@ lazy val io = project.in(file("apso-io"))
       "com.amazonaws"                              % "aws-java-sdk-s3"                % "1.11.553"       % "provided",
       "com.typesafe"                               % "config"                         % "1.3.4"          % "provided",
       "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test"))
+
+lazy val collections = project.in(file("apso-collections"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "apso-collections",
+    libraryDependencies ++= Seq(
+      "com.typesafe"                               % "config"                         % "1.3.4"          % "provided",
+      "org.scalacheck"                            %% "scalacheck"                     % "1.14.0"         % "test",
+      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test",
+      "org.specs2"                                %% "specs2-scalacheck"              % "4.5.1"          % "test"))
 
 lazy val commonSettings = Seq(
   resolvers ++= Seq(
