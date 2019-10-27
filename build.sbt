@@ -123,6 +123,26 @@ lazy val collections = project.in(file("apso-collections"))
       "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test",
       "org.specs2"                                %% "specs2-scalacheck"              % "4.5.1"          % "test"))
 
+lazy val elasticsearch = project.in(file("apso-elasticsearch"))
+  .dependsOn(core)
+  .dependsOn(testkit % "test")
+  .settings(commonSettings: _*)
+  .settings(
+    name := "apso-elasticsearch",
+    libraryDependencies ++= Seq(
+      "com.sksamuel.elastic4s"                    %% "elastic4s-core"                 % "7.1.2"          % "provided",
+      "com.sksamuel.elastic4s"                    %% "elastic4s-client-esjava"        % "7.1.2"          % "provided",
+      "com.typesafe"                               % "config"                         % "1.3.4"          % "provided",
+      "com.typesafe.akka"                         %% "akka-actor"                     % "2.5.22"         % "provided",
+      // NOTICE: This is added because of the exclusion rules on "elasticsearch-cluster-runner".
+      //         While it is important to exclude those libs because of clients of this apso lib, our tests
+      //         require the presence of the netty dependencies.
+      "io.netty"                                   % "netty-all"                      % "4.1.32.Final"   % "test",
+      "com.typesafe.akka"                         %% "akka-http-testkit"              % "10.1.8"         % "test",
+      "net.ruippeixotog"                          %% "akka-testkit-specs2"            % "0.2.3"          % "test",
+      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test",
+      "org.specs2"                                %% "specs2-scalacheck"              % "4.5.1"          % "test"))
+
 lazy val commonSettings = Seq(
   resolvers ++= Seq(
     Resolver.sonatypeRepo("snapshots"),
