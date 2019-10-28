@@ -166,7 +166,36 @@ lazy val encryption = project.in(file("apso-encryption"))
   .settings(
     name := "apso-encryption",
     libraryDependencies ++= Seq(
-      "commons-codec"                              % "commons-codec"                  % "1.12",
+      "commons-codec"                              % "commons-codec"                  % "1.12"))
+
+lazy val hashing = project.in(file("apso-hashing"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "apso-hashing",
+    libraryDependencies ++= Seq(
+      "com.joyent.util"                            % "fast-md5"                       % "2.7.1"))
+
+lazy val profiling = project.in(file("apso-profiling"))
+  .dependsOn(core)
+  .settings(commonSettings: _*)
+  .settings(
+    name := "apso-profiling",
+    libraryDependencies ++= Seq(
+      "org.apache.logging.log4j"                   % "log4j-api"                      % "2.11.2",
+      "org.apache.logging.log4j"                  %% "log4j-api-scala"                % "11.0"))
+
+lazy val akkaHttp = project.in(file("akka-http"))
+  .dependsOn(core)
+  .dependsOn(testkit % "test")
+  .settings(commonSettings: _*)
+  .settings(
+    name := "apso-akka-http",
+    libraryDependencies ++= Seq(
+      "com.typesafe.akka"                         %% "akka-actor"                     % "2.5.22"         % "provided",
+      "com.typesafe.akka"                         %% "akka-http"                      % "10.1.8"         % "provided",
+      "com.typesafe.akka"                         %% "akka-stream"                    % "2.5.22"         % "provided",
+      "com.typesafe.akka"                         %% "akka-http-testkit"              % "10.1.8"         % "test",
+      "net.ruippeixotog"                          %% "akka-testkit-specs2"            % "0.2.3"          % "test",
       "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test"))
 
 lazy val commonSettings = Seq(
