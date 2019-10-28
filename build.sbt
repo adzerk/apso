@@ -5,41 +5,24 @@ organization in ThisBuild := "com.velocidi"
 
 scalaVersion in ThisBuild := "2.12.9"
 
+def module(project: Project, moduleName: String, dependencies: sbt.librarymanagement.ModuleID*) =
+  project.in(file(moduleName))
+  .settings(commonSettings: _*)
+  .settings(name := s"apso-$moduleName",
+    libraryDependencies ++= dependencies)
+
 lazy val core = project.in(file("core"))
   .dependsOn(testkit % "test")
   .settings(commonSettings: _*)
   .settings(
     name := "apso",
     libraryDependencies ++= Seq(
-      "com.sksamuel.elastic4s"                    %% "elastic4s-core"                 % "7.1.2"          % "provided",
-      "com.sksamuel.elastic4s"                    %% "elastic4s-client-esjava"        % "7.1.2"          % "provided",
-      "com.amazonaws"                              % "aws-java-sdk-ec2"               % "1.11.553"       % "provided",
-      "com.amazonaws"                              % "aws-java-sdk-s3"                % "1.11.553"       % "provided",
-      "com.chuusai"                               %% "shapeless"                      % "2.3.3",
-      "com.github.nscala-time"                    %% "nscala-time"                    % "2.22.0",
-      "com.googlecode.concurrentlinkedhashmap"     % "concurrentlinkedhashmap-lru"    % "1.4.2",
       "com.hierynomus"                             % "sshj"                           % "0.27.0",
-      "com.j256.simplejmx"                         % "simplejmx"                      % "1.17",
-      "com.jcraft"                                 % "jzlib"                          % "1.1.3",
       "com.mashape.unirest"                        % "unirest-java"                   % "1.4.9",
-      "com.joyent.util"                            % "fast-md5"                       % "2.7.1",
       "com.typesafe"                               % "config"                         % "1.3.4"          % "provided",
       "com.typesafe.akka"                         %% "akka-actor"                     % "2.5.22"         % "provided",
-      "com.typesafe.akka"                         %% "akka-http"                      % "10.1.8"         % "provided",
-      "com.typesafe.akka"                         %% "akka-stream"                    % "2.5.22"         % "provided",
-      "commons-codec"                              % "commons-codec"                  % "1.12",
       "io.circe"                                  %% "circe-core"                     % "0.12.1",
-      "io.circe"                                  %% "circe-generic"                  % "0.12.1",
-      "io.circe"                                  %% "circe-literal"                  % "0.12.1",
-      "io.circe"                                  %% "circe-parser"                   % "0.12.1",
-      "io.github.andrebeat"                       %% "scala-pool"                     % "0.4.1",
-      "io.spray"                                  %% "spray-json"                     % "1.3.5",
-      "org.apache.logging.log4j"                   % "log4j-api"                      % "2.11.2",
       "org.apache.logging.log4j"                  %% "log4j-api-scala"                % "11.0",
-      "org.bouncycastle"                           % "bcpkix-jdk15on"                 % "1.60",
-      "org.bouncycastle"                           % "bcprov-jdk15on"                 % "1.60",
-      "org.scalaz"                                %% "scalaz-core"                    % "7.2.27"         % "provided",
-      "org.typelevel"                             %% "squants"                        % "1.5.0",
       // NOTICE: This is added because of the exclusion rules on "elasticsearch-cluster-runner".
       //         While it is important to exclude those libs because of clients of this apso lib, our tests
       //         require the presence of the netty dependencies.
@@ -64,75 +47,45 @@ lazy val testkit = project.in(file("testkit"))
       // FIXME: netty-all conflicts with all non-bundle netty dependencies, which are needed by GRPC and possibly others.
       "org.codelibs"                  % "elasticsearch-cluster-runner"             % "7.1.1.0" excludeAll ExclusionRule(organization = "io.netty"),
       "com.sksamuel.elastic4s"        %% "elastic4s-testkit"                       % "7.1.2",
-      "com.typesafe.akka"             %% "akka-testkit"                            % "2.5.22"          % "provided",
       "com.typesafe.akka"             %% "akka-http-testkit"                       % "10.1.8"          % "provided",
-      "com.typesafe.akka"             %% "akka-stream-testkit"                     % "2.5.22"          % "provided",
-      "org.apache.logging.log4j"       % "log4j-api"                               % "2.11.2",
-      "org.apache.logging.log4j"      %% "log4j-api-scala"                         % "11.0",
-      "org.specs2"                    %% "specs2-core"                             % "4.5.1"           % "provided",
-      "org.specs2"                    %% "specs2-junit"                            % "4.5.1"           % "provided"))
+      "org.specs2"                    %% "specs2-core"                             % "4.5.1"           % "provided"))
 
-lazy val json = project.in(file("apso-json"))
-  .dependsOn(core)
-  .dependsOn(collections)
-  .settings(commonSettings: _*)
-  .settings(
-    name := "apso-json",
-    libraryDependencies ++= Seq(
+lazy val json = module(project, "json",
       "com.github.nscala-time"                    %% "nscala-time"                    % "2.22.0",
       "com.typesafe"                               % "config"                         % "1.3.4"          % "provided",
       "io.circe"                                  %% "circe-core"                     % "0.12.1",
       "io.circe"                                  %% "circe-generic"                  % "0.12.1",
-      "io.circe"                                  %% "circe-literal"                  % "0.12.1",
       "io.circe"                                  %% "circe-parser"                   % "0.12.1",
       "io.spray"                                  %% "spray-json"                     % "1.3.5",
       "org.typelevel"                             %% "squants"                        % "1.5.0",
+      "io.circe"                                  %% "circe-literal"                  % "0.12.1"         % "test",
       "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test",
-      "org.specs2"                                %% "specs2-junit"                   % "4.5.1"          % "test"))
-
-lazy val aws = project.in(file("apso-aws"))
+      "org.specs2"                                %% "specs2-junit"                   % "4.5.1"          % "test")
   .dependsOn(core)
-  .settings(commonSettings: _*)
-  .settings(
-    name := "apso-aws",
-    libraryDependencies ++= Seq(
-      "com.amazonaws"                              % "aws-java-sdk-ec2"               % "1.11.553"       % "provided",
+  .dependsOn(collections)
+
+lazy val aws = module(project, "aws",
       "com.amazonaws"                              % "aws-java-sdk-s3"                % "1.11.553"       % "provided",
       "com.typesafe"                               % "config"                         % "1.3.4"          % "provided",
-      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test"))
+      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test")
+  .dependsOn(core)
 
-lazy val io = project.in(file("apso-io"))
+lazy val io = module(project, "io",
+      "com.amazonaws"                              % "aws-java-sdk-s3"                % "1.11.553"       % "provided",
+      "com.typesafe"                               % "config"                         % "1.3.4"          % "provided",
+      "io.github.andrebeat"                       %% "scala-pool"                     % "0.4.1",
+      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test")
   .dependsOn(aws)
   .dependsOn(testkit % "test")
-  .settings(commonSettings: _*)
-  .settings(
-    name := "apso-io",
-    libraryDependencies ++= Seq(
-      "com.sksamuel.elastic4s"                    %% "elastic4s-core"                 % "7.1.2"          % "provided",
-      "com.amazonaws"                              % "aws-java-sdk-s3"                % "1.11.553"       % "provided",
-      "com.typesafe"                               % "config"                         % "1.3.4"          % "provided",
-      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test"))
 
-lazy val collections = project.in(file("apso-collections"))
-  .settings(commonSettings: _*)
-  .settings(
-    name := "apso-collections",
-    libraryDependencies ++= Seq(
-      "com.typesafe"                               % "config"                         % "1.3.4"          % "provided",
+lazy val collections = module(project, "collections",
       "org.scalacheck"                            %% "scalacheck"                     % "1.14.0"         % "test",
       "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test",
-      "org.specs2"                                %% "specs2-scalacheck"              % "4.5.1"          % "test"))
+      "org.specs2"                                %% "specs2-scalacheck"              % "4.5.1"          % "test")
 
-lazy val elasticsearch = project.in(file("apso-elasticsearch"))
-  .dependsOn(core)
-  .dependsOn(testkit % "test")
-  .settings(commonSettings: _*)
-  .settings(
-    name := "apso-elasticsearch",
-    libraryDependencies ++= Seq(
+lazy val elasticsearch = module(project, "elasticsearch",
       "com.sksamuel.elastic4s"                    %% "elastic4s-core"                 % "7.1.2"          % "provided",
       "com.sksamuel.elastic4s"                    %% "elastic4s-client-esjava"        % "7.1.2"          % "provided",
-      "com.typesafe"                               % "config"                         % "1.3.4"          % "provided",
       "com.typesafe.akka"                         %% "akka-actor"                     % "2.5.22"         % "provided",
       // NOTICE: This is added because of the exclusion rules on "elasticsearch-cluster-runner".
       //         While it is important to exclude those libs because of clients of this apso lib, our tests
@@ -141,62 +94,41 @@ lazy val elasticsearch = project.in(file("apso-elasticsearch"))
       "com.typesafe.akka"                         %% "akka-http-testkit"              % "10.1.8"         % "test",
       "net.ruippeixotog"                          %% "akka-testkit-specs2"            % "0.2.3"          % "test",
       "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test",
-      "org.specs2"                                %% "specs2-scalacheck"              % "4.5.1"          % "test"))
-
-lazy val time = project.in(file("apso-time"))
-  .settings(commonSettings: _*)
-  .settings(
-    name := "apso-time",
-    libraryDependencies ++= Seq(
-      "com.github.nscala-time"                    %% "nscala-time"                    % "2.22.0",
-      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test"))
-
-lazy val caching = project.in(file("apso-caching"))
-  .settings(commonSettings: _*)
-  .settings(
-    name := "apso-caching",
-    libraryDependencies ++= Seq(
-      "com.googlecode.concurrentlinkedhashmap"     % "concurrentlinkedhashmap-lru"    % "1.4.2",
-      "net.ruippeixotog"                          %% "akka-testkit-specs2"            % "0.2.3"          % "test",
-      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test"))
-
-lazy val encryption = project.in(file("apso-encryption"))
-  .dependsOn(core)
-  .settings(commonSettings: _*)
-  .settings(
-    name := "apso-encryption",
-    libraryDependencies ++= Seq(
-      "commons-codec"                              % "commons-codec"                  % "1.12"))
-
-lazy val hashing = project.in(file("apso-hashing"))
-  .settings(commonSettings: _*)
-  .settings(
-    name := "apso-hashing",
-    libraryDependencies ++= Seq(
-      "com.joyent.util"                            % "fast-md5"                       % "2.7.1"))
-
-lazy val profiling = project.in(file("apso-profiling"))
-  .dependsOn(core)
-  .settings(commonSettings: _*)
-  .settings(
-    name := "apso-profiling",
-    libraryDependencies ++= Seq(
-      "org.apache.logging.log4j"                   % "log4j-api"                      % "2.11.2",
-      "org.apache.logging.log4j"                  %% "log4j-api-scala"                % "11.0"))
-
-lazy val akkaHttp = project.in(file("akka-http"))
+      "org.specs2"                                %% "specs2-scalacheck"              % "4.5.1"          % "test")
   .dependsOn(core)
   .dependsOn(testkit % "test")
-  .settings(commonSettings: _*)
-  .settings(
-    name := "apso-akka-http",
-    libraryDependencies ++= Seq(
+
+lazy val time = module(project, "time",
+      "com.github.nscala-time"                    %% "nscala-time"                    % "2.22.0",
+      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test")
+
+lazy val caching = module(project, "caching",
+      "com.googlecode.concurrentlinkedhashmap"     % "concurrentlinkedhashmap-lru"    % "1.4.2",
+      "net.ruippeixotog"                          %% "akka-testkit-specs2"            % "0.2.3"          % "test",
+      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test")
+
+lazy val encryption = module(project, "encryption",
+      "commons-codec"                              % "commons-codec"                  % "1.12")
+  .dependsOn(core)
+
+lazy val hashing = module(project, "hashing",
+      "com.joyent.util"                            % "fast-md5"                       % "2.7.1")
+
+lazy val profiling = module(project, "profiling",
+      "com.j256.simplejmx"                         % "simplejmx"                      % "1.17",
+      "org.apache.logging.log4j"                   % "log4j-api"                      % "2.11.2",
+      "org.apache.logging.log4j"                  %% "log4j-api-scala"                % "11.0")
+  .dependsOn(core)
+
+lazy val akkaHttp = module(project, "akka-http",
       "com.typesafe.akka"                         %% "akka-actor"                     % "2.5.22"         % "provided",
       "com.typesafe.akka"                         %% "akka-http"                      % "10.1.8"         % "provided",
       "com.typesafe.akka"                         %% "akka-stream"                    % "2.5.22"         % "provided",
       "com.typesafe.akka"                         %% "akka-http-testkit"              % "10.1.8"         % "test",
       "net.ruippeixotog"                          %% "akka-testkit-specs2"            % "0.2.3"          % "test",
-      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test"))
+      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test")
+  .dependsOn(core)
+  .dependsOn(testkit % "test")
 
 lazy val commonSettings = Seq(
   resolvers ++= Seq(

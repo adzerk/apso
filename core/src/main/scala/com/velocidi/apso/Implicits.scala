@@ -4,7 +4,6 @@ import scala.annotation.tailrec
 import scala.collection.generic.CanBuildFrom
 import scala.util.{ Random, Try }
 
-
 /**
  * Object containing implicit classes and methods of general purpose.
  */
