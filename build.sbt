@@ -143,6 +143,32 @@ lazy val elasticsearch = project.in(file("apso-elasticsearch"))
       "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test",
       "org.specs2"                                %% "specs2-scalacheck"              % "4.5.1"          % "test"))
 
+lazy val time = project.in(file("apso-time"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "apso-time",
+    libraryDependencies ++= Seq(
+      "com.github.nscala-time"                    %% "nscala-time"                    % "2.22.0",
+      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test"))
+
+lazy val caching = project.in(file("apso-caching"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "apso-caching",
+    libraryDependencies ++= Seq(
+      "com.googlecode.concurrentlinkedhashmap"     % "concurrentlinkedhashmap-lru"    % "1.4.2",
+      "net.ruippeixotog"                          %% "akka-testkit-specs2"            % "0.2.3"          % "test",
+      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test"))
+
+lazy val encryption = project.in(file("apso-encryption"))
+  .dependsOn(core)
+  .settings(commonSettings: _*)
+  .settings(
+    name := "apso-encryption",
+    libraryDependencies ++= Seq(
+      "commons-codec"                              % "commons-codec"                  % "1.12",
+      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test"))
+
 lazy val commonSettings = Seq(
   resolvers ++= Seq(
     Resolver.sonatypeRepo("snapshots"),
