@@ -15,7 +15,7 @@ lazy val core = project.in(file("core"))
   .dependsOn(testkit % "test")
   .settings(commonSettings: _*)
   .settings(
-    name := "apso",
+    name := "apso-core",
     libraryDependencies ++= Seq(
       "com.hierynomus"                             % "sshj"                           % "0.27.0",
       "com.mashape.unirest"                        % "unirest-java"                   % "1.4.9",
@@ -47,7 +47,9 @@ lazy val testkit = project.in(file("testkit"))
       // FIXME: netty-all conflicts with all non-bundle netty dependencies, which are needed by GRPC and possibly others.
       "org.codelibs"                  % "elasticsearch-cluster-runner"             % "7.1.1.0" excludeAll ExclusionRule(organization = "io.netty"),
       "com.sksamuel.elastic4s"        %% "elastic4s-testkit"                       % "7.1.2",
+      "com.typesafe.akka"             %% "akka-testkit"                            % "2.5.22"          % "provided",
       "com.typesafe.akka"             %% "akka-http-testkit"                       % "10.1.8"          % "provided",
+      "com.typesafe.akka"             %% "akka-stream-testkit"                     % "2.5.22"          % "provided",
       "org.specs2"                    %% "specs2-core"                             % "4.5.1"           % "provided"))
 
 lazy val json = module(project, "json",
