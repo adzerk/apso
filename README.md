@@ -6,18 +6,18 @@ Apso is Velocidi's Scala utilities library. It provides a series of useful metho
 
 ## Installation
 
-Apso's latest release is built against Scala 2.11 and Scala 2.12.
+Apso's latest release is built against Scala 2.12.
 
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso" % "0.12.10"
+libraryDependencies += "com.velocidi" %% "apso" % "0.14.0"
 ```
 
 The TestKit is available under the `apso-testkit` project. You can include it only for the `test` configuration:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-testkit" % "0.12.10" % "test"
+libraryDependencies += "com.velocidi" %% "apso-testkit" % "0.14.0" % "test"
 ```
 
 Please take into account that the library is still in an experimental stage and the interfaces might change for subsequent releases.
