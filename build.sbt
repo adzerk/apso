@@ -3,7 +3,7 @@ import ReleaseTransformations._
 
 organization in ThisBuild := "com.velocidi"
 
-scalaVersion in ThisBuild := "2.12.9"
+scalaVersion in ThisBuild := "2.12.10"
 
 lazy val core = project.in(file("core"))
   .dependsOn(testkit % "test")
