@@ -161,7 +161,7 @@ trait ProxySupport extends ClientIPDirectives {
               val fut = Future.fromTry(res)
                 .flatMap(r => r.entity.toStrict(t).map(e => r.withEntity(e)))
                 .map(Success.apply)
-              Source.fromFuture(fut).zip(Source.single(p))
+              Source.future(fut).zip(Source.single(p))
             }
         }
     }
