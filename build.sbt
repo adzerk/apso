@@ -1,5 +1,6 @@
 import scalariform.formatter.preferences._
 import ReleaseTransformations._
+import DefaultArtifactVersions._
 
 organization in ThisBuild := "com.velocidi"
 
@@ -17,118 +18,118 @@ lazy val core = project.in(file("core"))
   .settings(
     name := "apso-core",
     libraryDependencies ++= Seq(
-      "com.hierynomus"                             % "sshj"                           % "0.27.0",
-      "com.mashape.unirest"                        % "unirest-java"                   % "1.4.9",
-      "com.typesafe"                               % "config"                         % "1.3.4"          % "provided",
-      "com.typesafe.akka"                         %% "akka-actor"                     % "2.5.22"         % "provided",
-      "io.circe"                                  %% "circe-core"                     % "0.12.1",
-      "org.apache.logging.log4j"                  %% "log4j-api-scala"                % "11.0",
+      "com.hierynomus"                           % "sshj"                           % "0.27.0",
+      "com.mashape.unirest"                      % "unirest-java"                   % "1.4.9",
+      "com.typesafe"                             % "config"                         % defaultVersion % "provided",
+      "com.typesafe.akka"                       %% "akka-actor"                     % defaultVersion % "provided",
+      "io.circe"                                %% "circe-core"                     % defaultVersion,
+      "org.apache.logging.log4j"                %% "log4j-api-scala"                % "11.0",
       // NOTICE: This is added because of the exclusion rules on "elasticsearch-cluster-runner".
       //         While it is important to exclude those libs because of clients of this apso lib, our tests
       //         require the presence of the netty dependencies.
-      "io.netty"                                   % "netty-all"                      % "4.1.32.Final"   % "test",
-      "com.typesafe.akka"                         %% "akka-http-testkit"              % "10.1.8"         % "test",
-      "com.typesafe.akka"                         %% "akka-stream-testkit"            % "2.5.22"         % "test",
-      "junit"                                      % "junit"                          % "4.12"           % "test",
-      "net.ruippeixotog"                          %% "akka-testkit-specs2"            % "0.2.3"          % "test",
-      "org.apache.logging.log4j"                   % "log4j-core"                     % "2.11.2"         % "test",
-      "org.scalacheck"                            %% "scalacheck"                     % "1.14.0"         % "test",
-      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test",
-      "org.specs2"                                %% "specs2-scalacheck"              % "4.5.1"          % "test",
-      "org.specs2"                                %% "specs2-junit"                   % "4.5.1"          % "test"))
+      "io.netty"                                 % "netty-all"                      % defaultVersion % "test",
+      "com.typesafe.akka"                       %% "akka-http-testkit"              % defaultVersion % "test",
+      "com.typesafe.akka"                       %% "akka-stream-testkit"            % defaultVersion % "test",
+      "junit"                                    % "junit"                          % "4.12"         % "test",
+      "net.ruippeixotog"                        %% "akka-testkit-specs2"            % defaultVersion % "test",
+      "org.apache.logging.log4j"                 % "log4j-core"                     % "2.11.2"       % "test",
+      "org.scalacheck"                          %% "scalacheck"                     % defaultVersion % "test",
+      "org.specs2"                              %% "specs2-core"                    % defaultVersion % "test",
+      "org.specs2"                              %% "specs2-scalacheck"              % defaultVersion % "test",
+      "org.specs2"                              %% "specs2-junit"                   % defaultVersion % "test"))
 
 lazy val testkit = project.in(file("testkit"))
   .settings(commonSettings: _*)
   .settings(
     name := "apso-testkit",
     libraryDependencies ++= Seq(
-      "com.sksamuel.elastic4s"        %% "elastic4s-core"                          % "7.1.2"           % "provided",
-      "com.sksamuel.elastic4s"        %% "elastic4s-client-esjava"                 % "7.1.2"           % "provided",
+      "com.sksamuel.elastic4s"                  %% "elastic4s-core"                % defaultVersion % "provided",
+      "com.sksamuel.elastic4s"                  %% "elastic4s-client-esjava"       % defaultVersion % "provided",
       // FIXME: netty-all conflicts with all non-bundle netty dependencies, which are needed by GRPC and possibly others.
-      "org.codelibs"                  % "elasticsearch-cluster-runner"             % "7.1.1.0" excludeAll ExclusionRule(organization = "io.netty"),
-      "com.sksamuel.elastic4s"        %% "elastic4s-testkit"                       % "7.1.2",
-      "com.typesafe.akka"             %% "akka-testkit"                            % "2.5.22"          % "provided",
-      "com.typesafe.akka"             %% "akka-http-testkit"                       % "10.1.8"          % "provided",
-      "com.typesafe.akka"             %% "akka-stream-testkit"                     % "2.5.22"          % "provided",
-      "org.specs2"                    %% "specs2-core"                             % "4.5.1"           % "provided"))
+      "org.codelibs"                             % "elasticsearch-cluster-runner"  % "7.1.1.0" excludeAll ExclusionRule(organization = "io.netty"),
+      "com.sksamuel.elastic4s"                  %% "elastic4s-testkit"             % defaultVersion,
+      "com.typesafe.akka"                       %% "akka-testkit"                  % defaultVersion % "provided",
+      "com.typesafe.akka"                       %% "akka-http-testkit"             % defaultVersion % "provided",
+      "com.typesafe.akka"                       %% "akka-stream-testkit"           % defaultVersion % "provided",
+      "org.specs2"                              %% "specs2-core"                   % defaultVersion % "provided"))
 
 lazy val json = module(project, "json",
-      "com.github.nscala-time"                    %% "nscala-time"                    % "2.22.0",
-      "com.typesafe"                               % "config"                         % "1.3.4"          % "provided",
-      "io.circe"                                  %% "circe-core"                     % "0.12.1",
-      "io.circe"                                  %% "circe-generic"                  % "0.12.1",
-      "io.circe"                                  %% "circe-parser"                   % "0.12.1",
-      "io.spray"                                  %% "spray-json"                     % "1.3.5",
-      "org.typelevel"                             %% "squants"                        % "1.5.0",
-      "io.circe"                                  %% "circe-literal"                  % "0.12.1"         % "test",
-      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test",
-      "org.specs2"                                %% "specs2-junit"                   % "4.5.1"          % "test")
+      "com.github.nscala-time"                  %% "nscala-time"                   % defaultVersion,
+      "com.typesafe"                             % "config"                        % defaultVersion % "provided",
+      "io.circe"                                %% "circe-core"                    % defaultVersion,
+      "io.circe"                                %% "circe-generic"                 % defaultVersion,
+      "io.circe"                                %% "circe-parser"                  % defaultVersion,
+      "io.spray"                                %% "spray-json"                    % "1.3.5",
+      "org.typelevel"                           %% "squants"                       % "1.5.0",
+      "io.circe"                                %% "circe-literal"                 % defaultVersion % "test",
+      "org.specs2"                              %% "specs2-core"                   % defaultVersion % "test",
+      "org.specs2"                              %% "specs2-junit"                  % defaultVersion % "test")
   .dependsOn(core)
   .dependsOn(collections)
 
 lazy val aws = module(project, "aws",
-      "com.amazonaws"                              % "aws-java-sdk-s3"                % "1.11.553"       % "provided",
-      "com.typesafe"                               % "config"                         % "1.3.4"          % "provided",
-      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test")
+      "com.amazonaws"                            % "aws-java-sdk-s3"               % defaultVersion % "provided",
+      "com.typesafe"                             % "config"                        % defaultVersion % "provided",
+      "org.specs2"                              %% "specs2-core"                   % defaultVersion % "test")
   .dependsOn(core)
 
 lazy val io = module(project, "io",
-      "com.amazonaws"                              % "aws-java-sdk-s3"                % "1.11.553"       % "provided",
-      "com.typesafe"                               % "config"                         % "1.3.4"          % "provided",
-      "io.github.andrebeat"                       %% "scala-pool"                     % "0.4.1",
-      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test")
+      "com.amazonaws"                            % "aws-java-sdk-s3"               % defaultVersion % "provided",
+      "com.typesafe"                             % "config"                        % defaultVersion % "provided",
+      "io.github.andrebeat"                     %% "scala-pool"                    % "0.4.1",
+      "org.specs2"                              %% "specs2-core"                   % defaultVersion % "test")
   .dependsOn(aws)
   .dependsOn(testkit % "test")
 
 lazy val collections = module(project, "collections",
-      "org.scalacheck"                            %% "scalacheck"                     % "1.14.0"         % "test",
-      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test",
-      "org.specs2"                                %% "specs2-scalacheck"              % "4.5.1"          % "test")
+      "org.scalacheck"                          %% "scalacheck"                    % defaultVersion % "test",
+      "org.specs2"                              %% "specs2-core"                   % defaultVersion % "test",
+      "org.specs2"                              %% "specs2-scalacheck"             % defaultVersion % "test")
 
 lazy val elasticsearch = module(project, "elasticsearch",
-      "com.sksamuel.elastic4s"                    %% "elastic4s-core"                 % "7.1.2"          % "provided",
-      "com.sksamuel.elastic4s"                    %% "elastic4s-client-esjava"        % "7.1.2"          % "provided",
-      "com.typesafe.akka"                         %% "akka-actor"                     % "2.5.22"         % "provided",
+      "com.sksamuel.elastic4s"                  %% "elastic4s-core"                % defaultVersion % "provided",
+      "com.sksamuel.elastic4s"                  %% "elastic4s-client-esjava"       % defaultVersion % "provided",
+      "com.typesafe.akka"                       %% "akka-actor"                    % defaultVersion % "provided",
       // NOTICE: This is added because of the exclusion rules on "elasticsearch-cluster-runner".
       //         While it is important to exclude those libs because of clients of this apso lib, our tests
       //         require the presence of the netty dependencies.
-      "io.netty"                                   % "netty-all"                      % "4.1.32.Final"   % "test",
-      "com.typesafe.akka"                         %% "akka-http-testkit"              % "10.1.8"         % "test",
-      "net.ruippeixotog"                          %% "akka-testkit-specs2"            % "0.2.3"          % "test",
-      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test",
-      "org.specs2"                                %% "specs2-scalacheck"              % "4.5.1"          % "test")
+      "io.netty"                                 % "netty-all"                     % defaultVersion % "test",
+      "com.typesafe.akka"                       %% "akka-http-testkit"             % defaultVersion % "test",
+      "net.ruippeixotog"                        %% "akka-testkit-specs2"           % defaultVersion % "test",
+      "org.specs2"                              %% "specs2-core"                   % defaultVersion % "test",
+      "org.specs2"                              %% "specs2-scalacheck"             % defaultVersion % "test")
   .dependsOn(core)
   .dependsOn(testkit % "test")
 
 lazy val time = module(project, "time",
-      "com.github.nscala-time"                    %% "nscala-time"                    % "2.22.0",
-      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test")
+      "com.github.nscala-time"                  %% "nscala-time"                   % defaultVersion,
+      "org.specs2"                              %% "specs2-core"                   % defaultVersion % "test")
 
 lazy val caching = module(project, "caching",
-      "com.googlecode.concurrentlinkedhashmap"     % "concurrentlinkedhashmap-lru"    % "1.4.2",
-      "net.ruippeixotog"                          %% "akka-testkit-specs2"            % "0.2.3"          % "test",
-      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test")
+      "com.googlecode.concurrentlinkedhashmap"   % "concurrentlinkedhashmap-lru"   % "1.4.2",
+      "net.ruippeixotog"                        %% "akka-testkit-specs2"           % defaultVersion % "test",
+      "org.specs2"                              %% "specs2-core"                   % defaultVersion % "test")
 
 lazy val encryption = module(project, "encryption",
-      "commons-codec"                              % "commons-codec"                  % "1.12")
+      "commons-codec"                            % "commons-codec"                 % "1.12")
   .dependsOn(core)
 
 lazy val hashing = module(project, "hashing",
-      "com.joyent.util"                            % "fast-md5"                       % "2.7.1")
+      "com.joyent.util"                          % "fast-md5"                      % "2.7.1")
 
 lazy val profiling = module(project, "profiling",
-      "com.j256.simplejmx"                         % "simplejmx"                      % "1.17",
-      "org.apache.logging.log4j"                   % "log4j-api"                      % "2.11.2",
-      "org.apache.logging.log4j"                  %% "log4j-api-scala"                % "11.0")
+      "com.j256.simplejmx"                       % "simplejmx"                     % "1.17",
+      "org.apache.logging.log4j"                 % "log4j-api"                     % "2.11.2",
+      "org.apache.logging.log4j"                %% "log4j-api-scala"               % "11.0")
   .dependsOn(core)
 
 lazy val akkaHttp = module(project, "akka-http",
-      "com.typesafe.akka"                         %% "akka-actor"                     % "2.5.22"         % "provided",
-      "com.typesafe.akka"                         %% "akka-http"                      % "10.1.8"         % "provided",
-      "com.typesafe.akka"                         %% "akka-stream"                    % "2.5.22"         % "provided",
-      "com.typesafe.akka"                         %% "akka-http-testkit"              % "10.1.8"         % "test",
-      "net.ruippeixotog"                          %% "akka-testkit-specs2"            % "0.2.3"          % "test",
-      "org.specs2"                                %% "specs2-core"                    % "4.5.1"          % "test")
+      "com.typesafe.akka"                       %% "akka-actor"                    % defaultVersion % "provided",
+      "com.typesafe.akka"                       %% "akka-http"                     % defaultVersion % "provided",
+      "com.typesafe.akka"                       %% "akka-stream"                   % defaultVersion % "provided",
+      "com.typesafe.akka"                       %% "akka-http-testkit"             % defaultVersion % "test",
+      "net.ruippeixotog"                        %% "akka-testkit-specs2"           % defaultVersion % "test",
+      "org.specs2"                              %% "specs2-core"                   % defaultVersion % "test")
   .dependsOn(core)
   .dependsOn(testkit % "test")
 
