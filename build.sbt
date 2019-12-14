@@ -4,7 +4,7 @@ import DefaultArtifactVersions._
 
 organization in ThisBuild := "com.velocidi"
 
-scalaVersion in ThisBuild := "2.12.9"
+scalaVersion in ThisBuild := "2.12.10"
 
 def module(project: Project, moduleName: String, dependencies: sbt.librarymanagement.ModuleID*) =
   project.in(file(moduleName))

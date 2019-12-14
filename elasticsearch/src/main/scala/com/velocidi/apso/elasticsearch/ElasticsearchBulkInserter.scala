@@ -48,13 +48,13 @@ class ElasticsearchBulkInserter(bulkInserterConfig: config.Elasticsearch.BulkIns
 
   private[this] def becomeElasticsearchUp(): Unit = {
     esStateListeners.foreach { _ ! ElasticsearchUp }
-    val periodicFlush = context.system.scheduler.schedule(flushFrequency, flushFrequency, self, Flush)
+    val periodicFlush = context.system.scheduler.scheduleWithFixedDelay(flushFrequency, flushFrequency, self, Flush)
     context.become(elasticsearchUp(periodicFlush))
   }
 
   private[this] def becomeElasticsearchDown(): Unit = {
     esStateListeners.foreach { _ ! ElasticsearchDown }
-    val periodicCheck = context.system.scheduler.schedule(
+    val periodicCheck = context.system.scheduler.scheduleWithFixedDelay(
       esDownCheckFrequency, esDownCheckFrequency, self, CheckElasticsearch)
     context.become(elasticsearchDown(periodicCheck))
   }
