@@ -12,12 +12,7 @@ def module(project: Project, moduleName: String, dependencies: sbt.librarymanage
   .settings(name := s"apso-$moduleName",
     libraryDependencies ++= dependencies)
 
-lazy val core = project.in(file("core"))
-  .dependsOn(testkit % "test")
-  .settings(commonSettings: _*)
-  .settings(
-    name := "apso-core",
-    libraryDependencies ++= Seq(
+lazy val core = module(project,"core",
       "com.hierynomus"                           % "sshj"                           % "0.27.0",
       "com.mashape.unirest"                      % "unirest-java"                   % "1.4.9",
       "com.typesafe"                             % "config"                         % defaultVersion % "provided",
@@ -36,13 +31,10 @@ lazy val core = project.in(file("core"))
       "org.scalacheck"                          %% "scalacheck"                     % defaultVersion % "test",
       "org.specs2"                              %% "specs2-core"                    % defaultVersion % "test",
       "org.specs2"                              %% "specs2-scalacheck"              % defaultVersion % "test",
-      "org.specs2"                              %% "specs2-junit"                   % defaultVersion % "test"))
+      "org.specs2"                              %% "specs2-junit"                   % defaultVersion % "test")
+  .dependsOn(testkit % "test")
 
-lazy val testkit = project.in(file("testkit"))
-  .settings(commonSettings: _*)
-  .settings(
-    name := "apso-testkit",
-    libraryDependencies ++= Seq(
+lazy val testkit = module(project, "testkit",
       "com.sksamuel.elastic4s"                  %% "elastic4s-core"                % defaultVersion % "provided",
       "com.sksamuel.elastic4s"                  %% "elastic4s-client-esjava"       % defaultVersion % "provided",
       // FIXME: netty-all conflicts with all non-bundle netty dependencies, which are needed by GRPC and possibly others.
@@ -51,7 +43,7 @@ lazy val testkit = project.in(file("testkit"))
       "com.typesafe.akka"                       %% "akka-testkit"                  % defaultVersion % "provided",
       "com.typesafe.akka"                       %% "akka-http-testkit"             % defaultVersion % "provided",
       "com.typesafe.akka"                       %% "akka-stream-testkit"           % defaultVersion % "provided",
-      "org.specs2"                              %% "specs2-core"                   % defaultVersion % "provided"))
+      "org.specs2"                              %% "specs2-core"                   % defaultVersion % "provided")
 
 lazy val json = module(project, "json",
       "com.github.nscala-time"                  %% "nscala-time"                   % defaultVersion,
