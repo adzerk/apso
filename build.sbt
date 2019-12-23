@@ -116,7 +116,7 @@ lazy val profiling = module(project, "profiling",
       "org.apache.logging.log4j"                %% "log4j-api-scala"               % "11.0")
   .dependsOn(core)
 
-lazy val spray = module(project, "spray",
+lazy val akkaHttp = module(project, "akka-http",
       "com.typesafe.akka"                       %% "akka-actor"                    % defaultVersion % "provided",
       "com.typesafe.akka"                       %% "akka-http"                     % defaultVersion % "provided",
       "com.typesafe.akka"                       %% "akka-stream"                   % defaultVersion % "provided",
@@ -129,8 +129,8 @@ lazy val spray = module(project, "spray",
 lazy val apso = (project in file("."))
   .settings(commonSettings: _*)
   .settings(name := "apso")
-  .dependsOn(core, json, aws, io, collections, elasticsearch, time, caching, encryption, hashing, profiling, spray)
-  .aggregate(core, json, aws, io, collections, elasticsearch, time, caching, encryption, hashing, profiling, spray, testkit)
+  .dependsOn(core, json, aws, io, collections, elasticsearch, time, caching, encryption, hashing, profiling, akkaHttp)
+  .aggregate(core, json, aws, io, collections, elasticsearch, time, caching, encryption, hashing, profiling, akkaHttp, testkit)
 
 lazy val commonSettings = Seq(
   resolvers ++= Seq(

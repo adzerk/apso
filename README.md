@@ -38,6 +38,10 @@ Please take into account that the library is still in an experimental stage and 
     - [Reflect](#reflect)
     - [Retry](#retry)
     - [TryWith](#trywith)
+- [Akka HTTP](#akka-http)
+    - [ClientIPDirectives](#clientipdirectives)
+    - [ExtraMiscDirectives](#extramiscdirectives)
+    - [ProxySupport](#proxysupport)
 - [Amazon Web Services](#amazon-web-services)
     - [ConfigCredentialsProvider](#configcredentialsprovider)
     - [CredentialStore](#credentialstore)
@@ -63,11 +67,6 @@ Please take into account that the library is still in an experimental stage and 
 - [Profiling](#profiling)
     - [CpuSampler](#cpusampler)
     - [SimpleJmx](#simplejmx)
-- [Spray](#spray)
-    - [ClientIPDirectives](#clientipdirectives)
-    - [ExtraMiscDirectives](#extramiscdirectives)
-    - [Implicits](#implicits)
-    - [ProxySupport](#proxysupport)
 - [Time](#time)
 - [TestKit](#testkit)
 
@@ -344,6 +343,28 @@ scala> TryWith(buildResource)(badHandler)
 Resource is now Closed
 res3: scala.util.Try[Nothing] = Failure(java.lang.Exception)
 ```
+
+## Akka HTTP
+
+The `akka-http` module provides additional [directives](https://doc.akka.io/docs/akka-http/current/routing-dsl/directives/index.html#directives) to be used in [akka-http](https://doc.akka.io/docs/akka-http/current/index.html).
+
+To use it in an existing SBT project, add the following dependency to your `build.sbt`:
+
+```scala
+libraryDependencies += "com.velocidi" %% "apso-akka-http" % "0.14.0"
+```
+
+### ClientIPDirectives
+
+The `ClientIPDirectives` trait exposes an `optionalRawClientIP` directive that extracts the raw IP of the client from either the `X-Forwarded-For`, `Remote-Address` or `X-Real-IP` header, in that order of priority.
+
+### ExtraMiscDirectives
+
+The `ExtraMiscDirectives` trait exposes the directives `cacheControlMaxAge(maxAgeDuration)` and `optionalRefererHost` to set the cache-control header to the supplied finite duration (the minimum resolution is 1 second) to extract the referer from the HTTP request header, respectively. The `ExtraMiscDirectives` companion object exposes a `cacheControlNoCache` directive to reply with the `no-cache` option in the `Cache-Control` header.
+
+### ProxySupport
+
+The `ProxySupport` traits adds helper methods to proxy requests to a given uri, either directly (`proxyTo`), or with the unmatched path and query parameters of the current context (`proxyToUnmatchedPath`).
 
 ## Amazon Web Services
 
@@ -795,32 +816,6 @@ The `CpuSampler` is a lightweight configurable CPU profiler based on call stack 
 ### SimpleJmx
 
 The `SimpleJmx` trait allows mixing in a simple JMX server. The JMX server is configured through a `Config` object, where the parameters `host` and `port` can be set. When behind a firewall, both the `port` defined (the RMI registry port) and the `port + 1` port (the RMI server port) need to be open. In the event of a binding failure to the defined port, a retry is performed with a random port.
-
-## Spray
-
-The `spray` module provides additional [directives](http://spray.io/documentation/1.2.2/spray-routing/key-concepts/directives/) to be used in [spray-routing](https://github.com/spray/spray).
-
-To use it in an existing SBT project, add the following dependency to your `build.sbt`:
-
-```scala
-libraryDependencies += "com.velocidi" %% "apso-spray" % "0.14.0"
-```
-
-### ClientIPDirectives
-
-The `ClientIPDirectives` trait exposes an `optionalRawClientIP` directive that extracts the raw IP of the client from either the `X-Forwarded-For`, `Remote-Address` or `X-Real-IP` header, in that order of priority.
-
-### ExtraMiscDirectives
-
-The `ExtraMiscDirectives` trait exposes the directives `cacheControlMaxAge(maxAgeDuration)` and `optionalRefererHost` to set the cache-control header to the supplied finite duration (the minimum resolution is 1 second) to extract the referer from the HTTP request header, respectively. The `ExtraMiscDirectives` companion object exposes a `cacheControlNoCache` directive to reply with the `no-cache` option in the `Cache-Control` header.
-
-### Implicits
-
-The `Implicits` companion object exposes an implicit method that provides a [`Marshaller`](http://spray.io/documentation/1.2.2/spray-httpx/marshalling/) for Scalaz's `Validation`.
-
-### ProxySupport
-
-The `ProxySupport` traits adds helper methods to proxy requests to a given uri, either directly (`proxyTo`), or with the unmatched path and query parameters of the current context (`proxyToUnmatchedPath`).
 
 ## Time
 
