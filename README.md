@@ -2,7 +2,7 @@
 
 # Apso [![Build Status](https://travis-ci.org/velocidi/apso.svg?branch=master)](https://travis-ci.org/velocidi/apso) [![Maven Central](https://img.shields.io/maven-central/v/com.velocidi/apso_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/com.velocidi/apso_2.12)
 
-Apso is Velocidi's Scala project of utilities libraries. It provides a series of useful methods.
+Apso is Velocidi's collection of Scala utility libraries. It provides a series of useful methods.
 
 ## Installation
 
