@@ -90,6 +90,7 @@ lazy val elasticsearch = module(project, "elasticsearch",
       "com.sksamuel.elastic4s"                  %% "elastic4s-core"                % defaultVersion % "provided",
       "com.sksamuel.elastic4s"                  %% "elastic4s-client-esjava"       % defaultVersion % "provided",
       "com.typesafe.akka"                       %% "akka-actor"                    % defaultVersion % "provided",
+      "com.typesafe.akka"                       %% "akka-stream"                   % defaultVersion % "provided",
       // NOTICE: This is added because of the exclusion rules on "elasticsearch-cluster-runner".
       //         While it is important to exclude those libs because of clients of this apso lib, our tests
       //         require the presence of the netty dependencies.

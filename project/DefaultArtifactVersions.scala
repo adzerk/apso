@@ -29,10 +29,10 @@ trait DefaultArtifactVersions {
   final val defaultOrganizationVersions = Map(
     "com.amazonaws"          -> "1.11.553",
     "com.sksamuel.elastic4s" -> "7.1.2",
-    "com.typesafe.akka"      -> "2.5.22",
-    "io.circe"               -> "0.12.1",
-    "io.netty"               -> "4.1.32.Final",
-    "org.specs2"             -> "4.5.1")
+    "com.typesafe.akka"      -> "2.6.0",
+    "io.circe"               -> "0.12.3",
+    "io.netty"               -> "4.1.43.Final",
+    "org.specs2"             -> "4.8.1")
 
 
   /**
@@ -40,11 +40,11 @@ trait DefaultArtifactVersions {
    */
   final val defaultModuleVersions = Map(
     ("com.github.nscala-time", "nscala-time")         -> "2.22.0",
-    ("com.typesafe",           "config")              -> "1.3.4",
-    ("com.typesafe.akka",      "akka-http")           -> "10.1.8",
-    ("com.typesafe.akka",      "akka-http-testkit")   -> "10.1.8",
+    ("com.typesafe",           "config")              -> "1.4.0",
+    ("com.typesafe.akka",      "akka-http")           -> "10.1.11",
+    ("com.typesafe.akka",      "akka-http-testkit")   -> "10.1.11",
     ("net.ruippeixotog",       "akka-testkit-specs2") -> "0.2.3",
-    ("org.scalacheck",         "scalacheck")          -> "1.14.0")
+    ("org.scalacheck",         "scalacheck")          -> "1.14.2")
 
   /**
    * The value to be used in the library dependency in order to fetch the
