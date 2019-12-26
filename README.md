@@ -2,7 +2,7 @@
 
 # Apso [![Build Status](https://travis-ci.org/velocidi/apso.svg?branch=master)](https://travis-ci.org/velocidi/apso) [![Maven Central](https://img.shields.io/maven-central/v/com.velocidi/apso_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/com.velocidi/apso_2.12)
 
-Apso is Velocidi's Scala utilities library. It provides a series of useful methods.
+Apso is Velocidi's collection of Scala utility libraries. It provides a series of useful methods.
 
 ## Installation
 
@@ -14,6 +14,8 @@ To use it in an existing SBT project, add the following dependency to your `buil
 libraryDependencies += "com.velocidi" %% "apso" % "0.14.0"
 ```
 
+The project is divided in modules, you can instead install only a specific module.
+
 The TestKit is available under the `apso-testkit` project. You can include it only for the `test` configuration:
 
 ```scala
@@ -24,14 +26,22 @@ Please take into account that the library is still in an experimental stage and 
 
 ## Table of Contents
 
-- [Geo](#geo)
-- [JreVersionHelper](#jreversionhelper)
-- [Logging](#logging)
-- [ProgressBar](#progressbar)
-- [Reflect](#reflect)
-- [Retry](#retry)
-- [TryWith](#trywith)
-- [Implicits](#implicits)
+- [Core](#core)
+    - [Config](#config)
+        - [LazyConfigFactory](#lazyconfigfactory)
+    - [HTTP](#http)
+    - [Geo](#geo)
+    - [Implicits](#implicits)
+    - [JreVersionHelper](#jreversionhelper)
+    - [Logging](#logging)
+    - [ProgressBar](#progressbar)
+    - [Reflect](#reflect)
+    - [Retry](#retry)
+    - [TryWith](#trywith)
+- [Akka HTTP](#akka-http)
+    - [ClientIPDirectives](#clientipdirectives)
+    - [ExtraMiscDirectives](#extramiscdirectives)
+    - [ProxySupport](#proxysupport)
 - [Amazon Web Services](#amazon-web-services)
     - [ConfigCredentialsProvider](#configcredentialsprovider)
     - [CredentialStore](#credentialstore)
@@ -40,18 +50,15 @@ Please take into account that the library is still in an experimental stage and 
 - [Collections](#collections)
     - [Trie](#trie)
     - [TypedMap](#typedmap)
-- [Config](#config)
-    - [LazyConfigFactory](#lazyconfigfactory)
+    - [Iterators](#iterators)
+        - [CircularIterator](#circulariterator)
+        - [CompositeIterator](#compositeiterator)
+        - [MergedBufferedIterator](#mergedbufferediterator)
 - [Encryption](#encryption)
 - [Hashing](#hashing)
-- [HTTP](#http)
 - [IO](#io)
     - [FileDescriptor](#filedescriptor)
     - [ResourceUtil](#resourceutil)
-- [Iterators](#iterators)
-    - [CircularIterator](#circulariterator)
-    - [CompositeIterator](#compositeiterator)
-    - [MergedBufferedIterator](#mergedbufferediterator)
 - [JSON](#json)
     - [ExtraJsonProtocol](#extrajsonprotocol)
     - [JsValue](#jsvalue)
@@ -60,15 +67,52 @@ Please take into account that the library is still in an experimental stage and 
 - [Profiling](#profiling)
     - [CpuSampler](#cpusampler)
     - [SimpleJmx](#simplejmx)
-- [Spray](#spray)
-    - [ClientIPDirectives](#clientipdirectives)
-    - [ExtraMiscDirectives](#extramiscdirectives)
-    - [Implicits](#implicits)
-    - [ProxySupport](#proxysupport)
 - [Time](#time)
 - [TestKit](#testkit)
 
-## Geo
+## Core
+
+To use it in an existing SBT project, add the following dependency to your `build.sbt`:
+
+```scala
+libraryDependencies += "com.velocidi" %% "apso-core" % "0.14.0"
+```
+
+### Config
+
+Apso provides methods to ease working with Typesafe's [config](https://github.com/typesafehub/config).
+
+#### LazyConfigFactory
+
+The `LazyConfigFactory` object provides static methods for creating `Config` instances in a lazy way. The lazy way refers to the variable loading process. The usual process loads variables in config files eagerly (i.e. the path needs to be defined in the same file it is refered to). The loading process provided by `LazyConfigFactory` loads and merges all configuration files and only then resolves variables. This loading process introduces a third file (beyond the default ones - `application.conf` and `reference.conf`): `overrides.conf`. This file has priority over the `application.conf` file and can be used to specify keys that should always be overriden, e.g. by environment variables.
+
+### HTTP
+
+Apso provides a tiny wrapper for [Dispatch](http://dispatch.databinder.net/) with synchronous operations. It's called `W`, and the following shows some sample usage:
+
+```scala
+scala> import com.velocidi.apso.http.W
+import com.velocidi.apso.http.W
+
+scala> W.get("http://www.google.com/").getStatusCode
+res0: Int = 302
+
+scala> W.post("http://www.google.com/", "").getStatusCode
+res1: Int = 405
+
+scala> W.put("http://www.google.com/", "").getStatusCode
+res2: Int = 405
+
+scala> W.delete("http://www.google.com/").getStatusCode
+res3: Int = 405
+
+scala> W.head("http://www.google.com/").getStatusCode
+res4: Int = 302
+```
+
+The POST and PUT methods can also receive the body as `JSON` (of [circe](https://github.com/circe/circe)), which adds the `Content-type` header accordingly.
+
+### Geo
 
 The `Geo` object provides methods to compute distances in kilometers between two points on the planet Earth, calculated using the spherical [law of cosines](https://en.wikipedia.org/wiki/Great-circle_distance#Formulas). Coordinates are represented by a pair of `Double` for latitude and longitude.
 
@@ -93,7 +137,52 @@ scala> distFromOffice((38.7223032, -9.1414664))
 res2: Double = 275.118392477037
 ```
 
-## JreVersionHelper
+### Implicits
+
+Apso provides implicit conversions from `String`, `Seq[_]`, `Map[_, _]`, `Seq[Map[_, _]]` and `AutoCloseable` to extended types that come packed with extended features.
+
+```scala
+scala> import com.velocidi.apso.Implicits._
+import com.velocidi.apso.Implicits._
+
+scala> Seq(1, 3, 5).mergeSorted(Seq(2, 4))
+res9: Seq[Int] = List(1, 2, 3, 4, 5)
+
+scala> (0 to 15).average
+res10: Int = 7
+
+scala> Iterator(1, 3, 5).buffered.mergeSorted(Iterator(2, 4).buffered).toList
+res11: List[Int] = List(1, 2, 3, 4, 5)
+
+scala> Map(1 -> 2, 3 -> 6).twoWayMerge(Map(2 -> 4, 3 -> 5)) { (a, b) => b }
+res16: Map[Int,Int] = Map(2 -> 4, 3 -> 5, 1 -> 2)
+
+scala> Map(1 -> 2, 2 -> 4, 3 -> 6).twoWayMerge(Map(2 -> 2, 3 -> 5)) { (a, b) => b }
+res17: Map[Int,Int] = Map(2 -> 2, 3 -> 5, 1 -> 2)
+
+scala> Map(1 -> 2, 2 -> 3).mapKeys(_ + 1)
+res18: Map[Int,Int] = Map(2 -> 2, 3 -> 3)
+
+scala> scala.util.Random.choose((0 to 15).toSeq)
+res22: Option[Int] = Some(15)
+
+scala> scala.util.Random.choose((0 to 15).toSeq)
+res23: Option[Int] = Some(12)
+
+scala> scala.util.Random.choose((0 to 15).toSeq)
+res24: Option[Int] = Some(9)
+
+scala> scala.util.Random.choose((0 to 15).toSeq)
+res25: Option[Int] = Some(2)
+
+scala> scala.util.Random.chooseN((0 to 15).toSeq, 4)
+res26: Seq[Int] = List(9, 8, 7, 6)
+
+scala> scala.util.Random.chooseN((0 to 15).toSeq, 4)
+res27: Seq[Int] = List(8, 5, 2, 1)
+```
+
+### JreVersionHelper
 
 The JreVersionHelper object provides helper methods to check the two most significant parts of the JRE version at runtime:
 
@@ -105,7 +194,7 @@ scala> JreVersionHelper.jreVersion
 res0: (Int, Int) = (1,8)
 ```
 
-## Logging
+### Logging
 
 The `Logging` and `StrictLogging` traits allows mixing in Log4j2 `Logger` objects. The difference between the two is that in the former the `Logger` object is initialized lazily, while in the latter it is initialized strictly:
 
@@ -120,7 +209,7 @@ scala> a.log.info("test")
 ...
 ```
 
-## ProgressBar
+### ProgressBar
 
 The `ProgressBar` represents a widget to print a dynamic progress bar in a console.
 
@@ -150,7 +239,7 @@ scala> progress.tick(30)
  64% [=================================>                    ] - [ 0.77 ] ops/s
 ```
 
-## Reflect
+### Reflect
 
 The `Reflect` object contains helpers for reflection-related tasks, namely to create an instance of a given class given its fully qualified name and also to access singleton objects:
 
@@ -168,7 +257,7 @@ scala> Reflect.companion[Reflect.type]("com.velocidi.apso.Reflect")
 res1: com.velocidi.apso.Reflect.type = com.velocidi.apso.Reflect$@3b1dbca
 ```
 
-## Retry
+### Retry
 
 The `Retry` object provides a method to retry methods or `Future`s a given number of times until they succeed or the specified maximum number of retries is reached:
 
@@ -217,7 +306,7 @@ scala> println(Retry.retry(10)(m))
 Success(6)
 ```
 
-## TryWith
+### TryWith
 
 The `TryWith` object mimics the [try-with-resources](https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html) 
 construct from Java world, or a loan pattern, where a given function can try to use a `Closeable` 
@@ -255,54 +344,37 @@ Resource is now Closed
 res3: scala.util.Try[Nothing] = Failure(java.lang.Exception)
 ```
 
-## Implicits
+## Akka HTTP
 
-Apso provides implicit conversions from `String`, `Seq[_]`, `Map[_, _]`, `Seq[Map[_, _]]` and `AutoCloseable` to extended types that come packed with extended features.
+The `akka-http` module provides additional [directives](https://doc.akka.io/docs/akka-http/current/routing-dsl/directives/index.html#directives) to be used in [akka-http](https://doc.akka.io/docs/akka-http/current/index.html).
+
+To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-scala> import com.velocidi.apso.Implicits._
-import com.velocidi.apso.Implicits._
-
-scala> Seq(1, 3, 5).mergeSorted(Seq(2, 4))
-res9: Seq[Int] = List(1, 2, 3, 4, 5)
-
-scala> (0 to 15).average
-res10: Int = 7
-
-scala> Iterator(1, 3, 5).buffered.mergeSorted(Iterator(2, 4).buffered).toList
-res11: List[Int] = List(1, 2, 3, 4, 5)
-
-scala> Map(1 -> 2, 3 -> 6).twoWayMerge(Map(2 -> 4, 3 -> 5)) { (a, b) => b }
-res16: Map[Int,Int] = Map(2 -> 4, 3 -> 5, 1 -> 2)
-
-scala> Map(1 -> 2, 2 -> 4, 3 -> 6).twoWayMerge(Map(2 -> 2, 3 -> 5)) { (a, b) => b }
-res17: Map[Int,Int] = Map(2 -> 2, 3 -> 5, 1 -> 2)
-
-scala> Map(1 -> 2, 2 -> 3).mapKeys(_ + 1)
-res18: Map[Int,Int] = Map(2 -> 2, 3 -> 3)
-
-scala> scala.util.Random.choose((0 to 15).toSeq)
-res22: Option[Int] = Some(15)
-
-scala> scala.util.Random.choose((0 to 15).toSeq)
-res23: Option[Int] = Some(12)
-
-scala> scala.util.Random.choose((0 to 15).toSeq)
-res24: Option[Int] = Some(9)
-
-scala> scala.util.Random.choose((0 to 15).toSeq)
-res25: Option[Int] = Some(2)
-
-scala> scala.util.Random.chooseN((0 to 15).toSeq, 4)
-res26: Seq[Int] = List(9, 8, 7, 6)
-
-scala> scala.util.Random.chooseN((0 to 15).toSeq, 4)
-res27: Seq[Int] = List(8, 5, 2, 1)
+libraryDependencies += "com.velocidi" %% "apso-akka-http" % "0.14.0"
 ```
+
+### ClientIPDirectives
+
+The `ClientIPDirectives` trait exposes an `optionalRawClientIP` directive that extracts the raw IP of the client from either the `X-Forwarded-For`, `Remote-Address` or `X-Real-IP` header, in that order of priority.
+
+### ExtraMiscDirectives
+
+The `ExtraMiscDirectives` trait exposes the directives `cacheControlMaxAge(maxAgeDuration)` and `optionalRefererHost` to set the cache-control header to the supplied finite duration (the minimum resolution is 1 second) to extract the referer from the HTTP request header, respectively. The `ExtraMiscDirectives` companion object exposes a `cacheControlNoCache` directive to reply with the `no-cache` option in the `Cache-Control` header.
+
+### ProxySupport
+
+The `ProxySupport` traits adds helper methods to proxy requests to a given uri, either directly (`proxyTo`), or with the unmatched path and query parameters of the current context (`proxyToUnmatchedPath`).
 
 ## Amazon Web Services
 
 Apso provides a group of classes to ease the interaction with the Amazon Web Services, namely S3 and EC2.
+
+To use it in an existing SBT project, add the following dependency to your `build.sbt`:
+
+```scala
+libraryDependencies += "com.velocidi" %% "apso-aws" % "0.14.0"
+```
 
 ### ConfigCredentialsProvider
 
@@ -350,7 +422,11 @@ The `SerializableAWSCredentials` class provides a serializable container for AWS
 
 ## Collections
 
-The `com.velocidi.apso.collection` package provides some helpful collections:
+The `apso-collections` module provides some helpful collections. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
+                                                                 
+```scala
+libraryDependencies += "com.velocidi" %% "apso-collections" % "0.14.0"
+```
 
 ### Trie
 
@@ -406,18 +482,77 @@ scala> m.get[Char]
 res6: Option[Char] = None
 ```
 
-## Config
+### Iterators
 
-Apso provides methods to ease working with Typesafe's [config](https://github.com/typesafehub/config).
+Apso provides some utility iterators.
 
-### LazyConfigFactory
+#### CircularIterator
 
-The `LazyConfigFactory` object provides static methods for creating `Config` instances in a lazy way. The lazy way refers to the variable loading process. The usual process loads variables in config files eagerly (i.e. the path needs to be defined in the same file it is refered to). The loading process provided by `LazyConfigFactory` loads and merges all configuration files and only then resolves variables. This loading process introduces a third file (beyond the default ones - `application.conf` and `reference.conf`): `overrides.conf`. This file has priority over the `application.conf` file and can be used to specify keys that should always be overriden, e.g. by environment variables.
+The `CircularIterator` is an iterator that iterates over its elements in a circular way. See the following for sample usage:
+
+```scala
+scala> import com.velocidi.apso.iterator.CircularIterator
+import com.velocidi.apso.iterator.CircularIterator
+
+scala> val circularIterator = CircularIterator(List(1, 2, 3).toIterator)
+circularIterator: com.velocidi.apso.iterator.CircularIterator[Int] = non-empty iterator
+
+scala> circularIterator.take(10).toList
+res0: List[Int] = List(1, 2, 3, 1, 2, 3, 1, 2, 3, 1)
+```
+
+#### CompositeIterator
+
+The `CompositeIterator` is an iterator that wraps a list of other iterators and iterates over its elements sequentially. It handles compositions of a large number of iterators in a more efficient way than simply concatenating them, avoiding stack overflows in particular. It supports appending of new iterators while keeping its efficiency. See the following for sample usage:
+
+```scala
+scala> import com.velocidi.apso.iterator.CompositeIterator
+import com.velocidi.apso.iterator.CompositeIterator
+
+scala> val compositeIterator = CompositeIterator(List(1, 2, 3).toIterator, List(4, 5, 6).toIterator, List(7, 8, 9).toIterator)
+compositeIterator: com.velocidi.apso.iterator.CompositeIterator[Int] = non-empty iterator
+
+scala> compositeIterator.take(9).toList
+res0: List[Int] = List(1, 2, 3, 4, 5, 6, 7, 8, 9)
+```
+
+#### MergedBufferedIterator
+
+The `MergedBufferedIterator` is a collection of sorted `BufferedIterators` that allows traversing them in order, while also providing a `mergeSorted` method to merge with another sorted `BufferedIterator`. See the following for sample usage:
+
+```scala
+scala> import com.velocidi.apso.iterator.MergedBufferedIterator
+import com.velocidi.apso.iterator.MergedBufferedIterator
+
+scala> val it1 = MergedBufferedIterator(List(
+     |   (0 to 3).toIterator.buffered,
+     |   (0 to 8).toIterator.buffered,
+     |   (0 to 15).toIterator.buffered,
+     |   (0 to 11).toIterator.buffered))
+it1: com.velocidi.apso.iterator.MergedBufferedIterator[Int] = non-empty iterator
+
+scala> it1.toList
+res0: List[Int] = List(0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 10, 10, 11, 11, 12, 13, 14, 15)
+
+scala> val it2 = MergedBufferedIterator(List(
+     |   Iterator(1, 3, 5).buffered,
+     |   Iterator(2).buffered))
+it2: com.velocidi.apso.iterator.MergedBufferedIterator[Int] = non-empty iterator
+
+scala> it2.mergeSorted(Iterator(4, 6).buffered).toList
+res1: List[Int] = List(1, 2, 3, 4, 5, 6)
+```
 
 ## Encryption
 
 Apso provides some simple utility classes to deal with encryption and decryption of data, and methods that ease the
 creation of the underlying Cyphers.
+
+To use it in an existing SBT project, add the following dependency to your `build.sbt`:
+
+```scala
+libraryDependencies += "com.velocidi" %% "apso-encryption" % "0.14.0"
+```
 
 The following shows the creation of `Encryptor` and `Decryptor` objects,
 by loading a `KeyStore` file holding a symmetric key, and its use to encrypt and
@@ -439,10 +574,13 @@ res6: Option[String] = Some(secret_info)
 
 ```
 
-
 ## Hashing
 
-Apso provides utilities for various hashing functions.
+Apso provides utilities for various hashing functions. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
+                                                       
+```scala
+libraryDependencies += "com.velocidi" %% "apso-hashing" % "0.14.0"
+```
 
 ```scala
 scala> import com.velocidi.apso.hashing.Implicits._
@@ -455,35 +593,15 @@ scala> "abcd".murmurHash
 res1: Long = 7785666560123423118
 ```
 
-## HTTP
-
-Apso provides a tiny wrapper for [Dispatch](http://dispatch.databinder.net/) with synchronous operations. It's called `W`, and the following shows some sample usage:
-
-```scala
-scala> import com.velocidi.apso.http.W
-import com.velocidi.apso.http.W
-
-scala> W.get("http://www.google.com/").getStatusCode
-res0: Int = 302
-
-scala> W.post("http://www.google.com/", "").getStatusCode
-res1: Int = 405
-
-scala> W.put("http://www.google.com/", "").getStatusCode
-res2: Int = 405
-
-scala> W.delete("http://www.google.com/").getStatusCode
-res3: Int = 405
-
-scala> W.head("http://www.google.com/").getStatusCode
-res4: Int = 302
-```
-
-The POST and PUT methods can also receive the body as `JSON` (of [circe](https://github.com/circe/circe)), which adds the `Content-type` header accordingly.
-
 ## IO
 
-Apso provides methods to deal with IO-related features in the `io` package.
+Apso provides methods to deal with IO-related features in the `io` module.
+
+To use it in an existing SBT project, add the following dependency to your `build.sbt`:
+
+```scala
+libraryDependencies += "com.velocidi" %% "apso-io" % "0.14.0"
+``` 
 
 ### FileDescriptor
 
@@ -520,70 +638,13 @@ res2: String =
 "
 ```
 
-## Iterators
-
-Apso provides some utility iterators.
-
-### CircularIterator
-
-The `CircularIterator` is an iterator that iterates over its elements in a circular way. See the following for sample usage:
-
-```scala
-scala> import com.velocidi.apso.iterator.CircularIterator
-import com.velocidi.apso.iterator.CircularIterator
-
-scala> val circularIterator = CircularIterator(List(1, 2, 3).toIterator)
-circularIterator: com.velocidi.apso.iterator.CircularIterator[Int] = non-empty iterator
-
-scala> circularIterator.take(10).toList
-res0: List[Int] = List(1, 2, 3, 1, 2, 3, 1, 2, 3, 1)
-```
-
-### CompositeIterator
-
-The `CompositeIterator` is an iterator that wraps a list of other iterators and iterates over its elements sequentially. It handles compositions of a large number of iterators in a more efficient way than simply concatenating them, avoiding stack overflows in particular. It supports appending of new iterators while keeping its efficiency. See the following for sample usage:
-
-```scala
-scala> import com.velocidi.apso.iterator.CompositeIterator
-import com.velocidi.apso.iterator.CompositeIterator
-
-scala> val compositeIterator = CompositeIterator(List(1, 2, 3).toIterator, List(4, 5, 6).toIterator, List(7, 8, 9).toIterator)
-compositeIterator: com.velocidi.apso.iterator.CompositeIterator[Int] = non-empty iterator
-
-scala> compositeIterator.take(9).toList
-res0: List[Int] = List(1, 2, 3, 4, 5, 6, 7, 8, 9)
-```
-
-### MergedBufferedIterator
-
-The `MergedBufferedIterator` is a collection of sorted `BufferedIterators` that allows traversing them in order, while also providing a `mergeSorted` method to merge with another sorted `BufferedIterator`. See the following for sample usage:
-
-```scala
-scala> import com.velocidi.apso.iterator.MergedBufferedIterator
-import com.velocidi.apso.iterator.MergedBufferedIterator
-
-scala> val it1 = MergedBufferedIterator(List(
-     |   (0 to 3).toIterator.buffered,
-     |   (0 to 8).toIterator.buffered,
-     |   (0 to 15).toIterator.buffered,
-     |   (0 to 11).toIterator.buffered))
-it1: com.velocidi.apso.iterator.MergedBufferedIterator[Int] = non-empty iterator
-
-scala> it1.toList
-res0: List[Int] = List(0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 10, 10, 11, 11, 12, 13, 14, 15)
-
-scala> val it2 = MergedBufferedIterator(List(
-     |   Iterator(1, 3, 5).buffered,
-     |   Iterator(2).buffered))
-it2: com.velocidi.apso.iterator.MergedBufferedIterator[Int] = non-empty iterator
-
-scala> it2.mergeSorted(Iterator(4, 6).buffered).toList
-res1: List[Int] = List(1, 2, 3, 4, 5, 6)
-```
-
 ## JSON
 
-Apso includes a bunch of utilities to work with JSON serialization and deserialization.
+Apso includes a bunch of utilities to work with JSON serialization and deserialization. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
+
+```scala
+libraryDependencies += "com.velocidi" %% "apso-json" % "0.14.0"
+```
 
 ### ExtraJsonProtocol
 
@@ -740,7 +801,13 @@ res5: spray.json.JsValue = {"c":0.0,"b":["x","y"],"a":3}
 
 ## Profiling
 
-The `profiling` package of apso provides utilities to help with profiling the running process.
+The `profiling` module of apso provides utilities to help with profiling the running process.
+
+To use it in an existing SBT project, add the following dependency to your `build.sbt`:
+
+```scala
+libraryDependencies += "com.velocidi" %% "apso-profiling" % "0.14.0"
+```
 
 ### CpuSampler
 
@@ -750,29 +817,17 @@ The `CpuSampler` is a lightweight configurable CPU profiler based on call stack 
 
 The `SimpleJmx` trait allows mixing in a simple JMX server. The JMX server is configured through a `Config` object, where the parameters `host` and `port` can be set. When behind a firewall, both the `port` defined (the RMI registry port) and the `port + 1` port (the RMI server port) need to be open. In the event of a binding failure to the defined port, a retry is performed with a random port.
 
-## Spray
-
-The `spray` package provides additional [directives](http://spray.io/documentation/1.2.2/spray-routing/key-concepts/directives/) to be used in [spray-routing](https://github.com/spray/spray).
-
-### ClientIPDirectives
-
-The `ClientIPDirectives` trait exposes an `optionalRawClientIP` directive that extracts the raw IP of the client from either the `X-Forwarded-For`, `Remote-Address` or `X-Real-IP` header, in that order of priority.
-
-### ExtraMiscDirectives
-
-The `ExtraMiscDirectives` trait exposes the directives `cacheControlMaxAge(maxAgeDuration)` and `optionalRefererHost` to set the cache-control header to the supplied finite duration (the minimum resolution is 1 second) to extract the referer from the HTTP request header, respectively. The `ExtraMiscDirectives` companion object exposes a `cacheControlNoCache` directive to reply with the `no-cache` option in the `Cache-Control` header.
-
-### Implicits
-
-The `Implicits` companion object exposes an implicit method that provides a [`Marshaller`](http://spray.io/documentation/1.2.2/spray-httpx/marshalling/) for Scalaz's `Validation`.
-
-### ProxySupport
-
-The `ProxySupport` traits adds helper methods to proxy requests to a given uri, either directly (`proxyTo`), or with the unmatched path and query parameters of the current context (`proxyToUnmatchedPath`).
-
 ## Time
 
-The `com.velocidi.apso.time` package provides utilities to work with `DateTime` and `LocalDate`. It mainly adds support for better working with intervals. See the following sample usage:
+The `apso-time` module provides utilities to work with `DateTime` and `LocalDate`. It mainly adds support for better working with intervals. 
+
+To use it in an existing SBT project, add the following dependency to your `build.sbt`:
+
+```scala
+libraryDependencies += "com.velocidi" %% "apso-time" % "0.14.0"
+```
+
+See the following sample usages:
 
 ```scala
 scala> import com.github.nscala_time.time.Imports._
