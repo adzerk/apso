@@ -5,7 +5,7 @@ scala:
 jdk:
   - openjdk8
 script:
-  - sbt -S-Xfatal-warnings ++$TRAVIS_SCALA_VERSION clean coverage test
+  - sbt ++$TRAVIS_SCALA_VERSION clean coverage test
 after_success:
   - sbt ++$TRAVIS_SCALA_VERSION coverageReport coverageAggregate coveralls
 cache:
