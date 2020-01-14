@@ -4,9 +4,8 @@ import java.lang.management.ManagementFactory
 
 import scala.collection.mutable
 
-import org.slf4j.{ Logger, LoggerFactory }
-
 import com.velocidi.apso.profiling.CpuSampler._
+import org.apache.logging.log4j.scala.Logger
 
 /**
  * A lightweight CPU profiler based on call stack sampling.
@@ -24,7 +23,7 @@ import com.velocidi.apso.profiling.CpuSampler._
 class CpuSampler(
     samplePeriod: Long = 100,
     flushPeriod: Long = 10000,
-    logger: Logger = LoggerFactory.getLogger(getClass.getName)) extends Runnable {
+    logger: Logger = Logger(getClass)) extends Runnable {
 
   private[this] val threadBean = ManagementFactory.getThreadMXBean
 
