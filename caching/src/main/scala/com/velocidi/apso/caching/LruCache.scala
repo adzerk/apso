@@ -46,7 +46,7 @@ object LruCache {
     check(timeToLive, "timeToLive")
     check(timeToIdle, "timeToIdle")
 
-    if (timeToLive.isFinite() || timeToIdle.isFinite())
+    if (timeToLive.isFinite || timeToIdle.isFinite)
       new ExpiringLruCache[V](maxCapacity, initialCapacity, timeToLive, timeToIdle)
     else
       new SimpleLruCache[V](maxCapacity, initialCapacity)
@@ -70,18 +70,18 @@ final class SimpleLruCache[V](val maxCapacity: Int, val initialCapacity: Int) ex
 
   def get(key: Any) = Option(store.get(key))
 
-  def apply(key: Any, genValue: () ⇒ Future[V])(implicit ec: ExecutionContext): Future[V] = {
+  def apply(key: Any, genValue: () => Future[V])(implicit ec: ExecutionContext): Future[V] = {
     val promise = Promise[V]()
     store.putIfAbsent(key, promise.future) match {
-      case null ⇒
+      case null =>
         val future = genValue()
-        future.onComplete { value ⇒
+        future.onComplete { value =>
           promise.complete(value)
           // in case of exceptions we remove the cache entry (i.e. try again later)
           if (value.isFailure) store.remove(key, promise.future)
         }
         future
-      case existingFuture ⇒ existingFuture
+      case existingFuture => existingFuture
     }
   }
 
@@ -92,7 +92,7 @@ final class SimpleLruCache[V](val maxCapacity: Int, val initialCapacity: Int) ex
   def keys: Set[Any] = store.keySet().asScala.toSet
 
   def ascendingKeys(limit: Option[Int] = None) =
-    limit.map { lim ⇒ store.ascendingKeySetWithLimit(lim) }
+    limit.map { lim => store.ascendingKeySetWithLimit(lim) }
       .getOrElse(store.ascendingKeySet())
       .iterator().asScala
 
@@ -127,23 +127,23 @@ final class ExpiringLruCache[V](maxCapacity: Long, initialCapacity: Int,
 
   @tailrec
   def get(key: Any): Option[Future[V]] = store.get(key) match {
-    case null ⇒ None
-    case entry if (isAlive(entry)) ⇒
+    case null => None
+    case entry if (isAlive(entry)) =>
       entry.refresh()
       Some(entry.future)
-    case entry ⇒
+    case entry =>
       // remove entry, but only if it hasn't been removed and reinserted in the meantime
       if (store.remove(key, entry)) None // successfully removed
       else get(key) // nope, try again
   }
 
-  def apply(key: Any, genValue: () ⇒ Future[V])(implicit ec: ExecutionContext): Future[V] = {
+  def apply(key: Any, genValue: () => Future[V])(implicit ec: ExecutionContext): Future[V] = {
     def insert() = {
       val newEntry = new Entry(Promise[V]())
       val valueFuture =
         store.put(key, newEntry) match {
-          case null ⇒ genValue()
-          case entry ⇒
+          case null => genValue()
+          case entry =>
             if (isAlive(entry)) {
               // we date back the new entry we just inserted
               // in the meantime someone might have already seen the too fresh timestamp we just put in,
@@ -152,7 +152,7 @@ final class ExpiringLruCache[V](maxCapacity: Long, initialCapacity: Int,
               entry.future
             } else genValue()
         }
-      valueFuture.onComplete { value ⇒
+      valueFuture.onComplete { value =>
         newEntry.promise.tryComplete(value)
         // in case of exceptions we remove the cache entry (i.e. try again later)
         if (value.isFailure) store.remove(key, newEntry)
@@ -160,18 +160,18 @@ final class ExpiringLruCache[V](maxCapacity: Long, initialCapacity: Int,
       newEntry.promise.future
     }
     store.get(key) match {
-      case null ⇒ insert()
-      case entry if (isAlive(entry)) ⇒
+      case null => insert()
+      case entry if (isAlive(entry)) =>
         entry.refresh()
         entry.future
-      case entry ⇒ insert()
+      case _ => insert()
     }
   }
 
   def remove(key: Any) = store.remove(key) match {
-    case null ⇒ None
-    case entry if (isAlive(entry)) ⇒ Some(entry.future)
-    case entry ⇒ None
+    case null => None
+    case entry if (isAlive(entry)) => Some(entry.future)
+    case _ => None
   }
 
   def clear(): Unit = { store.clear() }
@@ -179,7 +179,7 @@ final class ExpiringLruCache[V](maxCapacity: Long, initialCapacity: Int,
   def keys: Set[Any] = store.keySet().asScala.toSet
 
   def ascendingKeys(limit: Option[Int] = None) =
-    limit.map { lim ⇒ store.ascendingKeySetWithLimit(lim) }
+    limit.map { lim => store.ascendingKeySetWithLimit(lim) }
       .getOrElse(store.ascendingKeySet())
       .iterator().asScala
 
@@ -199,8 +199,8 @@ private[caching] class Entry[T](val promise: Promise[T]) {
     lastAccessed = Timestamp.now
   }
   override def toString = future.value match {
-    case Some(Success(value)) ⇒ value.toString
-    case Some(Failure(exception)) ⇒ exception.toString
-    case None ⇒ "pending"
+    case Some(Success(value)) => value.toString
+    case Some(Failure(exception)) => exception.toString
+    case None => "pending"
   }
 }

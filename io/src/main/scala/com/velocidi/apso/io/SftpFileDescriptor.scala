@@ -1,6 +1,6 @@
 package com.velocidi.apso.io
 
-import java.io._
+import java.io.{ FileDescriptor => _, _ }
 import java.util.concurrent.{ ConcurrentHashMap, TimeoutException }
 
 import scala.collection.JavaConverters._
@@ -244,7 +244,7 @@ object SftpFileDescriptor {
     sshClient.connect(host, port)
 
     (password, identity) match {
-      case (Some(p), _) =>
+      case (Some(_), _) =>
         sshClient.authPassword(username, password.get)
       case (_, Some((f, p))) =>
         val keyProvider = p match {

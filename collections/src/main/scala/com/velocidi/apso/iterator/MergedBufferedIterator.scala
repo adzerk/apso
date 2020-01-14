@@ -3,7 +3,7 @@ package com.velocidi.apso.iterator
 import scala.collection.mutable.PriorityQueue
 
 case class MergedBufferedIterator[T](iterators: List[BufferedIterator[T]])(implicit ord: Ordering[T]) extends BufferedIterator[T] {
-  private[this] implicit def bufferedIteratorOrdering = new Ordering[BufferedIterator[T]] {
+  private[this] implicit lazy val bufferedIteratorOrdering = new Ordering[BufferedIterator[T]] {
     def compare(i1: BufferedIterator[T], i2: BufferedIterator[T]) =
       ord.compare(i2.head, i1.head)
   }
@@ -35,7 +35,7 @@ case class MergedBufferedIterator[T](iterators: List[BufferedIterator[T]])(impli
    */
   def mergeSorted[U >: T](thatIt: BufferedIterator[U])(implicit ord: Ordering[U]): BufferedIterator[U] =
     thatIt match {
-      case mIt @ MergedBufferedIterator(thatIts) => MergedBufferedIterator[U](nonEmptyIterators.toList ++ thatIts)
+      case MergedBufferedIterator(thatIts) => MergedBufferedIterator[U](nonEmptyIterators.toList ++ thatIts)
       case _ => MergedBufferedIterator[U](thatIt :: nonEmptyIterators.toList)
     }
 }

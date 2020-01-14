@@ -4,16 +4,17 @@ import scala.concurrent.duration._
 
 import com.mashape.unirest.http.{ HttpResponse, Unirest }
 import com.mashape.unirest.request.{ HttpRequest, HttpRequestWithBody }
+import com.typesafe.scalalogging.Logger
 import io.circe.Json
 import org.apache.http.client.config.{ CookieSpecs, RequestConfig }
 import org.apache.http.impl.client.DefaultRedirectStrategy
 import org.apache.http.impl.nio.client.HttpAsyncClients
 import org.apache.http.protocol.HttpContext
-import org.apache.logging.log4j.scala.Logging
 
-object W extends Logging {
+object W {
   case class Timeout(duration: FiniteDuration)
 
+  private[this] lazy val logger = Logger("W")
   private[this] lazy val defaultTimeout = Timeout(10.seconds)
 
   private[this] object NeverRedirectStrategy extends DefaultRedirectStrategy {

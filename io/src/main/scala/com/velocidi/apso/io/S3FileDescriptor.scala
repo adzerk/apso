@@ -84,7 +84,7 @@ case class S3FileDescriptor(
       (primary, secondary) match {
         case (h1 :: t1, h2 :: t2) if h1 == h2 => removePrefix(t1, t2)
         case (Nil, s) => s
-        case (p, Nil) => Nil
+        case (_, Nil) => Nil
       }
     }
 

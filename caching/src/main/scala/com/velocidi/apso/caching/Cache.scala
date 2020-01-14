@@ -25,7 +25,7 @@ import scala.util.control.NonFatal
 /**
  * General interface implemented by all spray cache implementations.
  */
-trait Cache[V] { cache ⇒
+trait Cache[V] { cache =>
 
   /**
    * Selects the (potentially non-existing) cache entry with the given key.
@@ -37,22 +37,22 @@ trait Cache[V] { cache ⇒
      * Returns either the cached Future for the key or evaluates the given call-by-name argument
      * which produces either a value instance of type `V` or a `Future[V]`.
      */
-    def apply(magnet: ⇒ ValueMagnet[V])(implicit ec: ExecutionContext): Future[V] =
-      cache.apply(key, () ⇒ try magnet.future catch { case NonFatal(e) ⇒ Future.failed(e) })
+    def apply(magnet: => ValueMagnet[V])(implicit ec: ExecutionContext): Future[V] =
+      cache.apply(key, () => try magnet.future catch { case NonFatal(e) => Future.failed(e) })
 
     /**
      * Returns either the cached Future for the key or evaluates the given function which
      * should lead to eventual completion of the promise.
      */
-    def apply[U](f: Promise[V] ⇒ U)(implicit ec: ExecutionContext): Future[V] =
-      cache.apply(key, () ⇒ { val p = Promise[V](); f(p); p.future })
+    def apply[U](f: Promise[V] => U)(implicit ec: ExecutionContext): Future[V] =
+      cache.apply(key, () => { val p = Promise[V](); f(p); p.future })
   }
 
   /**
    * Returns either the cached Future for the given key or evaluates the given value generating
    * function producing a `Future[V]`.
    */
-  def apply(key: Any, genValue: () ⇒ Future[V])(implicit ec: ExecutionContext): Future[V]
+  def apply(key: Any, genValue: () => Future[V])(implicit ec: ExecutionContext): Future[V]
 
   /**
    * Retrieves the future instance that is currently in the cache for the given key.
@@ -68,7 +68,7 @@ trait Cache[V] { cache ⇒
   /**
    * Clears the cache by removing all entries.
    */
-  def clear()
+  def clear(): Unit
 
   /**
    * Returns the set of keys in the cache, in no particular order

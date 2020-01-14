@@ -3,6 +3,7 @@ import ReleaseTransformations._
 
 organization in ThisBuild := "com.velocidi"
 
+crossScalaVersions in ThisBuild := Seq("2.12.10", "2.13.1")
 scalaVersion in ThisBuild := "2.12.10"
 
 def module(project: Project, moduleName: String) =
@@ -34,25 +35,37 @@ lazy val commonSettings = Seq(
   resolvers ++= Seq(
     Resolver.sonatypeRepo("snapshots"),
     Resolver.typesafeRepo("snapshots"),
-    "Spray Repository"              at "http://repo.spray.io/",
-    "Bintray Scalaz Releases"       at "http://dl.bintray.com/scalaz/releases",
-    "JCenter Repository"            at "http://jcenter.bintray.com/"),
+    "Spray Repository"              at "https://repo.spray.io/",
+    "Bintray Scalaz Releases"       at "https://dl.bintray.com/scalaz/releases",
+    "JCenter Repository"            at "https://jcenter.bintray.com/"),
 
   scalariformPreferences := scalariformPreferences.value
     .setPreference(DanglingCloseParenthesis, Prevent)
     .setPreference(DoubleIndentConstructorArguments, true),
 
-  scalacOptions ++= Seq(
-    "-encoding", "UTF-8",
-    "-language:existentials",
-    "-language:higherKinds",
-    "-language:implicitConversions",
-    "-deprecation",
-    "-feature",
-    "-unchecked",
-    "-Ywarn-dead-code",
-    "-Ywarn-unused-import",
-    "-Xlint:-adapted-args,-nullary-override,_"),
+  scalacOptions ++= {
+    lazy val commonFlags = Seq(
+      "-encoding", "UTF-8",
+      "-language:higherKinds",
+      "-language:implicitConversions",
+      "-feature",
+      "-unchecked",
+      "-Ywarn-dead-code")
+
+    def withCommon(flags: String*) =
+      commonFlags ++ flags
+
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, 12)) =>
+        withCommon(
+          "-deprecation",
+          "-Ywarn-unused-import")
+
+      case _ =>
+        withCommon(
+          "-Ywarn-unused:imports")
+    }
+  },
 
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
@@ -80,11 +93,11 @@ releaseProcess := Seq[ReleaseStep](
   checkSnapshotDependencies,
   inquireVersions,
   runClean,
-  releaseStepCommandAndRemaining("test"),
+  releaseStepCommandAndRemaining("+test"),
   setReleaseVersion,
   commitReleaseVersion,
   tagRelease,
-  releaseStepCommandAndRemaining("publishSigned"),
+  releaseStepCommandAndRemaining("+publishSigned"),
   setNextVersion,
   commitNextVersion,
   pushChanges,

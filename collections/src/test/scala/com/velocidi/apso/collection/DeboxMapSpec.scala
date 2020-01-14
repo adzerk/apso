@@ -36,7 +36,7 @@ class DeboxMapSpec extends Specification with ScalaCheck {
       val map = DeboxMap.empty[K, V]
       entries.foreach { case (k, v) => map.update(k, v) }
       entries.forall {
-        case (k, v) =>
+        case (k, _) =>
           map.contains(k) == entries.contains(k) &&
             map.get(k) == entries.get(k)
       } && map.equals(map) && !map.equals(0)

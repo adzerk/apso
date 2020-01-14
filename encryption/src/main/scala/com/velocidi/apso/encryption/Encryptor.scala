@@ -25,7 +25,7 @@ class Encryptor(encryptor: Cipher) extends EncryptionErrorHandling with Logging 
     Base64.encodeBase64URLSafeString(encryptor.doFinal(data)),
     { ex: Throwable => log.warn(s"Error while trying to encrypt data: $data", ex) })
 
-  def encryptToSafeString(data: String, pad: Boolean = true): Option[String] = handle(
+  def encryptToSafeString(data: String): Option[String] = handle(
     Base64.encodeBase64URLSafeString(encryptor.doFinal(data.getBytes("UTF-8"))),
     { ex: Throwable => log.warn(s"Error while trying to encrypt data: $data", ex) })
 }

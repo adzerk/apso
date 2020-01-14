@@ -130,5 +130,5 @@ object Implicits {
    * @param interval the time interval to be iterated over
    * @return an iterable time interval.
    */
-  implicit def intervalToStepped(interval: ReadableInterval) = IterableInterval(interval, 1.day)
+  implicit def intervalToStepped(interval: ReadableInterval): IterableInterval = IterableInterval(interval, 1.day)
 }

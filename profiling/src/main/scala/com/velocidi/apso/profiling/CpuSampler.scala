@@ -4,8 +4,9 @@ import java.lang.management.ManagementFactory
 
 import scala.collection.mutable
 
+import com.typesafe.scalalogging.Logger
+
 import com.velocidi.apso.profiling.CpuSampler._
-import org.apache.logging.log4j.scala.Logger
 
 /**
  * A lightweight CPU profiler based on call stack sampling.

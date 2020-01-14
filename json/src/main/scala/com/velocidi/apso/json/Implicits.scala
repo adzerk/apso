@@ -36,7 +36,7 @@ object Implicits {
     def toValue: Any = json match {
       case JsString(str) => str
       case JsNumber(num) => num
-      case JsObject(map) => map.mapValues(_.toValue).map(identity)
+      case JsObject(map) => map.mapValues(_.toValue).toMap
       case JsArray(elems) => elems.map(_.toValue)
       case JsBoolean(bool) => bool
       case JsNull => null

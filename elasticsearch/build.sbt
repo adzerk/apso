@@ -6,7 +6,7 @@ libraryDependencies ++= Seq(
   CirceCore,
   Elastic4sClientEsJava % Provided,
   Elastic4sCore         % Provided,
-  Log4jApiScala,
+  ScalaLogging,
   AkkaHttpTestkit       % Test,
   AkkaTestkitSpecs2     % Test,
   // NOTICE: This is added because of the exclusion rules on "elasticsearch-cluster-runner".

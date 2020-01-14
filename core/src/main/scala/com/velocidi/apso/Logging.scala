@@ -1,6 +1,6 @@
 package com.velocidi.apso
 
-import org.apache.logging.log4j.scala.Logger
+import com.typesafe.scalalogging.Logger
 
 /**
  * Trait to mixin a Log4j2 `Logger` object. The `Logger` object is initialized lazily.
