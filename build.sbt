@@ -27,8 +27,8 @@ lazy val time          = module(project, "time")
 lazy val apso = (project in file("."))
   .settings(commonSettings: _*)
   .settings(name := "apso")
-  .dependsOn(core, json, aws, io, collections, elasticsearch, time, caching, encryption, hashing, profiling, akkaHttp)
-  .aggregate(core, json, aws, io, collections, elasticsearch, time, caching, encryption, hashing, profiling, akkaHttp, testkit)
+  .dependsOn(akkaHttp, aws, caching, collections, core, elasticsearch, encryption, hashing, io, json, profiling, time)
+  .aggregate(akkaHttp, aws, caching, collections, core, elasticsearch, encryption, hashing, io, json, profiling, testkit, time)
 
 lazy val commonSettings = Seq(
   resolvers ++= Seq(
