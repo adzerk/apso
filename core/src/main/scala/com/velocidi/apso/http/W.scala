@@ -9,12 +9,11 @@ import org.apache.http.client.config.{ CookieSpecs, RequestConfig }
 import org.apache.http.impl.client.DefaultRedirectStrategy
 import org.apache.http.impl.nio.client.HttpAsyncClients
 import org.apache.http.protocol.HttpContext
-import org.slf4j.LoggerFactory
+import org.apache.logging.log4j.scala.Logging
 
-object W {
+object W extends Logging {
   case class Timeout(duration: FiniteDuration)
 
-  private[this] lazy val log = LoggerFactory.getLogger("W")
   private[this] lazy val defaultTimeout = Timeout(10.seconds)
 
   private[this] object NeverRedirectStrategy extends DefaultRedirectStrategy {
@@ -43,7 +42,7 @@ object W {
     }
 
     def exec(timeout: FiniteDuration) = {
-      log.debug(s"${req.getHttpMethod} ${req.getUrl}")
+      logger.debug(s"${req.getHttpMethod} ${req.getUrl}")
       req.asStringAsync().get(timeout.length, timeout.unit)
     }
   }
@@ -57,12 +56,12 @@ object W {
     }
 
     def exec(timeout: FiniteDuration) = {
-      log.debug(s"${req.getHttpMethod} ${req.getUrl}")
+      logger.debug(s"${req.getHttpMethod} ${req.getUrl}")
       req.asStringAsync().get(timeout.length, timeout.unit)
     }
 
     def exec(body: String, timeout: FiniteDuration) = {
-      log.debug(s"${req.getHttpMethod} ${req.getUrl}")
+      logger.debug(s"${req.getHttpMethod} ${req.getUrl}")
       req.body(body).asStringAsync().get(timeout.length, timeout.unit)
     }
   }
