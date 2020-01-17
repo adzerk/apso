@@ -3,8 +3,8 @@ import Dependencies._
 libraryDependencies ++= Seq(
   AkkaActor         % Provided,
   CirceCore,
-  Log4jApiScala,
   Log4jCore,
+  ScalaLogging,
   TypesafeConfig    % Provided,
   UnirestJava,
   AkkaHttpTestkit   % Test,

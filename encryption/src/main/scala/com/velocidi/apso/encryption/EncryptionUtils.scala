@@ -29,7 +29,7 @@ trait EncryptionUtils extends EncryptionErrorHandling {
         case _ => 0
       }
 
-      b64.padTo[Char, String](b64.length + padding, '=')
+      b64.padTo(b64.length + padding, '=')
     }
 
   def paddedUrlSafebase64(bytes: Array[Byte], pad: Boolean = true): String = {

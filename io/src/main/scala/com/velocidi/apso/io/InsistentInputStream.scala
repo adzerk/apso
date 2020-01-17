@@ -37,7 +37,7 @@ class InsistentInputStream(streamBuilder: (Long) => InputStream, maxRetries: Int
       backoff.foreach(d => Thread.sleep(d.toMillis))
       innerStream = streamBuilder(currPos)
     } match {
-      case Success(n) =>
+      case Success(_) =>
         remainingTries
       case Failure(t) =>
         if (remainingTries <= 0) throw t

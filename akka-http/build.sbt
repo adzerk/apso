@@ -4,7 +4,7 @@ libraryDependencies ++= Seq(
   AkkaActor         % Provided,
   AkkaHttp          % Provided,
   AkkaStream        % Provided,
-  Log4jApiScala,
+  ScalaLogging,
   AkkaHttpTestkit   % Test,
   AkkaTestkitSpecs2 % Test,
   Specs2Core        % Test)

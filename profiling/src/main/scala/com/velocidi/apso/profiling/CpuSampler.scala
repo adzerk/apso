@@ -4,7 +4,7 @@ import java.lang.management.ManagementFactory
 
 import scala.collection.mutable
 
-import org.apache.logging.log4j.scala.Logger
+import com.typesafe.scalalogging.Logger
 
 import com.velocidi.apso.profiling.CpuSampler._
 

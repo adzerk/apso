@@ -1,6 +1,6 @@
 package com.velocidi.apso.iterator
 
-import scala.collection.{ AbstractIterator, BufferedIterator, GenTraversableOnce, Iterator }
+import scala.collection.{ AbstractIterator, BufferedIterator, Iterator }
 
 /**
  * An iterator that wraps a list of other iterators and iterates over its
@@ -11,6 +11,7 @@ import scala.collection.{ AbstractIterator, BufferedIterator, GenTraversableOnce
  * @param iterators the list of iterators to compose
  * @tparam A the type of the elements to iterate over
  */
+@deprecated("The stack overflow caused by Iterator.++ should be fixed in recent Scala versions.", "0.15.0")
 class CompositeIterator[A](
     private[iterator] var current: Iterator[A] = Iterator.empty,
     private[iterator] var iterators: IndexedSeq[Iterator[A]] = Vector()) extends Iterator[A] { self =>
@@ -31,9 +32,6 @@ class CompositeIterator[A](
     if (hasNext) current.next()
     else throw new NoSuchElementException("next on empty iterator")
 
-  override def ++[B >: A](that: => GenTraversableOnce[B]): CompositeIterator[B] =
-    CompositeIterator[B](this, that.toIterator)
-
   // This forces the head to be stored only on the current iterator
   override def buffered: BufferedIterator[A] = {
     current = current.buffered
@@ -44,8 +42,6 @@ class CompositeIterator[A](
         else throw new NoSuchElementException("next on empty iterator")
       def next(): A = self.next()
       def hasNext: Boolean = self.hasNext
-      override def ++[B >: A](that: => GenTraversableOnce[B]): CompositeIterator[B] =
-        CompositeIterator[B](self, that.toIterator)
 
       // Methods that implement their own buffering strategy, therefore need to be overriden
       override def filter(p: (A) => Boolean): Iterator[A] =

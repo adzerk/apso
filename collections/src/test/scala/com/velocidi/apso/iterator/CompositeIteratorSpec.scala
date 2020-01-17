@@ -42,18 +42,5 @@ class CompositeIteratorSpec extends Specification {
       val cit = (CompositeIterator[Int]() ++ a1 ++ a2 ++ a3).buffered
       cit.filter(x => x > 2 && x < 5).toList mustEqual concatExpected.filter(x => x > 2 && x < 5)
     }
-
-    "correctly serialize iterators to a single queue" in {
-
-      "not create a recursive structure" in {
-        val cit = CompositeIterator() ++ a1 ++ a2 ++ a3
-        cit.iterators.length mustEqual 3
-      }
-
-      "not encapsulate multiple instances of composite iterators" in {
-        val cit = CompositeIterator(a1) ++ CompositeIterator(a2) ++ CompositeIterator(a3)
-        forall(cit.iterators)(_ must not(beAnInstanceOf[CompositeIterator[Int]]))
-      }
-    }
   }
 }

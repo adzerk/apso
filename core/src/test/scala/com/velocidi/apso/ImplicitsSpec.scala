@@ -44,13 +44,13 @@ class ImplicitsSpec extends Specification with ScalaCheck with FutureExtraMatche
       val tests = (1 to runs).map { _ => rand.chooseN(elems, n) }
 
       tests.map(_.size).toSet === Set(n)
-      val elementCounts: Map[Int, Int] = tests.flatten.groupBy(identity).mapValues(_.size)
+      val elementCounts: Map[Int, Int] = tests.flatten.groupBy(identity).mapValues(_.size).toMap
 
       elementCounts.keys.size must beCloseTo(elems.size +/- 5)
 
       // Expected probability of a number being picked
       val prob = (1 to n).foldLeft((elems.size, 0.0)) {
-        case ((rem, acc), next) =>
+        case ((rem, acc), _) =>
           val newAcc = acc + (1.0 - acc) * (1.0 / (rem - 1))
           (rem - 1, newAcc)
       }._2

@@ -2,9 +2,9 @@ import sbt._
 
 object Dependencies {
   object Versions {
-    val Akka                    = "2.6.0"
+    val Akka                    = "2.6.1"
     val AkkaHttp                = "10.1.11"
-    val AkkaTestkitSpecs2       = "0.2.3"
+    val AkkaTestkitSpecs2       = "0.2.4"
     val Aws                     = "1.11.553"
     val BouncyCastle            = "1.60"
     val Circe                   = "0.12.3"
@@ -14,15 +14,15 @@ object Dependencies {
     val FastMd5                 = "2.7.1"
     val JUnit                   = "4.12"
     val Log4jCore               = "2.11.2"
-    val Log4jApiScala           = "11.0"
     val Netty                   = "4.1.43.Final"
     val NscalaTime              = "2.22.0"
     val ScalaCheck              = "1.14.2"
-    val ScalaPool               = "0.4.1"
+    val ScalaLogging            = "3.9.2"
+    val ScalaPool               = "0.4.3"
     val SimpleJmx               = "1.17"
     val Specs2                  = "4.8.1"
     val SprayJson               = "1.3.5"
-    val Squants                 = "1.5.0"
+    val Squants                 = "1.6.0"
     val SshJ                    = "0.27.0"
     val TypesafeConfig          = "1.4.0"
     val UnirestJava             = "1.4.9"
@@ -51,11 +51,11 @@ object Dependencies {
   val ElasticsearchClusterRunner = "org.codelibs"                            % "elasticsearch-cluster-runner" % "7.1.1.0" excludeAll ExclusionRule(organization = "io.netty")
   val FastMd5                    = "com.joyent.util"                         % "fast-md5"                     % Versions.FastMd5
   val JUnit                      = "junit"                                   % "junit"                        % Versions.JUnit
-  val Log4jApiScala              = "org.apache.logging.log4j"               %% "log4j-api-scala"              % Versions.Log4jApiScala
   val Log4jCore                  = "org.apache.logging.log4j"                % "log4j-core"                   % Versions.Log4jCore
   val Netty                      = "io.netty"                                % "netty-all"                    % Versions.Netty
   val NscalaTime                 = "com.github.nscala-time"                 %% "nscala-time"                  % Versions.NscalaTime
   val ScalaCheck                 = "org.scalacheck"                         %% "scalacheck"                   % Versions.ScalaCheck
+  val ScalaLogging               = "com.typesafe.scala-logging"             %% "scala-logging"                % Versions.ScalaLogging
   val ScalaPool                  = "io.github.andrebeat"                    %% "scala-pool"                   % Versions.ScalaPool
   val SimpleJmx                  = "com.j256.simplejmx"                      % "simplejmx"                    % Versions.SimpleJmx
   val Specs2Core                 = "org.specs2"                             %% "specs2-core"                  % Versions.Specs2
