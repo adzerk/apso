@@ -5,9 +5,9 @@ scala:
 jdk:
   - openjdk8
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION clean coverage test
+  - sbt -Dsbt.color=always -Dsbt.supershell=false ++$TRAVIS_SCALA_VERSION clean coverage test
 after_success:
-  - sbt ++$TRAVIS_SCALA_VERSION coverageReport coverageAggregate coveralls
+  - sbt -Dsbt.color=always -Dsbt.supershell=false ++$TRAVIS_SCALA_VERSION coverageReport coverageAggregate coveralls
 cache:
   directories:
     - $HOME/.ivy2/cache
