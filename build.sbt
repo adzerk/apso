@@ -59,6 +59,7 @@ lazy val commonSettings = Seq(
       case Some((2, 12)) =>
         withCommon(
           "-deprecation",
+          "-Xfatal-warnings",
           "-Ywarn-unused-import")
 
       case _ =>
