@@ -18,9 +18,8 @@ import com.velocidi.apso.aws.S3Bucket.S3ObjectDownloader
 import com.velocidi.apso.{ Logging, TryWith }
 
 /**
- * A representation of an Amazon's S3 bucket. This class wraps an
- * [[com.amazonaws.services.s3.AmazonS3Client]] and provides a higher level interface for pushing
- * and pulling files to and from a bucket.
+ * A representation of an Amazon's S3 bucket. This class wraps an `AmazonS3Client` and provides a higher level
+ * interface for pushing and pulling files to and from a bucket.
  *
  * @param bucketName          the name of the bucket
  * @param credentialsProvider optional AWS credentials provider to use (since AWSCredentials are not serializable).

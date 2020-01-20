@@ -14,7 +14,7 @@ object BouncyCastleInitializer {
 }
 
 /**
- * Loads and provide a [[BouncyCastleProvider]] and provides utility methods to encode in base64, load keystores and create
+ * Loads and provide a `BouncyCastleProvider` and provides utility methods to encode in base64, load keystores and create
  * keys from raw password input.
  */
 trait EncryptionUtils extends EncryptionErrorHandling {

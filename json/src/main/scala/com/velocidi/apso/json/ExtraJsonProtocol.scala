@@ -16,7 +16,7 @@ import spray.json._
 import squants.market.{ Currency, MoneyContext }
 
 /**
- * Provides additional JsonFormats not available in the [[spray.json.DefaultJsonProtocol]].
+ * Provides additional JsonFormats not available in the `DefaultJsonProtocol`.
  */
 object ExtraJsonProtocol
   extends ExtraTimeJsonProtocol
