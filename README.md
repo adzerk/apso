@@ -6,12 +6,12 @@ Apso is Velocidi's collection of Scala utility libraries. It provides a series o
 
 ## Installation
 
-Apso's latest release is built against Scala 2.12.
+Apso's latest release is built against Scala 2.12 and Scala 2.13.
 
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso" % "0.14.0"
+libraryDependencies += "com.velocidi" %% "apso" % "0.15.0"
 ```
 
 The project is divided in modules, you can instead install only a specific module.
@@ -19,7 +19,7 @@ The project is divided in modules, you can instead install only a specific modul
 The TestKit is available under the `apso-testkit` project. You can include it only for the `test` configuration:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-testkit" % "0.14.0" % "test"
+libraryDependencies += "com.velocidi" %% "apso-testkit" % "0.15.0" % "test"
 ```
 
 Please take into account that the library is still in an experimental stage and the interfaces might change for subsequent releases.
@@ -75,7 +75,7 @@ Please take into account that the library is still in an experimental stage and 
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-core" % "0.14.0"
+libraryDependencies += "com.velocidi" %% "apso-core" % "0.15.0"
 ```
 
 ### Config
@@ -301,15 +301,15 @@ scala> def m() = {
      |   else
      |     throw new Exception()
      | }
-     
+
 scala> println(Retry.retry(10)(m))
 Success(6)
 ```
 
 ### TryWith
 
-The `TryWith` object mimics the [try-with-resources](https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html) 
-construct from Java world, or a loan pattern, where a given function can try to use a `Closeable` 
+The `TryWith` object mimics the [try-with-resources](https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html)
+construct from Java world, or a loan pattern, where a given function can try to use a `Closeable`
 resource which shall automatically be disposed off and closed properly afterwards.
 
 ```scala
@@ -351,7 +351,7 @@ The `akka-http` module provides additional [directives](https://doc.akka.io/docs
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-akka-http" % "0.14.0"
+libraryDependencies += "com.velocidi" %% "apso-akka-http" % "0.15.0"
 ```
 
 ### ClientIPDirectives
@@ -373,7 +373,7 @@ Apso provides a group of classes to ease the interaction with the Amazon Web Ser
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-aws" % "0.14.0"
+libraryDependencies += "com.velocidi" %% "apso-aws" % "0.15.0"
 ```
 
 ### ConfigCredentialsProvider
@@ -423,9 +423,9 @@ The `SerializableAWSCredentials` class provides a serializable container for AWS
 ## Collections
 
 The `apso-collections` module provides some helpful collections. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
-                                                                 
+
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-collections" % "0.14.0"
+libraryDependencies += "com.velocidi" %% "apso-collections" % "0.15.0"
 ```
 
 ### Trie
@@ -551,7 +551,7 @@ creation of the underlying Cyphers.
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-encryption" % "0.14.0"
+libraryDependencies += "com.velocidi" %% "apso-encryption" % "0.15.0"
 ```
 
 The following shows the creation of `Encryptor` and `Decryptor` objects,
@@ -577,9 +577,9 @@ res6: Option[String] = Some(secret_info)
 ## Hashing
 
 Apso provides utilities for various hashing functions. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
-                                                       
+
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-hashing" % "0.14.0"
+libraryDependencies += "com.velocidi" %% "apso-hashing" % "0.15.0"
 ```
 
 ```scala
@@ -600,8 +600,8 @@ Apso provides methods to deal with IO-related features in the `io` module.
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-io" % "0.14.0"
-``` 
+libraryDependencies += "com.velocidi" %% "apso-io" % "0.15.0"
+```
 
 ### FileDescriptor
 
@@ -643,7 +643,7 @@ res2: String =
 Apso includes a bunch of utilities to work with JSON serialization and deserialization. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-json" % "0.14.0"
+libraryDependencies += "com.velocidi" %% "apso-json" % "0.15.0"
 ```
 
 ### ExtraJsonProtocol
@@ -652,7 +652,7 @@ The `ExtraJsonProtocol` object combines three traits that provide extra `JsonFor
 
 * ExtraTimeJsonProtocol: `JsonFormat[FiniteDuration]` and `JsonFormat[Interval]`;
 * ExtraHttpJsonProtocol: `JsonFormat[URI]`;
-* ExtraMiscJsonProtocol: `JsonFormat[Config]`, `JsonFormat[DateTime]` and `JsonFormat[LocalDate]`. It also includes the non-implicit method `mapJsArrayFormat[K, V]` which serializes a map as an array of key-value objects. 
+* ExtraMiscJsonProtocol: `JsonFormat[Config]`, `JsonFormat[DateTime]` and `JsonFormat[LocalDate]`. It also includes the non-implicit method `mapJsArrayFormat[K, V]` which serializes a map as an array of key-value objects.
 Note that `spray-json`'s `JsonFormat` for maps has the same signature, so if you need to use both at the same time, you need to extend the `DefaultJsonProtocol` trait instead of importing it.
 
 ### JsValue
@@ -806,7 +806,7 @@ The `profiling` module of apso provides utilities to help with profiling the run
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-profiling" % "0.14.0"
+libraryDependencies += "com.velocidi" %% "apso-profiling" % "0.15.0"
 ```
 
 ### CpuSampler
@@ -819,12 +819,12 @@ The `SimpleJmx` trait allows mixing in a simple JMX server. The JMX server is co
 
 ## Time
 
-The `apso-time` module provides utilities to work with `DateTime` and `LocalDate`. It mainly adds support for better working with intervals. 
+The `apso-time` module provides utilities to work with `DateTime` and `LocalDate`. It mainly adds support for better working with intervals.
 
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-time" % "0.14.0"
+libraryDependencies += "com.velocidi" %% "apso-time" % "0.15.0"
 ```
 
 See the following sample usages:
