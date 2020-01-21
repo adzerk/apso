@@ -85,6 +85,7 @@ lazy val commonSettings = Seq(
     )
   ))
 
+releaseCrossBuild := true
 releaseTagComment := s"Release ${(version in ThisBuild).value}"
 releaseCommitMessage := s"Set version to ${(version in ThisBuild).value}"
 
