@@ -294,12 +294,14 @@ object SftpFileDescriptor {
 
   type Identity = (File, Option[String]) // (key, passphrase)
 
-  private[this] val idRegex = """(.*@)?([\-|\d|\w|\.]+)(:\d+)?(\/.*)""".r
+  private[this] val idRegex = """(.*@)?([\-|\d|\w|\.]+)(:\d+)?(\/.*)?""".r
 
   private def splitMeta(url: String): (String, Int, String) = {
     url match {
-      case idRegex(_, id, null, path) => (id, 22, path)
-      case idRegex(_, id, port, path) => (id, port.drop(1).toInt, path)
+      case idRegex(_, id, portOpt, pathOpt) =>
+        val port = Option(portOpt).map(_.drop(1).toInt).getOrElse(22)
+        val path = Option(pathOpt).getOrElse("/")
+        (id, port, path)
       case _ => throw new IllegalArgumentException("Error parsing SFTP URI.")
     }
   }
