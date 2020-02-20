@@ -13,6 +13,7 @@ import net.schmizz.sshj._
 import net.schmizz.sshj.common.SSHException
 import net.schmizz.sshj.sftp._
 import net.schmizz.sshj.transport.verification._
+import net.schmizz.sshj.userauth.password.PasswordUtils
 import net.schmizz.sshj.xfer.InMemorySourceFile
 
 import com.velocidi.apso.Logging
@@ -244,14 +245,21 @@ object SftpFileDescriptor {
     sshClient.connect(host, port)
 
     (password, identity) match {
-      case (Some(_), _) =>
-        sshClient.authPassword(username, password.get)
-      case (_, Some((f, p))) =>
-        val keyProvider = p match {
-          case Some(passphrase) =>
-            sshClient.loadKeys(f.getAbsolutePath, passphrase)
-          case None =>
-            sshClient.loadKeys(f.getAbsolutePath)
+      case (Some(pass), _) =>
+        sshClient.authPassword(username, pass)
+      case (_, Some(id)) =>
+        val keyProvider = id match {
+          case Identity(Left(keyString), None) =>
+            sshClient.loadKeys(keyString, null, null)
+          case Identity(Left(keyString), Some(passphrase)) =>
+            sshClient.loadKeys(
+              keyString,
+              null,
+              PasswordUtils.createOneOff(passphrase.toCharArray))
+          case Identity(Right(keyFile), None) =>
+            sshClient.loadKeys(keyFile.getAbsolutePath)
+          case Identity(Right(keyFile), Some(passphrase)) =>
+            sshClient.loadKeys(keyFile.getAbsolutePath, passphrase)
         }
 
         sshClient.authPublickey(username, keyProvider)
@@ -292,7 +300,7 @@ object SftpFileDescriptor {
     }
   }
 
-  type Identity = (File, Option[String]) // (key, passphrase)
+  case class Identity(sshKey: Either[String, File], passphrase: Option[String])
 
   private[this] val idRegex = """(.*@)?([\-|\d|\w|\.]+)(:\d+)?(\/.*)?""".r
 
@@ -314,7 +322,7 @@ object SftpFileDescriptor {
         case config.Credentials.Sftp.Entry.Basic(username, password) =>
           (hostname, username, Right(password))
         case config.Credentials.Sftp.Entry.PublicKey(username, keypairFile, passphrase) =>
-          (hostname, username, Left((new File(Properties.userHome + "/.ssh/" + keypairFile), passphrase)))
+          (hostname, username, Left(Identity(Right(new File(Properties.userHome + "/.ssh/" + keypairFile)), passphrase)))
       }
     }
   }
