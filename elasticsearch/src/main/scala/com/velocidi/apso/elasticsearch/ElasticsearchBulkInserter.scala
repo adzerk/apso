@@ -39,7 +39,6 @@ class ElasticsearchBulkInserter(esConfig: config.Elasticsearch)
   private[this] val esDownCheckFrequency = bulkInserterConfig.esDownCheckFrequency
 
   private[this] var client: ElasticClient = null
-  private[this] var esStateListeners = List.empty[ActorRef]
   private[this] var buffer: List[Message] = Nil
   private[this] val tryCountMap = mutable.Map.empty[Message, Int]
 
@@ -60,13 +59,11 @@ class ElasticsearchBulkInserter(esConfig: config.Elasticsearch)
   }
 
   private[this] def becomeElasticsearchUp(): Unit = {
-    esStateListeners.foreach { _ ! ElasticsearchUp }
     val periodicFlush = context.system.scheduler.scheduleWithFixedDelay(flushFrequency, flushFrequency, self, Flush)
     context.become(elasticsearchUp(periodicFlush))
   }
 
   private[this] def becomeElasticsearchDown(): Unit = {
-    esStateListeners.foreach { _ ! ElasticsearchDown }
     val periodicCheck = context.system.scheduler.scheduleWithFixedDelay(
       esDownCheckFrequency, esDownCheckFrequency, self, CheckElasticsearch)
     context.become(elasticsearchDown(periodicCheck))
@@ -141,9 +138,6 @@ class ElasticsearchBulkInserter(esConfig: config.Elasticsearch)
 
   def init: Receive = {
 
-    case ref: ActorRef =>
-      esStateListeners = ref :: esStateListeners
-
     case insert: Insert => addMsgToBuffer(insert.toRequest)
 
     case request: IndexRequest => addMsgToBuffer(request)
@@ -161,10 +155,6 @@ class ElasticsearchBulkInserter(esConfig: config.Elasticsearch)
   }
 
   def elasticsearchUp(periodicFlush: Cancellable): Receive = {
-
-    case ref: ActorRef =>
-      esStateListeners = ref :: esStateListeners
-      ref ! ElasticsearchUp
 
     case insert: Insert =>
       addMsgToBuffer(insert.toRequest)
@@ -189,10 +179,6 @@ class ElasticsearchBulkInserter(esConfig: config.Elasticsearch)
   }
 
   def elasticsearchDown(periodicCheck: Cancellable): Receive = {
-
-    case ref: ActorRef =>
-      esStateListeners = ref :: esStateListeners
-      ref ! ElasticsearchDown
 
     case insert: Insert => addMsgToBuffer(insert.toRequest)
 
