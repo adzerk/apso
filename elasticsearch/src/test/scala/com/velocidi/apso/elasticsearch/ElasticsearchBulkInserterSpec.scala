@@ -19,12 +19,12 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpeci
 
   def testBulkInserterConfig(maxBufferSize: Int, flushFreq: FiniteDuration) = {
     Elasticsearch(
-      "localhost",
-      httpPort,
-      false,
-      None,
-      None,
-      Some(Elasticsearch.BulkInserter(
+      host = "localhost",
+      port = httpPort,
+      useHttps = false,
+      username = None,
+      password = None,
+      bulkInserter = Some(Elasticsearch.BulkInserter(
         flushFrequency = flushFreq,
         esDownCheckFrequency = 10.seconds,
         maxBufferSize = maxBufferSize,
