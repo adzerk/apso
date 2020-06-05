@@ -7,7 +7,6 @@ import scala.util.{ Failure, Success, Try }
 
 import akka.actor._
 import akka.dispatch.ControlMessage
-import akka.event.Logging
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.requests.bulk.{ BulkResponse, BulkResponseItem }
 import com.sksamuel.elastic4s.requests.indexes.IndexRequest
@@ -23,6 +22,7 @@ import com.velocidi.apso.Logging
  */
 class ElasticsearchBulkInserter(bulkInserterConfig: config.Elasticsearch.BulkInserter, client: ElasticClient)
   extends Actor with ActorLogging {
+  extends Actor with Logging {
   import ElasticsearchBulkInserter._
 
   implicit private[this] val ec: ExecutionContext = context.system.dispatcher
@@ -40,7 +40,14 @@ class ElasticsearchBulkInserter(bulkInserterConfig: config.Elasticsearch.BulkIns
   // override this when a failure to insert documents in ES is not considered critical
   protected[this] def logErrorsAsWarnings = false
 
-  private[this] lazy val errorLogLevel = if (logErrorsAsWarnings) Logging.WarningLevel else Logging.ErrorLevel
+  private[this] def logErrorOrWarning(msg: => String, throwable: Option[Throwable] = None): Unit = {
+    (logErrorsAsWarnings, throwable) match {
+      case (true, Some(t)) => log.warn(msg, t)
+      case (true, None) => log.warn(msg)
+      case (false, Some(t)) => log.error(msg, t)
+      case (false, None) => log.error(msg)
+    }
+  }
 
   private[this] def checkElasticsearch(): Future[Boolean] = {
     client.execute(clusterHealth).map(_.result.status != "red")
@@ -64,7 +71,7 @@ class ElasticsearchBulkInserter(bulkInserterConfig: config.Elasticsearch.BulkIns
 
     if (tryCount > maxTryCount) {
       tryCountMap.remove(msg)
-      log.log(errorLogLevel, "Error inserting document in Elasticsearch: {}", item)
+      logErrorOrWarning(s"Error inserting document in Elasticsearch: $item")
       Nil
     } else {
       msg.sender ! Status.Failure(new Throwable(s"Error inserting document in Elasticsearch: ${item.error}"))
@@ -107,7 +114,7 @@ class ElasticsearchBulkInserter(bulkInserterConfig: config.Elasticsearch.BulkIns
 
           case Failure(ex) =>
             // FIXME: there are some cases where a failure here indicates that Elasticsearch is down
-            log.log(errorLogLevel, "Error inserting documents in Elasticsearch: {}", ex.getMessage)
+            logErrorOrWarning("Error inserting documents in Elasticsearch.", Some(ex))
         }
 
       case Failure(_) =>
@@ -141,7 +148,7 @@ class ElasticsearchBulkInserter(bulkInserterConfig: config.Elasticsearch.BulkIns
       becomeElasticsearchUp()
 
     case ElasticsearchDown =>
-      log.warning("Cannot connect to Elasticsearch. There may be some configuration problem or the cluster may be " +
+      log.warn("Cannot connect to Elasticsearch. There may be some configuration problem or the cluster may be " +
         "temporarily down.")
       becomeElasticsearchDown()
   }
@@ -168,7 +175,7 @@ class ElasticsearchBulkInserter(bulkInserterConfig: config.Elasticsearch.BulkIns
       if (buffer.nonEmpty) flush()
 
     case ElasticsearchDown =>
-      log.warning("Elasticsearch seems to be down. Waiting for cluster to recover")
+      log.warn("Elasticsearch seems to be down. Waiting for cluster to recover")
       periodicFlush.cancel()
       becomeElasticsearchDown()
       context.system.scheduler.scheduleOnce(2.seconds, self, CheckElasticsearch)
