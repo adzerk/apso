@@ -20,20 +20,26 @@ import com.velocidi.apso.Logging
  * This actor buffers requests until either the configured flush timer is
  * triggered or the buffer hits the max size.
  */
-class ElasticsearchBulkInserter(bulkInserterConfig: config.Elasticsearch.BulkInserter, client: ElasticClient)
-  extends Actor with ActorLogging {
+class ElasticsearchBulkInserter(esConfig: config.Elasticsearch)
   extends Actor with Logging {
   import ElasticsearchBulkInserter._
 
   implicit private[this] val ec: ExecutionContext = context.system.dispatcher
 
-  private[this] var esStateListeners = List.empty[ActorRef]
+  private[this] val bulkInserterConfig = esConfig.bulkInserter.getOrElse {
+    val fallback = config.Elasticsearch.BulkInserter(1.second, 10.seconds, 1000, 3)
+    log.warn("Bulk inserter settings for sending documents to Elasticsearch were not found in the config. " +
+      s"A default configuration will be used: $fallback")
+    fallback
+  }
 
   private[this] val maxBufferSize = bulkInserterConfig.maxBufferSize
   private[this] val maxTryCount = bulkInserterConfig.maxTryCount
   private[this] val flushFrequency = bulkInserterConfig.flushFrequency
   private[this] val esDownCheckFrequency = bulkInserterConfig.esDownCheckFrequency
 
+  private[this] var client: ElasticClient = null
+  private[this] var esStateListeners = List.empty[ActorRef]
   private[this] var buffer: List[Message] = Nil
   private[this] val tryCountMap = mutable.Map.empty[Message, Int]
 
@@ -124,6 +130,7 @@ class ElasticsearchBulkInserter(bulkInserterConfig: config.Elasticsearch.BulkIns
   }
 
   override def preStart() = {
+    client = ElasticsearchUtil.buildEsClient(esConfig)
     checkElasticsearch().onComplete {
       case Success(true) => self ! ElasticsearchUp
       case _ => self ! ElasticsearchDown
@@ -205,6 +212,7 @@ class ElasticsearchBulkInserter(bulkInserterConfig: config.Elasticsearch.BulkIns
 
   override def postStop() = {
     if (buffer.nonEmpty) flush()
+    client.close()
   }
 
   private def addMsgToBuffer(msg: IndexRequest) = buffer = Message(sender, msg) :: buffer
@@ -248,14 +256,5 @@ object ElasticsearchBulkInserter extends Logging {
    */
   case object CheckElasticsearch extends ControlMessage
 
-  def props(esConfig: config.Elasticsearch): Props = {
-    val bulkInserterConfig = esConfig.bulkInserter.getOrElse {
-      val fallback = config.Elasticsearch.BulkInserter(1.second, 10.seconds, 1000, 3)
-      log.warn("Bulk inserter settings for sending documents to Elasticsearch were not found in the config. " +
-        s"A default configuration will be used: $fallback")
-      fallback
-    }
-
-    Props(new ElasticsearchBulkInserter(bulkInserterConfig, ElasticsearchUtil.buildEsClient(esConfig)))
-  }
+  def props(esConfig: config.Elasticsearch): Props = Props(new ElasticsearchBulkInserter(esConfig))
 }

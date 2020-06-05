@@ -18,19 +18,29 @@ import com.velocidi.apso.elasticsearch.config.Elasticsearch
 class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpecification with ElasticsearchTestKit {
 
   def testBulkInserterConfig(maxBufferSize: Int, flushFreq: FiniteDuration) = {
-    Elasticsearch.BulkInserter(
-      flushFrequency = flushFreq,
-      esDownCheckFrequency = 10.seconds,
-      maxBufferSize = maxBufferSize,
-      maxTryCount = 3)
+    Elasticsearch(
+      "localhost",
+      httpPort,
+      false,
+      None,
+      None,
+      Some(Elasticsearch.BulkInserter(
+        flushFrequency = flushFreq,
+        esDownCheckFrequency = 10.seconds,
+        maxBufferSize = maxBufferSize,
+        maxTryCount = 3)))
   }
 
-  class TestElasticsearchBulkInserter(
-      maxBufferSize: Int = Int.MaxValue,
-      flushFreq: FiniteDuration = 1.day,
-      esStateListener: ActorRef = system.deadLetters)
-    extends ElasticsearchBulkInserter(testBulkInserterConfig(maxBufferSize, flushFreq), esClient) {
-    self ! esStateListener
+  def testBulkInserter(
+    maxBufferSize: Int = Int.MaxValue,
+    flushFreq: FiniteDuration = 1.day,
+    esStateListener: ActorRef = system.deadLetters): ActorRef = {
+    val actorRef = system.actorOf(
+      ElasticsearchBulkInserter
+        .props(testBulkInserterConfig(maxBufferSize, flushFreq))
+        .withDispatcher("flush-prio-dispatcher"))
+    actorRef ! esStateListener
+    actorRef
   }
 
   private def searchQuery(msgIndex: String): SearchRequest =
@@ -43,8 +53,7 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpeci
       val msgIndex = "test-index-1"
       val probe = TestProbe()
 
-      val bulkInserter = system.actorOf(Props(new TestElasticsearchBulkInserter(
-        maxBufferSize = 5, esStateListener = probe.ref)).withDispatcher("flush-prio-dispatcher"))
+      val bulkInserter = testBulkInserter(maxBufferSize = 5, esStateListener = probe.ref)
 
       probe must receiveWithin(10.seconds)(ElasticsearchUp)
 
@@ -59,8 +68,7 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpeci
       val msgIndex = "test-index-2"
       val probe = TestProbe()
 
-      val bulkInserter = system.actorOf(Props(new TestElasticsearchBulkInserter(
-        flushFreq = 10.seconds, esStateListener = probe.ref)).withDispatcher("flush-prio-dispatcher"))
+      val bulkInserter = testBulkInserter(flushFreq = 10.seconds, esStateListener = probe.ref)
 
       probe must receiveWithin(10.seconds)(ElasticsearchUp)
 
@@ -76,8 +84,7 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpeci
       val msgIndex = "test-index-3"
       val probe = TestProbe()
 
-      val bulkInserter = system.actorOf(Props(new TestElasticsearchBulkInserter(
-        maxBufferSize = 5, esStateListener = probe.ref)).withDispatcher("flush-prio-dispatcher"))
+      val bulkInserter = testBulkInserter(maxBufferSize = 5, esStateListener = probe.ref)
 
       probe must receiveWithin(10.seconds)(ElasticsearchUp)
 
@@ -99,8 +106,7 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpeci
       val msgIndex = "test-index-4"
       val probe = TestProbe()
 
-      val bulkInserter = system.actorOf(Props(new TestElasticsearchBulkInserter(
-        maxBufferSize = 2, esStateListener = probe.ref)).withDispatcher("flush-prio-dispatcher"))
+      val bulkInserter = testBulkInserter(maxBufferSize = 2, esStateListener = probe.ref)
 
       probe must receiveWithin(10.seconds)(ElasticsearchUp)
 
