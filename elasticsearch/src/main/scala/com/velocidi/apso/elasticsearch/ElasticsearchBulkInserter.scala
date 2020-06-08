@@ -7,7 +7,6 @@ import scala.util.{ Failure, Success, Try }
 
 import akka.actor._
 import akka.dispatch.ControlMessage
-import akka.event.Logging
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.requests.bulk.{ BulkResponse, BulkResponseItem }
 import com.sksamuel.elastic4s.requests.indexes.IndexRequest
@@ -21,39 +20,50 @@ import com.velocidi.apso.Logging
  * This actor buffers requests until either the configured flush timer is
  * triggered or the buffer hits the max size.
  */
-class ElasticsearchBulkInserter(bulkInserterConfig: config.Elasticsearch.BulkInserter, client: ElasticClient)
-  extends Actor with ActorLogging {
+class ElasticsearchBulkInserter(esConfig: config.Elasticsearch)
+  extends Actor with Logging {
   import ElasticsearchBulkInserter._
 
   implicit private[this] val ec: ExecutionContext = context.system.dispatcher
 
-  private[this] var esStateListeners = List.empty[ActorRef]
+  private[this] val bulkInserterConfig = esConfig.bulkInserter.getOrElse {
+    val fallback = config.Elasticsearch.BulkInserter(1.second, 10.seconds, 1000, 3)
+    log.warn("Bulk inserter settings for sending documents to Elasticsearch were not found in the config. " +
+      s"A default configuration will be used: $fallback")
+    fallback
+  }
 
   private[this] val maxBufferSize = bulkInserterConfig.maxBufferSize
   private[this] val maxTryCount = bulkInserterConfig.maxTryCount
   private[this] val flushFrequency = bulkInserterConfig.flushFrequency
   private[this] val esDownCheckFrequency = bulkInserterConfig.esDownCheckFrequency
 
+  private[this] var client: ElasticClient = null
   private[this] var buffer: List[Message] = Nil
   private[this] val tryCountMap = mutable.Map.empty[Message, Int]
 
   // override this when a failure to insert documents in ES is not considered critical
   protected[this] def logErrorsAsWarnings = false
 
-  private[this] lazy val errorLogLevel = if (logErrorsAsWarnings) Logging.WarningLevel else Logging.ErrorLevel
+  private[this] def logErrorOrWarning(msg: => String, throwable: Option[Throwable] = None): Unit = {
+    (logErrorsAsWarnings, throwable) match {
+      case (true, Some(t)) => log.warn(msg, t)
+      case (true, None) => log.warn(msg)
+      case (false, Some(t)) => log.error(msg, t)
+      case (false, None) => log.error(msg)
+    }
+  }
 
   private[this] def checkElasticsearch(): Future[Boolean] = {
     client.execute(clusterHealth).map(_.result.status != "red")
   }
 
   private[this] def becomeElasticsearchUp(): Unit = {
-    esStateListeners.foreach { _ ! ElasticsearchUp }
     val periodicFlush = context.system.scheduler.scheduleWithFixedDelay(flushFrequency, flushFrequency, self, Flush)
     context.become(elasticsearchUp(periodicFlush))
   }
 
   private[this] def becomeElasticsearchDown(): Unit = {
-    esStateListeners.foreach { _ ! ElasticsearchDown }
     val periodicCheck = context.system.scheduler.scheduleWithFixedDelay(
       esDownCheckFrequency, esDownCheckFrequency, self, CheckElasticsearch)
     context.become(elasticsearchDown(periodicCheck))
@@ -64,7 +74,7 @@ class ElasticsearchBulkInserter(bulkInserterConfig: config.Elasticsearch.BulkIns
 
     if (tryCount > maxTryCount) {
       tryCountMap.remove(msg)
-      log.log(errorLogLevel, "Error inserting document in Elasticsearch: {}", item)
+      logErrorOrWarning(s"Error inserting document in Elasticsearch: $item")
       Nil
     } else {
       msg.sender ! Status.Failure(new Throwable(s"Error inserting document in Elasticsearch: ${item.error}"))
@@ -107,7 +117,7 @@ class ElasticsearchBulkInserter(bulkInserterConfig: config.Elasticsearch.BulkIns
 
           case Failure(ex) =>
             // FIXME: there are some cases where a failure here indicates that Elasticsearch is down
-            log.log(errorLogLevel, "Error inserting documents in Elasticsearch: {}", ex.getMessage)
+            logErrorOrWarning("Error inserting documents in Elasticsearch.", Some(ex))
         }
 
       case Failure(_) =>
@@ -117,6 +127,7 @@ class ElasticsearchBulkInserter(bulkInserterConfig: config.Elasticsearch.BulkIns
   }
 
   override def preStart() = {
+    client = ElasticsearchUtil.buildEsClient(esConfig)
     checkElasticsearch().onComplete {
       case Success(true) => self ! ElasticsearchUp
       case _ => self ! ElasticsearchDown
@@ -126,9 +137,6 @@ class ElasticsearchBulkInserter(bulkInserterConfig: config.Elasticsearch.BulkIns
   def receive = init
 
   def init: Receive = {
-
-    case ref: ActorRef =>
-      esStateListeners = ref :: esStateListeners
 
     case insert: Insert => addMsgToBuffer(insert.toRequest)
 
@@ -141,16 +149,12 @@ class ElasticsearchBulkInserter(bulkInserterConfig: config.Elasticsearch.BulkIns
       becomeElasticsearchUp()
 
     case ElasticsearchDown =>
-      log.warning("Cannot connect to Elasticsearch. There may be some configuration problem or the cluster may be " +
+      log.warn("Cannot connect to Elasticsearch. There may be some configuration problem or the cluster may be " +
         "temporarily down.")
       becomeElasticsearchDown()
   }
 
   def elasticsearchUp(periodicFlush: Cancellable): Receive = {
-
-    case ref: ActorRef =>
-      esStateListeners = ref :: esStateListeners
-      ref ! ElasticsearchUp
 
     case insert: Insert =>
       addMsgToBuffer(insert.toRequest)
@@ -168,17 +172,13 @@ class ElasticsearchBulkInserter(bulkInserterConfig: config.Elasticsearch.BulkIns
       if (buffer.nonEmpty) flush()
 
     case ElasticsearchDown =>
-      log.warning("Elasticsearch seems to be down. Waiting for cluster to recover")
+      log.warn("Elasticsearch seems to be down. Waiting for cluster to recover")
       periodicFlush.cancel()
       becomeElasticsearchDown()
       context.system.scheduler.scheduleOnce(2.seconds, self, CheckElasticsearch)
   }
 
   def elasticsearchDown(periodicCheck: Cancellable): Receive = {
-
-    case ref: ActorRef =>
-      esStateListeners = ref :: esStateListeners
-      ref ! ElasticsearchDown
 
     case insert: Insert => addMsgToBuffer(insert.toRequest)
 
@@ -198,6 +198,7 @@ class ElasticsearchBulkInserter(bulkInserterConfig: config.Elasticsearch.BulkIns
 
   override def postStop() = {
     if (buffer.nonEmpty) flush()
+    client.close()
   }
 
   private def addMsgToBuffer(msg: IndexRequest) = buffer = Message(sender, msg) :: buffer
@@ -241,14 +242,5 @@ object ElasticsearchBulkInserter extends Logging {
    */
   case object CheckElasticsearch extends ControlMessage
 
-  def props(esConfig: config.Elasticsearch): Props = {
-    val bulkInserterConfig = esConfig.bulkInserter.getOrElse {
-      val fallback = config.Elasticsearch.BulkInserter(1.second, 10.seconds, 1000, 3)
-      log.warn("Bulk inserter settings for sending documents to Elasticsearch were not found in the config. " +
-        s"A default configuration will be used: $fallback")
-      fallback
-    }
-
-    Props(new ElasticsearchBulkInserter(bulkInserterConfig, ElasticsearchUtil.buildEsClient(esConfig)))
-  }
+  def props(esConfig: config.Elasticsearch): Props = Props(new ElasticsearchBulkInserter(esConfig))
 }
