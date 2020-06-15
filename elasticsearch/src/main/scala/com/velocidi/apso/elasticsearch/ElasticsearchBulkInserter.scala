@@ -20,7 +20,7 @@ import com.velocidi.apso.Logging
  * This actor buffers requests until either the configured flush timer is
  * triggered or the buffer hits the max size.
  */
-class ElasticsearchBulkInserter(esConfig: config.Elasticsearch)
+class ElasticsearchBulkInserter(esConfig: config.Elasticsearch, logErrorsAsWarnings: Boolean)
   extends Actor with Logging {
   import ElasticsearchBulkInserter._
 
@@ -41,9 +41,6 @@ class ElasticsearchBulkInserter(esConfig: config.Elasticsearch)
   private[this] var client: ElasticClient = null
   private[this] var buffer: List[Message] = Nil
   private[this] val tryCountMap = mutable.Map.empty[Message, Int]
-
-  // override this when a failure to insert documents in ES is not considered critical
-  protected[this] def logErrorsAsWarnings = false
 
   private[this] def logErrorOrWarning(msg: => String, throwable: Option[Throwable] = None): Unit = {
     (logErrorsAsWarnings, throwable) match {
@@ -242,5 +239,13 @@ object ElasticsearchBulkInserter extends Logging {
    */
   case object CheckElasticsearch extends ControlMessage
 
-  def props(esConfig: config.Elasticsearch): Props = Props(new ElasticsearchBulkInserter(esConfig))
+  /**
+   * Creates a Props for `ElasticsearchBulkInserter`.
+   *
+   * @param esConfig the elasticsearch configuration to use
+   * @param logErrorsAsWarnings whether errors should be logged as warnings
+   * @return a `Props` for `ElasticsearchBulkInserter`.
+   */
+  def props(esConfig: config.Elasticsearch, logErrorsAsWarnings: Boolean = false): Props =
+    Props(new ElasticsearchBulkInserter(esConfig, logErrorsAsWarnings))
 }
