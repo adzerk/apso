@@ -115,9 +115,9 @@ class ElasticsearchBulkInserter(esConfig: config.Elasticsearch)
             if (successCount == 0) self ! ElasticsearchDown
             failedReqs.foreach(self ! _)
 
-          case Failure(ex) =>
-            // FIXME: there are some cases where a failure here indicates that Elasticsearch is down
-            logErrorOrWarning("Error inserting documents in Elasticsearch.", Some(ex))
+          case Failure(_) =>
+            self ! ElasticsearchDown
+            sentBuffer.foreach(self ! _)
         }
 
       case Failure(_) =>
