@@ -21,7 +21,6 @@ object Dependencies {
     val ScalaPool               = "0.4.3"
     val SimpleJmx               = "1.17"
     val Specs2                  = "4.8.1"
-    val SprayJson               = "1.3.5"
     val Squants                 = "1.6.0"
     val SshJ                    = "0.27.0"
     val TypesafeConfig          = "1.4.0"
@@ -61,7 +60,6 @@ object Dependencies {
   val Specs2Core                 = "org.specs2"                             %% "specs2-core"                  % Versions.Specs2
   val Specs2JUnit                = "org.specs2"                             %% "specs2-junit"                 % Versions.Specs2
   val Specs2ScalaCheck           = "org.specs2"                             %% "specs2-scalacheck"            % Versions.Specs2
-  val SprayJson                  = "io.spray"                               %% "spray-json"                   % Versions.SprayJson
   val Squants                    = "org.typelevel"                          %% "squants"                      % Versions.Squants
   val SshJ                       = "com.hierynomus"                          % "sshj"                         % Versions.SshJ
   val TypesafeConfig             = "com.typesafe"                            % "config"                       % Versions.TypesafeConfig
