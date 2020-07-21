@@ -167,7 +167,7 @@ trait ExtraMiscJsonProtocol {
     def apply(a: DateTime): Json = stringEncoder.apply(printer.print(a))
   }
   implicit val dateTimeDecoder: Decoder[DateTime] =
-    Decoder[String].emapTry(v => Try(new DateTime(v)))
+    Decoder[String].emapTry(v => Try(DateTime.parse(v)))
 
   @deprecated("This will be removed in a future version.", "2019/10/23")
   implicit object LocalDateFormat extends JsonFormat[LocalDate] {
