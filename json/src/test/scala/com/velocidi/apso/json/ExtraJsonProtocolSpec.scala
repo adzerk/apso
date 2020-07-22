@@ -168,7 +168,7 @@ class ExtraJsonProtocolSpec extends Specification {
     }
 
     "provide an Encoder and Decoder for DateTime" in {
-      val dateTime = new DateTime("2016-01-01")
+      val dateTime = DateTime.parse("2016-01-01T00:00:00.000Z")
       val dateTimeJsonString = json""""2016-01-01T00:00:00.000Z""""
 
       dateTime.asJson mustEqual dateTimeJsonString
