@@ -68,7 +68,7 @@ trait ExtraMiscJsonProtocol {
     def apply(a: DateTime): Json = stringEncoder.apply(printer.print(a))
   }
   implicit val dateTimeDecoder: Decoder[DateTime] =
-    Decoder[String].emapTry(v => Try(DateTime.parse(v)))
+    Decoder[String].emapTry(v => Try(DateTime.parse(v).toDateTime(DateTimeZone.UTC)))
 
   implicit val localDateEncoder: Encoder[LocalDate] =
     Encoder[String].contramap(_.toString)
