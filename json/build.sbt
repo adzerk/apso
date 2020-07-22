@@ -5,7 +5,6 @@ libraryDependencies ++= Seq(
   CirceGeneric,
   CirceParser,
   NscalaTime,
-  SprayJson,
   Squants,
   TypesafeConfig % Provided,
   CirceLiteral   % Test,
