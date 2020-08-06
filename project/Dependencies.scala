@@ -14,7 +14,6 @@ object Dependencies {
     val FastMd5                 = "2.7.1"
     val JUnit                   = "4.12"
     val Log4jCore               = "2.12.1"
-    val Netty                   = "4.1.43.Final"
     val NscalaTime              = "2.22.0"
     val ScalaCheck              = "1.14.2"
     val ScalaLogging            = "3.9.2"
@@ -47,11 +46,10 @@ object Dependencies {
   val Elastic4sCore              = "com.sksamuel.elastic4s"                 %% "elastic4s-core"               % Versions.Elastic4s
   val Elastic4sTestkit           = "com.sksamuel.elastic4s"                 %% "elastic4s-testkit"            % Versions.Elastic4s
   // FIXME: netty-all conflicts with all non-bundle netty dependencies, which are needed by GRPC and possibly others.
-  val ElasticsearchClusterRunner = "org.codelibs"                            % "elasticsearch-cluster-runner" % "7.1.1.0" excludeAll ExclusionRule(organization = "io.netty")
+  val ElasticsearchClusterRunner = "org.codelibs"                            % "elasticsearch-cluster-runner" % "7.1.1.0"
   val FastMd5                    = "com.joyent.util"                         % "fast-md5"                     % Versions.FastMd5
   val JUnit                      = "junit"                                   % "junit"                        % Versions.JUnit
   val Log4jCore                  = "org.apache.logging.log4j"                % "log4j-core"                   % Versions.Log4jCore
-  val Netty                      = "io.netty"                                % "netty-all"                    % Versions.Netty
   val NscalaTime                 = "com.github.nscala-time"                 %% "nscala-time"                  % Versions.NscalaTime
   val ScalaCheck                 = "org.scalacheck"                         %% "scalacheck"                   % Versions.ScalaCheck
   val ScalaLogging               = "com.typesafe.scala-logging"             %% "scala-logging"                % Versions.ScalaLogging
