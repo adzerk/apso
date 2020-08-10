@@ -7,9 +7,10 @@ import akka.http.scaladsl.model.headers.CacheDirectives._
 import akka.http.scaladsl.model.headers._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import net.ruippeixotog.akka.testkit.specs2.mutable.AkkaSpecificationLike
+import akka.http.scaladsl.testkit.Specs2RouteTest
+import org.specs2.mutable.Specification
 
-class ExtraMiscDirectivesSpec extends Specs2RouteTest with AkkaSpecificationLike {
+class ExtraMiscDirectivesSpec extends Specification with Specs2RouteTest {
 
   "The ExtraMiscDirectives" should {
     import ExtraMiscDirectives._
