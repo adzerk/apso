@@ -14,15 +14,15 @@ import akka.http.scaladsl.model.headers._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.RouteResult
 import akka.http.scaladsl.server.RouteResult.Complete
-import akka.http.scaladsl.testkit.RouteTestTimeout
+import akka.http.scaladsl.testkit.{ RouteTestTimeout, Specs2RouteTest }
 import akka.stream.scaladsl.Flow
-import net.ruippeixotog.akka.testkit.specs2.mutable.AkkaSpecificationLike
 import org.specs2.concurrent.ExecutionEnv
+import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 
 import com.velocidi.apso.NetUtils._
 
-class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specs2RouteTest with AkkaSpecificationLike with ProxySupport {
+class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Specs2RouteTest with ProxySupport {
 
   trait MockServer extends Scope {
     def serverResponse(req: HttpRequest) = HttpResponse(entity = req.uri.toRelative.toString)
