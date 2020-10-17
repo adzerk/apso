@@ -31,6 +31,21 @@ lazy val apso = (project in file("."))
   .dependsOn(akkaHttp, aws, caching, collections, core, elasticsearch, encryption, hashing, io, json, profiling, time)
   .aggregate(akkaHttp, aws, caching, collections, core, elasticsearch, encryption, hashing, io, json, profiling, testkit, time)
 
+
+lazy val docs = (project in file("apso-docs"))
+  .dependsOn(apso)
+  .settings(
+    mdocOut := baseDirectory.in(ThisBuild).value,
+
+    mdocVariables := Map(
+      "VERSION" -> version.value
+    ),
+
+    libraryDependencies ++= Seq(Dependencies.AwsJavaSdkS3)
+  )
+  .enablePlugins(MdocPlugin)
+
+
 lazy val commonSettings = Seq(
   resolvers ++= Seq(
     Resolver.sonatypeRepo("snapshots"),
