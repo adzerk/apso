@@ -11,7 +11,7 @@ Apso's latest release is built against Scala 2.12 and Scala 2.13.
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso" % "0.16.2-SNAPSHOT"
+libraryDependencies += "com.velocidi" %% "apso" % "0.16.1"
 ```
 
 The project is divided in modules, you can instead install only a specific module.
@@ -19,7 +19,7 @@ The project is divided in modules, you can instead install only a specific modul
 The TestKit is available under the `apso-testkit` project. You can include it only for the `test` configuration:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-testkit" % "0.16.2-SNAPSHOT" % "test"
+libraryDependencies += "com.velocidi" %% "apso-testkit" % "0.16.1" % "test"
 ```
 
 Please take into account that the library is still in an experimental stage and the interfaces might change for subsequent releases.
@@ -71,7 +71,7 @@ Please take into account that the library is still in an experimental stage and 
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-core" % "0.16.2-SNAPSHOT"
+libraryDependencies += "com.velocidi" %% "apso-core" % "0.16.1"
 ```
 
 ### Config
@@ -121,7 +121,7 @@ You can also have the distance function curried if you are computing distances f
 
 ```scala
 val distFromOffice = Geo.distanceFrom((41.1617609, -8.6024716))
-// distFromOffice: (Double, Double) => Double = com.velocidi.apso.Geo$$$Lambda$75849/691439771@4e912e8e
+// distFromOffice: (Double, Double) => Double = com.velocidi.apso.Geo$$$Lambda$8256/54395449@73bdd623
 
 distFromOffice((41.1763745, -8.5964861))
 // res3: Double = 1.7004440762344684
@@ -153,22 +153,22 @@ Map(1 -> 2, 2 -> 3).mapKeys(_ + 1)
 // res10: Map[Int, Int] = Map(2 -> 2, 3 -> 3)
 
 scala.util.Random.choose((0 to 15).toSeq)
-// res11: Option[Int] = Some(5)
+// res11: Option[Int] = Some(13)
 
 scala.util.Random.choose((0 to 15).toSeq)
-// res12: Option[Int] = Some(4)
+// res12: Option[Int] = Some(14)
 
 scala.util.Random.choose((0 to 15).toSeq)
-// res13: Option[Int] = Some(5)
+// res13: Option[Int] = Some(9)
 
 scala.util.Random.choose((0 to 15).toSeq)
-// res14: Option[Int] = Some(8)
+// res14: Option[Int] = Some(4)
 
 scala.util.Random.chooseN((0 to 15).toSeq, 4)
-// res15: Seq[Int] = List(5, 4, 3, 2)
+// res15: Seq[Int] = List(9, 8, 7, 5)
 
 scala.util.Random.chooseN((0 to 15).toSeq, 4)
-// res16: Seq[Int] = List(11, 8, 5, 2)
+// res16: Seq[Int] = List(12, 10, 9, 7)
 ```
 
 ### JreVersionHelper
@@ -208,26 +208,26 @@ val progress = ProgressBar(100)
 //   100L,
 //   80,
 //   "ops",
-//   com.velocidi.apso.ProgressBar$$$Lambda$75856/1785298081@7e7866d6
+//   com.velocidi.apso.ProgressBar$$$Lambda$8263/859839612@16847b56
 // )
 
 progress.tick(1)
-//   1% [>                                                   ] / [ 333.33 ] ops/s  
+//   1% [>                                                   ] / [ 500.00 ] ops/s  
 
 progress.tick(2)
-//   3% [=>                                                  ] - [ 375.00 ] ops/s  
+//   3% [=>                                                  ] - [ 428.57 ] ops/s  
 
 progress.tick(1)
-//   4% [==>                                                 ] \ [ 333.33 ] ops/s  
+//   4% [==>                                                 ] \ [ 444.44 ] ops/s  
 
 progress.tick(10)
-//  14% [=======>                                            ] | [ 933.33 ] ops/s  
+//  14% [=======>                                           ] | [ 1166.67 ] ops/s  
 
 progress.tick(20)
-//  34% [=================>                                 ] / [ 1888.89 ] ops/s  
+//  34% [=================>                                 ] / [ 2428.57 ] ops/s  
 
 progress.tick(30)
-//  64% [================================>                  ] - [ 3047.62 ] ops/s
+//  64% [================================>                  ] - [ 3764.71 ] ops/s
 ```
 
 ### Reflect
@@ -334,7 +334,7 @@ The `akka-http` module provides additional [directives](https://doc.akka.io/docs
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-akka-http" % "0.16.2-SNAPSHOT"
+libraryDependencies += "com.velocidi" %% "apso-akka-http" % "0.16.1"
 ```
 
 ### ClientIPDirectives
@@ -356,7 +356,7 @@ Apso provides a group of classes to ease the interaction with the Amazon Web Ser
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-aws" % "0.16.2-SNAPSHOT"
+libraryDependencies += "com.velocidi" %% "apso-aws" % "0.16.1"
 ```
 
 ### ConfigCredentialsProvider
@@ -384,7 +384,7 @@ val confProvider = ConfigCredentialsProvider(
 // )
 
 val credentials = confProvider.getCredentials
-// credentials: com.amazonaws.auth.AWSCredentials = com.amazonaws.auth.BasicAWSCredentials@2567ec4b
+// credentials: com.amazonaws.auth.AWSCredentials = com.amazonaws.auth.BasicAWSCredentials@58250871
 
 credentials.getAWSAccessKeyId
 // res34: String = "<access-key>"
@@ -410,7 +410,7 @@ The `SerializableAWSCredentials` class provides a serializable container for AWS
 The `apso-collections` module provides some helpful collections. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-collections" % "0.16.2-SNAPSHOT"
+libraryDependencies += "com.velocidi" %% "apso-collections" % "0.16.1"
 ```
 
 ### Trie
@@ -421,7 +421,6 @@ The `Trie` class is an implementation of an immutable trie. An example usage fol
 import com.velocidi.apso.collection._
 
 val t = Trie[Char, Int]()
-// Success(6)
 // t: Trie[Char, Int] = Trie(None, Map())
 
 val nt = t.set("one", 1).set("two", 2).set("three", 3).set("four", 4)
@@ -600,7 +599,7 @@ creation of the underlying Cyphers.
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-encryption" % "0.16.2-SNAPSHOT"
+libraryDependencies += "com.velocidi" %% "apso-encryption" % "0.16.1"
 ```
 
 The following shows the creation of `Encryptor` and `Decryptor` objects,
@@ -645,7 +644,7 @@ Apso provides methods to deal with IO-related features in the `io` module.
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-io" % "0.16.2-SNAPSHOT"
+libraryDependencies += "com.velocidi" %% "apso-io" % "0.16.1"
 ```
 
 ### FileDescriptor
@@ -678,7 +677,7 @@ ResourceUtil.getResourceAsString("reference.conf")
 Apso includes a bunch of utilities to work with JSON serialization and deserialization. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-json" % "0.16.2-SNAPSHOT"
+libraryDependencies += "com.velocidi" %% "apso-json" % "0.16.1"
 ```
 
 ## Profiling
@@ -688,7 +687,7 @@ The `profiling` module of apso provides utilities to help with profiling the run
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-profiling" % "0.16.2-SNAPSHOT"
+libraryDependencies += "com.velocidi" %% "apso-profiling" % "0.16.1"
 ```
 
 ### CpuSampler
@@ -706,7 +705,7 @@ The `apso-time` module provides utilities to work with `DateTime` and `LocalDate
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-time" % "0.16.2-SNAPSHOT"
+libraryDependencies += "com.velocidi" %% "apso-time" % "0.16.1"
 ```
 
 See the following sample usages:

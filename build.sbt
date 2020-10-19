@@ -38,10 +38,12 @@ lazy val docs = (project in file("apso-docs"))
     mdocOut := baseDirectory.in(ThisBuild).value,
 
     mdocVariables := Map(
-      "VERSION" -> version.value
+      "VERSION" -> "0.16.1" // This version should be set to the currently released version.
     ),
 
-    libraryDependencies ++= Seq(Dependencies.AwsJavaSdkS3)
+    libraryDependencies ++= Seq(Dependencies.AwsJavaSdkS3),
+
+    skip in publish := true
   )
   .enablePlugins(MdocPlugin)
 
