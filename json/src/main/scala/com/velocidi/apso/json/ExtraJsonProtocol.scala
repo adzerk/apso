@@ -13,6 +13,8 @@ import org.joda.time.format.ISODateTimeFormat
 import org.joda.time.{ Duration => _, _ }
 import squants.market.{ Currency, MoneyContext }
 
+import com.velocidi.apso.json.syntax._
+
 /**
  * Provides additional JsonFormats not available in the `DefaultJsonProtocol`.
  */
@@ -28,8 +30,8 @@ trait ExtraTimeJsonProtocol {
   implicit val finiteDurationEncoder: Encoder[FiniteDuration] =
     Encoder.forProduct1("milliseconds")(_.toMillis)
   implicit val finiteDurationDecoder: Decoder[FiniteDuration] =
-    Decoder[Long].emapTry(v => tryToParseDuration(v.toString)) or
-      Decoder[String].emapTry(v => tryToParseDuration(v)) or
+    Decoder[Long].emapPrettyTry(v => tryToParseDuration(v.toString)) or
+      Decoder[String].emapPrettyTry(v => tryToParseDuration(v)) or
       Decoder.forProduct1[FiniteDuration, Long]("milliseconds")(_.millis) or
       Decoder.forProduct1[FiniteDuration, Long]("seconds")(_.seconds) or
       Decoder.forProduct1[FiniteDuration, Long]("minutes")(_.minutes) or
@@ -44,7 +46,7 @@ trait ExtraTimeJsonProtocol {
   implicit val periodEncoder: Encoder[Period] =
     Encoder[String].contramap(_.toString)
   implicit val periodDecoder: Decoder[Period] =
-    Decoder[String].emapTry(v => Try(new Period(v)))
+    Decoder[String].emapPrettyTry(v => Try(new Period(v)))
 }
 
 trait ExtraHttpJsonProtocol {
@@ -52,14 +54,14 @@ trait ExtraHttpJsonProtocol {
   implicit val uriEncoder: Encoder[URI] =
     Encoder[String].contramap(_.toString)
   implicit val uriDecoder: Decoder[URI] =
-    Decoder[String].emapTry(v => Try(new URI(v)))
+    Decoder[String].emapPrettyTry(v => Try(new URI(v)))
 }
 
 trait ExtraMiscJsonProtocol {
   implicit val configEncoder: Encoder[Config] =
     Encoder[Json].contramap(conf => parse(conf.root.render(ConfigRenderOptions.concise())).fold(throw _, identity))
   implicit val configDecoder: Decoder[Config] =
-    Decoder[Json].emapTry(json => Try(ConfigFactory.parseString(json.toString)))
+    Decoder[Json].emapPrettyTry(json => Try(ConfigFactory.parseString(json.toString)))
 
   implicit val dateTimeEncoder: Encoder[DateTime] = new Encoder[DateTime] {
     private val stringEncoder = Encoder[String]
@@ -68,14 +70,14 @@ trait ExtraMiscJsonProtocol {
     def apply(a: DateTime): Json = stringEncoder.apply(printer.print(a))
   }
   implicit val dateTimeDecoder: Decoder[DateTime] =
-    Decoder[String].emapTry(v => Try(DateTime.parse(v).toDateTime(DateTimeZone.UTC)))
+    Decoder[String].emapPrettyTry(v => Try(DateTime.parse(v).toDateTime(DateTimeZone.UTC)))
 
   implicit val localDateEncoder: Encoder[LocalDate] =
     Encoder[String].contramap(_.toString)
   implicit val localDateDecoder: Decoder[LocalDate] =
-    Decoder[String].emapTry(v => Try(new LocalDate(v)))
+    Decoder[String].emapPrettyTry(v => Try(new LocalDate(v)))
 
-  implicit def currencyDecoder(implicit moneyContext: MoneyContext): Decoder[Currency] = Decoder[String].emapTry(Currency(_))
+  implicit def currencyDecoder(implicit moneyContext: MoneyContext): Decoder[Currency] = Decoder[String].emapPrettyTry(Currency(_))
   implicit val currencyEncoder: Encoder[Currency] = Encoder[String].contramap(_.toString)
 
   /**
