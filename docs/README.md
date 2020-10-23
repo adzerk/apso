@@ -496,7 +496,7 @@ decryptor.get.decryptToString(encryptor.get.encryptToSafeString(secretData).get)
 Apso provides utilities for various hashing functions. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-hashing" % "@VERSION"
+libraryDependencies += "com.velocidi" %% "apso-hashing" % "@VERSION@"
 ```
 
 ```scala mdoc:reset
