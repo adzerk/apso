@@ -34,6 +34,7 @@ lazy val apso = (project in file("."))
 
 lazy val docs = (project in file("apso-docs"))
   .dependsOn(apso)
+  .settings(commonSettings: _*)
   .settings(
     mdocOut := baseDirectory.in(ThisBuild).value,
 
