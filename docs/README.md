@@ -119,9 +119,10 @@ Geo.distance((41.1617609, -8.6024716), (41.1763745, -8.5964861))
 
 You can also have the distance function curried if you are computing distances from a fixed point:
 
-```scala mdoc
+```scala mdoc:silent
 val distFromOffice = Geo.distanceFrom((41.1617609, -8.6024716))
-
+```
+```scala mdoc
 distFromOffice((41.1763745, -8.5964861))
 
 distFromOffice((38.7223032, -9.1414664))
@@ -144,27 +145,33 @@ Map(1 -> 2, 2 -> 4, 3 -> 6).twoWayMerge(Map(2 -> 2, 3 -> 5)) { (a, b) => b }
 
 Map(1 -> 2, 2 -> 3).mapKeys(_ + 1)
 
-scala.util.Random.choose((0 to 15).toSeq)
+```
+```scala mdoc:silent
+val rand = new scala.util.Random(1)
+```
+```scala mdoc
+rand.choose((0 to 15).toSeq)
 
-scala.util.Random.choose((0 to 15).toSeq)
+rand.choose((0 to 15).toSeq)
 
-scala.util.Random.choose((0 to 15).toSeq)
+rand.choose((0 to 15).toSeq)
 
-scala.util.Random.choose((0 to 15).toSeq)
+rand.choose((0 to 15).toSeq)
 
-scala.util.Random.chooseN((0 to 15).toSeq, 4)
+rand.chooseN((0 to 15).toSeq, 4)
 
-scala.util.Random.chooseN((0 to 15).toSeq, 4)
+rand.chooseN((0 to 15).toSeq, 4)
 ```
 
 ### JreVersionHelper
 
 The JreVersionHelper object provides helper methods to check the two most significant parts of the JRE version at runtime:
 
-```scala mdoc:reset
+```scala mdoc:compile-only
 import com.velocidi.apso.JreVersionHelper
 
 JreVersionHelper.jreVersion
+// res0: (Int, Int) = (1, 8)
 ```
 
 ### Logging
@@ -185,22 +192,28 @@ a.log.info("test")
 
 The `ProgressBar` represents a widget to print a dynamic progress bar in a console.
 
-```scala mdoc:reset
+```scala mdoc:compile-only
 import com.velocidi.apso.ProgressBar
 
 val progress = ProgressBar(100)
 
 progress.tick(1)
+// 1% [>                                                     ] / [ 0.19 ] ops/s	
 
 progress.tick(2)
+// 3% [=>                                                    ] - [ 0.15 ] ops/s
 
 progress.tick(1)
+// 4% [==>                                                   ] \ [ 0.12 ] ops/s
 
 progress.tick(10)
+// 14% [=======>                                              ] | [ 0.31 ] ops/s
 
 progress.tick(20)
+// 34% [==================>                                   ] / [ 0.46 ] ops/s
 
 progress.tick(30)
+// 64% [=================================>                    ] - [ 0.77 ] ops/s
 ```
 
 ### Reflect
@@ -226,10 +239,11 @@ res1: com.velocidi.apso.Reflect.type = com.velocidi.apso.Reflect$@3b1dbca
 The `Retry` object provides a method to retry methods or `Future`s a given number of times until they succeed or the specified maximum number of retries is reached:
 
 ```scala mdoc:reset
-import scala.concurrent.Future
-import com.velocidi.apso.Retry
-
+import scala.concurrent._
+import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
+
+import com.velocidi.apso.Retry
 
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -246,7 +260,7 @@ def f: Future[Int] = {
   }
 }
 
-Retry.retryFuture(10)(f).onComplete(println)
+Await.result(Retry.retryFuture(10)(f), 1.second)
 
 var attempts = 0
 
@@ -328,7 +342,7 @@ libraryDependencies += "com.velocidi" %% "apso-aws" % "@VERSION@"
 
 The `ConfigCredentialsProvider` is an `AWSCredentialsProvider` (from AWS SDK for Java) that retrieves credentials from a typesafe configuration, allowing customization of its `Config` object, as well as the access key and secret key paths:
 
-```scala mdoc:reset
+```scala mdoc:silent
 import com.velocidi.apso.aws._
 
 import com.typesafe.config._

@@ -121,8 +121,8 @@ You can also have the distance function curried if you are computing distances f
 
 ```scala
 val distFromOffice = Geo.distanceFrom((41.1617609, -8.6024716))
-// distFromOffice: (Double, Double) => Double = com.velocidi.apso.Geo$$$Lambda$8256/54395449@73bdd623
-
+```
+```scala
 distFromOffice((41.1763745, -8.5964861))
 // res3: Double = 1.7004440762344684
 
@@ -151,24 +151,28 @@ Map(1 -> 2, 2 -> 4, 3 -> 6).twoWayMerge(Map(2 -> 2, 3 -> 5)) { (a, b) => b }
 
 Map(1 -> 2, 2 -> 3).mapKeys(_ + 1)
 // res10: Map[Int, Int] = Map(2 -> 2, 3 -> 3)
+```
+```scala
+val rand = new scala.util.Random(1)
+```
+```scala
+rand.choose((0 to 15).toSeq)
+// res11: Option[Int] = Some(11)
 
-scala.util.Random.choose((0 to 15).toSeq)
-// res11: Option[Int] = Some(13)
+rand.choose((0 to 15).toSeq)
+// res12: Option[Int] = Some(1)
 
-scala.util.Random.choose((0 to 15).toSeq)
-// res12: Option[Int] = Some(14)
+rand.choose((0 to 15).toSeq)
+// res13: Option[Int] = Some(6)
 
-scala.util.Random.choose((0 to 15).toSeq)
-// res13: Option[Int] = Some(9)
+rand.choose((0 to 15).toSeq)
+// res14: Option[Int] = Some(6)
 
-scala.util.Random.choose((0 to 15).toSeq)
-// res14: Option[Int] = Some(4)
+rand.chooseN((0 to 15).toSeq, 4)
+// res15: Seq[Int] = List(9, 8, 3, 0)
 
-scala.util.Random.chooseN((0 to 15).toSeq, 4)
-// res15: Seq[Int] = List(9, 8, 7, 5)
-
-scala.util.Random.chooseN((0 to 15).toSeq, 4)
-// res16: Seq[Int] = List(12, 10, 9, 7)
+rand.chooseN((0 to 15).toSeq, 4)
+// res16: Seq[Int] = List(7, 6, 5, 2)
 ```
 
 ### JreVersionHelper
@@ -179,7 +183,6 @@ The JreVersionHelper object provides helper methods to check the two most signif
 import com.velocidi.apso.JreVersionHelper
 
 JreVersionHelper.jreVersion
-// res18: (Int, Int) = (1, 8)
 ```
 
 ### Logging
@@ -204,30 +207,23 @@ The `ProgressBar` represents a widget to print a dynamic progress bar in a conso
 import com.velocidi.apso.ProgressBar
 
 val progress = ProgressBar(100)
-// progress: ProgressBar = ProgressBar(
-//   100L,
-//   80,
-//   "ops",
-//   com.velocidi.apso.ProgressBar$$$Lambda$8263/859839612@16847b56
-// )
 
 progress.tick(1)
-//   1% [>                                                   ] / [ 500.00 ] ops/s  
+// 1% [>                                                     ] / [ 0.19 ] ops/s	
 
 progress.tick(2)
-//   3% [=>                                                  ] - [ 428.57 ] ops/s  
+// 3% [=>                                                    ] - [ 0.15 ] ops/s
 
 progress.tick(1)
-//   4% [==>                                                 ] \ [ 444.44 ] ops/s  
+// 4% [==>                                                   ] \ [ 0.12 ] ops/s
 
 progress.tick(10)
-//  14% [=======>                                           ] | [ 1166.67 ] ops/s  
+// 14% [=======>                                              ] | [ 0.31 ] ops/s
 
 progress.tick(20)
-//  34% [=================>                                 ] / [ 2428.57 ] ops/s  
+// 34% [==================>                                   ] / [ 0.46 ] ops/s
 
 progress.tick(30)
-//  64% [================================>                  ] - [ 3764.71 ] ops/s
 ```
 
 ### Reflect
@@ -253,10 +249,11 @@ res1: com.velocidi.apso.Reflect.type = com.velocidi.apso.Reflect$@3b1dbca
 The `Retry` object provides a method to retry methods or `Future`s a given number of times until they succeed or the specified maximum number of retries is reached:
 
 ```scala
-import scala.concurrent.Future
-import com.velocidi.apso.Retry
-
+import scala.concurrent._
+import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
+
+import com.velocidi.apso.Retry
 
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -274,7 +271,8 @@ def f: Future[Int] = {
   }
 }
 
-Retry.retryFuture(10)(f).onComplete(println)
+Await.result(Retry.retryFuture(10)(f), 1.second)
+// res21: Int = 6
 
 var attempts = 0
 // attempts: Int = 0
@@ -320,11 +318,11 @@ def badHandler(resource: Closeable) = {
 TryWith(buildResource)(goodHandler)
 // good resource
 // Resource is now Closed
-// res31: util.Try[Unit] = Success(())
+// res24: util.Try[Unit] = Success(())
 
 TryWith(buildResource)(badHandler)
 // Resource is now Closed
-// res32: util.Try[Nothing] = Failure(java.lang.Exception)
+// res25: util.Try[Nothing] = Failure(java.lang.Exception)
 ```
 
 ## Akka HTTP
@@ -377,20 +375,12 @@ val confProvider = ConfigCredentialsProvider(
   }"""),
   accessKeyPath = "aws.access-key",
   secretKeyPath = "aws.secret-key")
-// confProvider: ConfigCredentialsProvider = ConfigCredentialsProvider(
-//   Config(SimpleConfigObject({"aws":{"access-key":"<access-key>","secret-key":"<secret-key>"}})),
-//   "aws.access-key",
-//   "aws.secret-key"
-// )
 
 val credentials = confProvider.getCredentials
-// credentials: com.amazonaws.auth.AWSCredentials = com.amazonaws.auth.BasicAWSCredentials@58250871
 
 credentials.getAWSAccessKeyId
-// res34: String = "<access-key>"
 
 credentials.getAWSSecretKey
-// res35: String = "<secret-key>"
 ```
 
 ### CredentialStore
@@ -450,13 +440,13 @@ val nt = t.set("one", 1).set("two", 2).set("three", 3).set("four", 4)
 // )
 
 nt.get("one")
-// res37: Option[Int] = Some(1)
+// res29: Option[Int] = Some(1)
 
 nt.get("two")
-// res38: Option[Int] = Some(2)
+// res30: Option[Int] = Some(2)
 
 nt.get("five")
-// res39: Option[Int] = None
+// res31: Option[Int] = None
 ```
 
 ### TypedMap
@@ -470,25 +460,25 @@ val m = TypedMap("one", 2, 3l)
 // m: TypedMap[Any] = Map(java.lang.String -> one, Int -> 2, Long -> 3)
 
 m[String]
-// res41: String = "one"
+// res33: String = "one"
 
 m[Int]
-// res42: Int = 2
+// res34: Int = 2
 
 m[Long]
-// res43: Long = 3L
+// res35: Long = 3L
 
 m.get[String]
-// res44: Option[String] = Some("one")
+// res36: Option[String] = Some("one")
 
 m.get[Int]
-// res45: Option[Int] = Some(2)
+// res37: Option[Int] = Some(2)
 
 m.get[Long]
-// res46: Option[Long] = Some(3L)
+// res38: Option[Long] = Some(3L)
 
 m.get[Char]
-// res47: Option[Char] = None
+// res39: Option[Char] = None
 ```
 
 ### Iterators
@@ -506,7 +496,7 @@ val circularIterator = CircularIterator(List(1, 2, 3).toIterator)
 // circularIterator: CircularIterator[Int] = non-empty iterator
 
 circularIterator.take(10).toList
-// res49: List[Int] = List(1, 2, 3, 1, 2, 3, 1, 2, 3, 1)
+// res41: List[Int] = List(1, 2, 3, 1, 2, 3, 1, 2, 3, 1)
 ```
 
 #### CompositeIterator
@@ -520,7 +510,7 @@ val compositeIterator = CompositeIterator(List(1, 2, 3).toIterator, List(4, 5, 6
 // compositeIterator: CompositeIterator[Int] = empty iterator
 
 compositeIterator.take(9).toList
-// res51: List[Int] = List(1, 2, 3, 4, 5, 6, 7, 8, 9)
+// res43: List[Int] = List(1, 2, 3, 4, 5, 6, 7, 8, 9)
 ```
 
 #### MergedBufferedIterator
@@ -538,7 +528,7 @@ val it1 = MergedBufferedIterator(List(
 // it1: MergedBufferedIterator[Int] = empty iterator
 
 it1.toList
-// res53: List[Int] = List(
+// res45: List[Int] = List(
 //   0,
 //   0,
 //   0,
@@ -588,7 +578,7 @@ val it2 = MergedBufferedIterator(List(
 // it2: MergedBufferedIterator[Int] = non-empty iterator
 
 it2.mergeSorted(Iterator(4, 6).buffered).toList
-// res54: List[Int] = List(1, 2, 3, 4, 5, 6)
+// res46: List[Int] = List(1, 2, 3, 4, 5, 6)
 ```
 
 ## Encryption
@@ -631,10 +621,10 @@ libraryDependencies += "com.velocidi" %% "apso-hashing" % "@VERSION"
 import com.velocidi.apso.hashing.Implicits._
 
 "abcd".md5
-// res57: String = "e2fc714c4727ee9395f324cd2e7f331f"
+// res49: String = "e2fc714c4727ee9395f324cd2e7f331f"
 
 "abcd".murmurHash
-// res58: Long = 7785666560123423118L
+// res50: Long = 7785666560123423118L
 ```
 
 ## IO
@@ -718,10 +708,10 @@ import com.velocidi.apso.time._
 import com.velocidi.apso.time.Implicits._
 
 (new DateTime("2012-01-01") to new DateTime("2012-01-01")).toList
-// res61: List[DateTime] = List(2012-01-01T00:00:00.000Z)
+// res53: List[DateTime] = List(2012-01-01T00:00:00.000Z)
 
 (new DateTime("2012-02-01") until new DateTime("2012-03-01") by 1.day)
-// res62: IterableInterval = SteppedInterval(
+// res54: IterableInterval = SteppedInterval(
 //   2012-02-01T00:00:00.000Z,
 //   2012-02-02T00:00:00.000Z,
 //   2012-02-03T00:00:00.000Z,
@@ -754,7 +744,7 @@ import com.velocidi.apso.time.Implicits._
 // )
 
 (new DateTime("2012-01-01") until new DateTime("2012-02-01") by 2.minutes)
-// res63: IterableInterval = SteppedInterval(
+// res55: IterableInterval = SteppedInterval(
 //   2012-01-01T00:00:00.000Z,
 //   2012-01-01T00:02:00.000Z,
 //   2012-01-01T00:04:00.000Z,
