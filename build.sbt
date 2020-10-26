@@ -39,7 +39,7 @@ lazy val docs = (project in file("apso-docs"))
     mdocOut := baseDirectory.in(ThisBuild).value,
 
     mdocVariables := Map(
-      "VERSION" -> "0.16.1" // This version should be set to the currently released version.
+      "VERSION" -> "0.16.2" // This version should be set to the currently released version.
     ),
 
     // This is necessary because `aws-java-sdk-s3` has the `provided` scope in apso-aws
