@@ -11,7 +11,7 @@ Apso's latest release is built against Scala 2.12 and Scala 2.13.
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso" % "0.16.2"
+libraryDependencies += "com.velocidi" %% "apso" % "@VERSION@"
 ```
 
 The project is divided in modules, you can instead install only a specific module.
@@ -19,7 +19,7 @@ The project is divided in modules, you can instead install only a specific modul
 The TestKit is available under the `apso-testkit` project. You can include it only for the `test` configuration:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-testkit" % "0.16.2" % "test"
+libraryDependencies += "com.velocidi" %% "apso-testkit" % "@VERSION@" % "test"
 ```
 
 Please take into account that the library is still in an experimental stage and the interfaces might change for subsequent releases.
@@ -71,7 +71,7 @@ Please take into account that the library is still in an experimental stage and 
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-core" % "0.16.2"
+libraryDependencies += "com.velocidi" %% "apso-core" % "@VERSION@"
 ```
 
 ### Config
@@ -86,7 +86,7 @@ The `LazyConfigFactory` object provides static methods for creating `Config` ins
 
 Apso provides a tiny wrapper for [Dispatch](http://dispatch.databinder.net/) with synchronous operations. It's called `W`, and the following shows some sample usage:
 
-```scala
+```scala mdoc:compile-only
 import com.velocidi.apso.http.W
 
 W.get("http://www.google.com/").getStatus
@@ -102,6 +102,7 @@ W.delete("http://www.google.com/").getStatus
 // res3: Int = 405
 
 W.head("http://www.google.com/").getStatus
+// res4: Int = 302
 ```
 
 The POST and PUT methods can also receive the body as `JSON` (of [circe](https://github.com/circe/circe)), which adds the `Content-type` header accordingly.
@@ -110,86 +111,74 @@ The POST and PUT methods can also receive the body as `JSON` (of [circe](https:/
 
 The `Geo` object provides methods to compute distances in kilometers between two points on the planet Earth, calculated using the spherical [law of cosines](https://en.wikipedia.org/wiki/Great-circle_distance#Formulas). Coordinates are represented by a pair of `Double` for latitude and longitude.
 
-```scala
+```scala mdoc:reset
 import com.velocidi.apso.Geo
 
 Geo.distance((41.1617609, -8.6024716), (41.1763745, -8.5964861))
-// res2: Double = 1.7004440762344684
 ```
 
 You can also have the distance function curried if you are computing distances from a fixed point:
 
-```scala
+```scala mdoc:silent
 val distFromOffice = Geo.distanceFrom((41.1617609, -8.6024716))
 ```
-```scala
+```scala mdoc
 distFromOffice((41.1763745, -8.5964861))
-// res3: Double = 1.7004440762344684
 
 distFromOffice((38.7223032, -9.1414664))
-// res4: Double = 275.118392477037
 ```
 
 ### Implicits
 
 Apso provides implicit conversions from `String`, `Seq[_]`, `Map[_, _]`, `Seq[Map[_, _]]` and `AutoCloseable` to extended types that come packed with extended features.
 
-```scala
+```scala mdoc:reset
 import com.velocidi.apso.Implicits._
 
 Seq(1, 3, 5).mergeSorted(Seq(2, 4))
-// res6: Seq[Int] = List(1, 2, 3, 4, 5)
 
 (0 to 15).average
-// res7: Int = 7
 
 Map(1 -> 2, 3 -> 6).twoWayMerge(Map(2 -> 4, 3 -> 5)) { (a, b) => b }
-// res8: Map[Int, Int] = Map(2 -> 4, 3 -> 5, 1 -> 2)
 
 Map(1 -> 2, 2 -> 4, 3 -> 6).twoWayMerge(Map(2 -> 2, 3 -> 5)) { (a, b) => b }
-// res9: Map[Int, Int] = Map(2 -> 2, 3 -> 5, 1 -> 2)
 
 Map(1 -> 2, 2 -> 3).mapKeys(_ + 1)
-// res10: Map[Int, Int] = Map(2 -> 2, 3 -> 3)
+
 ```
-```scala
+```scala mdoc:silent
 val rand = new scala.util.Random(1)
 ```
-```scala
+```scala mdoc
 rand.choose((0 to 15).toSeq)
-// res11: Option[Int] = Some(11)
 
 rand.choose((0 to 15).toSeq)
-// res12: Option[Int] = Some(1)
 
 rand.choose((0 to 15).toSeq)
-// res13: Option[Int] = Some(6)
 
 rand.choose((0 to 15).toSeq)
-// res14: Option[Int] = Some(6)
 
 rand.chooseN((0 to 15).toSeq, 4)
-// res15: Seq[Int] = List(9, 8, 3, 0)
 
 rand.chooseN((0 to 15).toSeq, 4)
-// res16: Seq[Int] = List(7, 6, 5, 2)
 ```
 
 ### JreVersionHelper
 
 The JreVersionHelper object provides helper methods to check the two most significant parts of the JRE version at runtime:
 
-```scala
+```scala mdoc:compile-only
 import com.velocidi.apso.JreVersionHelper
 
 JreVersionHelper.jreVersion
+// res0: (Int, Int) = (1, 8)
 ```
 
 ### Logging
 
 The `Logging` and `StrictLogging` traits allows mixing in Log4j2 `Logger` objects. The difference between the two is that in the former the `Logger` object is initialized lazily, while in the latter it is initialized strictly:
 
-```scala
+```scala mdoc:compile-only
 import com.velocidi.apso.Logging
 
 class A extends Logging {}
@@ -203,7 +192,7 @@ a.log.info("test")
 
 The `ProgressBar` represents a widget to print a dynamic progress bar in a console.
 
-```scala
+```scala mdoc:compile-only
 import com.velocidi.apso.ProgressBar
 
 val progress = ProgressBar(100)
@@ -224,6 +213,7 @@ progress.tick(20)
 // 34% [==================>                                   ] / [ 0.46 ] ops/s
 
 progress.tick(30)
+// 64% [=================================>                    ] - [ 0.77 ] ops/s
 ```
 
 ### Reflect
@@ -248,7 +238,7 @@ res1: com.velocidi.apso.Reflect.type = com.velocidi.apso.Reflect$@3b1dbca
 
 The `Retry` object provides a method to retry methods or `Future`s a given number of times until they succeed or the specified maximum number of retries is reached:
 
-```scala
+```scala mdoc:reset
 import scala.concurrent._
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -258,7 +248,6 @@ import com.velocidi.apso.Retry
 import java.util.concurrent.atomic.AtomicInteger
 
 val a = new AtomicInteger()
-// a: AtomicInteger = 7
 
 def f: Future[Int] = {
   Future {
@@ -272,10 +261,8 @@ def f: Future[Int] = {
 }
 
 Await.result(Retry.retryFuture(10)(f), Duration.Inf)
-// res21: Int = 6
 
 var attempts = 0
-// attempts: Int = 0
 
 def m() = {
   attempts += 1
@@ -286,7 +273,6 @@ def m() = {
 }
 
 Retry.retry(10)(m)
-// res22: util.Try[Int] = Success(6)
 ```
 
 ### TryWith
@@ -295,7 +281,7 @@ The `TryWith` object mimics the [try-with-resources](https://docs.oracle.com/jav
 construct from Java world, or a loan pattern, where a given function can try to use a `Closeable`
 resource which shall automatically be disposed off and closed properly afterwards.
 
-```scala
+```scala mdoc:reset
 import java.io.Closeable
 
 import com.velocidi.apso.TryWith
@@ -316,13 +302,8 @@ def badHandler(resource: Closeable) = {
 }
 
 TryWith(buildResource)(goodHandler)
-// good resource
-// Resource is now Closed
-// res24: util.Try[Unit] = Success(())
 
 TryWith(buildResource)(badHandler)
-// Resource is now Closed
-// res25: util.Try[Nothing] = Failure(java.lang.Exception)
 ```
 
 ## Akka HTTP
@@ -332,7 +313,7 @@ The `akka-http` module provides additional [directives](https://doc.akka.io/docs
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-akka-http" % "0.16.2"
+libraryDependencies += "com.velocidi" %% "apso-akka-http" % "@VERSION@"
 ```
 
 ### ClientIPDirectives
@@ -354,14 +335,14 @@ Apso provides a group of classes to ease the interaction with the Amazon Web Ser
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-aws" % "0.16.2"
+libraryDependencies += "com.velocidi" %% "apso-aws" % "@VERSION@"
 ```
 
 ### ConfigCredentialsProvider
 
 The `ConfigCredentialsProvider` is an `AWSCredentialsProvider` (from AWS SDK for Java) that retrieves credentials from a typesafe configuration, allowing customization of its `Config` object, as well as the access key and secret key paths:
 
-```scala
+```scala mdoc:silent
 import com.velocidi.apso.aws._
 
 import com.typesafe.config._
@@ -400,85 +381,49 @@ The `SerializableAWSCredentials` class provides a serializable container for AWS
 The `apso-collections` module provides some helpful collections. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-collections" % "0.16.2"
+libraryDependencies += "com.velocidi" %% "apso-collections" % "@VERSION@"
 ```
 
 ### Trie
 
 The `Trie` class is an implementation of an immutable trie. An example usage follows:
 
-```scala
+```scala mdoc:reset
 import com.velocidi.apso.collection._
 
 val t = Trie[Char, Int]()
-// t: Trie[Char, Int] = Trie(None, Map())
 
 val nt = t.set("one", 1).set("two", 2).set("three", 3).set("four", 4)
-// nt: Trie[Char, Int] = Trie(
-//   None,
-//   Map(
-//     'o' -> Trie(None, Map('n' -> Trie(None, Map('e' -> Trie(Some(1), Map()))))),
-//     't' -> Trie(
-//       None,
-//       Map(
-//         'w' -> Trie(None, Map('o' -> Trie(Some(2), Map()))),
-//         'h' -> Trie(
-//           None,
-//           Map(
-//             'r' -> Trie(None, Map('e' -> Trie(None, Map('e' -> Trie(Some(3), Map())))))
-//           )
-//         )
-//       )
-//     ),
-//     'f' -> Trie(
-//       None,
-//       Map(
-//         'o' -> Trie(None, Map('u' -> Trie(None, Map('r' -> Trie(Some(4), Map())))))
-//       )
-//     )
-//   )
-// )
 
 nt.get("one")
-// res29: Option[Int] = Some(1)
 
 nt.get("two")
-// res30: Option[Int] = Some(2)
 
 nt.get("five")
-// res31: Option[Int] = None
 ```
 
 ### TypedMap
 
 The `TypedMap` is a map that associates types with values. It can be used as follows:
 
-```scala
+```scala mdoc:reset
 import com.velocidi.apso.collection._
 
 val m = TypedMap("one", 2, 3l)
-// m: TypedMap[Any] = Map(java.lang.String -> one, Int -> 2, Long -> 3)
 
 m[String]
-// res33: String = "one"
 
 m[Int]
-// res34: Int = 2
 
 m[Long]
-// res35: Long = 3L
 
 m.get[String]
-// res36: Option[String] = Some("one")
 
 m.get[Int]
-// res37: Option[Int] = Some(2)
 
 m.get[Long]
-// res38: Option[Long] = Some(3L)
 
 m.get[Char]
-// res39: Option[Char] = None
 ```
 
 ### Iterators
@@ -489,35 +434,31 @@ Apso provides some utility iterators.
 
 The `CircularIterator` is an iterator that iterates over its elements in a circular way. See the following for sample usage:
 
-```scala
+```scala mdoc:reset
 import com.velocidi.apso.iterator.CircularIterator
 
 val circularIterator = CircularIterator(List(1, 2, 3).toIterator)
-// circularIterator: CircularIterator[Int] = non-empty iterator
 
 circularIterator.take(10).toList
-// res41: List[Int] = List(1, 2, 3, 1, 2, 3, 1, 2, 3, 1)
 ```
 
 #### CompositeIterator
 
 The `CompositeIterator` is an iterator that wraps a list of other iterators and iterates over its elements sequentially. It handles compositions of a large number of iterators in a more efficient way than simply concatenating them, avoiding stack overflows in particular. It supports appending of new iterators while keeping its efficiency. See the following for sample usage:
 
-```scala
+```scala mdoc:reset
 import com.velocidi.apso.iterator.CompositeIterator
 
 val compositeIterator = CompositeIterator(List(1, 2, 3).toIterator, List(4, 5, 6).toIterator, List(7, 8, 9).toIterator)
-// compositeIterator: CompositeIterator[Int] = empty iterator
 
 compositeIterator.take(9).toList
-// res43: List[Int] = List(1, 2, 3, 4, 5, 6, 7, 8, 9)
 ```
 
 #### MergedBufferedIterator
 
 The `MergedBufferedIterator` is a collection of sorted `BufferedIterators` that allows traversing them in order, while also providing a `mergeSorted` method to merge with another sorted `BufferedIterator`. See the following for sample usage:
 
-```scala
+```scala mdoc:reset
 import com.velocidi.apso.iterator.MergedBufferedIterator
 
 val it1 = MergedBufferedIterator(List(
@@ -525,60 +466,14 @@ val it1 = MergedBufferedIterator(List(
          (0 to 8).toIterator.buffered,
          (0 to 15).toIterator.buffered,
          (0 to 11).toIterator.buffered))
-// it1: MergedBufferedIterator[Int] = empty iterator
 
 it1.toList
-// res45: List[Int] = List(
-//   0,
-//   0,
-//   0,
-//   0,
-//   1,
-//   1,
-//   1,
-//   1,
-//   2,
-//   2,
-//   2,
-//   2,
-//   3,
-//   3,
-//   3,
-//   3,
-//   4,
-//   4,
-//   4,
-//   5,
-//   5,
-//   5,
-//   6,
-//   6,
-//   6,
-//   7,
-//   7,
-//   7,
-//   8,
-//   8,
-//   8,
-//   9,
-//   9,
-//   10,
-//   10,
-//   11,
-//   11,
-//   12,
-//   13,
-//   14,
-//   15
-// )
 
 val it2 = MergedBufferedIterator(List(
          Iterator(1, 3, 5).buffered,
          Iterator(2).buffered))
-// it2: MergedBufferedIterator[Int] = non-empty iterator
 
 it2.mergeSorted(Iterator(4, 6).buffered).toList
-// res46: List[Int] = List(1, 2, 3, 4, 5, 6)
 ```
 
 ## Encryption
@@ -589,14 +484,14 @@ creation of the underlying Cyphers.
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-encryption" % "0.16.2"
+libraryDependencies += "com.velocidi" %% "apso-encryption" % "@VERSION@"
 ```
 
 The following shows the creation of `Encryptor` and `Decryptor` objects,
 by loading a `KeyStore` file holding a symmetric key, and its use to encrypt and
 decrypt data:
 
-```scala
+```scala mdoc:compile-only
 import com.velocidi.apso.encryption._
 
 val encryptor = Encryptor("AES", getClass.getResourceAsStream("/keystoreFile.jceks"), "keystorePass", "keyAlias", "keyPass")
@@ -607,6 +502,7 @@ val secretData = "secret_info"
 
 // encrypt data and encode it in base64; then decrypt it to string
 decryptor.get.decryptToString(encryptor.get.encryptToSafeString(secretData).get)
+
 ```
 
 ## Hashing
@@ -614,17 +510,15 @@ decryptor.get.decryptToString(encryptor.get.encryptToSafeString(secretData).get)
 Apso provides utilities for various hashing functions. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-hashing" % "0.16.2"
+libraryDependencies += "com.velocidi" %% "apso-hashing" % "@VERSION@"
 ```
 
-```scala
+```scala mdoc:reset
 import com.velocidi.apso.hashing.Implicits._
 
 "abcd".md5
-// res49: String = "e2fc714c4727ee9395f324cd2e7f331f"
 
 "abcd".murmurHash
-// res50: Long = 7785666560123423118L
 ```
 
 ## IO
@@ -634,7 +528,7 @@ Apso provides methods to deal with IO-related features in the `io` module.
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-io" % "0.16.2"
+libraryDependencies += "com.velocidi" %% "apso-io" % "@VERSION@"
 ```
 
 ### FileDescriptor
@@ -649,7 +543,7 @@ Apso introduces the concept of a `FileDescriptor`: a representation of a file st
 
 The `ResourceUtil` object provides methods to access files available through Java's runtime environment classpath:
 
-```scala
+```scala mdoc:compile-only
 import com.velocidi.apso.io.ResourceUtil
 // import com.velocidi.apso.io.ResourceUtil
 
@@ -660,6 +554,16 @@ ResourceUtil.getResourceStream("reference.conf")
 // res1: java.io.InputStream = java.io.BufferedInputStream@6f16d172
 
 ResourceUtil.getResourceAsString("reference.conf")
+// res2: String =
+// "apso {
+//   io {
+//     file-descriptor {
+//       sftp.max-connections-per-host = 8
+//       sftp.max-idle-time = 10s
+//     }
+//   }
+// }
+// "
 ```
 
 ## JSON
@@ -667,7 +571,7 @@ ResourceUtil.getResourceAsString("reference.conf")
 Apso includes a bunch of utilities to work with JSON serialization and deserialization. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-json" % "0.16.2"
+libraryDependencies += "com.velocidi" %% "apso-json" % "@VERSION@"
 ```
 
 ## Profiling
@@ -677,7 +581,7 @@ The `profiling` module of apso provides utilities to help with profiling the run
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-profiling" % "0.16.2"
+libraryDependencies += "com.velocidi" %% "apso-profiling" % "@VERSION@"
 ```
 
 ### CpuSampler
@@ -695,12 +599,12 @@ The `apso-time` module provides utilities to work with `DateTime` and `LocalDate
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-time" % "0.16.2"
+libraryDependencies += "com.velocidi" %% "apso-time" % "@VERSION@"
 ```
 
 See the following sample usages:
 
-```scala
+```scala mdoc:reset
 import com.github.nscala_time.time.Imports._
 
 import com.velocidi.apso.time._
@@ -708,92 +612,10 @@ import com.velocidi.apso.time._
 import com.velocidi.apso.time.Implicits._
 
 (new DateTime("2012-01-01") to new DateTime("2012-01-01")).toList
-// res53: List[DateTime] = List(2012-01-01T00:00:00.000Z)
 
 (new DateTime("2012-02-01") until new DateTime("2012-03-01") by 1.day)
-// res54: IterableInterval = SteppedInterval(
-//   2012-02-01T00:00:00.000Z,
-//   2012-02-02T00:00:00.000Z,
-//   2012-02-03T00:00:00.000Z,
-//   2012-02-04T00:00:00.000Z,
-//   2012-02-05T00:00:00.000Z,
-//   2012-02-06T00:00:00.000Z,
-//   2012-02-07T00:00:00.000Z,
-//   2012-02-08T00:00:00.000Z,
-//   2012-02-09T00:00:00.000Z,
-//   2012-02-10T00:00:00.000Z,
-//   2012-02-11T00:00:00.000Z,
-//   2012-02-12T00:00:00.000Z,
-//   2012-02-13T00:00:00.000Z,
-//   2012-02-14T00:00:00.000Z,
-//   2012-02-15T00:00:00.000Z,
-//   2012-02-16T00:00:00.000Z,
-//   2012-02-17T00:00:00.000Z,
-//   2012-02-18T00:00:00.000Z,
-//   2012-02-19T00:00:00.000Z,
-//   2012-02-20T00:00:00.000Z,
-//   2012-02-21T00:00:00.000Z,
-//   2012-02-22T00:00:00.000Z,
-//   2012-02-23T00:00:00.000Z,
-//   2012-02-24T00:00:00.000Z,
-//   2012-02-25T00:00:00.000Z,
-//   2012-02-26T00:00:00.000Z,
-//   2012-02-27T00:00:00.000Z,
-//   2012-02-28T00:00:00.000Z,
-//   2012-02-29T00:00:00.000Z
-// )
 
 (new DateTime("2012-01-01") until new DateTime("2012-02-01") by 2.minutes)
-// res55: IterableInterval = SteppedInterval(
-//   2012-01-01T00:00:00.000Z,
-//   2012-01-01T00:02:00.000Z,
-//   2012-01-01T00:04:00.000Z,
-//   2012-01-01T00:06:00.000Z,
-//   2012-01-01T00:08:00.000Z,
-//   2012-01-01T00:10:00.000Z,
-//   2012-01-01T00:12:00.000Z,
-//   2012-01-01T00:14:00.000Z,
-//   2012-01-01T00:16:00.000Z,
-//   2012-01-01T00:18:00.000Z,
-//   2012-01-01T00:20:00.000Z,
-//   2012-01-01T00:22:00.000Z,
-//   2012-01-01T00:24:00.000Z,
-//   2012-01-01T00:26:00.000Z,
-//   2012-01-01T00:28:00.000Z,
-//   2012-01-01T00:30:00.000Z,
-//   2012-01-01T00:32:00.000Z,
-//   2012-01-01T00:34:00.000Z,
-//   2012-01-01T00:36:00.000Z,
-//   2012-01-01T00:38:00.000Z,
-//   2012-01-01T00:40:00.000Z,
-//   2012-01-01T00:42:00.000Z,
-//   2012-01-01T00:44:00.000Z,
-//   2012-01-01T00:46:00.000Z,
-//   2012-01-01T00:48:00.000Z,
-//   2012-01-01T00:50:00.000Z,
-//   2012-01-01T00:52:00.000Z,
-//   2012-01-01T00:54:00.000Z,
-//   2012-01-01T00:56:00.000Z,
-//   2012-01-01T00:58:00.000Z,
-//   2012-01-01T01:00:00.000Z,
-//   2012-01-01T01:02:00.000Z,
-//   2012-01-01T01:04:00.000Z,
-//   2012-01-01T01:06:00.000Z,
-//   2012-01-01T01:08:00.000Z,
-//   2012-01-01T01:10:00.000Z,
-//   2012-01-01T01:12:00.000Z,
-//   2012-01-01T01:14:00.000Z,
-//   2012-01-01T01:16:00.000Z,
-//   2012-01-01T01:18:00.000Z,
-//   2012-01-01T01:20:00.000Z,
-//   2012-01-01T01:22:00.000Z,
-//   2012-01-01T01:24:00.000Z,
-//   2012-01-01T01:26:00.000Z,
-//   2012-01-01T01:28:00.000Z,
-//   2012-01-01T01:30:00.000Z,
-//   2012-01-01T01:32:00.000Z,
-//   2012-01-01T01:34:00.000Z,
-// ...
 ```
 
 ## TestKit

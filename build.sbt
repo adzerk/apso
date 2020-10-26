@@ -31,6 +31,25 @@ lazy val apso = (project in file("."))
   .dependsOn(akkaHttp, aws, caching, collections, core, elasticsearch, encryption, hashing, io, json, profiling, time)
   .aggregate(akkaHttp, aws, caching, collections, core, elasticsearch, encryption, hashing, io, json, profiling, testkit, time)
 
+
+lazy val docs = (project in file("apso-docs"))
+  .dependsOn(apso)
+  .settings(commonSettings: _*)
+  .settings(
+    mdocOut := baseDirectory.in(ThisBuild).value,
+
+    mdocVariables := Map(
+      "VERSION" -> "0.16.2" // This version should be set to the currently released version.
+    ),
+
+    // This is necessary because `aws-java-sdk-s3` has the `provided` scope in apso-aws
+    libraryDependencies ++= Seq(Dependencies.AwsJavaSdkS3),
+
+    skip in publish := true
+  )
+  .enablePlugins(MdocPlugin)
+
+
 lazy val commonSettings = Seq(
   resolvers ++= Seq(
     Resolver.sonatypeRepo("snapshots"),
