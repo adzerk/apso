@@ -272,7 +272,7 @@ def m() = {
     throw new Exception()
 }
 
-println(Retry.retry(10)(m))
+Retry.retry(10)(m)
 ```
 
 ### TryWith

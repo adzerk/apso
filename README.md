@@ -285,8 +285,8 @@ def m() = {
     throw new Exception()
 }
 
-println(Retry.retry(10)(m))
-// Success(6)
+Retry.retry(10)(m)
+// res22: util.Try[Int] = Success(6)
 ```
 
 ### TryWith
@@ -614,7 +614,7 @@ decryptor.get.decryptToString(encryptor.get.encryptToSafeString(secretData).get)
 Apso provides utilities for various hashing functions. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-hashing" % "@VERSION"
+libraryDependencies += "com.velocidi" %% "apso-hashing" % "0.16.1"
 ```
 
 ```scala
