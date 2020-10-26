@@ -260,7 +260,7 @@ def f: Future[Int] = {
   }
 }
 
-Await.result(Retry.retryFuture(10)(f), 1.second)
+Await.result(Retry.retryFuture(10)(f), Duration.Inf)
 
 var attempts = 0
 
