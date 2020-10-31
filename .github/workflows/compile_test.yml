@@ -41,3 +41,5 @@ jobs:
         key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
     - name: Run tests
       run: sbt -Dsbt.color=always ++$SCALA_VERSION test:compile test
+    - name: Check mdoc for uncommited changes
+      run: sbt -Dsbt.color=always "docs/mdoc --check"
