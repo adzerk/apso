@@ -1,4 +1,3 @@
 import Dependencies._
 
-libraryDependencies ++= Seq(
-  FastMd5)
+libraryDependencies ++= Seq(FastMd5)

@@ -10,31 +10,45 @@ def module(project: Project, moduleName: String) =
     .settings(name := s"apso-$moduleName")
     .settings(commonSettings: _*)
 
-lazy val akkaHttp      = module(project, "akka-http").dependsOn(core, testkit % Test)
-lazy val aws           = module(project, "aws").dependsOn(core)
-lazy val caching       = module(project, "caching")
-lazy val collections   = module(project, "collections")
-lazy val core          = module(project, "core").dependsOn(testkit % Test)
+lazy val akkaHttp = module(project, "akka-http").dependsOn(core, testkit % Test)
+lazy val aws = module(project, "aws").dependsOn(core)
+lazy val caching = module(project, "caching")
+lazy val collections = module(project, "collections")
+lazy val core = module(project, "core").dependsOn(testkit % Test)
 lazy val elasticsearch = module(project, "elasticsearch").dependsOn(core, testkit % Test)
-lazy val encryption    = module(project, "encryption").dependsOn(core)
-lazy val hashing       = module(project, "hashing")
-lazy val io            = module(project, "io").dependsOn(aws, testkit % Test)
-lazy val json          = module(project, "json").dependsOn(core, collections)
-lazy val profiling     = module(project, "profiling").dependsOn(core)
-lazy val testkit       = module(project, "testkit")
-lazy val time          = module(project, "time")
+lazy val encryption = module(project, "encryption").dependsOn(core)
+lazy val hashing = module(project, "hashing")
+lazy val io = module(project, "io").dependsOn(aws, testkit % Test)
+lazy val json = module(project, "json").dependsOn(core, collections)
+lazy val profiling = module(project, "profiling").dependsOn(core)
+lazy val testkit = module(project, "testkit")
+lazy val time = module(project, "time")
 
 lazy val apso = (project in file("."))
   .settings(commonSettings: _*)
   .settings(name := "apso")
   .dependsOn(akkaHttp, aws, caching, collections, core, elasticsearch, encryption, hashing, io, json, profiling, time)
-  .aggregate(akkaHttp, aws, caching, collections, core, elasticsearch, encryption, hashing, io, json, profiling, testkit, time)
-
+  .aggregate(
+    akkaHttp,
+    aws,
+    caching,
+    collections,
+    core,
+    elasticsearch,
+    encryption,
+    hashing,
+    io,
+    json,
+    profiling,
+    testkit,
+    time
+  )
 
 lazy val docs = (project in file("apso-docs"))
   .dependsOn(apso)
   .settings(commonSettings: _*)
   .settings(
+    // format: off
     mdocOut := baseDirectory.in(ThisBuild).value,
 
     mdocVariables := Map(
@@ -45,11 +59,12 @@ lazy val docs = (project in file("apso-docs"))
     libraryDependencies ++= Seq(Dependencies.AwsJavaSdkS3),
 
     skip in publish := true
+    // format: on
   )
   .enablePlugins(MdocPlugin)
 
-
 lazy val commonSettings = Seq(
+  // format: off
   resolvers ++= Seq(
     Resolver.sonatypeRepo("snapshots"),
     Resolver.typesafeRepo("snapshots"),
@@ -99,7 +114,9 @@ lazy val commonSettings = Seq(
       url("https://github.com/velocidi/apso"),
       "scm:git@github.com:velocidi/apso.git"
     )
-  ))
+  )
+  // format: on
+)
 
 releaseCrossBuild := true
 releaseTagComment := s"Release ${(version in ThisBuild).value}"
@@ -117,4 +134,5 @@ releaseProcess := Seq[ReleaseStep](
   releaseStepCommand("sonatypeBundleRelease"),
   setNextVersion,
   commitNextVersion,
-  pushChanges)
+  pushChanges
+)
