@@ -19,10 +19,12 @@ class FileDescriptorCredentialsSpec extends Specification with CustomMatchers {
     ids = Map(
       "foo" -> config.Credentials.Sftp.Entry.Basic("foo-username", "foo-password"),
       "bar" -> config.Credentials.Sftp.Entry.Basic("barzed-username", "barzed-password"),
-      "zed" -> config.Credentials.Sftp.Entry.Basic("barzed-username", "barzed-password")))
+      "zed" -> config.Credentials.Sftp.Entry.Basic("barzed-username", "barzed-password")
+    )
+  )
 
-  val testConfig = baseConfig.copy(
-    default = Some(config.Credentials.Sftp.Entry.Basic("default-username", "default-password")))
+  val testConfig =
+    baseConfig.copy(default = Some(config.Credentials.Sftp.Entry.Basic("default-username", "default-password")))
 
   "A FileDescriptorCredential" should {
 

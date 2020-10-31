@@ -4,7 +4,7 @@ import scala.reflect.ClassTag
 
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Prop.forAll
-import org.scalacheck.{ Arbitrary, Gen }
+import org.scalacheck.{Arbitrary, Gen}
 import org.specs2.ScalaCheck
 import org.specs2.mutable._
 
@@ -18,14 +18,15 @@ class DeboxMapSpec extends Specification with ScalaCheck {
       keys <- listOf(arbitrary[A])
       values <- listOfN(keys.size, arbitrary[B])
       removedKeys <- someOf(keys)
-    } yield if (keys.isEmpty)
-      DeboxMap.empty[A, B]
-    else {
-      val map = DeboxMap[A, B](keys.toArray, values.toArray)
-      // Remove some keys to have dirty blocks (state = 2)
-      removedKeys.foreach { k => map.remove(k) }
-      map
-    }
+    } yield
+      if (keys.isEmpty)
+        DeboxMap.empty[A, B]
+      else {
+        val map = DeboxMap[A, B](keys.toArray, values.toArray)
+        // Remove some keys to have dirty blocks (state = 2)
+        removedKeys.foreach { k => map.remove(k) }
+        map
+      }
   }
 
   implicit def arbDeboxMap[A: Arbitrary: ClassTag, B: Arbitrary: ClassTag] = Arbitrary(genDeboxMap[A, B])
@@ -35,10 +36,9 @@ class DeboxMapSpec extends Specification with ScalaCheck {
     "support the get, contains and equals methods" in forAll { (entries: Map[K, V]) =>
       val map = DeboxMap.empty[K, V]
       entries.foreach { case (k, v) => map.update(k, v) }
-      entries.forall {
-        case (k, _) =>
-          map.contains(k) == entries.contains(k) &&
-            map.get(k) == entries.get(k)
+      entries.forall { case (k, _) =>
+        map.contains(k) == entries.contains(k) &&
+          map.get(k) == entries.get(k)
       } && map.equals(map) && !map.equals(0)
     }
 
@@ -76,7 +76,7 @@ class DeboxMapSpec extends Specification with ScalaCheck {
 
     "support the getOrElse method" in forAll { (map: DeboxMap[K, V], k: K, v: V) =>
       (map.contains(k) && (map.getOrElse(k, v) == map.get(k).get)) ||
-        (!map.contains(k) && (map.getOrElse(k, v) == v))
+      (!map.contains(k) && (map.getOrElse(k, v) == v))
     }
 
     "support the getOrElseUpdate method" in forAll { (map: DeboxMap[K, V], k: K, v: V) =>
@@ -91,9 +91,8 @@ class DeboxMapSpec extends Specification with ScalaCheck {
     "support the foreach method" in forAll { (map: DeboxMap[K, V]) =>
       val entries = scala.collection.mutable.ListBuffer.empty[(K, V)]
       map.foreach { case (k, v) => entries.append((k, v)) }
-      entries.length == map.length && entries.forall {
-        case (k, v) =>
-          map.get(k) == Some(v)
+      entries.length == map.length && entries.forall { case (k, v) =>
+        map.get(k) == Some(v)
       }
     }
 

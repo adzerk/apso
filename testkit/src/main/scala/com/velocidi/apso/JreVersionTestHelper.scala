@@ -1,6 +1,6 @@
 package com.velocidi.apso
 
-import org.specs2.execute.{ AsResult, Result, Skipped }
+import org.specs2.execute.{AsResult, Result, Skipped}
 import JreVersionTestHelper._
 import scala.math.Ordering.Implicits._
 

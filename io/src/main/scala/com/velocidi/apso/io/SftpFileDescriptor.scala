@@ -1,14 +1,14 @@
 package com.velocidi.apso.io
 
-import java.io.{ FileDescriptor => _, _ }
-import java.util.concurrent.{ ConcurrentHashMap, TimeoutException }
+import java.io.{FileDescriptor => _, _}
+import java.util.concurrent.{ConcurrentHashMap, TimeoutException}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
-import scala.util.{ Properties, Try }
+import scala.util.{Properties, Try}
 
 import com.typesafe.config.ConfigFactory
-import io.github.andrebeat.pool.{ Lease, Pool }
+import io.github.andrebeat.pool.{Lease, Pool}
 import net.schmizz.sshj._
 import net.schmizz.sshj.common.SSHException
 import net.schmizz.sshj.sftp._
@@ -18,35 +18,34 @@ import net.schmizz.sshj.xfer.InMemorySourceFile
 
 import com.velocidi.apso.Logging
 
-/**
- * A `FileDescriptor` for files served over SFTP. This file descriptor only supports absolute paths.
- * The SSH connections for a given host are pooled.
- *
- * The URI for this `FileDescriptor` should be in the format:
- * - `sftp://<username>@<hostname>:<port>/<absolute-path>`
- *
- * Both the username and port are optional. Additionally, the credentials config expects an object
- * with the following format:
- *
- * `sftp {
- *    default = {
- *      username = <username>
- *      password = <password>
- *    }
- *  }`
- *
- * Or if using public key authentication:
- * `sftp {
- *    default = {
- *      username = <username>
- *      keypair-file = <key filename>
- *      passphrase = <passphrase>
- *    }
- *  }`
- *
- * What is considered as an `id` for credentials handling is the `hostname` of the file descriptor,
- * therefore it is possible to provide credentials for a specific `hostname`.
- */
+/** A `FileDescriptor` for files served over SFTP. This file descriptor only supports absolute paths.
+  * The SSH connections for a given host are pooled.
+  *
+  * The URI for this `FileDescriptor` should be in the format:
+  * - `sftp://<username>@<hostname>:<port>/<absolute-path>`
+  *
+  * Both the username and port are optional. Additionally, the credentials config expects an object
+  * with the following format:
+  *
+  * `sftp {
+  *    default = {
+  *      username = <username>
+  *      password = <password>
+  *    }
+  *  }`
+  *
+  * Or if using public key authentication:
+  * `sftp {
+  *    default = {
+  *      username = <username>
+  *      keypair-file = <key filename>
+  *      passphrase = <passphrase>
+  *    }
+  *  }`
+  *
+  * What is considered as an `id` for credentials handling is the `hostname` of the file descriptor,
+  * therefore it is possible to provide credentials for a specific `hostname`.
+  */
 case class SftpFileDescriptor(
     host: String,
     port: Int,
@@ -54,8 +53,10 @@ case class SftpFileDescriptor(
     password: Option[String],
     elements: List[String],
     identity: Option[SftpFileDescriptor.Identity],
-    @transient private var _fileAttributes: Option[FileAttributes] = None)
-  extends FileDescriptor with RemoteFileDescriptor with Logging {
+    @transient private var _fileAttributes: Option[FileAttributes] = None
+) extends FileDescriptor
+    with RemoteFileDescriptor
+    with Logging {
 
   type Self = SftpFileDescriptor
 
@@ -152,7 +153,7 @@ case class SftpFileDescriptor(
     log.info(s"Uploading '$localTarget' to '$toString'")
 
     parent().mkdirs() &&
-      Try(sftp(_.put(localTarget.path, path))).isSuccess
+    Try(sftp(_.put(localTarget.path, path))).isSuccess
   }
 
   def upload(inputStream: InputStream, length: Option[Long]): Boolean = {
@@ -167,7 +168,7 @@ case class SftpFileDescriptor(
     }
 
     parent().mkdirs() &&
-      Try(sftp(_.put(sourceFile, path))).isSuccess
+    Try(sftp(_.put(sourceFile, path))).isSuccess
   }
 
   def stream(offset: Long = 0L) = new InputStream {
@@ -212,10 +213,10 @@ case class SftpFileDescriptor(
 object SftpFileDescriptor {
   private[this] val fdConf = ConfigFactory.load()
   private[this] val maxConnections = fdConf.getInt("apso.io.file-descriptor.sftp.max-connections-per-host")
-  private[this] val maxIdleTime = Duration.fromNanos(
-    fdConf.getDuration("apso.io.file-descriptor.sftp.max-idle-time").toNanos)
-  private[this] val leaseAcquireMaxDuration = Duration.fromNanos(
-    fdConf.getDuration("apso.io.file-descriptor.sftp.max-lease-acquire-duration").toNanos)
+  private[this] val maxIdleTime =
+    Duration.fromNanos(fdConf.getDuration("apso.io.file-descriptor.sftp.max-idle-time").toNanos)
+  private[this] val leaseAcquireMaxDuration =
+    Duration.fromNanos(fdConf.getDuration("apso.io.file-descriptor.sftp.max-lease-acquire-duration").toNanos)
 
   private[this] val connectionPools = new ConcurrentHashMap[String, Pool[SftpClient]]()
 
@@ -233,11 +234,12 @@ object SftpFileDescriptor {
   implicit def sftpClientToSFTPClient(c: SftpClient): SFTPClient = c.sftpClient
 
   private[this] def sshClient(
-    host: String,
-    port: Int,
-    username: String,
-    password: Option[String],
-    identity: Option[Identity]) = {
+      host: String,
+      port: Int,
+      username: String,
+      password: Option[String],
+      identity: Option[Identity]
+  ) = {
 
     val sshClient = new SSHClient()
     sshClient.addHostKeyVerifier(new PromiscuousVerifier())
@@ -252,10 +254,7 @@ object SftpFileDescriptor {
           case Identity(Left(keyString), None) =>
             sshClient.loadKeys(keyString, null, null)
           case Identity(Left(keyString), Some(passphrase)) =>
-            sshClient.loadKeys(
-              keyString,
-              null,
-              PasswordUtils.createOneOff(passphrase.toCharArray))
+            sshClient.loadKeys(keyString, null, PasswordUtils.createOneOff(passphrase.toCharArray))
           case Identity(Right(keyFile), None) =>
             sshClient.loadKeys(keyFile.getAbsolutePath)
           case Identity(Right(keyFile), Some(passphrase)) =>
@@ -271,11 +270,12 @@ object SftpFileDescriptor {
   }
 
   private def acquireConnection(
-    host: String,
-    port: Int,
-    username: String,
-    password: Option[String],
-    identity: Option[Identity]): Lease[SftpClient] = {
+      host: String,
+      port: Int,
+      username: String,
+      password: Option[String],
+      identity: Option[Identity]
+  ): Lease[SftpClient] = {
 
     val pool = {
       val p = connectionPools.get(host)
@@ -285,7 +285,8 @@ object SftpFileDescriptor {
             maxConnections,
             () => new SftpClient(sshClient(host, port, username, password, identity)),
             dispose = { c: SftpClient => c.close() },
-            maxIdleTime = maxIdleTime)
+            maxIdleTime = maxIdleTime
+          )
 
           connectionPools.put(host, pool)
 
@@ -314,26 +315,35 @@ object SftpFileDescriptor {
     }
   }
 
-  private[this] val credentials = new FileDescriptorCredentials[config.Credentials.Sftp.Entry, (String, String, Either[Identity, String])] {
-    def id(path: String) = splitMeta(path)._1
+  private[this] val credentials =
+    new FileDescriptorCredentials[config.Credentials.Sftp.Entry, (String, String, Either[Identity, String])] {
+      def id(path: String) = splitMeta(path)._1
 
-    def createCredentials(hostname: String, sftpConfig: config.Credentials.Sftp.Entry): (String, String, Either[Identity, String]) = {
-      sftpConfig match {
-        case config.Credentials.Sftp.Entry.Basic(username, password) =>
-          (hostname, username, Right(password))
-        case config.Credentials.Sftp.Entry.PublicKey(username, keypairFile, passphrase) =>
-          (hostname, username, Left(Identity(Right(new File(Properties.userHome + "/.ssh/" + keypairFile)), passphrase)))
+      def createCredentials(
+          hostname: String,
+          sftpConfig: config.Credentials.Sftp.Entry
+      ): (String, String, Either[Identity, String]) = {
+        sftpConfig match {
+          case config.Credentials.Sftp.Entry.Basic(username, password) =>
+            (hostname, username, Right(password))
+          case config.Credentials.Sftp.Entry.PublicKey(username, keypairFile, passphrase) =>
+            (
+              hostname,
+              username,
+              Left(Identity(Right(new File(Properties.userHome + "/.ssh/" + keypairFile)), passphrase))
+            )
+        }
       }
     }
-  }
 
   def apply(
-    host: String,
-    port: Int,
-    url: String,
-    username: String,
-    password: Option[String],
-    identity: Option[Identity])(implicit d: DummyImplicit): SftpFileDescriptor = {
+      host: String,
+      port: Int,
+      url: String,
+      username: String,
+      password: Option[String],
+      identity: Option[Identity]
+  )(implicit d: DummyImplicit): SftpFileDescriptor = {
 
     val (_, _, path) = splitMeta(url)
 
@@ -347,12 +357,9 @@ object SftpFileDescriptor {
     SftpFileDescriptor(host, port, username, password, elements, identity)
   }
 
-  def apply(
-    host: String,
-    port: Int,
-    url: String,
-    username: String,
-    password: Option[String])(implicit d: DummyImplicit): SftpFileDescriptor = {
+  def apply(host: String, port: Int, url: String, username: String, password: Option[String])(implicit
+      d: DummyImplicit
+  ): SftpFileDescriptor = {
 
     apply(host, port, url, username, password, None)
   }

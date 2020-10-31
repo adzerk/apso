@@ -4,12 +4,12 @@ import java.net.URI
 
 import scala.concurrent.duration._
 
-import com.typesafe.config.{ Config, ConfigFactory }
+import com.typesafe.config.{Config, ConfigFactory}
 import io.circe._
 import io.circe.literal._
 import io.circe.parser._
 import io.circe.syntax._
-import org.joda.time.{ DateTime, Interval, LocalDate, Period }
+import org.joda.time.{DateTime, Interval, LocalDate, Period}
 import org.specs2.mutable.Specification
 import squants.market._
 

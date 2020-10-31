@@ -15,9 +15,9 @@ trait FutureExtraMatchers { this: SpecificationLike =>
   }
 
   implicit class RichFutureExtraMatcher[T: AsResult](m: => T) {
-    /**
-     * @return a matcher that needs to eventually match, after a given number of retries.
-     */
+
+    /** @return a matcher that needs to eventually match, after a given number of retries.
+      */
     def eventually(retries: Int): T = EventuallyMatchers.eventually(retries, 100.milliseconds)(m)
   }
 

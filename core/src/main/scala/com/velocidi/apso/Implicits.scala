@@ -2,35 +2,34 @@ package com.velocidi.apso
 
 import scala.annotation.tailrec
 import scala.collection.generic.CanBuildFrom
-import scala.util.{ Random, Try }
+import scala.util.{Random, Try}
 
-/**
- * Object containing implicit classes and methods of general purpose.
- */
+/** Object containing implicit classes and methods of general purpose.
+  */
 object Implicits {
 
-  /**
-   * Implicit class that provides new methods for sequences for which their concrete type is
-   * important.
-   * @param seq the sequence to which the new methods are provided
-   * @tparam T the type of the elements in the sequence
-   * @tparam CC the concrete type of the sequence
-   */
+  /** Implicit class that provides new methods for sequences for which their concrete type is
+    * important.
+    * @param seq the sequence to which the new methods are provided
+    * @tparam T the type of the elements in the sequence
+    * @tparam CC the concrete type of the sequence
+    */
   final implicit class ApsoSeqTyped[T, CC[X] <: Seq[X]](val seq: CC[T]) extends AnyVal {
 
-    /**
-     * Merges this sequence with another traversable assuming that both collections are already
-     * sorted. This method eagerly evaluates all the elements of both collections, even if they are
-     * lazy collections. For that reason, infinite sequences are not supported.
-     * @param it the traversable collection to merge with this one
-     * @param bf combiner factory which provides a combiner
-     * @param ord the ordering with which the collections are sorted and with which the merged
-     *            collection is to be returned
-     * @tparam U element type of the resulting collection
-     * @tparam That type of the resulting collection
-     * @return this sequence merged with the given traversable
-     */
-    def mergeSorted[U >: T, That](it: TraversableOnce[U])(implicit bf: CanBuildFrom[CC[T], U, That], ord: Ordering[U]): That = {
+    /** Merges this sequence with another traversable assuming that both collections are already
+      * sorted. This method eagerly evaluates all the elements of both collections, even if they are
+      * lazy collections. For that reason, infinite sequences are not supported.
+      * @param it the traversable collection to merge with this one
+      * @param bf combiner factory which provides a combiner
+      * @param ord the ordering with which the collections are sorted and with which the merged
+      *            collection is to be returned
+      * @tparam U element type of the resulting collection
+      * @tparam That type of the resulting collection
+      * @return this sequence merged with the given traversable
+      */
+    def mergeSorted[U >: T, That](
+        it: TraversableOnce[U]
+    )(implicit bf: CanBuildFrom[CC[T], U, That], ord: Ordering[U]): That = {
       val b = bf(seq)
 
       if (seq.isEmpty) b ++= it
@@ -61,21 +60,19 @@ object Implicits {
     }
   }
 
-  /**
-   * Implicit class that provides new methods for traversable-once collections.
-   * @param it the traversable-once collection to which the new methods are provided.
-   */
+  /** Implicit class that provides new methods for traversable-once collections.
+    * @param it the traversable-once collection to which the new methods are provided.
+    */
   final implicit class ApsoTraversableOnce[T](val it: TraversableOnce[T]) extends AnyVal {
 
-    /**
-     * Returns the average of the elements of this collection.
-     * @param num either an instance of `Numeric` or an instance of `Fractional`, defining a set of
-     *            numeric operations which includes the `+` and the `/` operators to be used in
-     *            forming the average.
-     * @tparam A the result type of the `/` operator
-     * @return the average of all elements of this collection with respect to the `+` and `/`
-     *         operators in `num`.
-     */
+    /** Returns the average of the elements of this collection.
+      * @param num either an instance of `Numeric` or an instance of `Fractional`, defining a set of
+      *            numeric operations which includes the `+` and the `/` operators to be used in
+      *            forming the average.
+      * @tparam A the result type of the `/` operator
+      * @return the average of all elements of this collection with respect to the `+` and `/`
+      *         operators in `num`.
+      */
     def average[A >: T](implicit num: Numeric[A]): A = {
       val div: (A, A) => A = num match {
         case n: Fractional[A] => n.div
@@ -91,64 +88,57 @@ object Implicits {
     }
   }
 
-  /**
-   * Implicit class that provides new methods for maps.
-   * @param map the map to which the new methods are provided.
-   */
+  /** Implicit class that provides new methods for maps.
+    * @param map the map to which the new methods are provided.
+    */
   final implicit class ApsoMap[A, B](val map: Map[A, B]) extends AnyVal {
 
-    /**
-     * Merges a given map with this map. The map is constructed as follows:
-     * <ul>
-     *   <li>Keys present in one of thw two maps are present in the merged map;
-     *   <li>Keys in both maps are present in the merged map with a value given
-     *       by `f(thisValue, thatValue)`;
-     * </ul>
-     * @param that the map to be merged with this map
-     * @param f the function used to merge two values with the same key
-     * @return the merged map.
-     */
+    /** Merges a given map with this map. The map is constructed as follows:
+      * <ul>
+      *   <li>Keys present in one of thw two maps are present in the merged map;
+      *   <li>Keys in both maps are present in the merged map with a value given
+      *       by `f(thisValue, thatValue)`;
+      * </ul>
+      * @param that the map to be merged with this map
+      * @param f the function used to merge two values with the same key
+      * @return the merged map.
+      */
     def twoWayMerge(that: Map[A, B])(f: (B, B) => B): Map[A, B] =
-      map.foldLeft(that) {
-        case (thatMap, (key, mapValue)) =>
-          thatMap.get(key) match {
-            case Some(thatValue) => thatMap.updated(key, f(mapValue, thatValue))
-            case None => thatMap.updated(key, mapValue)
-          }
+      map.foldLeft(that) { case (thatMap, (key, mapValue)) =>
+        thatMap.get(key) match {
+          case Some(thatValue) => thatMap.updated(key, f(mapValue, thatValue))
+          case None => thatMap.updated(key, mapValue)
+        }
       }
 
-    /**
-     * Applies a given function to all keys of this map. In case `f` is not
-     * injective, the behaviour is undefined.
-     * @param f the function to apply to all keys of this map
-     * @return the resulting map with the keys mapped with function `f`.
-     */
+    /** Applies a given function to all keys of this map. In case `f` is not
+      * injective, the behaviour is undefined.
+      * @param f the function to apply to all keys of this map
+      * @return the resulting map with the keys mapped with function `f`.
+      */
     def mapKeys[C](f: A => C): Map[C, B] =
       map.map { case (k, v) => f(k) -> v }
   }
 
-  /**
-   * Implicit class that provides new methods for random number generators.
-   * @param rand the `Random` instance to which the new methods are provided.
-   */
+  /** Implicit class that provides new methods for random number generators.
+    * @param rand the `Random` instance to which the new methods are provided.
+    */
   final implicit class ApsoRandom(val rand: Random) extends AnyVal {
 
-    /**
-     * Chooses a random element from an indexed sequence.
-     * @param seq the indexed sequence of elements to choose from
-     * @tparam T the type of the elements
-     * @return the selected element wrapped in a `Some` if `seq` has at least one element, `None`
-     *         otherwise.
-     */
+    /** Chooses a random element from an indexed sequence.
+      * @param seq the indexed sequence of elements to choose from
+      * @tparam T the type of the elements
+      * @return the selected element wrapped in a `Some` if `seq` has at least one element, `None`
+      *         otherwise.
+      */
     def choose[T](seq: IndexedSeq[T]): Option[T] =
       if (seq.isEmpty) None else Some(seq(rand.nextInt(seq.length)))
 
-    /**
-     * Chooses n random element from a sequence.
-     * @param seq the sequence of elements to choose from
-     * @tparam T the type of the elements
-     * @return the selected elements
-     */
+    /** Chooses n random element from a sequence.
+      * @param seq the sequence of elements to choose from
+      * @tparam T the type of the elements
+      * @return the selected elements
+      */
     def chooseN[T](seq: Seq[T], n: Int): Seq[T] = {
       @tailrec
       def chooseAux(_seq: Seq[T], _n: Int, acc: Seq[T]): Seq[T] =
@@ -161,18 +151,17 @@ object Implicits {
       chooseAux(seq, n, Seq.empty)
     }
 
-    /**
-     * Chooses an element of a sequence according to a weight function.
-     * @param seq the elements to choose from
-     * @param valueFunc the function that maps elements to weights
-     * @param r the random value used to select the elements. If the default random value is used,
-     *          the weighted selection uses 1.0 as the sum of all weights. To use another scale of
-     *          weights, a random value between 0.0 and the maximum weight should be passed.
-     * @tparam T the type of the elements
-     * @return the selected element wrapped in a `Some` if some element was chosen, `None`
-     *         otherwise. Not choosing any element can happen if the weights of the elements do not
-     *         sum up to the maximum value of `r`.
-     */
+    /** Chooses an element of a sequence according to a weight function.
+      * @param seq the elements to choose from
+      * @param valueFunc the function that maps elements to weights
+      * @param r the random value used to select the elements. If the default random value is used,
+      *          the weighted selection uses 1.0 as the sum of all weights. To use another scale of
+      *          weights, a random value between 0.0 and the maximum weight should be passed.
+      * @tparam T the type of the elements
+      * @return the selected element wrapped in a `Some` if some element was chosen, `None`
+      *         otherwise. Not choosing any element can happen if the weights of the elements do not
+      *         sum up to the maximum value of `r`.
+      */
     def monteCarlo[T](seq: Traversable[T], valueFunc: T => Double, r: Double): Option[T] =
       if (seq.isEmpty) None
       else {
@@ -181,36 +170,34 @@ object Implicits {
         else monteCarlo(seq.tail, valueFunc, r - v)
       }
 
-    /**
-     * Chooses an element of a sequence according to a weight function.
-     * @param seq the pairs (element, probability) to choose from
-     * @tparam T the type of the elements in the sequence
-     * @return the selected element wrapped in a `Some` if some element was chosen, `None`
-     *         otherwise. Not choosing any element can happen if the weights of the elements do not
-     *         sum up to the maximum value of `r`.
-     */
+    /** Chooses an element of a sequence according to a weight function.
+      * @param seq the pairs (element, probability) to choose from
+      * @tparam T the type of the elements in the sequence
+      * @return the selected element wrapped in a `Some` if some element was chosen, `None`
+      *         otherwise. Not choosing any element can happen if the weights of the elements do not
+      *         sum up to the maximum value of `r`.
+      */
     @inline def monteCarlo[T](seq: Traversable[(T, Double)], r: Double = rand.nextDouble()): Option[T] =
       monteCarlo(seq, { p: (T, Double) => p._2 }, r).map(_._1)
 
-    /**
-     * Chooses a random element of a traversable using the reservoir sampling technique, traversing
-     * only once the given sequence.
-     * @param seq the elements to choose from
-     * @tparam T the type of the elements
-     * @return the selected element wrapped in a `Some`, or `None` if the traversable is empty.
-     */
+    /** Chooses a random element of a traversable using the reservoir sampling technique, traversing
+      * only once the given sequence.
+      * @param seq the elements to choose from
+      * @tparam T the type of the elements
+      * @return the selected element wrapped in a `Some`, or `None` if the traversable is empty.
+      */
     def reservoirSample[T](seq: TraversableOnce[T]): Option[T] =
-      seq.foldLeft((None: Option[T], 1)) {
-        case ((curr, n), candidate) =>
+      seq
+        .foldLeft((None: Option[T], 1)) { case ((curr, n), candidate) =>
           (if (rand.nextDouble() < 1.0 / n) Some(candidate) else curr, n + 1)
-      }._1
+        }
+        ._1
 
-    /**
-     * Returns an infinite stream of weighted samples of a sequence.
-     * @param seq the elements to choose from
-     * @tparam T the type of the elements
-     * @return an infinite stream of weighted samples of a sequence.
-     */
+    /** Returns an infinite stream of weighted samples of a sequence.
+      * @param seq the elements to choose from
+      * @tparam T the type of the elements
+      * @return an infinite stream of weighted samples of a sequence.
+      */
     def samples[T](seq: Traversable[T], valueFunc: T => Double): Iterator[T] = {
       if (seq.isEmpty) Iterator.empty
       else {
@@ -220,9 +207,10 @@ object Implicits {
         val (small, large) = scaled.partition(_._2 < 1.0)
 
         def alias(
-          small: List[(T, Double)],
-          large: List[(T, Double)],
-          rest: List[(T, Double, Option[T])]): List[(T, Double, Option[T])] = {
+            small: List[(T, Double)],
+            large: List[(T, Double)],
+            rest: List[(T, Double, Option[T])]
+        ): List[(T, Double, Option[T])] = {
 
           (small, large) match {
             case ((s, ps) :: ss, (l, pl) :: ll) =>
@@ -252,62 +240,59 @@ object Implicits {
       }
     }
 
-    /**
-     * Returns an infinite stream of weighted samples of a sequence.
-     * @param seq the pairs (element, probability) to choose from
-     * @tparam T the type of the elements
-     * @return an infinite stream of weighted samples of a sequence.
-     */
+    /** Returns an infinite stream of weighted samples of a sequence.
+      * @param seq the pairs (element, probability) to choose from
+      * @tparam T the type of the elements
+      * @return an infinite stream of weighted samples of a sequence.
+      */
     @inline def samples[T](seq: Traversable[(T, Double)]): Iterator[T] =
       samples(seq, { p: (T, Double) => p._2 }).map(_._1)
 
-    /**
-     * Returns a decreasingly ordered stream of n doubles in [0, 1], according to a
-     * uniform distribution.
-     * More Info: BENTLEY, SAXE, Generating Sorted Lists of Random Numbers
-     *
-     * @param n amount of numbers to generate
-     * @return ordered stream of doubles
-     */
+    /** Returns a decreasingly ordered stream of n doubles in [0, 1], according to a
+      * uniform distribution.
+      * More Info: BENTLEY, SAXE, Generating Sorted Lists of Random Numbers
+      *
+      * @param n amount of numbers to generate
+      * @return ordered stream of doubles
+      */
     def decreasingUniformStream(n: Int): Stream[Double] =
-      Stream.iterate((n + 1, 1.0), n + 1) { case (i, currMax) => (i - 1, currMax * math.pow(rand.nextDouble(), 1.0 / i)) }.tail.map(_._2)
+      Stream
+        .iterate((n + 1, 1.0), n + 1) { case (i, currMax) => (i - 1, currMax * math.pow(rand.nextDouble(), 1.0 / i)) }
+        .tail
+        .map(_._2)
 
-    /**
-     * Returns an increasingly ordered stream of n doubles in [0, 1], according to a
-     * uniform distribution.
-     * More Info: BENTLEY, SAXE, Generating Sorted Lists of Random Numbers
-     *
-     * @param n amount of numbers to generate
-     * @return ordered stream of doubles
-     */
+    /** Returns an increasingly ordered stream of n doubles in [0, 1], according to a
+      * uniform distribution.
+      * More Info: BENTLEY, SAXE, Generating Sorted Lists of Random Numbers
+      *
+      * @param n amount of numbers to generate
+      * @return ordered stream of doubles
+      */
     def increasingUniformStream(n: Int): Stream[Double] =
       decreasingUniformStream(n).map(1 - _)
   }
 
-  /**
-   * Implicit class that provides new methods for closeable resources.
-   * @param res the closeable resource to which the new methods are provided.
-   */
+  /** Implicit class that provides new methods for closeable resources.
+    * @param res the closeable resource to which the new methods are provided.
+    */
   final implicit class ApsoCloseable[U <: AutoCloseable](val res: U) extends AnyVal {
 
-    /**
-     * Uses this resource and closes it afterwards.
-     * @param f the block of code to execute using this resource
-     * @tparam T the return type of the code block.
-     * @return the value returned by the code block.
-     */
+    /** Uses this resource and closes it afterwards.
+      * @param f the block of code to execute using this resource
+      * @tparam T the return type of the code block.
+      * @return the value returned by the code block.
+      */
     def use[T](f: U => T): T = TryWith(res)(f).get
 
-    /**
-     * Uses this resource and closes it afterwards.
-     *
-     * Any exception thrown by the code block or during the call to `close()` of the `AutoCloseable` resource
-     * is caught and presented as a `Failure` in return value.
-     *
-     * @param f the block of code to execute using this resource
-     * @tparam T the return type of the code block.
-     * @return a `Try` of the value returned by the code block.
-     */
+    /** Uses this resource and closes it afterwards.
+      *
+      * Any exception thrown by the code block or during the call to `close()` of the `AutoCloseable` resource
+      * is caught and presented as a `Failure` in return value.
+      *
+      * @param f the block of code to execute using this resource
+      * @tparam T the return type of the code block.
+      * @return a `Try` of the value returned by the code block.
+      */
     def tryUse[T](f: U => T): Try[T] = TryWith(res)(f)
   }
 }

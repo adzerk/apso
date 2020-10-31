@@ -1,4 +1,3 @@
-import scalariform.formatter.preferences._
 import ReleaseTransformations._
 
 organization in ThisBuild := "com.velocidi"
@@ -58,9 +57,7 @@ lazy val commonSettings = Seq(
     "Bintray Scalaz Releases"       at "https://dl.bintray.com/scalaz/releases",
     "JCenter Repository"            at "https://jcenter.bintray.com/"),
 
-  scalariformPreferences := scalariformPreferences.value
-    .setPreference(DanglingCloseParenthesis, Prevent)
-    .setPreference(DoubleIndentConstructorArguments, true),
+  scalafmtOnCompile := true,
 
   scalacOptions ++= {
     lazy val commonFlags = Seq(

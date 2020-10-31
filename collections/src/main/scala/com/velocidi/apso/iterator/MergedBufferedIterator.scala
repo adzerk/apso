@@ -2,7 +2,8 @@ package com.velocidi.apso.iterator
 
 import scala.collection.mutable.PriorityQueue
 
-case class MergedBufferedIterator[T](iterators: List[BufferedIterator[T]])(implicit ord: Ordering[T]) extends BufferedIterator[T] {
+case class MergedBufferedIterator[T](iterators: List[BufferedIterator[T]])(implicit ord: Ordering[T])
+    extends BufferedIterator[T] {
   private[this] implicit lazy val bufferedIteratorOrdering = new Ordering[BufferedIterator[T]] {
     def compare(i1: BufferedIterator[T], i2: BufferedIterator[T]) =
       ord.compare(i2.head, i1.head)
@@ -26,13 +27,12 @@ case class MergedBufferedIterator[T](iterators: List[BufferedIterator[T]])(impli
 
   def hasNext: Boolean = nonEmptyIterators.nonEmpty
 
-  /**
-   * Lazily merges this buffered iterator with another buffered iterator assuming that both collections
-   * are already sorted.
-   * @param thatIt the iterator  to merge with this one
-   * @tparam U element type of the resulting collection
-   * @return the merged iterators
-   */
+  /** Lazily merges this buffered iterator with another buffered iterator assuming that both collections
+    * are already sorted.
+    * @param thatIt the iterator  to merge with this one
+    * @tparam U element type of the resulting collection
+    * @return the merged iterators
+    */
   def mergeSorted[U >: T](thatIt: BufferedIterator[U])(implicit ord: Ordering[U]): BufferedIterator[U] =
     thatIt match {
       case MergedBufferedIterator(thatIts) => MergedBufferedIterator[U](nonEmptyIterators.toList ++ thatIts)

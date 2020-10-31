@@ -4,14 +4,14 @@ import scala.concurrent.duration._
 import scala.util.Random
 
 import com.sksamuel.elastic4s.requests.indexes.CreateIndexTemplateRequest
-import com.sksamuel.elastic4s.requests.mappings.{ KeywordField, MappingDefinition }
+import com.sksamuel.elastic4s.requests.mappings.{KeywordField, MappingDefinition}
 import com.sksamuel.elastic4s.requests.mappings.dynamictemplate.DynamicTemplateRequest
 import com.sksamuel.elastic4s.testkit._
 import org.scalatest.Suite
 import org.specs2.mutable._
 import org.specs2.specification._
 import com.sksamuel.elastic4s.ElasticDsl._
-import com.sksamuel.elastic4s.{ ElasticClient, ElasticProperties }
+import com.sksamuel.elastic4s.{ElasticClient, ElasticProperties}
 import com.sksamuel.elastic4s.http.JavaClient
 import org.codelibs.elasticsearch.runner.ElasticsearchClusterRunner
 import org.elasticsearch.common.settings.Settings
@@ -43,7 +43,8 @@ trait NoSpecElasticsearchTestKit {
       .baseTransportPort(9300 + Random.nextInt(50))
       .numOfNode(1)
       .disableESLogger()
-      .useLogger())
+      .useLogger()
+  )
 
   val httpPort = runner.getNode(0).settings().getAsInt("http.port", 9201)
   val underlying = new Suite with ClientProvider with ElasticSugar {
@@ -54,12 +55,20 @@ trait NoSpecElasticsearchTestKit {
 
   // base templates
 
-  esClient.execute(
-    CreateIndexTemplateRequest("default", "*")
-      .settings(Map("number_of_replicas" -> 1, "number_of_shards" -> 1))
-      .mappings(Iterable(MappingDefinition().dynamicTemplates(
-        DynamicTemplateRequest("strings_as_keywords", KeywordField(""))
-          .matchMappingType("string"))))).await(10.seconds)
+  esClient
+    .execute(
+      CreateIndexTemplateRequest("default", "*")
+        .settings(Map("number_of_replicas" -> 1, "number_of_shards" -> 1))
+        .mappings(
+          Iterable(
+            MappingDefinition().dynamicTemplates(
+              DynamicTemplateRequest("strings_as_keywords", KeywordField(""))
+                .matchMappingType("string")
+            )
+          )
+        )
+    )
+    .await(10.seconds)
 
   runner.ensureYellow()
 
@@ -75,4 +84,3 @@ trait NoSpecElasticsearchTestKit {
   lazy val host = "localhost"
   lazy val useHttps = false
 }
-

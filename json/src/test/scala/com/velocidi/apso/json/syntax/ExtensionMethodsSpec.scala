@@ -1,10 +1,10 @@
 package com.velocidi.apso.json.syntax
 
-import scala.util.{ Failure, Success }
+import scala.util.{Failure, Success}
 
 import io.circe.CursorOp.DownField
 import io.circe.Decoder.Result
-import io.circe.{ Decoder, DecodingFailure, Json }
+import io.circe.{Decoder, DecodingFailure, Json}
 import io.circe.syntax._
 import org.specs2.mutable.Specification
 
@@ -26,7 +26,8 @@ class ExtensionMethodsSpec extends Specification {
     }
 
     "return a DecodingFailure with corrects ops if f returns a failure Try in a nested json decoding" in {
-      val result: Result[TestClass] = Json.obj("1" -> Json.obj("2" := "error")).hcursor.downField("1").downField("2").as[TestClass]
+      val result: Result[TestClass] =
+        Json.obj("1" -> Json.obj("2" := "error")).hcursor.downField("1").downField("2").as[TestClass]
       result must beLeft(DecodingFailure("foo", List(DownField("2"), DownField("1"))))
     }
   }

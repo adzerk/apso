@@ -2,34 +2,36 @@ package com.velocidi.apso.elasticsearch
 
 import scala.collection.mutable
 import scala.concurrent.duration._
-import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.{ Failure, Success, Try }
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success, Try}
 
 import akka.actor._
 import akka.dispatch.ControlMessage
 import com.sksamuel.elastic4s.ElasticDsl._
-import com.sksamuel.elastic4s.requests.bulk.{ BulkResponse, BulkResponseItem }
+import com.sksamuel.elastic4s.requests.bulk.{BulkResponse, BulkResponseItem}
 import com.sksamuel.elastic4s.requests.indexes.IndexRequest
-import com.sksamuel.elastic4s.{ ElasticClient, Indexable }
+import com.sksamuel.elastic4s.{ElasticClient, Indexable}
 import io.circe.Json
 
 import com.velocidi.apso.Logging
 
-/**
- * An actor responsible for inserting tracking events into Elasticsearch.
- * This actor buffers requests until either the configured flush timer is
- * triggered or the buffer hits the max size.
- */
+/** An actor responsible for inserting tracking events into Elasticsearch.
+  * This actor buffers requests until either the configured flush timer is
+  * triggered or the buffer hits the max size.
+  */
 class ElasticsearchBulkInserter(esConfig: config.Elasticsearch, logErrorsAsWarnings: Boolean)
-  extends Actor with Logging {
+    extends Actor
+    with Logging {
   import ElasticsearchBulkInserter._
 
   implicit private[this] val ec: ExecutionContext = context.system.dispatcher
 
   private[this] val bulkInserterConfig = esConfig.bulkInserter.getOrElse {
     val fallback = config.Elasticsearch.BulkInserter(1.second, 10.seconds, 1000, 3)
-    log.warn("Bulk inserter settings for sending documents to Elasticsearch were not found in the config. " +
-      s"A default configuration will be used: $fallback")
+    log.warn(
+      "Bulk inserter settings for sending documents to Elasticsearch were not found in the config. " +
+        s"A default configuration will be used: $fallback"
+    )
     fallback
   }
 
@@ -62,7 +64,11 @@ class ElasticsearchBulkInserter(esConfig: config.Elasticsearch, logErrorsAsWarni
 
   private[this] def becomeElasticsearchDown(): Unit = {
     val periodicCheck = context.system.scheduler.scheduleWithFixedDelay(
-      esDownCheckFrequency, esDownCheckFrequency, self, CheckElasticsearch)
+      esDownCheckFrequency,
+      esDownCheckFrequency,
+      self,
+      CheckElasticsearch
+    )
     context.become(elasticsearchDown(periodicCheck))
   }
 
@@ -78,7 +84,9 @@ class ElasticsearchBulkInserter(esConfig: config.Elasticsearch, logErrorsAsWarni
       tryCountMap(msg) = tryCount
       log.info(
         "Error inserting document in Elasticsearch: {}. Will retry {} more times",
-        item.error, maxTryCount - tryCount)
+        item.error,
+        maxTryCount - tryCount
+      )
       List(msg)
     }
   }
@@ -146,8 +154,10 @@ class ElasticsearchBulkInserter(esConfig: config.Elasticsearch, logErrorsAsWarni
       becomeElasticsearchUp()
 
     case ElasticsearchDown =>
-      log.warn("Cannot connect to Elasticsearch. There may be some configuration problem or the cluster may be " +
-        "temporarily down.")
+      log.warn(
+        "Cannot connect to Elasticsearch. There may be some configuration problem or the cluster may be " +
+          "temporarily down."
+      )
       becomeElasticsearchDown()
   }
 
@@ -201,9 +211,8 @@ class ElasticsearchBulkInserter(esConfig: config.Elasticsearch, logErrorsAsWarni
   private def addMsgToBuffer(msg: IndexRequest) = buffer = Message(sender, msg) :: buffer
 }
 
-/**
- * Companion object for the `ElasticsearchBulkInserter` actor.
- */
+/** Companion object for the `ElasticsearchBulkInserter` actor.
+  */
 object ElasticsearchBulkInserter extends Logging {
   implicit object JsonIndexable extends Indexable[Json] {
     def json(js: Json) = js.noSpaces
@@ -211,41 +220,35 @@ object ElasticsearchBulkInserter extends Logging {
 
   private case class Message(sender: ActorRef, msg: IndexRequest)
 
-  /**
-   * Message containing an object to insert
-   * @param obj the JSON object to publish
-   */
+  /** Message containing an object to insert
+    * @param obj the JSON object to publish
+    */
   case class Insert(obj: Json, index: String) {
     def toRequest: IndexRequest = indexInto(index).doc(obj)
   }
 
-  /**
-   * Message to signal the `ElasticsearchBulkInserter` actor that it should flush the buffered requests.
-   */
+  /** Message to signal the `ElasticsearchBulkInserter` actor that it should flush the buffered requests.
+    */
   case object Flush extends ControlMessage
 
-  /**
-   * Message to notify the `ElasticsearchBulkInserter` actor that Elasticsearch was deemed down.
-   */
+  /** Message to notify the `ElasticsearchBulkInserter` actor that Elasticsearch was deemed down.
+    */
   case object ElasticsearchDown extends ControlMessage
 
-  /**
-   * Message to notify the `ElasticsearchBulkInserter` actor that Elasticsearch was deemed up.
-   */
+  /** Message to notify the `ElasticsearchBulkInserter` actor that Elasticsearch was deemed up.
+    */
   case object ElasticsearchUp extends ControlMessage
 
-  /**
-   * Message to signal the `ElasticsearchBulkInserter` actor that an Elasticsearch check is to be performed.
-   */
+  /** Message to signal the `ElasticsearchBulkInserter` actor that an Elasticsearch check is to be performed.
+    */
   case object CheckElasticsearch extends ControlMessage
 
-  /**
-   * Creates a Props for `ElasticsearchBulkInserter`.
-   *
-   * @param esConfig the elasticsearch configuration to use
-   * @param logErrorsAsWarnings whether errors should be logged as warnings
-   * @return a `Props` for `ElasticsearchBulkInserter`.
-   */
+  /** Creates a Props for `ElasticsearchBulkInserter`.
+    *
+    * @param esConfig the elasticsearch configuration to use
+    * @param logErrorsAsWarnings whether errors should be logged as warnings
+    * @return a `Props` for `ElasticsearchBulkInserter`.
+    */
   def props(esConfig: config.Elasticsearch, logErrorsAsWarnings: Boolean = false): Props =
     Props(new ElasticsearchBulkInserter(esConfig, logErrorsAsWarnings))
 }

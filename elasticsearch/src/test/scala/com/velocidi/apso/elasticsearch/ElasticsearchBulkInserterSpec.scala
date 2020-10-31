@@ -23,21 +23,27 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpeci
       useHttps = false,
       username = None,
       password = None,
-      bulkInserter = Some(Elasticsearch.BulkInserter(
-        flushFrequency = flushFreq,
-        esDownCheckFrequency = 10.seconds,
-        maxBufferSize = maxBufferSize,
-        maxTryCount = 3)))
+      bulkInserter = Some(
+        Elasticsearch.BulkInserter(
+          flushFrequency = flushFreq,
+          esDownCheckFrequency = 10.seconds,
+          maxBufferSize = maxBufferSize,
+          maxTryCount = 3
+        )
+      )
+    )
   }
 
   def testBulkInserter(
-    maxBufferSize: Int = Int.MaxValue,
-    flushFreq: FiniteDuration = 1.day,
-    esStateListener: ActorRef = system.deadLetters): ActorRef = {
+      maxBufferSize: Int = Int.MaxValue,
+      flushFreq: FiniteDuration = 1.day,
+      esStateListener: ActorRef = system.deadLetters
+  ): ActorRef = {
     val actorRef = system.actorOf(
       ElasticsearchBulkInserter
         .props(testBulkInserterConfig(maxBufferSize, flushFreq))
-        .withDispatcher("flush-prio-dispatcher"))
+        .withDispatcher("flush-prio-dispatcher")
+    )
     actorRef ! esStateListener
     actorRef
   }
@@ -54,10 +60,14 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpeci
       val bulkInserter = testBulkInserter(maxBufferSize = 5)
 
       for (i <- 1 to 3) bulkInserter ! Insert(Json.obj("id" := i), msgIndex)
-      esClient.execute(searchQuery(msgIndex)).map(_.result.totalHits) must not(be_==(3).awaitFor(5.seconds).eventually(5, 2.seconds))
+      esClient.execute(searchQuery(msgIndex)).map(_.result.totalHits) must not(
+        be_==(3).awaitFor(5.seconds).eventually(5, 2.seconds)
+      )
 
       for (i <- 4 to 5) bulkInserter ! Insert(Json.obj("id" := i), msgIndex)
-      esClient.execute(searchQuery(msgIndex)).map(_.result.totalHits) must be_==(5).awaitFor(5.seconds).eventually(30, 2.seconds)
+      esClient.execute(searchQuery(msgIndex)).map(_.result.totalHits) must be_==(5)
+        .awaitFor(5.seconds)
+        .eventually(30, 2.seconds)
     }
 
     "collect events and send them in bulk to Elasticsearch after a periodic flush occurs" in {
@@ -68,9 +78,13 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpeci
       for (i <- 1 to 5) bulkInserter ! Insert(Json.obj("id" := i), msgIndex)
 
       Thread.sleep(5000)
-      esClient.execute(searchQuery(msgIndex)).map(_.result.totalHits) must be_==(0).awaitFor(5.seconds).eventually(10, 2.seconds)
+      esClient.execute(searchQuery(msgIndex)).map(_.result.totalHits) must be_==(0)
+        .awaitFor(5.seconds)
+        .eventually(10, 2.seconds)
       Thread.sleep(7500)
-      esClient.execute(searchQuery(msgIndex)).map(_.result.totalHits) must be_==(5).awaitFor(5.seconds).eventually(10, 2.seconds)
+      esClient.execute(searchQuery(msgIndex)).map(_.result.totalHits) must be_==(5)
+        .awaitFor(5.seconds)
+        .eventually(10, 2.seconds)
     }
 
     "correctly handle errors and retry document insertion errors" in {
@@ -79,19 +93,27 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpeci
       val bulkInserter = testBulkInserter(maxBufferSize = 2)
 
       // use a mapping that does not allow for extra fields other than the "name" one
-      esClient.execute(putMapping(msgIndex) rawSource """{"dynamic":"strict","properties":{"name":{"type":"text"}}}""") must
+      esClient.execute(
+        putMapping(msgIndex) rawSource """{"dynamic":"strict","properties":{"name":{"type":"text"}}}"""
+      ) must
         beAnInstanceOf[RequestSuccess[_]].awaitFor(5.seconds)
 
       // insert a (valid) document
       bulkInserter ! Insert(Json.obj("name" := "test1"), msgIndex)
       bulkInserter ! Insert(Json.obj("name" := "test2"), msgIndex)
-      esClient.execute(searchQuery(msgIndex)).map(_.result.totalHits) must be_==(2).awaitFor(5.seconds).eventually(30, 2.seconds)
+      esClient.execute(searchQuery(msgIndex)).map(_.result.totalHits) must be_==(2)
+        .awaitFor(5.seconds)
+        .eventually(30, 2.seconds)
 
       // try to insert a (invalid) document; this one should stay on the buffer for retry later on...
       bulkInserter ! Insert(Json.obj("name" := "test3"), msgIndex)
       bulkInserter ! Insert(Json.obj("name" := "test4", "other" := "dynamic_field_value"), msgIndex)
-      esClient.execute(searchQuery(msgIndex)).map(_.result.totalHits) must not(be_==(4).awaitFor(5.seconds).eventually(5, 2.seconds))
-      esClient.execute(searchQuery(msgIndex)).map(_.result.totalHits) must be_==(3).awaitFor(5.seconds).eventually(5, 2.seconds)
+      esClient.execute(searchQuery(msgIndex)).map(_.result.totalHits) must not(
+        be_==(4).awaitFor(5.seconds).eventually(5, 2.seconds)
+      )
+      esClient.execute(searchQuery(msgIndex)).map(_.result.totalHits) must be_==(3)
+        .awaitFor(5.seconds)
+        .eventually(5, 2.seconds)
 
       // now, change the mapping so that new fields are allowed...
       esClient.execute(putMapping(msgIndex) rawSource """{"dynamic":true,"properties":{"name":{"type":"text"}}}""") must

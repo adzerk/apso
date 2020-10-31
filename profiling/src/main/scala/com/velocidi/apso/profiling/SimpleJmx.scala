@@ -2,11 +2,11 @@ package com.velocidi.apso.profiling
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.{ Failure, Success, Try }
+import scala.util.{Failure, Success, Try}
 
 import com.j256.simplejmx.server.JmxServer
 
-import com.velocidi.apso.{ Logging, NetUtils }
+import com.velocidi.apso.{Logging, NetUtils}
 
 trait SimpleJmx extends Logging {
 

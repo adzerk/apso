@@ -4,28 +4,45 @@ import java.io.InputStream
 
 import scala.annotation.tailrec
 import scala.concurrent.duration._
-import scala.util.{ Failure, Success, Try }
+import scala.util.{Failure, Success, Try}
 
 import com.velocidi.apso.Logging
 
-/**
- * A InputStream that wraps another InputStream, retrying failed reads. This is useful for input streams that can have
- * transient failures (eg HTTP input streams).
- *
- * @param streamBuilder function that returns a new stream starting at a certain position.
- * @param maxRetries maximum number of times to retry a read
- * @param backoff optional duration to wait between retries
- */
-class InsistentInputStream(streamBuilder: (Long) => InputStream, maxRetries: Int = 10, backoff: Option[FiniteDuration] = None) extends InputStream with Logging {
+/** A InputStream that wraps another InputStream, retrying failed reads. This is useful for input streams that can have
+  * transient failures (eg HTTP input streams).
+  *
+  * @param streamBuilder function that returns a new stream starting at a certain position.
+  * @param maxRetries maximum number of times to retry a read
+  * @param backoff optional duration to wait between retries
+  */
+class InsistentInputStream(
+    streamBuilder: (Long) => InputStream,
+    maxRetries: Int = 10,
+    backoff: Option[FiniteDuration] = None
+) extends InputStream
+    with Logging {
 
   def this(streamBuilder: () => InputStream, maxRetries: Int, backoff: Option[FiniteDuration]) =
-    this({ x => val is = streamBuilder(); is.skip(x); is }, maxRetries, backoff)
+    this(
+      { x =>
+        val is = streamBuilder(); is.skip(x); is
+      },
+      maxRetries,
+      backoff
+    )
 
   def this(streamBuilder: () => InputStream, maxRetries: Int) =
-    this({ x => val is = streamBuilder(); is.skip(x); is }, maxRetries)
+    this(
+      { x =>
+        val is = streamBuilder(); is.skip(x); is
+      },
+      maxRetries
+    )
 
   def this(streamBuilder: () => InputStream) =
-    this({ x => val is = streamBuilder(); is.skip(x); is })
+    this({ x =>
+      val is = streamBuilder(); is.skip(x); is
+    })
 
   private[this] var innerStream: InputStream = streamBuilder(0)
   private[this] var currPos: Long = 0
