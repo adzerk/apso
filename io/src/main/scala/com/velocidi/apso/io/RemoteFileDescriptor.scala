@@ -8,7 +8,7 @@ trait RemoteFileDescriptor { this: FileDescriptor =>
 
   lazy val name: String = elements.lastOption.getOrElse("")
   lazy val path: String = root + "/" + elements.mkString("/")
-  def isLocal: Boolean = false
+  val isLocal: Boolean = false
 
   private def sanitize(segment: String): Option[String] = {
     val whiteSpaceValidated = segment.trim match {

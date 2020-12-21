@@ -22,7 +22,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
 
   lazy val name: String = file.getName
 
-  def isLocal: Boolean = true
+  val isLocal: Boolean = true
 
   lazy val file = Paths.get(initialPath).normalize().toAbsolutePath.toFile
 
