@@ -3,8 +3,8 @@ import ReleaseTransformations._
 
 organization in ThisBuild := "com.velocidi"
 
-crossScalaVersions in ThisBuild := Seq("2.12.10", "2.13.1")
-scalaVersion in ThisBuild := "2.12.10"
+crossScalaVersions in ThisBuild := Seq("2.12.12", "2.13.4")
+scalaVersion in ThisBuild := "2.12.12"
 
 def module(project: Project, moduleName: String) =
   (project in file(moduleName))
