@@ -20,8 +20,10 @@ import com.velocidi.apso.Logging
  * This actor buffers requests until either the configured flush timer is
  * triggered or the buffer hits the max size.
  */
-class ElasticsearchBulkInserter(esConfig: config.Elasticsearch, logErrorsAsWarnings: Boolean)
-  extends Actor with Logging {
+class ElasticsearchBulkInserter(
+    esConfig: config.Elasticsearch,
+    logErrorsAsWarnings: Boolean,
+    timeoutOnStop: FiniteDuration = 3.seconds) extends Actor with Logging {
   import ElasticsearchBulkInserter._
 
   implicit private[this] val ec: ExecutionContext = context.system.dispatcher
@@ -202,7 +204,7 @@ class ElasticsearchBulkInserter(esConfig: config.Elasticsearch, logErrorsAsWarni
     val stop = if (buffer.nonEmpty) flush().andThen { case _ => client.close() }
     else Future(client.close)
 
-    Try(Await.result(stop, 3.seconds)).failed.foreach { ex =>
+    Try(Await.result(stop, timeoutOnStop)).failed.foreach { ex =>
       log.warn("Failed to cleanly stop Bulk Inserter!", ex)
     }
   }
