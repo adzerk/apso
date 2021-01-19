@@ -2,7 +2,7 @@ package com.velocidi.apso.elasticsearch
 
 import scala.collection.mutable
 import scala.concurrent.duration._
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ Await, ExecutionContext, Future }
 import scala.util.{ Failure, Success, Try }
 
 import akka.actor._
@@ -20,8 +20,10 @@ import com.velocidi.apso.Logging
  * This actor buffers requests until either the configured flush timer is
  * triggered or the buffer hits the max size.
  */
-class ElasticsearchBulkInserter(esConfig: config.Elasticsearch, logErrorsAsWarnings: Boolean)
-  extends Actor with Logging {
+class ElasticsearchBulkInserter(
+    esConfig: config.Elasticsearch,
+    logErrorsAsWarnings: Boolean,
+    timeoutOnStop: FiniteDuration = 3.seconds) extends Actor with Logging {
   import ElasticsearchBulkInserter._
 
   implicit private[this] val ec: ExecutionContext = context.system.dispatcher
@@ -99,7 +101,7 @@ class ElasticsearchBulkInserter(esConfig: config.Elasticsearch, logErrorsAsWarni
     (successCount, failedReqs)
   }
 
-  private[this] def flush() = {
+  private[this] def flush(): Future[BulkResponse] = {
     val sentBuffer = buffer
     buffer = Nil
 
@@ -116,10 +118,12 @@ class ElasticsearchBulkInserter(esConfig: config.Elasticsearch, logErrorsAsWarni
             self ! ElasticsearchDown
             sentBuffer.foreach(self ! _)
         }
+        bulkResponseFut
 
-      case Failure(_) =>
+      case Failure(ex) =>
         self ! ElasticsearchDown
         sentBuffer.foreach(self ! _)
+        Future.failed(ex)
     }
   }
 
@@ -194,8 +198,15 @@ class ElasticsearchBulkInserter(esConfig: config.Elasticsearch, logErrorsAsWarni
   }
 
   override def postStop() = {
-    if (buffer.nonEmpty) flush()
-    client.close()
+    super.postStop()
+
+    log.info("Stopping Bulk Inserter...")
+    val stop = if (buffer.nonEmpty) flush().andThen { case _ => client.close() }
+    else Future(client.close)
+
+    Try(Await.result(stop, timeoutOnStop)).failed.foreach { ex =>
+      log.warn("Failed to cleanly stop Bulk Inserter!", ex)
+    }
   }
 
   private def addMsgToBuffer(msg: IndexRequest) = buffer = Message(sender, msg) :: buffer
