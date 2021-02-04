@@ -40,7 +40,6 @@ trait NoSpecElasticsearchTestKit {
       // another es-cluster-runner instance could already be using that same port
       // By adding this Random we avoid binding to ports already in use
       .baseHttpPort(9200 + Random.nextInt(50))
-      .baseTransportPort(9300 + Random.nextInt(50))
       .numOfNode(1)
       .disableESLogger()
       .useLogger())
