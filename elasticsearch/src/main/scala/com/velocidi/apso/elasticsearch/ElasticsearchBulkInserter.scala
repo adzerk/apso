@@ -72,11 +72,11 @@ class ElasticsearchBulkInserter(
     val tryCount = tryCountMap.getOrElse(msg, 0) + 1
 
     if (tryCount > maxTryCount) {
+      msg.sender ! Status.Failure(new Throwable(s"Error inserting document in Elasticsearch: ${item.error}"))
       tryCountMap.remove(msg)
       logErrorOrWarning(s"Error inserting document in Elasticsearch: $item")
       Nil
     } else {
-      msg.sender ! Status.Failure(new Throwable(s"Error inserting document in Elasticsearch: ${item.error}"))
       tryCountMap(msg) = tryCount
       log.info(
         "Error inserting document in Elasticsearch: {}. Will retry {} more times",
