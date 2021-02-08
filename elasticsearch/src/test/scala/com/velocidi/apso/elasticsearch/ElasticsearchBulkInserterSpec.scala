@@ -157,7 +157,7 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpeci
       numberOfHits(msgIndex1) must be_==(6).retry(eventuallyRetries = 30)
       probe must receive.like { case Status.Failure(_) => ok }
 
-      // NOTICE: trying on a setting in which the retries are by the flush frequency
+      // NOTICE: trying on a setting in which the retries are triggered by the flush frequency
       val msgIndex2 = "test-index-6"
       // maxTryCount is 3
       val bulkInserter2 = testBulkInserter(maxBufferSize = 2, flushFreq = 500.millis)
