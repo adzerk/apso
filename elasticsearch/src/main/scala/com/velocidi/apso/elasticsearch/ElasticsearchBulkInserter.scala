@@ -85,20 +85,19 @@ class ElasticsearchBulkInserter(
     }
   }
 
-  private[this] def countSuccessfulMsgs(sentBuffer: Iterable[Message], bulkResponse: BulkResponse) = {
+  // returns a list of the failed requests
+  private[this] def notifyOfSuccessfulAndGetFailed(sentBuffer: Iterable[Message], bulkResponse: BulkResponse) = {
     val reqsAndRes = sentBuffer.iterator.zip(bulkResponse.items.iterator)
 
-    val (successCount, failedReqs) = reqsAndRes.foldLeft((0, List.empty[Message])) {
-      case ((count, failedReqs), (req, res)) if res.error.isDefined =>
-        (count, failedReqs ::: addRetry(req, res))
+    reqsAndRes.foldLeft(List.empty[Message]) {
+      case (failedReqs, (req, res)) if res.error.isDefined =>
+        failedReqs ::: addRetry(req, res)
 
-      case ((count, failedReqs), (req, res)) => // if res.error.isEmpty...
+      case (failedReqs, (req, res)) => // if res.error.isEmpty...
         req.sender ! res.id
         tryCountMap.remove(req)
-        (count + 1, failedReqs)
+        failedReqs
     }
-
-    (successCount, failedReqs)
   }
 
   private[this] def flush(): Future[BulkResponse] = {
@@ -109,10 +108,7 @@ class ElasticsearchBulkInserter(
       case Success(bulkResponseFut: Future[BulkResponse]) =>
         bulkResponseFut.onComplete {
           case Success(bulkResponse) =>
-            val (successCount, failedReqs) = countSuccessfulMsgs(sentBuffer, bulkResponse)
-
-            if (successCount == 0) self ! ElasticsearchDown
-            failedReqs.foreach(self ! _)
+            notifyOfSuccessfulAndGetFailed(sentBuffer, bulkResponse).foreach(self ! _)
 
           case Failure(_) =>
             self ! ElasticsearchDown
