@@ -171,9 +171,9 @@ final class ExpiringLruCache[V](maxCapacity: Long, initialCapacity: Int, timeToL
   }
 
   def remove(key: Any) = store.remove(key) match {
-    case null => None
+    case null                      => None
     case entry if (isAlive(entry)) => Some(entry.future)
-    case _ => None
+    case _                         => None
   }
 
   def clear(): Unit = { store.clear() }
@@ -203,8 +203,8 @@ private[caching] class Entry[T](val promise: Promise[T]) {
     lastAccessed = Timestamp.now
   }
   override def toString = future.value match {
-    case Some(Success(value)) => value.toString
+    case Some(Success(value))     => value.toString
     case Some(Failure(exception)) => exception.toString
-    case None => "pending"
+    case None                     => "pending"
   }
 }

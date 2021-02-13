@@ -33,7 +33,7 @@ case class S3FileDescriptor(
 
   def size = summary match {
     case Some(info) => info.getSize
-    case None => bucket.size(builtPath)
+    case None       => bucket.size(builtPath)
   }
 
   def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean): Boolean = {
@@ -75,8 +75,8 @@ case class S3FileDescriptor(
   override def cd(pathString: String): S3FileDescriptor = {
     val newPath = pathString.split("/").map(_.trim).toList.foldLeft(elements) {
       case (acc, "." | "") => acc
-      case (acc, "..") => acc.dropRight(1)
-      case (acc, segment) => acc :+ segment
+      case (acc, "..")     => acc.dropRight(1)
+      case (acc, segment)  => acc :+ segment
     }
     this.copy(elements = newPath)
   }
@@ -85,8 +85,8 @@ case class S3FileDescriptor(
     def removePrefix(primary: List[String], secondary: List[String]): List[String] = {
       (primary, secondary) match {
         case (h1 :: t1, h2 :: t2) if h1 == h2 => removePrefix(t1, t2)
-        case (Nil, s) => s
-        case (_, Nil) => Nil
+        case (Nil, s)                         => s
+        case (_, Nil)                         => Nil
       }
     }
 

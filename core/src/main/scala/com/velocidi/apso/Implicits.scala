@@ -76,8 +76,8 @@ object Implicits {
     def average[A >: T](implicit num: Numeric[A]): A = {
       val div: (A, A) => A = num match {
         case n: Fractional[A] => n.div
-        case n: Integral[A] => n.quot
-        case _ => sys.error("Numeric does not support division!")
+        case n: Integral[A]   => n.quot
+        case _                => sys.error("Numeric does not support division!")
       }
       val res = it.foldLeft((num.zero, num.zero)) { (acc, e) =>
         (num.plus(acc._1, e), num.plus(acc._2, num.one))
@@ -107,7 +107,7 @@ object Implicits {
       map.foldLeft(that) { case (thatMap, (key, mapValue)) =>
         thatMap.get(key) match {
           case Some(thatValue) => thatMap.updated(key, f(mapValue, thatValue))
-          case None => thatMap.updated(key, mapValue)
+          case None            => thatMap.updated(key, mapValue)
         }
       }
 
@@ -223,7 +223,7 @@ object Implicits {
 
             case (_, (l, _) :: ll) => alias(small, ll, (l, 1.0, None) :: rest)
             case ((s, _) :: ss, _) => alias(ss, large, (s, 1.0, None) :: rest)
-            case _ => rest
+            case _                 => rest
           }
         }
 
@@ -231,7 +231,7 @@ object Implicits {
 
         def select(p1: Double, p2: Double, table: Vector[(T, Double, Option[T])]): T = {
           table((p1 * len).toInt) match {
-            case (a, _, None) => a
+            case (a, _, None)    => a
             case (a, p, Some(b)) => if (p2 <= p) a else b
           }
         }

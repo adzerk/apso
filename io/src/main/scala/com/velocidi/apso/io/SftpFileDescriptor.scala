@@ -300,7 +300,7 @@ object SftpFileDescriptor {
 
     pool.tryAcquire(leaseAcquireMaxDuration) match {
       case Some(lease) => lease
-      case None => throw new TimeoutException(s"Failed to acquire a SFTP client within $leaseAcquireMaxDuration.")
+      case None        => throw new TimeoutException(s"Failed to acquire a SFTP client within $leaseAcquireMaxDuration.")
     }
   }
 
@@ -352,9 +352,9 @@ object SftpFileDescriptor {
 
     val elements =
       path.split("/").toList match {
-        case Nil => Nil
+        case Nil              => Nil
         case "" :: hd :: tail => hd :: tail
-        case _ => throw new IllegalArgumentException("Error parsing SFTP URI. Only absolute paths are supported.")
+        case _                => throw new IllegalArgumentException("Error parsing SFTP URI. Only absolute paths are supported.")
       }
 
     SftpFileDescriptor(host, port, username, password, elements, identity)

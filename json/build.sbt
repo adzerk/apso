@@ -7,7 +7,7 @@ libraryDependencies ++= Seq(
   NscalaTime,
   Squants,
   TypesafeConfig % Provided,
-  CirceLiteral % Test,
-  Specs2Core % Test,
-  Specs2JUnit % Test
+  CirceLiteral   % Test,
+  Specs2Core     % Test,
+  Specs2JUnit    % Test
 )

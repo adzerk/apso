@@ -119,8 +119,8 @@ trait FileDescriptor {
   def cd(pathString: String): FileDescriptor = {
     pathString.split("/").toList.foldLeft(this) {
       case (acc, "." | "") => acc
-      case (acc, "..") => acc.parent()
-      case (acc, segment) => acc.child(segment)
+      case (acc, "..")     => acc.parent()
+      case (acc, segment)  => acc.child(segment)
     }
   }
 
@@ -163,9 +163,9 @@ object FileDescriptor {
   def apply(uri: String, credentialsConfig: config.Credentials): FileDescriptor = {
     protocol(uri) match {
       case ("file", path) => LocalFileDescriptor(path)
-      case ("s3", path) => S3FileDescriptor(path, credentialsConfig.s3)
+      case ("s3", path)   => S3FileDescriptor(path, credentialsConfig.s3)
       case ("sftp", path) => SftpFileDescriptor(path, credentialsConfig.sftp)
-      case _ => throw new UnsupportedOperationException("Protocol not supported")
+      case _              => throw new UnsupportedOperationException("Protocol not supported")
     }
   }
 
@@ -175,6 +175,6 @@ object FileDescriptor {
     */
   private def protocol(uri: String) = uri.split("://").toList match {
     case protocol :: path :: Nil => (protocol, path)
-    case _ => throw new IllegalArgumentException("Malformed URI")
+    case _                       => throw new IllegalArgumentException("Malformed URI")
   }
 }

@@ -52,8 +52,8 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
   override def cd(pathString: String): LocalFileDescriptor = {
     val newPath = pathString.split("/").map(_.trim).toList.foldLeft(normalizedPath) {
       case (acc, "." | "") => acc
-      case (acc, "..") => acc.getParent
-      case (acc, segment) => acc.resolve(segment)
+      case (acc, "..")     => acc.getParent
+      case (acc, segment)  => acc.resolve(segment)
     }
     LocalFileDescriptor(newPath.toString)
   }
@@ -72,7 +72,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
       val result = Try(Files.copy(normalizedPath, downloadFile.normalizedPath, StandardCopyOption.REPLACE_EXISTING))
 
       result match {
-        case Success(_) => if (safeDownloading) downloadFile.rename(localTarget)
+        case Success(_)  => if (safeDownloading) downloadFile.rename(localTarget)
         case Failure(ex) => log.warn(s"File copy failed ($ex)")
       }
 
@@ -90,7 +90,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
       val result = Try(Files.copy(localTarget.normalizedPath, normalizedPath, StandardCopyOption.REPLACE_EXISTING))
 
       result match {
-        case Success(_) =>
+        case Success(_)  =>
         case Failure(ex) => log.warn(s"File copy failed ($ex)")
       }
 
@@ -108,7 +108,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
       val result = Try(Files.copy(inputStream, normalizedPath, StandardCopyOption.REPLACE_EXISTING))
 
       result match {
-        case Success(_) =>
+        case Success(_)  =>
         case Failure(ex) => log.warn(s"File copy failed ($ex)")
       }
 
@@ -137,9 +137,9 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
       val restStr = rest.headOption.getOrElse("")
 
       file.list.filter(_.name.startsWith(headStr)).flatMap {
-        case fd if fd.isDirectory => aux(fd, rest)
+        case fd if fd.isDirectory              => aux(fd, rest)
         case fd if fd.name.startsWith(restStr) => Seq(fd)
-        case _ => Seq()
+        case _                                 => Seq()
       }
     }
     aux(this, prefix.split('/'))
@@ -204,6 +204,6 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
 
   override def equals(other: Any): Boolean = other match {
     case that: LocalFileDescriptor => path == that.path
-    case _ => false
+    case _                         => false
   }
 }

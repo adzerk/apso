@@ -172,7 +172,7 @@ trait ProxySupport extends ClientIPDirectives {
 
     private[this] lazy val sink = Sink.foreach[(Try[HttpResponse], Promise[RouteResult])] {
       case ((Success(resp), p)) => p.success(Complete(resp))
-      case ((Failure(e), p)) => p.failure(e)
+      case ((Failure(e), p))    => p.failure(e)
     }
 
     private[this] lazy val queue = source.via(flow).toMat(sink)(Keep.left).run()
@@ -186,9 +186,9 @@ trait ProxySupport extends ClientIPDirectives {
     def sendRequest(req: HttpRequest, failOnDrop: Boolean): Future[RouteResult] = {
       val promise = Promise[RouteResult]()
       queue.offer(req -> promise).flatMap {
-        case Enqueued => promise.future
+        case Enqueued         => promise.future
         case OfferFailure(ex) => Future.failed(new RuntimeException("Queue offering failed", ex))
-        case QueueClosed => Future.failed(new RuntimeException("Queue is completed before call!?"))
+        case QueueClosed      => Future.failed(new RuntimeException("Queue is completed before call!?"))
         case Dropped =>
           log.warn(s"Request queue for $host:$port is full")
           if (failOnDrop) Future.failed(new RuntimeException("Dropping request (Queue is full)"))

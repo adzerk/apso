@@ -37,7 +37,7 @@ case class Trie[K, V](value: Option[V] = None, nodes: Map[K, Trie[K, V]] = Map[K
       case Seq(h, t @ _*) =>
         nodes.get(h) match {
           case Some(trie) => trie.get(t)
-          case _ => None
+          case _          => None
         }
 
       case _ =>

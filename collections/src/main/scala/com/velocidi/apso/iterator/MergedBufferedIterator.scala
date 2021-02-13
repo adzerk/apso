@@ -36,6 +36,6 @@ case class MergedBufferedIterator[T](iterators: List[BufferedIterator[T]])(impli
   def mergeSorted[U >: T](thatIt: BufferedIterator[U])(implicit ord: Ordering[U]): BufferedIterator[U] =
     thatIt match {
       case MergedBufferedIterator(thatIts) => MergedBufferedIterator[U](nonEmptyIterators.toList ++ thatIts)
-      case _ => MergedBufferedIterator[U](thatIt :: nonEmptyIterators.toList)
+      case _                               => MergedBufferedIterator[U](thatIt :: nonEmptyIterators.toList)
     }
 }

@@ -20,7 +20,7 @@ class TypedMap[T] private (val inner: Map[ClassTag[_], T]) {
   override def toString = inner.toString()
   override def equals(other: Any) = other match {
     case that: TypedMap[_] => this.inner == that.inner
-    case _ => false
+    case _                 => false
   }
   override def hashCode = inner.hashCode()
 }

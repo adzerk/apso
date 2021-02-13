@@ -49,10 +49,10 @@ class ElasticsearchBulkInserter(
 
   private[this] def logErrorOrWarning(msg: => String, throwable: Option[Throwable] = None): Unit = {
     (logErrorsAsWarnings, throwable) match {
-      case (true, Some(t)) => log.warn(msg, t)
-      case (true, None) => log.warn(msg)
+      case (true, Some(t))  => log.warn(msg, t)
+      case (true, None)     => log.warn(msg)
       case (false, Some(t)) => log.error(msg, t)
-      case (false, None) => log.error(msg)
+      case (false, None)    => log.error(msg)
     }
   }
 
@@ -140,7 +140,7 @@ class ElasticsearchBulkInserter(
     client = ElasticsearchUtil.buildEsClient(esConfig)
     checkElasticsearch().onComplete {
       case Success(true) => self ! ElasticsearchUp
-      case _ => self ! ElasticsearchDown
+      case _             => self ! ElasticsearchDown
     }
   }
 

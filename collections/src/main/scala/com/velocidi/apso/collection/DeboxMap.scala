@@ -382,7 +382,7 @@ final class DeboxMap[
 
     that match {
       case that: DeboxMap[A, B] => equalsInner(this, that) && equalsInner(that, this)
-      case _ => false
+      case _                    => false
     }
   }
 

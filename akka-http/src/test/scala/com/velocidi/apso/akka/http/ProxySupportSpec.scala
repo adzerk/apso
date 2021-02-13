@@ -165,7 +165,7 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
         case Complete(res) if res.status.intValue() == 200 =>
           res.entity.toStrict(10.seconds).map { r => r.data.utf8String }
         case Complete(res) => Future.successful(res.status.intValue().toString)
-        case _ => Future.failed(new Exception("Failed to parse result"))
+        case _             => Future.failed(new Exception("Failed to parse result"))
       }
 
       proxy

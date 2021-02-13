@@ -98,7 +98,7 @@ object Implicits {
   def fromCirceFullPaths(paths: Seq[(String, Json)], separatorRegex: String = "\\."): Json = {
     def createJson(keys: Seq[String], value: Json): Json = {
       keys match {
-        case Nil => value
+        case Nil    => value
         case h :: t => Json.obj(h -> createJson(t, value))
       }
     }

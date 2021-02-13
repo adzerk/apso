@@ -11,7 +11,7 @@ class FileDescriptorCredentialsSpec extends Specification with CustomMatchers {
 
     def createCredentials(id: String, fdConfig: config.Credentials.Sftp.Entry): (String, String) = fdConfig match {
       case config.Credentials.Sftp.Entry.Basic(username, password) => (username, password)
-      case _ => throw new Exception
+      case _                                                       => throw new Exception
     }
   }
 

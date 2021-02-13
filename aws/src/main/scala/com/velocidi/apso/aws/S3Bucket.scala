@@ -320,7 +320,7 @@ class S3Bucket(
 
   override def equals(obj: Any): Boolean = obj match {
     case b: S3Bucket => b.bucketName == bucketName
-    case _ => false
+    case _           => false
   }
 }
 
