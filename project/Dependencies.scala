@@ -2,31 +2,33 @@ import sbt._
 
 object Dependencies {
   object Versions {
-    val Akka = "2.6.1"
-    val AkkaHttp = "10.1.11"
-    val AkkaTestkitSpecs2 = "0.2.4"
-    val Aws = "1.11.553"
-    val BouncyCastle = "1.64"
-    val Circe = "0.12.3"
-    val CommonsCodec = "1.13"
+    val Akka = "2.6.10"
+    val AkkaHttp = "10.1.13"
+    val AkkaTestkitSpecs2 = "0.3.0"
+    val Aws = "1.11.928"
+    val BouncyCastle = "1.68"
+    val Circe = "0.13.0"
+    val CommonsCodec = "1.15"
     val ConcurrentLinkedHashMap = "1.4.2"
-    val Elastic4s = "7.1.2"
+    val Elastic4s = "7.1.4"
     val FastMd5 = "2.7.1"
     val JUnit = "4.12"
     val Log4jCore = "2.12.1"
-    val NscalaTime = "2.22.0"
-    val ScalaCheck = "1.14.2"
+    val NscalaTime = "2.26.0"
+    val ScalaCheck = "1.14.3"
     val ScalaLogging = "3.9.2"
     val ScalaPool = "0.4.3"
     val SimpleJmx = "1.17"
-    val Specs2 = "4.8.1"
-    val Squants = "1.6.0"
-    val SshJ = "0.27.0"
-    val TypesafeConfig = "1.4.0"
+    val Specs2 = "4.8.3"
+    val Squants = "1.7.0"
+    val SshJ = "0.30.0"
+    val TypesafeConfig = "1.4.1"
     val UnirestJava = "1.4.9"
   }
 
   val AkkaActor = "com.typesafe.akka" %% "akka-actor" % Versions.Akka
+  val AkkaActorTyped = "com.typesafe.akka" %% "akka-actor-typed" % Versions.Akka
+  val AkkaActorTestkitTyped = "com.typesafe.akka" %% "akka-actor-testkit-typed" % Versions.Akka
   val AkkaHttp = "com.typesafe.akka" %% "akka-http" % Versions.AkkaHttp
   val AkkaHttpTestkit = "com.typesafe.akka" %% "akka-http-testkit" % Versions.AkkaHttp
   val AkkaStream = "com.typesafe.akka" %% "akka-stream" % Versions.Akka

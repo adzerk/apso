@@ -2,8 +2,8 @@ import ReleaseTransformations._
 
 organization in ThisBuild := "com.velocidi"
 
-crossScalaVersions in ThisBuild := Seq("2.12.10", "2.13.1")
-scalaVersion in ThisBuild := "2.12.10"
+crossScalaVersions in ThisBuild := Seq("2.12.12", "2.13.4")
+scalaVersion in ThisBuild := "2.12.12"
 
 def module(project: Project, moduleName: String) =
   (project in file(moduleName))
@@ -52,7 +52,7 @@ lazy val docs = (project in file("apso-docs"))
     mdocOut := baseDirectory.in(ThisBuild).value,
 
     mdocVariables := Map(
-      "VERSION" -> "0.16.2" // This version should be set to the currently released version.
+      "VERSION" -> "0.16.3" // This version should be set to the currently released version.
     ),
 
     // This is necessary because `aws-java-sdk-s3` has the `provided` scope in apso-aws

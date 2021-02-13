@@ -19,6 +19,10 @@ trait FileDescriptor {
     */
   def name: String
 
+  /** Whether the file descriptor is used to access a local file.
+    */
+  def isLocal: Boolean
+
   /** The size of the file associated with the file descriptor.
     */
   def size: Long

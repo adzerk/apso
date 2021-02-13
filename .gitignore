@@ -3,6 +3,7 @@ target/
 
 # system and IDE setting files
 .DS_Store
+.bsp
 .idea
 .idea_modules
 .ensime

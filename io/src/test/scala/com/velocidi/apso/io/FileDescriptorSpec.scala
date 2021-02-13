@@ -29,6 +29,13 @@ class FileDescriptorSpec extends Specification with CustomMatchers {
       )
     }
 
+    "correctly identify itself as local or non-local" in {
+      FileDescriptor("file:///tmp/folder").isLocal must beTrue
+      FileDescriptor("s3://tmp/path").isLocal must beFalse
+      FileDescriptor("sftp://localhost/tmp/path", fdConfig).isLocal must beFalse
+      FileDescriptor("sftp://valid-host.com/tmp/path", fdConfig).isLocal must beFalse
+    }
+
     "be serializable" in {
       FileDescriptor("file:///tmp/folder") must beSerializable
       FileDescriptor("s3://tmp/path") must beSerializable

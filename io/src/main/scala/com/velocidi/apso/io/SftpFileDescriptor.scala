@@ -218,7 +218,9 @@ object SftpFileDescriptor {
   private[this] val leaseAcquireMaxDuration =
     Duration.fromNanos(fdConf.getDuration("apso.io.file-descriptor.sftp.max-lease-acquire-duration").toNanos)
 
-  private[this] val connectionPools = new ConcurrentHashMap[String, Pool[SftpClient]]()
+  // We can't share the same connection if any of the connection details are different (host, port, username, password, identity)
+  private[this] val connectionPools =
+    new ConcurrentHashMap[(String, Int, String, Option[String], Option[Identity]), Pool[SftpClient]]()
 
   // This is just a helper class to tie together the lifetime of the SFTPClient
   // with the SSHClient, i.e. when we close the SFTPClient we also want to
@@ -278,7 +280,8 @@ object SftpFileDescriptor {
   ): Lease[SftpClient] = {
 
     val pool = {
-      val p = connectionPools.get(host)
+      val key = (host, port, username, password, identity)
+      val p = connectionPools.get(key)
       if (p == null) {
         synchronized {
           val pool = Pool(
@@ -288,7 +291,7 @@ object SftpFileDescriptor {
             maxIdleTime = maxIdleTime
           )
 
-          connectionPools.put(host, pool)
+          connectionPools.put(key, pool)
 
           pool
         }
@@ -297,7 +300,7 @@ object SftpFileDescriptor {
 
     pool.tryAcquire(leaseAcquireMaxDuration) match {
       case Some(lease) => lease
-      case None => throw new TimeoutException(s"Failed to acquire a SFTP client within ${leaseAcquireMaxDuration}.")
+      case None => throw new TimeoutException(s"Failed to acquire a SFTP client within $leaseAcquireMaxDuration.")
     }
   }
 
