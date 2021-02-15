@@ -85,18 +85,26 @@ class ElasticsearchBulkInserter(
     }
   }
 
-  // returns a list of the failed requests
-  private[this] def notifyOfSuccessfulAndGetFailed(sentBuffer: Iterable[Message], bulkResponse: BulkResponse) = {
+  /**
+   * Given a list of messages that were sent for indexing and the corresponding bulk response, it returns a list
+   * of failed messages and notifies the sender of the successful ones. The retry counter of the failed messages is also incremented.
+   *
+   * @param sentBuffer the list of messages that were sent for bulk indexing on Elasticsearch
+   * @param bulkResponse the Elasticsearch response for the bulk indexing of the `sentBuffer`
+   * @return an iterator of [[Message]] corresponding to those in `sentBuffer` that failed to index in Elasticsearch
+   */
+  private[this] def notifyOfSuccessfulAndGetFailed(sentBuffer: Iterable[Message], bulkResponse: BulkResponse): Iterator[Message] = {
     val reqsAndRes = sentBuffer.iterator.zip(bulkResponse.items.iterator)
 
-    reqsAndRes.foldLeft(List.empty[Message]) {
-      case (failedReqs, (req, res)) if res.error.isDefined =>
-        failedReqs ::: addRetry(req, res)
-
-      case (failedReqs, (req, res)) => // if res.error.isEmpty...
-        req.sender ! res.id
-        tryCountMap.remove(req)
-        failedReqs
+    reqsAndRes.flatMap {
+      case (req, res) =>
+        if (res.error.isDefined) {
+          addRetry(req, res)
+        } else {
+          req.sender ! res.id
+          tryCountMap.remove(req)
+          Nil
+        }
     }
   }
 
