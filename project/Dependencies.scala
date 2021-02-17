@@ -10,7 +10,7 @@ object Dependencies {
     val Circe                   = "0.13.0"
     val CommonsCodec            = "1.15"
     val ConcurrentLinkedHashMap = "1.4.2"
-    val Elastic4s               = "7.1.4"
+    val Elastic4s               = "7.10.0"
     val FastMd5                 = "2.7.1"
     val JUnit                   = "4.12"
     val Log4jCore               = "2.12.1"
@@ -48,7 +48,7 @@ object Dependencies {
   val Elastic4sCore              = "com.sksamuel.elastic4s"                 %% "elastic4s-core"               % Versions.Elastic4s
   val Elastic4sTestkit           = "com.sksamuel.elastic4s"                 %% "elastic4s-testkit"            % Versions.Elastic4s
   // FIXME: netty-all conflicts with all non-bundle netty dependencies, which are needed by GRPC and possibly others.
-  val ElasticsearchClusterRunner = "org.codelibs"                            % "elasticsearch-cluster-runner" % "7.1.1.0"
+  val ElasticsearchClusterRunner = "org.codelibs"                            % "elasticsearch-cluster-runner" % "7.10.2.0"
   val FastMd5                    = "com.joyent.util"                         % "fast-md5"                     % Versions.FastMd5
   val JUnit                      = "junit"                                   % "junit"                        % Versions.JUnit
   val Log4jCore                  = "org.apache.logging.log4j"                % "log4j-core"                   % Versions.Log4jCore
