@@ -11,26 +11,26 @@ def module(project: Project, moduleName: String) =
     .settings(name := s"apso-$moduleName")
     .settings(commonSettings: _*)
 
-lazy val akkaHttp      = module(project, "akka-http").dependsOn(core, testkit % Test)
-lazy val aws           = module(project, "aws").dependsOn(core)
+lazy val akkaHttp      = module(project, "akka-http").dependsOn(log, core % Test, testkit % Test)
+lazy val aws           = module(project, "aws").dependsOn(core, log)
 lazy val caching       = module(project, "caching")
 lazy val collections   = module(project, "collections")
 lazy val core          = module(project, "core").dependsOn(testkit % Test)
-lazy val elasticsearch = module(project, "elasticsearch").dependsOn(core, testkit % Test)
-lazy val encryption    = module(project, "encryption").dependsOn(core)
+lazy val elasticsearch = module(project, "elasticsearch").dependsOn(log, testkit % Test)
+lazy val encryption    = module(project, "encryption").dependsOn(log)
 lazy val hashing       = module(project, "hashing")
 lazy val io            = module(project, "io").dependsOn(aws, testkit % Test)
-lazy val json          = module(project, "json").dependsOn(core, collections)
-lazy val profiling     = module(project, "profiling").dependsOn(core)
+lazy val json          = module(project, "json")
+lazy val log           = module(project, "log")
+lazy val profiling     = module(project, "profiling").dependsOn(core, log)
 lazy val testkit       = module(project, "testkit")
 lazy val time          = module(project, "time")
 
 lazy val apso = (project in file("."))
   .settings(commonSettings: _*)
   .settings(name := "apso")
-  .dependsOn(akkaHttp, aws, caching, collections, core, elasticsearch, encryption, hashing, io, json, profiling, time)
-  .aggregate(akkaHttp, aws, caching, collections, core, elasticsearch, encryption, hashing, io, json, profiling, testkit, time)
-
+  .dependsOn(akkaHttp, aws, caching, collections, core, elasticsearch, encryption, hashing, io, json, log, profiling, time)
+  .aggregate(akkaHttp, aws, caching, collections, core, elasticsearch, encryption, hashing, io, json, log, profiling, testkit, time)
 
 lazy val docs = (project in file("apso-docs"))
   .dependsOn(apso)
@@ -48,7 +48,6 @@ lazy val docs = (project in file("apso-docs"))
     skip in publish := true
   )
   .enablePlugins(MdocPlugin)
-
 
 lazy val commonSettings = Seq(
   resolvers ++= Seq(
