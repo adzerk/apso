@@ -11,4 +11,5 @@ libraryDependencies ++= Seq(
   TypesafeConfig % Provided,
   CirceLiteral   % Test,
   Specs2Core     % Test,
-  Specs2JUnit    % Test)
+  Specs2JUnit    % Test
+)

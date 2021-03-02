@@ -12,15 +12,15 @@ trait RemoteFileDescriptor { this: FileDescriptor =>
 
   private def sanitize(segment: String): Option[String] = {
     val whiteSpaceValidated = segment.trim match {
-      case "" => None
+      case ""  => None
       case str => Some(str)
     }
 
     whiteSpaceValidated.map {
       _.count(_ == '/') match {
-        case 0 => segment
+        case 0                          => segment
         case 1 if segment.endsWith("/") => segment.dropRight(1)
-        case _ => throw new IllegalArgumentException("path cannot contain /")
+        case _                          => throw new IllegalArgumentException("path cannot contain /")
       }
     }
   }

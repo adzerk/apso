@@ -7,4 +7,5 @@ libraryDependencies ++= Seq(
   ScalaPool,
   SshJ,
   TypesafeConfig,
-  Specs2Core     % Test)
+  Specs2Core % Test
+)

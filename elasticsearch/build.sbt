@@ -14,4 +14,5 @@ libraryDependencies ++= Seq(
   AkkaHttpTestkit       % Test,
   AkkaTestkitSpecs2     % Test,
   Specs2Core            % Test,
-  Specs2ScalaCheck      % Test)
+  Specs2ScalaCheck      % Test
+)

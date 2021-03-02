@@ -2,19 +2,19 @@ package com.velocidi.apso
 
 import scala.compat.Platform._
 
-/**
- * A widget for printing a dynamic progress bar in a console.
- * @param total the number representing the full progress bar
- * @param width the line width of the progress bar
- * @param throughputUnit the throughput unit that is being measured
- * @param throughputTransformer a function to transform the measured throughput
- *                              value, before displaying it
- */
+/** A widget for printing a dynamic progress bar in a console.
+  * @param total the number representing the full progress bar
+  * @param width the line width of the progress bar
+  * @param throughputUnit the throughput unit that is being measured
+  * @param throughputTransformer a function to transform the measured throughput
+  *                              value, before displaying it
+  */
 case class ProgressBar(
     total: Long = 100,
     width: Int = 80,
     throughputUnit: String = "ops",
-    throughputTransformer: Double => Double = identity) {
+    throughputTransformer: Double => Double = identity
+) {
   private[this] var done = 0L
   private[this] val startTimestamp = currentTime
 
@@ -26,17 +26,15 @@ case class ProgressBar(
     workchars(lastChar)
   }
 
-  /**
-   * Increase the progress by one.
-   */
+  /** Increase the progress by one.
+    */
   def tick() {
     tick(1)
   }
 
-  /**
-   * Increase the progress by the given number of units.
-   * @param inc the number of progress units to increase
-   */
+  /** Increase the progress by the given number of units.
+    * @param inc the number of progress units to increase
+    */
   def tick(inc: Long) {
     if (!isFinished) {
       done += inc
@@ -68,9 +66,8 @@ case class ProgressBar(
     }
   }
 
-  /**
-   * Returns `true` if this progress bar is full.
-   * @return `true` if this progress bar is full, `false` otherwise.
-   */
+  /** Returns `true` if this progress bar is full.
+    * @return `true` if this progress bar is full, `false` otherwise.
+    */
   def isFinished = done >= total
 }

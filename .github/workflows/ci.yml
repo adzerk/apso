@@ -13,10 +13,12 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        scala: [2.12.10, 2.13.1]
-
-    env:
-      SCALA_VERSION: ${{ matrix.scala }}
+        scala: ['2.12', '2.13']
+        include:
+          - scala: '2.12'
+            scala-version: 2.12.12
+          - scala: '2.13'
+            scala-version: 2.13.4
 
     steps:
     - uses: actions/checkout@v2
@@ -39,7 +41,11 @@ jobs:
       with:
         path: ~/.sbt
         key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
+    - name: Compile and check format
+      run: >-
+        sbt ++$SCALA_VERSION scalafmtSbt test:compile &&
+        git diff --exit-code
     - name: Run tests
-      run: sbt -Dsbt.color=always ++$SCALA_VERSION test:compile test
+      run: sbt -Dsbt.color=always ++${{ matrix.scala-version }} test
     - name: Check mdoc for uncommitted changes
       run: sbt -Dsbt.color=always "docs/mdoc --check"
