@@ -42,9 +42,6 @@ lazy val docs = (project in file("apso-docs"))
       "VERSION" -> "0.16.3" // This version should be set to the currently released version.
     ),
 
-    // This is necessary because `aws-java-sdk-s3` has the `provided` scope in apso-aws
-    libraryDependencies ++= Seq(Dependencies.AwsJavaSdkS3),
-
     skip in publish := true
   )
   .enablePlugins(MdocPlugin)
