@@ -4,8 +4,8 @@ import scala.util.{ Failure, Success }
 
 import io.circe.CursorOp.DownField
 import io.circe.Decoder.Result
-import io.circe.{ Decoder, DecodingFailure, Json }
 import io.circe.syntax._
+import io.circe.{ Decoder, DecodingFailure, Json }
 import org.specs2.mutable.Specification
 
 class ExtensionMethodsSpec extends Specification {

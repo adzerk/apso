@@ -2,9 +2,9 @@ package com.velocidi.apso.encryption
 
 import java.io.InputStream
 import java.security.{ Key, MessageDigest }
-
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
+
 import org.apache.commons.codec.binary.Base64
 
 import com.velocidi.apso.Logging

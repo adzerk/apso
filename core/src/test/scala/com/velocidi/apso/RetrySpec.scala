@@ -1,9 +1,10 @@
 package com.velocidi.apso
 
-import org.specs2.concurrent.ExecutionEnv
-import org.specs2.mutable.Specification
 import scala.concurrent.Future
 import scala.util.Failure
+
+import org.specs2.concurrent.ExecutionEnv
+import org.specs2.mutable.Specification
 
 class RetrySpec(implicit ee: ExecutionEnv) extends Specification with FutureExtraMatchers {
 

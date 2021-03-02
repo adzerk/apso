@@ -1,7 +1,7 @@
 package com.velocidi.apso.collection
 
-import org.specs2.mutable._
 import org.specs2.matcher.MatchResult
+import org.specs2.mutable._
 
 class TrieSpec extends Specification {
   "A Trie" should {

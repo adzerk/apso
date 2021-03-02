@@ -1,7 +1,7 @@
 package com.velocidi.apso.time
 
-import org.joda.time.ReadableInterval
 import com.github.nscala_time.time.Imports._
+import org.joda.time.ReadableInterval
 
 /**
  * Object containing implicit classes and methods related to datetime libraries.

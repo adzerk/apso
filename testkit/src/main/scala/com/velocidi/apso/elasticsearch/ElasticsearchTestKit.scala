@@ -3,18 +3,18 @@ package com.velocidi.apso.elasticsearch
 import scala.concurrent.duration._
 import scala.util.Random
 
+import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.http.JavaClient
 import com.sksamuel.elastic4s.requests.indexes.CreateIndexTemplateRequest
-import com.sksamuel.elastic4s.requests.mappings.{ KeywordField, MappingDefinition }
 import com.sksamuel.elastic4s.requests.mappings.dynamictemplate.DynamicTemplateRequest
+import com.sksamuel.elastic4s.requests.mappings.{ KeywordField, MappingDefinition }
 import com.sksamuel.elastic4s.testkit._
+import com.sksamuel.elastic4s.{ ElasticClient, ElasticProperties }
+import org.codelibs.elasticsearch.runner.ElasticsearchClusterRunner
+import org.elasticsearch.common.settings.Settings
 import org.scalatest.Suite
 import org.specs2.mutable._
 import org.specs2.specification._
-import com.sksamuel.elastic4s.ElasticDsl._
-import com.sksamuel.elastic4s.{ ElasticClient, ElasticProperties }
-import com.sksamuel.elastic4s.http.JavaClient
-import org.codelibs.elasticsearch.runner.ElasticsearchClusterRunner
-import org.elasticsearch.common.settings.Settings
 
 trait ElasticsearchTestKit extends NoSpecElasticsearchTestKit with AfterAll {
   this: SpecificationLike =>

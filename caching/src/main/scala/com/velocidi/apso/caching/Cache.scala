@@ -19,7 +19,7 @@
 
 package com.velocidi.apso.caching
 
-import scala.concurrent.{ Promise, Future, ExecutionContext }
+import scala.concurrent.{ ExecutionContext, Future, Promise }
 import scala.util.control.NonFatal
 
 /**
