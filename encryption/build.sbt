@@ -1,7 +1,7 @@
 import Dependencies._
 
 libraryDependencies ++= Seq(
-  BouncyCastlePkix,
+  BouncyCastlePkix % Runtime,
   BouncyCastleProvider,
   CommonsCodec,
   ScalaLogging)

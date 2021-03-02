@@ -1,7 +1,8 @@
 import Dependencies._
 
 libraryDependencies ++= Seq(
-  AwsJavaSdkS3   % Provided,
+  AwsJavaSdkS3,
+  AwsJavaSdkCore,
   ScalaLogging,
-  TypesafeConfig % Provided,
+  TypesafeConfig,
   Specs2Core     % Test)

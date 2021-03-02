@@ -2,11 +2,13 @@ import Dependencies._
 
 libraryDependencies ++= Seq(
   AkkaActor             % Provided,
-  AkkaActorTyped        % Provided,
-  AkkaStream            % Provided,
+  ApacheHttpAsyncClient,
+  ApacheHttpClient,
+  ApacheHttpCore,
   CirceCore,
-  Elastic4sClientEsJava % Provided,
-  Elastic4sCore         % Provided,
+  Elastic4sClientEsJava,
+  Elastic4sCore,
+  ElasticsearchRestClient,
   ScalaLogging,
   AkkaActorTestkitTyped % Test,
   AkkaHttpTestkit       % Test,
