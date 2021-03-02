@@ -2,7 +2,7 @@ package com.velocidi.apso
 
 import java.io.Closeable
 
-import scala.util.{ Failure, Success }
+import scala.util.{Failure, Success}
 
 import org.specs2.mutable.Specification
 

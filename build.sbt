@@ -1,4 +1,3 @@
-import scalariform.formatter.preferences._
 import ReleaseTransformations._
 
 organization in ThisBuild := "com.velocidi"
@@ -29,13 +28,27 @@ lazy val apso = (project in file("."))
   .settings(commonSettings: _*)
   .settings(name := "apso")
   .dependsOn(akkaHttp, aws, caching, collections, core, elasticsearch, encryption, hashing, io, json, profiling, time)
-  .aggregate(akkaHttp, aws, caching, collections, core, elasticsearch, encryption, hashing, io, json, profiling, testkit, time)
-
+  .aggregate(
+    akkaHttp,
+    aws,
+    caching,
+    collections,
+    core,
+    elasticsearch,
+    encryption,
+    hashing,
+    io,
+    json,
+    profiling,
+    testkit,
+    time
+  )
 
 lazy val docs = (project in file("apso-docs"))
   .dependsOn(apso)
   .settings(commonSettings: _*)
   .settings(
+    // format: off
     mdocOut := baseDirectory.in(ThisBuild).value,
 
     mdocVariables := Map(
@@ -46,11 +59,12 @@ lazy val docs = (project in file("apso-docs"))
     libraryDependencies ++= Seq(Dependencies.AwsJavaSdkS3),
 
     skip in publish := true
+    // format: on
   )
   .enablePlugins(MdocPlugin)
 
-
 lazy val commonSettings = Seq(
+  // format: off
   resolvers ++= Seq(
     Resolver.sonatypeRepo("snapshots"),
     Resolver.typesafeRepo("snapshots"),
@@ -58,9 +72,7 @@ lazy val commonSettings = Seq(
     "Bintray Scalaz Releases"       at "https://dl.bintray.com/scalaz/releases",
     "JCenter Repository"            at "https://jcenter.bintray.com/"),
 
-  scalariformPreferences := scalariformPreferences.value
-    .setPreference(DanglingCloseParenthesis, Prevent)
-    .setPreference(DoubleIndentConstructorArguments, true),
+  scalafmtOnCompile := true,
 
   scalacOptions ++= {
     lazy val commonFlags = Seq(
@@ -102,7 +114,9 @@ lazy val commonSettings = Seq(
       url("https://github.com/velocidi/apso"),
       "scm:git@github.com:velocidi/apso.git"
     )
-  ))
+  )
+  // format: on
+)
 
 releaseCrossBuild := true
 releaseTagComment := s"Release ${(version in ThisBuild).value}"
@@ -120,4 +134,5 @@ releaseProcess := Seq[ReleaseStep](
   releaseStepCommand("sonatypeBundleRelease"),
   setNextVersion,
   commitNextVersion,
-  pushChanges)
+  pushChanges
+)

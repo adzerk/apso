@@ -5,7 +5,7 @@ import JreVersionHelper._
 trait JreVersionHelper {
   def jreVersion: (Int, Int) = System.getProperty("java.version") match {
     case VersionRegex(ma, mi) => (ma.toInt, mi.toInt)
-    case v => throw new Exception(s"Cannot parse JRE version: $v")
+    case v                    => throw new Exception(s"Cannot parse JRE version: $v")
   }
 }
 

@@ -1,20 +1,19 @@
 package com.velocidi.apso.config
 
 import java.io.File
-import java.net.{ MalformedURLException, URL }
+import java.net.{MalformedURLException, URL}
 
 import com.typesafe.config._
 import com.typesafe.config.impl.Parseable
 
-/**
- * Contains static methods for creating `Config` instances in a lazy way.
- *
- * The loading process resolves variables lazily - configurations are first completely loaded and merged
- * (reference.conf, the application file and default overrides) and only then are variables resolved. This
- * `ConfigFactory` also considers a third standard configuration file, `overrides.conf`, which has priority over the
- * application file and can be used to specify keys that should always be overriden, e.g. by environment variables if
- * they are defined.
- */
+/** Contains static methods for creating `Config` instances in a lazy way.
+  *
+  * The loading process resolves variables lazily - configurations are first completely loaded and merged
+  * (reference.conf, the application file and default overrides) and only then are variables resolved. This
+  * `ConfigFactory` also considers a third standard configuration file, `overrides.conf`, which has priority over the
+  * application file and can be used to specify keys that should always be overriden, e.g. by environment variables if
+  * they are defined.
+  */
 object LazyConfigFactory {
 
   lazy val load: Config = load(ConfigParseOptions.defaults, ConfigResolveOptions.defaults)
@@ -22,25 +21,28 @@ object LazyConfigFactory {
   def load(resourceBasename: String): Config = load(
     ConfigFactory.parseResourcesAnySyntax(resourceBasename),
     ConfigParseOptions.defaults,
-    ConfigResolveOptions.defaults)
+    ConfigResolveOptions.defaults
+  )
 
   def load(parseOptions: ConfigParseOptions, resolveOptions: ConfigResolveOptions): Config =
     load(defaultApplication(parseOptions), parseOptions, resolveOptions)
 
   def load(config: Config, parseOptions: ConfigParseOptions, resolveOptions: ConfigResolveOptions): Config =
-    defaultOverrides(parseOptions).
-      withFallback(config).
-      withFallback(defaultEnvReference(parseOptions)).
-      withFallback(defaultReference(parseOptions)).
-      resolve(resolveOptions)
+    defaultOverrides(parseOptions)
+      .withFallback(config)
+      .withFallback(defaultEnvReference(parseOptions))
+      .withFallback(defaultReference(parseOptions))
+      .resolve(resolveOptions)
 
   def defaultOverrides(parseOptions: ConfigParseOptions): Config =
-    ConfigFactory.systemProperties.
-      withFallback(Parseable.newResources("overrides.conf", parseOptions).parse.toConfig)
+    ConfigFactory.systemProperties.withFallback(Parseable.newResources("overrides.conf", parseOptions).parse.toConfig)
 
   def defaultApplication(parseOptions: ConfigParseOptions): Config = {
     val loader = parseOptions.getClassLoader
-    if (loader == null) throw new ConfigException.BugOrBroken("ClassLoader should have been set here; bug in ConfigFactory. " + "(You can probably work around this bug by passing in a class loader or calling currentThread().setContextClassLoader() though.)")
+    if (loader == null)
+      throw new ConfigException.BugOrBroken(
+        "ClassLoader should have been set here; bug in ConfigFactory. " + "(You can probably work around this bug by passing in a class loader or calling currentThread().setContextClassLoader() though.)"
+      )
     var specified: Int = 0
     var resource = System.getProperty("config.resource")
     if (resource != null) specified += 1
@@ -51,8 +53,10 @@ object LazyConfigFactory {
     if (specified == 0) {
       ConfigFactory.parseResourcesAnySyntax(loader, "application", parseOptions)
     } else if (specified > 1) {
-      throw new ConfigException.Generic("You set more than one of config.file='" + file + "', config.url='" + url +
-        "', config.resource='" + resource + "'; don't know which one to use!")
+      throw new ConfigException.Generic(
+        "You set more than one of config.file='" + file + "', config.url='" + url +
+          "', config.resource='" + resource + "'; don't know which one to use!"
+      )
     } else {
       val overrideOptions: ConfigParseOptions = parseOptions.setAllowMissing(false)
       if (resource != null) {
@@ -65,7 +69,10 @@ object LazyConfigFactory {
           ConfigFactory.parseURL(new URL(url), overrideOptions)
         } catch {
           case e: MalformedURLException =>
-            throw new ConfigException.Generic("Bad URL in config.url system property: '" + url + "': " + e.getMessage, e)
+            throw new ConfigException.Generic(
+              "Bad URL in config.url system property: '" + url + "': " + e.getMessage,
+              e
+            )
         }
       }
     }

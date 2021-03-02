@@ -14,4 +14,5 @@ libraryDependencies ++= Seq(
   ScalaCheck        % Test,
   Specs2Core        % Test,
   Specs2JUnit       % Test,
-  Specs2ScalaCheck  % Test)
+  Specs2ScalaCheck  % Test
+)
