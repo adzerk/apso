@@ -49,11 +49,12 @@ class ImplicitsSpec extends Specification with ScalaCheck with FutureExtraMatche
       elementCounts.keys.size must beCloseTo(elems.size +/- 5)
 
       // Expected probability of a number being picked
-      val prob = (1 to n).foldLeft((elems.size, 0.0)) {
-        case ((rem, acc), _) =>
+      val prob = (1 to n)
+        .foldLeft((elems.size, 0.0)) { case ((rem, acc), _) =>
           val newAcc = acc + (1.0 - acc) * (1.0 / (rem - 1))
           (rem - 1, newAcc)
-      }._2
+        }
+        ._2
 
       elementCounts.values.sum.toDouble / (elementCounts.size * runs) must beCloseTo(prob +/- 0.05)
     }
@@ -113,11 +114,12 @@ class ImplicitsSpec extends Specification with ScalaCheck with FutureExtraMatche
 
       rand.samples(Map.empty[String, Double]) must beEmpty
 
-      val sampleDistr = rand.samples(map).take(runs).
-        foldLeft(Map.empty[String, Int]) { case (acc, k) => acc.updated(k, acc.getOrElse(k, 0) + 1) }
+      val sampleDistr = rand.samples(map).take(runs).foldLeft(Map.empty[String, Int]) { case (acc, k) =>
+        acc.updated(k, acc.getOrElse(k, 0) + 1)
+      }
 
-      forall(map) {
-        case (k, prob) => sampleDistr(k).toDouble must beCloseTo(runs * prob, runs * prob * 0.1)
+      forall(map) { case (k, prob) =>
+        sampleDistr(k).toDouble must beCloseTo(runs * prob, runs * prob * 0.1)
       }
     }
 

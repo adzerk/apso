@@ -25,21 +25,27 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpeci
       useHttps = false,
       username = None,
       password = None,
-      bulkInserter = Some(Elasticsearch.BulkInserter(
-        flushFrequency = flushFreq,
-        esDownCheckFrequency = 10.seconds,
-        maxBufferSize = maxBufferSize,
-        maxTryCount = 3)))
+      bulkInserter = Some(
+        Elasticsearch.BulkInserter(
+          flushFrequency = flushFreq,
+          esDownCheckFrequency = 10.seconds,
+          maxBufferSize = maxBufferSize,
+          maxTryCount = 3
+        )
+      )
+    )
   }
 
   def testBulkInserter(
-    maxBufferSize: Int = Int.MaxValue,
-    flushFreq: FiniteDuration = 1.day,
-    esStateListener: ActorRef = system.deadLetters): ActorRef = {
+      maxBufferSize: Int = Int.MaxValue,
+      flushFreq: FiniteDuration = 1.day,
+      esStateListener: ActorRef = system.deadLetters
+  ): ActorRef = {
     val actorRef = system.actorOf(
       ElasticsearchBulkInserter
         .props(testBulkInserterConfig(maxBufferSize, flushFreq))
-        .withDispatcher("flush-prio-dispatcher"))
+        .withDispatcher("flush-prio-dispatcher")
+    )
     actorRef ! esStateListener
     actorRef
   }
@@ -53,13 +59,16 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpeci
 
   private implicit class ExtraMatchers[T](m: Matcher[T]) {
     def retry(
-      awaitFor: FiniteDuration = 5.seconds,
-      eventuallyRetries: Int = 5,
-      eventuallyWait: FiniteDuration = 2.seconds) = m.awaitFor(awaitFor).eventually(eventuallyRetries, eventuallyWait)
+        awaitFor: FiniteDuration = 5.seconds,
+        eventuallyRetries: Int = 5,
+        eventuallyWait: FiniteDuration = 2.seconds
+    ) = m.awaitFor(awaitFor).eventually(eventuallyRetries, eventuallyWait)
   }
 
   "An ElasticsearchBulkInserter" should {
-    Seq("test-index-1", "test-index-2", "test-index-3", "test-index-4", "test-index-5", "test-index-6").foreach(ensureIndexExists)
+    Seq("test-index-1", "test-index-2", "test-index-3", "test-index-4", "test-index-5", "test-index-6").foreach(
+      ensureIndexExists
+    )
 
     "collect events and send them in bulk to Elasticsearch after a buffer is filled" in {
       val msgIndex = "test-index-1"
@@ -92,7 +101,9 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpeci
       val bulkInserter = testBulkInserter(maxBufferSize = 2)
 
       // use a mapping that does not allow for extra fields other than the "name" one
-      esClient.execute(putMapping(msgIndex) rawSource """{"dynamic":"strict","properties":{"name":{"type":"text"}}}""") must
+      esClient.execute(
+        putMapping(msgIndex) rawSource """{"dynamic":"strict","properties":{"name":{"type":"text"}}}"""
+      ) must
         beAnInstanceOf[RequestSuccess[_]].awaitFor(5.seconds)
 
       // insert a (valid) document
@@ -122,7 +133,9 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpeci
         val bulkInserter = testBulkInserter(maxBufferSize = 2, flushFreq = 1.day)
 
         // use a mapping that does not allow for extra fields other than the "name" one
-        esClient.execute(putMapping(msgIndex) rawSource """{"dynamic":"strict","properties":{"name":{"type":"text"}}}""") must
+        esClient.execute(
+          putMapping(msgIndex) rawSource """{"dynamic":"strict","properties":{"name":{"type":"text"}}}"""
+        ) must
           beAnInstanceOf[RequestSuccess[_]].awaitFor(5.seconds)
 
         // insert valid documents
@@ -163,7 +176,9 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpeci
         val bulkInserter = testBulkInserter(maxBufferSize = 2, flushFreq = 500.millis)
 
         // use a mapping that does not allow for extra fields other than the "name" one
-        esClient.execute(putMapping(msgIndex) rawSource """{"dynamic":"strict","properties":{"name":{"type":"text"}}}""") must
+        esClient.execute(
+          putMapping(msgIndex) rawSource """{"dynamic":"strict","properties":{"name":{"type":"text"}}}"""
+        ) must
           beAnInstanceOf[RequestSuccess[_]].awaitFor(5.seconds)
 
         // insert an invalid document that will be retried

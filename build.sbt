@@ -1,4 +1,3 @@
-import scalariform.formatter.preferences._
 import ReleaseTransformations._
 
 organization in ThisBuild := "com.velocidi"
@@ -29,28 +28,40 @@ lazy val apso = (project in file("."))
   .settings(commonSettings: _*)
   .settings(name := "apso")
   .dependsOn(akkaHttp, aws, caching, collections, core, elasticsearch, encryption, hashing, io, json, profiling, time)
-  .aggregate(akkaHttp, aws, caching, collections, core, elasticsearch, encryption, hashing, io, json, profiling, testkit, time)
-
+  .aggregate(
+    akkaHttp,
+    aws,
+    caching,
+    collections,
+    core,
+    elasticsearch,
+    encryption,
+    hashing,
+    io,
+    json,
+    profiling,
+    testkit,
+    time
+  )
 
 lazy val docs = (project in file("apso-docs"))
   .dependsOn(apso)
   .settings(commonSettings: _*)
   .settings(
+    // format: off
     mdocOut := baseDirectory.in(ThisBuild).value,
 
     mdocVariables := Map(
       "VERSION" -> "0.16.3" // This version should be set to the currently released version.
     ),
 
-    // This is necessary because `aws-java-sdk-s3` has the `provided` scope in apso-aws
-    libraryDependencies ++= Seq(Dependencies.AwsJavaSdkS3),
-
     skip in publish := true
+    // format: on
   )
   .enablePlugins(MdocPlugin)
 
-
 lazy val commonSettings = Seq(
+  // format: off
   resolvers ++= Seq(
     Resolver.sonatypeRepo("snapshots"),
     Resolver.typesafeRepo("snapshots"),
@@ -58,9 +69,7 @@ lazy val commonSettings = Seq(
     "Bintray Scalaz Releases"       at "https://dl.bintray.com/scalaz/releases",
     "JCenter Repository"            at "https://jcenter.bintray.com/"),
 
-  scalariformPreferences := scalariformPreferences.value
-    .setPreference(DanglingCloseParenthesis, Prevent)
-    .setPreference(DoubleIndentConstructorArguments, true),
+  scalafmtOnCompile := true,
 
   // Enable Scalafix and the OrganizeImports rule.
   semanticdbEnabled := true,
@@ -107,7 +116,9 @@ lazy val commonSettings = Seq(
       url("https://github.com/velocidi/apso"),
       "scm:git@github.com:velocidi/apso.git"
     )
-  ))
+  )
+  // format: on
+)
 
 // Enable the OrganizeImports Scalafix rule.
 scalafixDependencies in ThisBuild += "com.github.liancheng" %% "organize-imports" % "0.5.0"
@@ -128,4 +139,5 @@ releaseProcess := Seq[ReleaseStep](
   releaseStepCommand("sonatypeBundleRelease"),
   setNextVersion,
   commitNextVersion,
-  pushChanges)
+  pushChanges
+)

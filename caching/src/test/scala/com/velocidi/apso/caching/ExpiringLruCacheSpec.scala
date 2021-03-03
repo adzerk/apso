@@ -20,7 +20,7 @@ import java.util.Random
 import java.util.concurrent.CountDownLatch
 
 import scala.concurrent.duration._
-import scala.concurrent.{ Future, Promise }
+import scala.concurrent.{Future, Promise}
 
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.matcher.Matcher
@@ -29,8 +29,12 @@ import org.specs2.mutable.Specification
 class ExpiringLruCacheSpec(implicit ee: ExecutionEnv) extends Specification {
   val timeout = 15.seconds
 
-  def lruCache[T](maxCapacity: Int = 500, initialCapacity: Int = 16,
-    timeToLive: Duration = Duration.Inf, timeToIdle: Duration = Duration.Inf) =
+  def lruCache[T](
+      maxCapacity: Int = 500,
+      initialCapacity: Int = 16,
+      timeToLive: Duration = Duration.Inf,
+      timeToIdle: Duration = Duration.Inf
+  ) =
     new ExpiringLruCache[T](maxCapacity, initialCapacity, timeToLive, timeToIdle)
 
   val beConsistent: Matcher[Seq[Int]] =
@@ -52,7 +56,9 @@ class ExpiringLruCacheSpec(implicit ee: ExecutionEnv) extends Specification {
     "return stored values upon cache hit on existing values" in {
       val cache = lruCache[String]()
       cache(1)("A") must beEqualTo("A").await
-      cache(1)(failure("Cached expression was evaluated despite a cache hit").asInstanceOf[String]) must beEqualTo("A").await
+      cache(1)(failure("Cached expression was evaluated despite a cache hit").asInstanceOf[String]) must beEqualTo(
+        "A"
+      ).await
       cache.store.toString === "{1=A}"
       cache.size === 1
     }
@@ -128,8 +134,12 @@ class ExpiringLruCacheSpec(implicit ee: ExecutionEnv) extends Specification {
               if (array(ix) == 0)
                 array(ix) = value
               if (array(ix) != value) {
-                Future.failed(new Throwable("Cache view is inconsistent (track " + track + ", iteration " + i +
-                  ", index " + ix + ": expected " + array(ix) + " but is " + value))
+                Future.failed(
+                  new Throwable(
+                    "Cache view is inconsistent (track " + track + ", iteration " + i +
+                      ", index " + ix + ": expected " + array(ix) + " but is " + value
+                  )
+                )
               } else
                 Future.successful(())
             }
@@ -141,7 +151,8 @@ class ExpiringLruCacheSpec(implicit ee: ExecutionEnv) extends Specification {
 
       val views = fs.flatMap(s => Future.sequence(s))
 
-      views must beLike[Seq[Array[Int]]] { case v => forall(v.transpose)(_ must beConsistent) }.await(retries = 0, timeout = timeout)
+      views must beLike[Seq[Array[Int]]] { case v => forall(v.transpose)(_ must beConsistent) }
+        .await(retries = 0, timeout = timeout)
     }
   }
 }

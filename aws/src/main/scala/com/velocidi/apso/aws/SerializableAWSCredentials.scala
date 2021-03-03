@@ -1,6 +1,6 @@
 package com.velocidi.apso.aws
 
-import com.amazonaws.auth.{ AWSCredentials, BasicAWSCredentials }
+import com.amazonaws.auth.{AWSCredentials, BasicAWSCredentials}
 
 case class SerializableAWSCredentials(accessKey: String, secretKey: String) extends AWSCredentials {
   def getAWSAccessKeyId: String = accessKey

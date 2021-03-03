@@ -41,7 +41,12 @@ class IterableIntervalSpec extends Specification {
         Seq(new DateTime("2012-01-01"), new DateTime("2012-01-02"))
 
       (new DateTime("2012-01-29") until new DateTime("2012-02-02")).toSeq mustEqual
-        Seq(new DateTime("2012-01-29"), new DateTime("2012-01-30"), new DateTime("2012-01-31"), new DateTime("2012-02-01"))
+        Seq(
+          new DateTime("2012-01-29"),
+          new DateTime("2012-01-30"),
+          new DateTime("2012-01-31"),
+          new DateTime("2012-02-01")
+        )
 
       (new DateTime("2012-02-29") until new DateTime("2012-03-02")).toSeq mustEqual
         Seq(new DateTime("2012-02-29"), new DateTime("2012-03-01"))
@@ -54,8 +59,13 @@ class IterableIntervalSpec extends Specification {
         Seq(new DateTime("2012-01-01"))
 
       (new DateTime(2012, 1, 29, 1, 0) until new DateTime(2012, 1, 29, 1, 10) by 2.minutes).toSeq mustEqual
-        Seq(new DateTime(2012, 1, 29, 1, 0), new DateTime(2012, 1, 29, 1, 2), new DateTime(2012, 1, 29, 1, 4),
-          new DateTime(2012, 1, 29, 1, 6), new DateTime(2012, 1, 29, 1, 8))
+        Seq(
+          new DateTime(2012, 1, 29, 1, 0),
+          new DateTime(2012, 1, 29, 1, 2),
+          new DateTime(2012, 1, 29, 1, 4),
+          new DateTime(2012, 1, 29, 1, 6),
+          new DateTime(2012, 1, 29, 1, 8)
+        )
     }
   }
 }
