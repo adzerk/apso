@@ -1,10 +1,10 @@
 package com.velocidi.apso.io
 
-import java.io.{ FileInputStream, FileWriter, InputStream }
-import java.nio.file.{ Files, Path, Paths, StandardCopyOption }
+import java.io.{FileInputStream, FileWriter, InputStream}
+import java.nio.file.{Files, Path, Paths, StandardCopyOption}
 
 import scala.io.Source
-import scala.util.{ Failure, Success, Try }
+import scala.util.{Failure, Success, Try}
 
 import com.velocidi.apso.Implicits.ApsoCloseable
 import com.velocidi.apso.Logging
@@ -43,8 +43,8 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
   }
 
   override def children(names: String*): LocalFileDescriptor = {
-    val childPath = names.foldLeft(normalizedPath) {
-      (acc, child) => acc.resolve(child)
+    val childPath = names.foldLeft(normalizedPath) { (acc, child) =>
+      acc.resolve(child)
     }
     LocalFileDescriptor(childPath.toString)
   }
@@ -52,8 +52,8 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
   override def cd(pathString: String): LocalFileDescriptor = {
     val newPath = pathString.split("/").map(_.trim).toList.foldLeft(normalizedPath) {
       case (acc, "." | "") => acc
-      case (acc, "..") => acc.getParent
-      case (acc, segment) => acc.resolve(segment)
+      case (acc, "..")     => acc.getParent
+      case (acc, segment)  => acc.resolve(segment)
     }
     LocalFileDescriptor(newPath.toString)
   }
@@ -63,16 +63,16 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
       throw new Exception("File descriptor points to a directory")
     } else {
 
-      val downloadFile = if (safeDownloading) localTarget.sibling(_ + ".tmp")
-      else localTarget
+      val downloadFile =
+        if (safeDownloading) localTarget.sibling(_ + ".tmp")
+        else localTarget
 
       localTarget.parent().mkdirs()
 
-      val result = Try(Files.copy(normalizedPath, downloadFile.normalizedPath,
-        StandardCopyOption.REPLACE_EXISTING))
+      val result = Try(Files.copy(normalizedPath, downloadFile.normalizedPath, StandardCopyOption.REPLACE_EXISTING))
 
       result match {
-        case Success(_) => if (safeDownloading) downloadFile.rename(localTarget)
+        case Success(_)  => if (safeDownloading) downloadFile.rename(localTarget)
         case Failure(ex) => log.warn(s"File copy failed ($ex)")
       }
 
@@ -87,11 +87,10 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
 
       parent().mkdirs()
 
-      val result = Try(Files.copy(localTarget.normalizedPath, normalizedPath,
-        StandardCopyOption.REPLACE_EXISTING))
+      val result = Try(Files.copy(localTarget.normalizedPath, normalizedPath, StandardCopyOption.REPLACE_EXISTING))
 
       result match {
-        case Success(_) =>
+        case Success(_)  =>
         case Failure(ex) => log.warn(s"File copy failed ($ex)")
       }
 
@@ -106,11 +105,10 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
 
       parent().mkdirs()
 
-      val result = Try(Files.copy(inputStream, normalizedPath,
-        StandardCopyOption.REPLACE_EXISTING))
+      val result = Try(Files.copy(inputStream, normalizedPath, StandardCopyOption.REPLACE_EXISTING))
 
       result match {
-        case Success(_) =>
+        case Success(_)  =>
         case Failure(ex) => log.warn(s"File copy failed ($ex)")
       }
 
@@ -139,9 +137,9 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
       val restStr = rest.headOption.getOrElse("")
 
       file.list.filter(_.name.startsWith(headStr)).flatMap {
-        case fd if fd.isDirectory => aux(fd, rest)
+        case fd if fd.isDirectory              => aux(fd, rest)
         case fd if fd.name.startsWith(restStr) => Seq(fd)
-        case _ => Seq()
+        case _                                 => Seq()
       }
     }
     aux(this, prefix.split('/'))
@@ -155,12 +153,11 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
 
   def delete(): Boolean = file.delete()
 
-  /**
-   * Deletes the directory associated with the file descriptor by recursively deleting all the
-   * directories and files inside it. Symbolic links are not followed and are just deleted as
-   * "regular" files.
-   * @return `true` if the delete was successful, `false` otherwise.
-   */
+  /** Deletes the directory associated with the file descriptor by recursively deleting all the
+    * directories and files inside it. Symbolic links are not followed and are just deleted as
+    * "regular" files.
+    * @return `true` if the delete was successful, `false` otherwise.
+    */
   def deleteDir(): Boolean = {
     def aux(fd: LocalFileDescriptor): Boolean = {
       if (isDirectory && !Files.isSymbolicLink(fd.normalizedPath)) {
@@ -173,44 +170,40 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
 
   def mkdirs(): Boolean = exists || file.mkdirs()
 
-  /**
-   * Renames the file pointed by the file descriptor
-   * @param to the file descriptor to be renamed to
-   * @return a Some of the renamed file descriptor if successful, otherwise None.
-   */
+  /** Renames the file pointed by the file descriptor
+    * @param to the file descriptor to be renamed to
+    * @return a Some of the renamed file descriptor if successful, otherwise None.
+    */
   def rename(to: LocalFileDescriptor): Option[LocalFileDescriptor] = {
     to.parent().mkdirs()
     if (file.renameTo(to.file)) Some(to) else None
   }
 
-  /**
-   * Writes the given string `str` to the file pointed by the file descriptor
-   * @param str the string to write to the file
-   */
+  /** Writes the given string `str` to the file pointed by the file descriptor
+    * @param str the string to write to the file
+    */
   def write(str: String): Unit = {
     parent().mkdirs()
     new FileWriter(path).tryUse(_.write(str))
   }
 
-  /**
-   * Writes the given byteArray to file pointed by the file descriptor
-   * @param byteArray the byte array to write to the file
-   */
+  /** Writes the given byteArray to file pointed by the file descriptor
+    * @param byteArray the byte array to write to the file
+    */
   def write(byteArray: Array[Byte]): Unit = {
     parent().mkdirs()
     Files.write(normalizedPath, byteArray)
   }
 
-  /**
-   * Reads the file pointed by the file descriptor and returns it in string format
-   * @return the contents of the file in string format
-   */
+  /** Reads the file pointed by the file descriptor and returns it in string format
+    * @return the contents of the file in string format
+    */
   def readString: String = Source.fromFile(file, "UTF-8").mkString
 
   override def toString: String = s"file://$path"
 
   override def equals(other: Any): Boolean = other match {
     case that: LocalFileDescriptor => path == that.path
-    case _ => false
+    case _                         => false
   }
 }

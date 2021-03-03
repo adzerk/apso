@@ -1,8 +1,11 @@
 import Dependencies._
 
 libraryDependencies ++= Seq(
+  ApacheHttpAsyncClient,
+  ApacheHttpClient,
+  ApacheHttpCore,
   CirceCore,
-  Log4jCore,
+  Log4jCore         % Runtime,
   ScalaLogging,
   TypesafeConfig    % Provided,
   UnirestJava,
@@ -13,4 +16,5 @@ libraryDependencies ++= Seq(
   ScalaCheck        % Test,
   Specs2Core        % Test,
   Specs2JUnit       % Test,
-  Specs2ScalaCheck  % Test)
+  Specs2ScalaCheck  % Test
+)

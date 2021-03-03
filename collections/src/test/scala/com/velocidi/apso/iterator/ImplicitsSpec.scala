@@ -28,7 +28,10 @@ class ImplicitsSpec extends Specification {
       Seq(Impl1(3)).iterator.buffered.mergeSorted(Seq(Impl2(5)).iterator.buffered).toSeq === Seq(Impl1(3), Impl2(5))
       Seq(Impl1(3)).iterator.buffered.mergeSorted(Seq(Impl2(5)).iterator.buffered).toSeq must beAnInstanceOf[Seq[Base]]
 
-      List(1, 4, 7).iterator.buffered.mergeSorted(List(2, 5, 8).iterator.buffered).mergeSorted(List(3, 6, 9).iterator.buffered).toList ===
+      List(1, 4, 7).iterator.buffered
+        .mergeSorted(List(2, 5, 8).iterator.buffered)
+        .mergeSorted(List(3, 6, 9).iterator.buffered)
+        .toList ===
         List(1, 2, 3, 4, 5, 6, 7, 8, 9)
     }
   }

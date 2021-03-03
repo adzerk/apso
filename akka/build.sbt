@@ -1,4 +1,3 @@
 import Dependencies._
 
-libraryDependencies ++= Seq(
-  AkkaActor % Provided)
+libraryDependencies ++= Seq(AkkaActor % Provided)

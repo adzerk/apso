@@ -1,12 +1,14 @@
 import Dependencies._
 
 libraryDependencies ++= Seq(
-  AkkaActor               % Provided,
-  AkkaActorTyped          % Provided,
-  AkkaHttp                % Provided,
-  AkkaStream              % Provided,
+  AkkaActor             % Provided,
+  AkkaHttp              % Provided,
+  AkkaHttpCore          % Provided,
+  AkkaStream            % Provided,
   ScalaLogging,
-  AkkaActorTestkitTyped   % Test,
-  AkkaHttpTestkit         % Test,
-  AkkaTestkitSpecs2       % Test,
-  Specs2Core              % Test)
+  TypesafeConfig,
+  AkkaActorTestkitTyped % Test,
+  AkkaHttpTestkit       % Test,
+  AkkaTestkitSpecs2     % Test,
+  Specs2Core            % Test
+)

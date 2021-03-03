@@ -1,5 +1,3 @@
 import Dependencies._
 
-libraryDependencies ++= Seq(
-  NscalaTime,
-  Specs2Core % Test)
+libraryDependencies ++= Seq(JodaTime, NscalaTime, Specs2Core % Test)
