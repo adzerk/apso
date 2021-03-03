@@ -10,7 +10,8 @@ case class Elasticsearch(
     useHttps: Boolean,
     username: Option[String] = None,
     password: Option[String] = None,
-    bulkInserter: Option[BulkInserter] = None) {
+    bulkInserter: Option[BulkInserter] = None
+) {
   require(username.isDefined == password.isDefined, "Both username and password must be provided!")
 }
 
@@ -19,5 +20,6 @@ object Elasticsearch {
       flushFrequency: FiniteDuration,
       esDownCheckFrequency: FiniteDuration,
       maxBufferSize: Int,
-      maxTryCount: Int)
+      maxTryCount: Int
+  )
 }

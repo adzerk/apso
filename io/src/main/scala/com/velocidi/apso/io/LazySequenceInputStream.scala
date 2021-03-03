@@ -2,14 +2,13 @@ package com.velocidi.apso.io
 
 import java.io.InputStream
 
-/**
- * Provides the same functionality as `java.io.SequenceInputStream`, i.e. a
- * `SequenceInputStream` represents the logical concatenation of other input streams.
- * Unlike `SequenceInputStream`, this implementation will open the concatenated input
- * streams lazily (as needed). At any point while reading from the stream, only one
- * underlying `InputStream` should be open.
- * @param streams A sequence of `InputStream` thunks
- */
+/** Provides the same functionality as `java.io.SequenceInputStream`, i.e. a
+  * `SequenceInputStream` represents the logical concatenation of other input streams.
+  * Unlike `SequenceInputStream`, this implementation will open the concatenated input
+  * streams lazily (as needed). At any point while reading from the stream, only one
+  * underlying `InputStream` should be open.
+  * @param streams A sequence of `InputStream` thunks
+  */
 class LazySequenceInputStream(private[this] var streams: Seq[() => InputStream]) extends InputStream {
   private[this] var current: InputStream = null
 

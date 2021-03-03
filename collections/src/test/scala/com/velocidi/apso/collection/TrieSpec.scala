@@ -8,9 +8,8 @@ class TrieSpec extends Specification {
     def checkTree[A, B](input: Seq[A], v: B, trie: Trie[A, B]): MatchResult[_] = {
       input match {
         case Seq(h, t @ _*) =>
-          trie.nodes.get(h) must beLike {
-            case Some(trie) =>
-              checkTree(t, v, trie)
+          trie.nodes.get(h) must beLike { case Some(trie) =>
+            checkTree(t, v, trie)
           }
 
         case _ =>

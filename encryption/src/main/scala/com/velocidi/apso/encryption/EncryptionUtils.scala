@@ -13,10 +13,9 @@ object BouncyCastleInitializer {
   def apply() = provider
 }
 
-/**
- * Loads and provide a `BouncyCastleProvider` and provides utility methods to encode in base64, load keystores and create
- * keys from raw password input.
- */
+/** Loads and provide a `BouncyCastleProvider` and provides utility methods to encode in base64, load keystores and create
+  * keys from raw password input.
+  */
 trait EncryptionUtils extends EncryptionErrorHandling {
   val provider = BouncyCastleInitializer()
 
@@ -58,8 +57,8 @@ object EncryptionUtils extends EncryptionUtils
 
 trait EncryptionErrorHandling {
 
-  protected def handler[T]: PartialFunction[Throwable, Option[T]] = {
-    case _: Exception => None
+  protected def handler[T]: PartialFunction[Throwable, Option[T]] = { case _: Exception =>
+    None
   }
 
   protected def handler[T](onException: Throwable => Unit): PartialFunction[Throwable, Option[T]] = {
@@ -68,7 +67,11 @@ trait EncryptionErrorHandling {
       None
   }
 
-  protected def handle[T](f: => T): Option[T] = try { Some(f) } catch handler[T]
-  protected def handle[T](f: => T, onException: Throwable => Unit): Option[T] = try { Some(f) } catch handler[T](onException)
-  protected def handle[T](f: => T, g: => Unit): Option[T] = try { Some(f) } catch handler[T] finally { g }
+  protected def handle[T](f: => T): Option[T] = try { Some(f) }
+  catch handler[T]
+  protected def handle[T](f: => T, onException: Throwable => Unit): Option[T] = try { Some(f) }
+  catch handler[T](onException)
+  protected def handle[T](f: => T, g: => Unit): Option[T] = try { Some(f) }
+  catch handler[T]
+  finally { g }
 }

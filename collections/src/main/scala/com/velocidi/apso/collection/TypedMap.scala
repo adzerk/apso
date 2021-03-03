@@ -2,10 +2,9 @@ package com.velocidi.apso.collection
 
 import scala.reflect.ClassTag
 
-/**
- * Typed map that associates types with values.
- * Based on http://stackoverflow.com/a/7337610/4243494
- */
+/** Typed map that associates types with values.
+  * Based on http://stackoverflow.com/a/7337610/4243494
+  */
 class TypedMap[T] private (val inner: Map[ClassTag[_], T]) {
   def +[U >: T, L <: U](t: Typed[L]) = new TypedMap[U](inner.+[U](t.toPair))
   def +[U >: T, L <: U: ClassTag](x: L)(implicit ct: ClassTag[L]) = new TypedMap[U](inner.+[U](ct -> x))
@@ -13,14 +12,15 @@ class TypedMap[T] private (val inner: Map[ClassTag[_], T]) {
 
   def apply[A <: T: ClassTag](implicit ct: ClassTag[A]): A = inner(ct).asInstanceOf[A]
   def get[A <: T: Manifest](implicit ct: ClassTag[A]): Option[A] = inner.get(ct).map(_.asInstanceOf[A])
-  def getOrElse[A <: T: ClassTag](default: => A)(implicit ct: ClassTag[A]): A = inner.getOrElse(ct, default).asInstanceOf[A]
+  def getOrElse[A <: T: ClassTag](default: => A)(implicit ct: ClassTag[A]): A =
+    inner.getOrElse(ct, default).asInstanceOf[A]
   def contains[A <: T: ClassTag](implicit ct: ClassTag[A]) = inner.contains(ct)
   def size = inner.size
   def values = inner.values
   override def toString = inner.toString()
   override def equals(other: Any) = other match {
     case that: TypedMap[_] => this.inner == that.inner
-    case _ => false
+    case _                 => false
   }
   override def hashCode = inner.hashCode()
 }
