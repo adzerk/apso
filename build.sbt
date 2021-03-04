@@ -10,6 +10,7 @@ def module(project: Project, moduleName: String) =
     .settings(name := s"apso-$moduleName")
     .settings(commonSettings: _*)
 
+lazy val akka          = module(project, "akka")
 lazy val akkaHttp      = module(project, "akka-http").dependsOn(core, testkit % Test)
 lazy val aws           = module(project, "aws").dependsOn(core)
 lazy val caching       = module(project, "caching")
@@ -27,8 +28,23 @@ lazy val time          = module(project, "time")
 lazy val apso = (project in file("."))
   .settings(commonSettings: _*)
   .settings(name := "apso")
-  .dependsOn(akkaHttp, aws, caching, collections, core, elasticsearch, encryption, hashing, io, json, profiling, time)
+  .dependsOn(
+    akka,
+    akkaHttp,
+    aws,
+    caching,
+    collections,
+    core,
+    elasticsearch,
+    encryption,
+    hashing,
+    io,
+    json,
+    profiling,
+    time
+  )
   .aggregate(
+    akka,
     akkaHttp,
     aws,
     caching,
