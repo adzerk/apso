@@ -10,6 +10,7 @@ def module(project: Project, moduleName: String) =
     .settings(name := s"apso-$moduleName")
     .settings(commonSettings: _*)
 
+lazy val akka          = module(project, "akka")
 lazy val akkaHttp      = module(project, "akka-http").dependsOn(log, core % Test, testkit % Test)
 lazy val aws           = module(project, "aws").dependsOn(core, log)
 lazy val caching       = module(project, "caching")
@@ -29,6 +30,7 @@ lazy val apso = (project in file("."))
   .settings(commonSettings: _*)
   .settings(name := "apso")
   .dependsOn(
+    akka,
     akkaHttp,
     aws,
     caching,
@@ -44,6 +46,7 @@ lazy val apso = (project in file("."))
     time
   )
   .aggregate(
+    akka,
     akkaHttp,
     aws,
     caching,
@@ -86,6 +89,11 @@ lazy val commonSettings = Seq(
     "JCenter Repository"            at "https://jcenter.bintray.com/"),
 
   scalafmtOnCompile := true,
+
+  // Enable Scalafix and the OrganizeImports rule.
+  semanticdbEnabled := true,
+  semanticdbVersion := scalafixSemanticdb.revision,
+  scalafixOnCompile := true,
 
   scalacOptions ++= {
     lazy val commonFlags = Seq(
@@ -130,6 +138,9 @@ lazy val commonSettings = Seq(
   )
   // format: on
 )
+
+// Enable the OrganizeImports Scalafix rule.
+scalafixDependencies in ThisBuild += "com.github.liancheng" %% "organize-imports" % "0.5.0"
 
 releaseCrossBuild := true
 releaseTagComment := s"Release ${(version in ThisBuild).value}"

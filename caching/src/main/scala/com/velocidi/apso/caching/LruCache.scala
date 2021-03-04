@@ -16,12 +16,13 @@
 
 package com.velocidi.apso.caching
 
-import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.{Failure, Success}
+
+import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap
 
 object LruCache {
 

@@ -43,7 +43,7 @@ jobs:
         key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
     - name: Compile and check format
       run: >-
-        sbt ++$SCALA_VERSION scalafmtSbt test:compile &&
+        sbt ++${{ matrix.scala-version }} scalafmtSbt test:compile &&
         git diff --exit-code
     - name: Run tests
       run: sbt -Dsbt.color=always ++${{ matrix.scala-version }} test
