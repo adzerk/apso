@@ -11,7 +11,7 @@ import akka.http.scaladsl.model.headers.{`Remote-Address`, `X-Forwarded-For`}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.RouteResult.Complete
 import akka.http.scaladsl.server.{Directive1, RequestContext, Route, RouteResult}
-import akka.stream.QueueOfferResult.{Dropped, Enqueued, QueueClosed, Failure => OfferFailure}
+import akka.stream.QueueOfferResult.{Dropped, Enqueued, Failure => OfferFailure, QueueClosed}
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{Materializer, OverflowStrategy}
 import com.typesafe.config.ConfigFactory
