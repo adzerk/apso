@@ -1,8 +1,10 @@
 package com.velocidi.apso
 
-import org.specs2.execute.{AsResult, Result, Skipped}
-import JreVersionTestHelper._
 import scala.math.Ordering.Implicits._
+
+import org.specs2.execute.{AsResult, Result, Skipped}
+
+import JreVersionTestHelper._
 
 trait JreVersionTestHelper {
   def jre[T](major: Int, minor: Int)(r: => T)(implicit evidence: AsResult[T]): Result = {

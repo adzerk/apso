@@ -1,9 +1,11 @@
 package com.velocidi.apso
 
 import java.io._
+
+import scala.reflect.ClassTag
+
 import org.specs2.matcher.{Expectable, MatchResult, Matcher}
 import org.specs2.mutable.SpecificationLike
-import scala.reflect.ClassTag
 
 trait CustomMatchers extends SpecificationLike {
   def serializationBufSize = 10000

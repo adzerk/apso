@@ -1,12 +1,12 @@
 package com.velocidi.apso.io
 
-import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
-
-import org.specs2.mutable.Specification
 import scala.util.Try
 
-import com.velocidi.apso.aws.S3Bucket
+import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
+import org.specs2.mutable.Specification
+
 import com.velocidi.apso.CustomMatchers
+import com.velocidi.apso.aws.S3Bucket
 
 class FileDescriptorSpec extends Specification with CustomMatchers {
 
