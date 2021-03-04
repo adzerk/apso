@@ -6,7 +6,7 @@ libraryDependencies ++= Seq(
   ApacheHttpClient,
   ApacheHttpCore,
   CirceCore,
-  Log4jCore % Runtime,
+  Log4jCore         % Runtime,
   ScalaLogging,
   TypesafeConfig    % Provided,
   UnirestJava,
