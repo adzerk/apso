@@ -1,4 +1,5 @@
 import ReleaseTransformations._
+import spray.boilerplate.BoilerplatePlugin
 
 organization in ThisBuild := "com.velocidi"
 
@@ -13,7 +14,7 @@ def module(project: Project, moduleName: String) =
 lazy val akka          = module(project, "akka")
 lazy val akkaHttp      = module(project, "akka-http").dependsOn(log, core % Test, testkit % Test)
 lazy val aws           = module(project, "aws").dependsOn(core, log)
-lazy val caching       = module(project, "caching")
+lazy val caching       = module(project, "caching").enablePlugins(BoilerplatePlugin)
 lazy val collections   = module(project, "collections")
 lazy val core          = module(project, "core").dependsOn(testkit % Test)
 lazy val elasticsearch = module(project, "elasticsearch").dependsOn(log, testkit % Test)
