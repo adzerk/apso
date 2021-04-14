@@ -1,0 +1,37 @@
+package com.velocidi.apso.caching
+
+import scalacache.Id
+
+/**
+  * Provides extension methods `.cached()` and `.cachedF()` for FunctionN types
+  */
+trait CachedFunctionsExtras {
+
+  final implicit class Fn0CachingExtras[V](fn: Function0[V]) {
+    final def cached(conf: config.Cache): MemoizeFn0[Id, V] = {
+      MemoizeFn(fn, conf)
+    }
+  }
+
+  [#
+  final implicit class Fn1CachingExtras[[#I0#], V](fn: Function1[[#I0#], V]) {
+    final def cached(conf: config.Cache): MemoizeFn1[Id, [#I0#], V] = {
+      MemoizeFn(fn, conf)
+    }
+  }#
+  ]
+
+  final implicit class Fn0CachingFExtras[F[_], V](fn: Function0[F[V]]) {
+    final def cachedF(conf: config.Cache)(implicit modeImpl: ModeImpl[F]): MemoizeFn0[F, V] = {
+      MemoizeFn.applyF(fn, conf)
+    }
+  }
+
+  [#
+  final implicit class Fn1CachingFExtras[[#I0#], F[_], V](fn: Function1[[#I0#], F[V]]) {
+    final def cachedF(conf: config.Cache)(implicit modeImpl: ModeImpl[F]): MemoizeFn1[F, [#I0#], V] = {
+      MemoizeFn.applyF(fn, conf)
+    }
+  }#
+  ]
+}

@@ -1,0 +1,91 @@
+package com.velocidi.apso.caching
+
+import scalacache._
+import scalacache.memoization._
+
+/**
+  * Provides a memoization mechanism for functions with 0 arguments using ScalaCache.
+  *
+  * Provides a corresponding `apply()` method that follows the signature of the provided `fn` function, but is
+  * memoized using ScalaCache.
+  */
+sealed trait MemoizeFn0[F[_], V] extends Function0[F[V]] {
+  implicit def mode: Mode[F]
+
+  def cacheConf: config.Cache
+  implicit def underlyingCache: scalacache.Cache[V]
+  def fn: () => F[V]
+
+  override def apply() = memoizeF(cacheConf.ttl)(fn())
+}
+
+[#
+/**
+  * Provides a memoization mechanism for functions with 1 arguments using ScalaCache.
+  *
+  * Provides a corresponding `apply()` method that follows the signature of the provided `fn` function, but is
+  * memoized using ScalaCache.
+  */
+sealed trait MemoizeFn1[F[_], [#-I0#], V] extends Function1[[#I0#], F[V]] {
+implicit def mode: Mode[F]
+
+def cacheConf: config.Cache
+implicit def underlyingCache: scalacache.Cache[V]
+def fn: ([#I0#]) => F[V]
+
+override def apply([#i0: I0#]) = memoizeF(cacheConf.ttl)(fn([#i0#]))
+}#
+]
+
+/**
+  * Provides methods to cache/memoize a given function using ScalaCache.
+  *
+  * The provided `function` param is memoized using ScalaCache and the client can provide a `config.Cache` object
+  * to configure the underlying cache engine, such as type (caffeine, guava), size and time-to-live.
+  *
+  * Each method returns a `MemoizeFn*` object, according to the number of arguments of the input function, which
+  * provides a corresponding `apply()` method. This method signature follows the signature of the provided function,
+  * meaning the returned object can be applied just like the original function.
+  */
+object MemoizeFn {
+
+  def apply[V](function: () => V, conf: config.Cache)(implicit modeImpl: ModeImpl[Id]): MemoizeFn0[Id, V] = {
+    new MemoizeFn0[Id, V] {
+      implicit lazy val mode: Mode[Id] = modeImpl.mode
+      lazy val cacheConf = conf
+      implicit lazy val underlyingCache = conf.implementation[V]
+      lazy val fn = function
+    }
+  }
+
+    [#
+  def apply[[#I0#], V](function: ([#I0#]) => V, conf: config.Cache)(implicit modeImpl: ModeImpl[Id]): MemoizeFn1[Id, [#I0#], V] = {
+    new MemoizeFn1[Id, [#I0#], V] {
+      implicit lazy val mode: Mode[Id] = modeImpl.mode
+      lazy val cacheConf = conf
+      implicit lazy val underlyingCache = conf.implementation[V]
+      lazy val fn = function
+    }
+  }#
+  ]
+
+  def applyF[F[_], V](function: () => F[V], conf: config.Cache)(implicit modeImpl: ModeImpl[F]): MemoizeFn0[F, V] = {
+    new MemoizeFn0[F, V] {
+      implicit lazy val mode: Mode[F] = modeImpl.mode
+      lazy val cacheConf = conf
+      implicit lazy val underlyingCache = conf.implementation[V]
+      lazy val fn = function
+    }
+  }
+
+    [#
+  def applyF[[#I0#], F[_], V](function: ([#I0#]) => F[V], conf: config.Cache)(implicit modeImpl: ModeImpl[F]): MemoizeFn1[F, [#I0#], V] = {
+    new MemoizeFn1[F, [#I0#], V] {
+      implicit lazy val mode: Mode[F] = modeImpl.mode
+      lazy val cacheConf = conf
+      implicit lazy val underlyingCache = conf.implementation[V]
+      lazy val fn = function
+    }
+  }#
+  ]
+}

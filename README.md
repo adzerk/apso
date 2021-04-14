@@ -47,6 +47,7 @@ Please take into account that the library is still in an experimental stage and 
     - [CredentialStore](#credentialstore)
     - [S3Bucket](#s3bucket)
     - [SerializableAWSCredentials](#serializableawscredentials)
+- [Caching](#caching)
 - [Collections](#collections)
     - [Trie](#trie)
     - [TypedMap](#typedmap)
@@ -395,6 +396,61 @@ The `S3Bucket` class wraps an instance of `AmazonS3Client` (from AWS SDK for Jav
 
 The `SerializableAWSCredentials` class provides a serializable container for AWS credentials, extending the `AWSCredentials` class (from AWS SDK for Java).
 
+## Caching
+The `apso-caching` module provides provides utilities for caching. 
+
+To use it in an existing SBT project, add the following dependency to your `build.sbt`:
+
+```scala
+libraryDependencies += "com.velocidi" %% "apso-caching" % "0.16.10"
+```
+
+Apso provides utilities to simplify the caching of method calls, with [ScalaCache](https://cb372.github.io/scalacache/) and using either `Guava` or `Caffeine` as underlying cache implementations. 
+
+These utilities are provided as `cached()` and `cachedF()` extension methods over all `FunctionN[]` types:
+
+```scala
+import scala.concurrent._
+import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
+
+import java.util.concurrent.atomic.AtomicInteger
+
+import com.velocidi.apso.caching._
+
+val x = new AtomicInteger(0)
+// x: AtomicInteger = 2
+
+val cachedFn = ((i: Int) => {
+  val value = x.getAndAdd(i)
+  value
+}).cached(config.Cache.Caffeine(Some(3), None))
+// cachedFn: MemoizeFn1[scalacache.package.Id, Int, Int] = <function1>
+
+cachedFn(2)
+// res29: scalacache.package.Id[Int] = 0
+cachedFn(2)
+// res30: scalacache.package.Id[Int] = 0
+x
+// res31: AtomicInteger = 2
+
+val y = new AtomicInteger(0)
+// y: AtomicInteger = 3
+
+val cachedFutFn = ((i: Int) => Future {
+  val value = y.getAndAdd(i)
+  value
+}).cachedF(config.Cache.Guava(Some(2), None))
+// cachedFutFn: MemoizeFn1[Future, Int, Int] = <function1>
+
+Await.result(cachedFutFn(3), Duration.Inf)
+// res32: Int = 0
+Await.result(cachedFutFn(3), Duration.Inf)
+// res33: Int = 0
+y
+// res34: AtomicInteger = 3
+```
+
 ## Collections
 
 The `apso-collections` module provides some helpful collections. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
@@ -440,13 +496,13 @@ val nt = t.set("one", 1).set("two", 2).set("three", 3).set("four", 4)
 // )
 
 nt.get("one")
-// res29: Option[Int] = Some(1)
+// res36: Option[Int] = Some(1)
 
 nt.get("two")
-// res30: Option[Int] = Some(2)
+// res37: Option[Int] = Some(2)
 
 nt.get("five")
-// res31: Option[Int] = None
+// res38: Option[Int] = None
 ```
 
 ### TypedMap
@@ -460,25 +516,25 @@ val m = TypedMap("one", 2, 3l)
 // m: TypedMap[Any] = Map(java.lang.String -> one, Int -> 2, Long -> 3)
 
 m[String]
-// res33: String = "one"
+// res40: String = "one"
 
 m[Int]
-// res34: Int = 2
+// res41: Int = 2
 
 m[Long]
-// res35: Long = 3L
+// res42: Long = 3L
 
 m.get[String]
-// res36: Option[String] = Some("one")
+// res43: Option[String] = Some("one")
 
 m.get[Int]
-// res37: Option[Int] = Some(2)
+// res44: Option[Int] = Some(2)
 
 m.get[Long]
-// res38: Option[Long] = Some(3L)
+// res45: Option[Long] = Some(3L)
 
 m.get[Char]
-// res39: Option[Char] = None
+// res46: Option[Char] = None
 ```
 
 ### Iterators
@@ -496,7 +552,7 @@ val circularIterator = CircularIterator(List(1, 2, 3).toIterator)
 // circularIterator: CircularIterator[Int] = non-empty iterator
 
 circularIterator.take(10).toList
-// res41: List[Int] = List(1, 2, 3, 1, 2, 3, 1, 2, 3, 1)
+// res48: List[Int] = List(1, 2, 3, 1, 2, 3, 1, 2, 3, 1)
 ```
 
 #### CompositeIterator
@@ -510,7 +566,7 @@ val compositeIterator = CompositeIterator(List(1, 2, 3).toIterator, List(4, 5, 6
 // compositeIterator: CompositeIterator[Int] = empty iterator
 
 compositeIterator.take(9).toList
-// res43: List[Int] = List(1, 2, 3, 4, 5, 6, 7, 8, 9)
+// res50: List[Int] = List(1, 2, 3, 4, 5, 6, 7, 8, 9)
 ```
 
 #### MergedBufferedIterator
@@ -528,7 +584,7 @@ val it1 = MergedBufferedIterator(List(
 // it1: MergedBufferedIterator[Int] = empty iterator
 
 it1.toList
-// res45: List[Int] = List(
+// res52: List[Int] = List(
 //   0,
 //   0,
 //   0,
@@ -578,7 +634,7 @@ val it2 = MergedBufferedIterator(List(
 // it2: MergedBufferedIterator[Int] = non-empty iterator
 
 it2.mergeSorted(Iterator(4, 6).buffered).toList
-// res46: List[Int] = List(1, 2, 3, 4, 5, 6)
+// res53: List[Int] = List(1, 2, 3, 4, 5, 6)
 ```
 
 ## Encryption
@@ -621,10 +677,10 @@ libraryDependencies += "com.velocidi" %% "apso-hashing" % "0.16.10"
 import com.velocidi.apso.hashing.Implicits._
 
 "abcd".md5
-// res49: String = "e2fc714c4727ee9395f324cd2e7f331f"
+// res56: String = "e2fc714c4727ee9395f324cd2e7f331f"
 
 "abcd".murmurHash
-// res50: Long = 7785666560123423118L
+// res57: Long = 7785666560123423118L
 ```
 
 ## IO
@@ -708,10 +764,10 @@ import com.velocidi.apso.time._
 import com.velocidi.apso.time.Implicits._
 
 (new DateTime("2012-01-01") to new DateTime("2012-01-01")).toList
-// res53: List[DateTime] = List(2012-01-01T00:00:00.000Z)
+// res60: List[DateTime] = List(2012-01-01T00:00:00.000Z)
 
 (new DateTime("2012-02-01") until new DateTime("2012-03-01") by 1.day)
-// res54: IterableInterval = SteppedInterval(
+// res61: IterableInterval = SteppedInterval(
 //   2012-02-01T00:00:00.000Z,
 //   2012-02-02T00:00:00.000Z,
 //   2012-02-03T00:00:00.000Z,
@@ -744,7 +800,7 @@ import com.velocidi.apso.time.Implicits._
 // )
 
 (new DateTime("2012-01-01") until new DateTime("2012-02-01") by 2.minutes)
-// res55: IterableInterval = SteppedInterval(
+// res62: IterableInterval = SteppedInterval(
 //   2012-01-01T00:00:00.000Z,
 //   2012-01-01T00:02:00.000Z,
 //   2012-01-01T00:04:00.000Z,
