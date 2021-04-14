@@ -386,7 +386,9 @@ To use it in an existing SBT project, add the following dependency to your `buil
 libraryDependencies += "com.velocidi" %% "apso-caching" % "@VERSION@"
 ```
 
-Apso provides utilities to simplify the caching of method calls, with [ScalaCache](https://cb372.github.io/scalacache/)'s `Guava` or `Caffeine`. These are provided in an implicit scope, to make its invocation simpler:
+Apso provides utilities to simplify the caching of method calls, with [ScalaCache](https://cb372.github.io/scalacache/) and using either `Guava` or `Caffeine` as underlying cache implementations. 
+
+These utilities are provided as `cached()` and `cachedF()` extension methods over all `FunctionN[]` types:
 
 ```scala mdoc:reset
 import scala.concurrent._
@@ -406,6 +408,7 @@ val cachedFn = ((i: Int) => {
 
 cachedFn(2)
 cachedFn(2)
+x
 
 val y = new AtomicInteger(0)
 
@@ -416,6 +419,7 @@ val cachedFutFn = ((i: Int) => Future {
 
 Await.result(cachedFutFn(3), Duration.Inf)
 Await.result(cachedFutFn(3), Duration.Inf)
+y
 ```
 
 ## Collections
