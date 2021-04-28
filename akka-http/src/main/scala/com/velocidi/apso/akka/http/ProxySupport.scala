@@ -1,5 +1,7 @@
 package com.velocidi.apso.akka.http
 
+import java.net.InetAddress
+
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{Future, Promise}
 import scala.util.{Failure, Success, Try}
@@ -7,7 +9,7 @@ import scala.util.{Failure, Success, Try}
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.{`Remote-Address`, `X-Forwarded-For`}
+import akka.http.scaladsl.model.headers._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.RouteResult.Complete
 import akka.http.scaladsl.server.{Directive1, RequestContext, Route, RouteResult}
@@ -37,7 +39,7 @@ trait ProxySupport extends ClientIPDirectives {
     //        - https://www.mnot.net/blog/2011/07/11/what_proxies_must_do
     //        - https://tools.ietf.org/html/draft-ietf-httpbis-p1-messaging-14#section-7.1.3
     //        - https://doc.akka.io/docs/akka-http/current/common/http-model.html
-    val hs = headers.filter(_.renderInRequests())
+    val hs = headers.filter(header => header.renderInRequests() && header.isNot("remote-address"))
     // add `X-Forwarded-For` header
     ip.fold(hs)(addForwardedFor(_, hs))
   }
@@ -57,7 +59,11 @@ trait ProxySupport extends ClientIPDirectives {
   }
 
   private[this] val optionalRemoteAddress: Directive1[Option[RemoteAddress]] =
-    headerValuePF { case `Remote-Address`(address) => Some(address) } | provide(None)
+    headerValuePF {
+      case header if header.is("remote-address") => Some(RemoteAddress.IP(InetAddress.getByName(header.value)))
+    } | provide(
+      None
+    )
 
   private[this] def proxy(
       strictTimeout: Option[FiniteDuration] = None
@@ -86,7 +92,7 @@ trait ProxySupport extends ClientIPDirectives {
     * @return a route that handles requests by proxying them to the given URI.
     */
   def proxySingleTo(uri: Uri): Route = proxy() { case (ip, ctx) =>
-    ctx.request.copy(uri = uri, headers = getHeaders(ip, ctx.request.headers.toList))
+    ctx.request.withUri(uri).withHeaders(getHeaders(ip, ctx.request.headers.toList))
   }
 
   /** Proxies a single request to a destination base URI. The target URI is created by concatenating the base URI with
@@ -96,10 +102,9 @@ trait ProxySupport extends ClientIPDirectives {
     * @return a route that handles requests by proxying them to the given URI.
     */
   def proxySingleToUnmatchedPath(uri: Uri): Route = proxy() { case (ip, ctx) =>
-    ctx.request.copy(
-      uri = uri.withPath(uri.path ++ ctx.unmatchedPath).withQuery(ctx.request.uri.query()),
-      headers = getHeaders(ip, ctx.request.headers.toList)
-    )
+    ctx.request
+      .withUri(uri.withPath(uri.path ++ ctx.unmatchedPath).withQuery(ctx.request.uri.query()))
+      .withHeaders(getHeaders(ip, ctx.request.headers.toList))
   }
 
   /** Proxies a single request to a destination URI.
@@ -110,7 +115,7 @@ trait ProxySupport extends ClientIPDirectives {
     * @return a route that handles requests by proxying them to the given URI.
     */
   def strictProxySingleTo(uri: Uri, timeout: FiniteDuration): Route = proxy(Some(timeout)) { case (ip, ctx) =>
-    ctx.request.copy(uri = uri, headers = getHeaders(ip, ctx.request.headers.toList))
+    ctx.request.withUri(uri).withHeaders(getHeaders(ip, ctx.request.headers.toList))
   }
 
   /** Proxies a single request to a destination base URI. The target URI is created by concatenating the base URI with
@@ -123,10 +128,9 @@ trait ProxySupport extends ClientIPDirectives {
     */
   def strictProxySingleToUnmatchedPath(uri: Uri, timeout: FiniteDuration): Route = proxy(Some(timeout)) {
     case (ip, ctx) =>
-      ctx.request.copy(
-        uri = uri.withPath(uri.path ++ ctx.unmatchedPath).withQuery(ctx.request.uri.query()),
-        headers = getHeaders(ip, ctx.request.headers.toList)
-      )
+      ctx.request
+        .withUri(uri.withPath(uri.path ++ ctx.unmatchedPath).withQuery(ctx.request.uri.query()))
+        .withHeaders(getHeaders(ip, ctx.request.headers.toList))
   }
 
   private[this] lazy val defaultQueueSize =
@@ -203,7 +207,7 @@ trait ProxySupport extends ClientIPDirectives {
       */
     def proxyTo(uri: Uri): Route = {
       optionalRemoteAddress { ip => ctx =>
-        val req = ctx.request.copy(uri = uri, headers = getHeaders(ip, ctx.request.headers.toList))
+        val req = ctx.request.withUri(uri).withHeaders(getHeaders(ip, ctx.request.headers.toList))
         sendRequest(req, failOnDrop = false)
       }
     }
