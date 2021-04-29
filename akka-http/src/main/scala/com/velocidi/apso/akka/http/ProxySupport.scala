@@ -1,7 +1,5 @@
 package com.velocidi.apso.akka.http
 
-import java.net.InetAddress
-
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{Future, Promise}
 import scala.util.{Failure, Success, Try}
@@ -29,6 +27,9 @@ import com.velocidi.apso.Logging
   * - `proxySingleTo` takes the original request and proxies it to the proxy URI;
   * - `proxySingleToUnmatchedPath` copies only the unmatched path from the original URI, and adds it to the path of the
   * proxy URI.
+  *
+  * In order for the client ip to be propagated in `X-Forwarded-For` headers, the
+  * `akka.http.server.remote-address-attribute` config setting must be set to "on".
   */
 trait ProxySupport extends ClientIPDirectives {
 
@@ -39,7 +40,7 @@ trait ProxySupport extends ClientIPDirectives {
     //        - https://www.mnot.net/blog/2011/07/11/what_proxies_must_do
     //        - https://tools.ietf.org/html/draft-ietf-httpbis-p1-messaging-14#section-7.1.3
     //        - https://doc.akka.io/docs/akka-http/current/common/http-model.html
-    val hs = headers.filter(header => header.renderInRequests() && header.isNot("remote-address"))
+    val hs = headers.filter(header => header.renderInRequests())
     // add `X-Forwarded-For` header
     ip.fold(hs)(addForwardedFor(_, hs))
   }
@@ -59,11 +60,7 @@ trait ProxySupport extends ClientIPDirectives {
   }
 
   private[this] val optionalRemoteAddress: Directive1[Option[RemoteAddress]] =
-    headerValuePF {
-      case header if header.is("remote-address") => Some(RemoteAddress.IP(InetAddress.getByName(header.value)))
-    } | provide(
-      None
-    )
+    extractRequest.map(_.attribute(AttributeKeys.remoteAddress))
 
   private[this] def proxy(
       strictTimeout: Option[FiniteDuration] = None

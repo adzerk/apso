@@ -190,7 +190,6 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
         HttpResponse(entity = req.headers.map(header => s"${header.name}: ${header.value}").mkString("\n"))
       Get("/get-path-proxied").withHeaders(
         Host("expecteddomain.com"),
-        RawHeader("Remote-Address", localIp1.toString),
         `Raw-Request-URI`("somedomain.com")
       ) ~> routes ~> check {
         responseAs[String] must not(contain("Remote-Address"))
@@ -212,16 +211,15 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
       }
 
       "add `X-Forwarded-For` if request has `Remote-Address`" in new CollectHeadersAndForwardedForMockServer {
-        Get("/get-path-proxied").withHeaders(RawHeader("Remote-Address", localIp1.toString)) ~> routes ~> check {
+        Get("/get-path-proxied").withAttributes(Map(AttributeKeys.remoteAddress -> localIp1)) ~> routes ~> check {
           responseAs[String] must be_==("127.0.0.1")
         }
       }
 
       "update existing `X-Forwarded-For`" in new CollectHeadersAndForwardedForMockServer {
-        Get("/get-path-proxied").withHeaders(
-          RawHeader("Remote-Address", localIp1.toString),
-          `X-Forwarded-For`(localIp2)
-        ) ~> routes ~> check {
+        Get("/get-path-proxied")
+          .withHeaders(`X-Forwarded-For`(localIp2))
+          .withAttributes(Map(AttributeKeys.remoteAddress -> localIp1)) ~> routes ~> check {
           status == OK
           responseAs[String] must be_==("127.0.0.2, 127.0.0.1")
         }
