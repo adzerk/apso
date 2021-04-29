@@ -40,7 +40,7 @@ trait ProxySupport extends ClientIPDirectives {
     //        - https://www.mnot.net/blog/2011/07/11/what_proxies_must_do
     //        - https://tools.ietf.org/html/draft-ietf-httpbis-p1-messaging-14#section-7.1.3
     //        - https://doc.akka.io/docs/akka-http/current/common/http-model.html
-    val hs = headers.filter(header => header.renderInRequests())
+    val hs = headers.filter(_.renderInRequests())
     // add `X-Forwarded-For` header
     ip.fold(hs)(addForwardedFor(_, hs))
   }
