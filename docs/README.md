@@ -327,7 +327,7 @@ The `ExtraMiscDirectives` trait exposes the directives `cacheControlMaxAge(maxAg
 
 ### ProxySupport
 
-The `ProxySupport` traits adds helper methods to proxy requests to a given uri, either directly (`proxyTo`), or with the unmatched path and query parameters of the current context (`proxyToUnmatchedPath`).
+The `ProxySupport` traits adds helper methods to proxy requests to a given uri, either directly (`proxyTo`), or with the unmatched path and query parameters of the current context (`proxyToUnmatchedPath`). In order for the client IP to be correctly propagated in `X-Forward-For` headers, the `ProxySupport` trait requires the `akka.http.server.remote-address-attribute` setting to be `on`.
 
 ## Amazon Web Services
 

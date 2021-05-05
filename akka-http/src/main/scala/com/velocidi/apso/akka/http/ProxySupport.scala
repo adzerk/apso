@@ -7,7 +7,7 @@ import scala.util.{Failure, Success, Try}
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.{`Remote-Address`, `X-Forwarded-For`}
+import akka.http.scaladsl.model.headers._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.RouteResult.Complete
 import akka.http.scaladsl.server.{Directive1, RequestContext, Route, RouteResult}
@@ -27,6 +27,9 @@ import com.velocidi.apso.Logging
   * - `proxySingleTo` takes the original request and proxies it to the proxy URI;
   * - `proxySingleToUnmatchedPath` copies only the unmatched path from the original URI, and adds it to the path of the
   * proxy URI.
+  *
+  * In order for the client ip to be propagated in `X-Forwarded-For` headers, the
+  * `akka.http.server.remote-address-attribute` config setting must be set to "on".
   */
 trait ProxySupport extends ClientIPDirectives {
 
@@ -57,7 +60,7 @@ trait ProxySupport extends ClientIPDirectives {
   }
 
   private[this] val optionalRemoteAddress: Directive1[Option[RemoteAddress]] =
-    headerValuePF { case `Remote-Address`(address) => Some(address) } | provide(None)
+    extractRequest.map(_.attribute(AttributeKeys.remoteAddress))
 
   private[this] def proxy(
       strictTimeout: Option[FiniteDuration] = None
@@ -86,7 +89,7 @@ trait ProxySupport extends ClientIPDirectives {
     * @return a route that handles requests by proxying them to the given URI.
     */
   def proxySingleTo(uri: Uri): Route = proxy() { case (ip, ctx) =>
-    ctx.request.copy(uri = uri, headers = getHeaders(ip, ctx.request.headers.toList))
+    ctx.request.withUri(uri).withHeaders(getHeaders(ip, ctx.request.headers.toList))
   }
 
   /** Proxies a single request to a destination base URI. The target URI is created by concatenating the base URI with
@@ -96,10 +99,9 @@ trait ProxySupport extends ClientIPDirectives {
     * @return a route that handles requests by proxying them to the given URI.
     */
   def proxySingleToUnmatchedPath(uri: Uri): Route = proxy() { case (ip, ctx) =>
-    ctx.request.copy(
-      uri = uri.withPath(uri.path ++ ctx.unmatchedPath).withQuery(ctx.request.uri.query()),
-      headers = getHeaders(ip, ctx.request.headers.toList)
-    )
+    ctx.request
+      .withUri(uri.withPath(uri.path ++ ctx.unmatchedPath).withQuery(ctx.request.uri.query()))
+      .withHeaders(getHeaders(ip, ctx.request.headers.toList))
   }
 
   /** Proxies a single request to a destination URI.
@@ -110,7 +112,7 @@ trait ProxySupport extends ClientIPDirectives {
     * @return a route that handles requests by proxying them to the given URI.
     */
   def strictProxySingleTo(uri: Uri, timeout: FiniteDuration): Route = proxy(Some(timeout)) { case (ip, ctx) =>
-    ctx.request.copy(uri = uri, headers = getHeaders(ip, ctx.request.headers.toList))
+    ctx.request.withUri(uri).withHeaders(getHeaders(ip, ctx.request.headers.toList))
   }
 
   /** Proxies a single request to a destination base URI. The target URI is created by concatenating the base URI with
@@ -123,10 +125,9 @@ trait ProxySupport extends ClientIPDirectives {
     */
   def strictProxySingleToUnmatchedPath(uri: Uri, timeout: FiniteDuration): Route = proxy(Some(timeout)) {
     case (ip, ctx) =>
-      ctx.request.copy(
-        uri = uri.withPath(uri.path ++ ctx.unmatchedPath).withQuery(ctx.request.uri.query()),
-        headers = getHeaders(ip, ctx.request.headers.toList)
-      )
+      ctx.request
+        .withUri(uri.withPath(uri.path ++ ctx.unmatchedPath).withQuery(ctx.request.uri.query()))
+        .withHeaders(getHeaders(ip, ctx.request.headers.toList))
   }
 
   private[this] lazy val defaultQueueSize =
@@ -203,7 +204,7 @@ trait ProxySupport extends ClientIPDirectives {
       */
     def proxyTo(uri: Uri): Route = {
       optionalRemoteAddress { ip => ctx =>
-        val req = ctx.request.copy(uri = uri, headers = getHeaders(ip, ctx.request.headers.toList))
+        val req = ctx.request.withUri(uri).withHeaders(getHeaders(ip, ctx.request.headers.toList))
         sendRequest(req, failOnDrop = false)
       }
     }

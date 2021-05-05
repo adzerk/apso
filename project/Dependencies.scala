@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
   object Versions {
     val Akka                    = "2.6.10"
-    val AkkaHttp                = "10.1.13"
+    val AkkaHttp                = "10.2.4"
     val AkkaTestkitSpecs2       = "0.3.0"
     val Aws                     = "1.11.928"
     val BouncyCastle            = "1.68"
