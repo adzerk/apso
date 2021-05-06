@@ -43,21 +43,6 @@ trait ExtraTimeJsonProtocol {
     Encoder[String].contramap(_.toString)
   implicit val periodDecoder: Decoder[Period] =
     Decoder[String].emapPrettyTry(v => Try(new Period(v)))
-}
-
-trait ExtraHttpJsonProtocol {
-
-  implicit val uriEncoder: Encoder[URI] =
-    Encoder[String].contramap(_.toString)
-  implicit val uriDecoder: Decoder[URI] =
-    Decoder[String].emapPrettyTry(v => Try(new URI(v)))
-}
-
-trait ExtraMiscJsonProtocol {
-  implicit val configEncoder: Encoder[Config] =
-    Encoder[Json].contramap(conf => parse(conf.root.render(ConfigRenderOptions.concise())).fold(throw _, identity))
-  implicit val configDecoder: Decoder[Config] =
-    Decoder[Json].emapPrettyTry(json => Try(ConfigFactory.parseString(json.toString)))
 
   implicit val dateTimeEncoder: Encoder[DateTime] = new Encoder[DateTime] {
     private val stringEncoder = Encoder[String]
@@ -72,6 +57,24 @@ trait ExtraMiscJsonProtocol {
     Encoder[String].contramap(_.toString)
   implicit val localDateDecoder: Decoder[LocalDate] =
     Decoder[String].emapPrettyTry(v => Try(new LocalDate(v)))
+}
+
+object ExtraTimeJsonProtocol extends ExtraTimeJsonProtocol
+
+trait ExtraHttpJsonProtocol {
+  implicit val uriEncoder: Encoder[URI] =
+    Encoder[String].contramap(_.toString)
+  implicit val uriDecoder: Decoder[URI] =
+    Decoder[String].emapPrettyTry(v => Try(new URI(v)))
+}
+
+object ExtraHttpJsonProtocol extends ExtraHttpJsonProtocol
+
+trait ExtraMiscJsonProtocol {
+  implicit val configEncoder: Encoder[Config] =
+    Encoder[Json].contramap(conf => parse(conf.root.render(ConfigRenderOptions.concise())).fold(throw _, identity))
+  implicit val configDecoder: Decoder[Config] =
+    Decoder[Json].emapPrettyTry(json => Try(ConfigFactory.parseString(json.toString)))
 
   implicit def currencyDecoder(implicit moneyContext: MoneyContext): Decoder[Currency] =
     Decoder[String].emapPrettyTry(Currency(_))
@@ -103,3 +106,5 @@ trait ExtraMiscJsonProtocol {
       "Expected a json object with 'key' and 'value' as keys"
     )
 }
+
+object ExtraMiscJsonProtocol extends ExtraMiscJsonProtocol
