@@ -765,7 +765,7 @@ js1.deepMerge(js2).spaces2
 //   "b" : 3
 // }"""	
 
-fromCirceFullPaths(Seq(	
+fromFullPaths(Seq(	
    "a" -> 1.asJson,	
    "b.c" -> 2.asJson,	
    "b.d" -> 3.asJson,	
@@ -818,13 +818,13 @@ The `JsonConvert` object contains helpers for converting between JSON values and
 ```scala
 import com.velocidi.apso.circe._
 
-JsonConvert.toCirceJson("abcd")
+JsonConvert.toJson("abcd")
 // res71: io.circe.Json = JString("abcd")
 
-JsonConvert.toCirceJson(1)
+JsonConvert.toJson(1)
 // res72: io.circe.Json = JNumber(JsonLong(1L))
 	
-JsonConvert.toCirceJson(Map(1 -> 2, 3 -> 4))	
+JsonConvert.toJson(Map(1 -> 2, 3 -> 4))	
 // res73: io.circe.Json = JObject(object[1 -> 2,3 -> 4])
 ```
 

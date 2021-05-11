@@ -20,12 +20,12 @@ object JsonConvert {
     case n: Double      => n.asJson
     case b: Boolean     => b.asJson
     case str: String    => str.asJson
-    case map: Map[_, _] => Json.obj(map.map { case (k, v) => (k.toString, toCirceJson(v)) }.toList: _*)
+    case map: Map[_, _] => Json.obj(map.map { case (k, v) => (k.toString, toJson(v)) }.toList: _*)
     case map: java.util.Map[_, _] =>
-      Json.obj(map.asScala.map({ case (k, v) => (k.toString, toCirceJson(v)) }).toList: _*)
-    case t: TraversableOnce[_]    => Json.fromValues(t.map(toCirceJson).toVector)
-    case t: java.lang.Iterable[_] => Json.fromValues(t.asScala.map(toCirceJson).toVector)
-    case arr: Array[_]            => Json.fromValues(arr.toVector.map(toCirceJson))
+      Json.obj(map.asScala.map({ case (k, v) => (k.toString, toJson(v)) }).toList: _*)
+    case t: TraversableOnce[_]    => Json.fromValues(t.map(toJson).toVector)
+    case t: java.lang.Iterable[_] => Json.fromValues(t.asScala.map(toJson).toVector)
+    case arr: Array[_]            => Json.fromValues(arr.toVector.map(toJson))
     case _                        => Json.fromString(obj.toString)
   }
 }

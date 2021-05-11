@@ -650,7 +650,7 @@ val js2 = Json.obj(
 ```scala mdoc	
 js1.deepMerge(js2).spaces2	
 
-fromCirceFullPaths(Seq(	
+fromFullPaths(Seq(	
    "a" -> 1.asJson,	
    "b.c" -> 2.asJson,	
    "b.d" -> 3.asJson,	
@@ -672,11 +672,11 @@ The `JsonConvert` object contains helpers for converting between JSON values and
 ```scala mdoc:reset
 import com.velocidi.apso.circe._
 
-JsonConvert.toCirceJson("abcd")
+JsonConvert.toJson("abcd")
 
-JsonConvert.toCirceJson(1)
+JsonConvert.toJson(1)
 	
-JsonConvert.toCirceJson(Map(1 -> 2, 3 -> 4))	
+JsonConvert.toJson(Map(1 -> 2, 3 -> 4))	
 ```
 
 ## Profiling
