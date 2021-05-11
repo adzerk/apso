@@ -95,7 +95,7 @@ object Implicits {
     * @param separatorRegex regex to use to separate fields
     * @return the resulting Json object
     */
-  def fromCirceFullPaths(paths: Seq[(String, Json)], separatorRegex: String = "\\."): Json = {
+  def fromFullPaths(paths: Seq[(String, Json)], separatorRegex: String = "\\."): Json = {
     def createJson(keys: Seq[String], value: Json): Json = {
       keys match {
         case Nil    => value
@@ -106,7 +106,7 @@ object Implicits {
     paths match {
       case Nil => Json.obj()
       case (path, value) :: rem =>
-        createJson(path.split(separatorRegex).toList, value).deepMerge(fromCirceFullPaths(rem, separatorRegex))
+        createJson(path.split(separatorRegex).toList, value).deepMerge(fromFullPaths(rem, separatorRegex))
     }
   }
 

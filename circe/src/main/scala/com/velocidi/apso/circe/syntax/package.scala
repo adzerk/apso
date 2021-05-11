@@ -5,7 +5,7 @@ import scala.util.Try
 import io.circe.Decoder
 
 package object syntax {
-  implicit class CirceDecoderExtras[A](val decoder: Decoder[A]) extends AnyVal {
+  implicit class DecoderExtras[A](val decoder: Decoder[A]) extends AnyVal {
 
     /** Performs similarly to `emapTry` but in case of failure it exclusively uses the Throwable's message
       * to create the DecodingFailure message whereas `emapTry` would use the message+stacktrace.

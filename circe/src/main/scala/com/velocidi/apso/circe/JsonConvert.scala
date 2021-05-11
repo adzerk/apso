@@ -14,7 +14,7 @@ object JsonConvert {
     * @param obj the object to convert
     * @return the given object converted to a circe JSON value.
     */
-  def toCirceJson(obj: Any): Json = obj match {
+  def toJson(obj: Any): Json = obj match {
     case null           => Json.Null
     case n: Int         => n.asJson
     case n: Long        => n.asJson
