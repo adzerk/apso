@@ -1,4 +1,4 @@
-package com.velocidi.apso.json
+package com.velocidi.apso.circe
 
 import scala.util.Try
 

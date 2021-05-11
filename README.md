@@ -720,10 +720,10 @@ ResourceUtil.getResourceAsString("reference.conf")
 
 ## JSON
 
-Apso includes a bunch of utilities to work with JSON serialization and deserialization. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
+Apso includes a bunch of utilities to work with JSON serialization and deserialization, specifically with the [circe](https://circe.github.io/circe/) library. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-json" % "0.16.10"
+libraryDependencies += "com.velocidi" %% "apso-circe" % "0.16.10"
 ```
 
 ### ExtraJsonProtocol
@@ -738,7 +738,7 @@ The `ExtraJsonProtocol` object combines three traits that provide extra `Encoder
 The `json` package provides some implicits around [circe](https://circe.github.io/circe/)'s `Json` to unwrap JSON values, merge two `Json` and create `Json` from a sequence of dot-separated paths with the corresponding leaf values. It also provides methods to access and delete fields on the `Json` object. See the following for sample usage:	
 
 ```scala
-import com.velocidi.apso.json.Implicits._		
+import com.velocidi.apso.circe.Implicits._		
 import io.circe.syntax._
 import io.circe.Json
 
@@ -816,7 +816,7 @@ js1.deleteField("x")
 The `JsonConvert` object contains helpers for converting between JSON values and other structures. See the following for sample usage:	
 
 ```scala
-import com.velocidi.apso.json._
+import com.velocidi.apso.circe._
 
 JsonConvert.toCirceJson("abcd")
 // res71: io.circe.Json = JString("abcd")

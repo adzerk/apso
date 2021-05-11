@@ -15,13 +15,13 @@ lazy val akka          = module(project, "akka")
 lazy val akkaHttp      = module(project, "akka-http").dependsOn(log, core % Test, testkit % Test)
 lazy val aws           = module(project, "aws").dependsOn(core, log)
 lazy val caching       = module(project, "caching").enablePlugins(BoilerplatePlugin)
+lazy val circe         = module(project, "circe")
 lazy val collections   = module(project, "collections")
 lazy val core          = module(project, "core").dependsOn(testkit % Test)
 lazy val elasticsearch = module(project, "elasticsearch").dependsOn(log, testkit % Test)
 lazy val encryption    = module(project, "encryption").dependsOn(log)
 lazy val hashing       = module(project, "hashing")
 lazy val io            = module(project, "io").dependsOn(aws, testkit % Test)
-lazy val json          = module(project, "json")
 lazy val log           = module(project, "log")
 lazy val profiling     = module(project, "profiling").dependsOn(core, log)
 lazy val testkit       = module(project, "testkit")
@@ -35,13 +35,13 @@ lazy val apso = (project in file("."))
     akkaHttp,
     aws,
     caching,
+    circe,
     collections,
     core,
     elasticsearch,
     encryption,
     hashing,
     io,
-    json,
     log,
     profiling,
     time
@@ -51,13 +51,13 @@ lazy val apso = (project in file("."))
     akkaHttp,
     aws,
     caching,
+    circe,
     collections,
     core,
     elasticsearch,
     encryption,
     hashing,
     io,
-    json,
     log,
     profiling,
     testkit,

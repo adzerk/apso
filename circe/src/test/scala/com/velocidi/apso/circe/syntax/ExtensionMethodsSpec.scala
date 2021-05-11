@@ -1,4 +1,4 @@
-package com.velocidi.apso.json.syntax
+package com.velocidi.apso.circe.syntax
 
 import scala.util.{Failure, Success}
 

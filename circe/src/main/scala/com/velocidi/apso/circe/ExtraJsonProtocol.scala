@@ -1,4 +1,4 @@
-package com.velocidi.apso.json
+package com.velocidi.apso.circe
 
 import java.net.URI
 
@@ -13,7 +13,7 @@ import org.joda.time.format.ISODateTimeFormat
 import org.joda.time.{Duration => _, _}
 import squants.market.{Currency, MoneyContext}
 
-import com.velocidi.apso.json.syntax._
+import com.velocidi.apso.circe.syntax._
 
 /** Provides additional JsonFormats not available in the `DefaultJsonProtocol`.
   */
