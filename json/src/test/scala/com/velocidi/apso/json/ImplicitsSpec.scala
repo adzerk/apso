@@ -14,23 +14,15 @@ class ImplicitsSpec extends Specification {
       val expectedJson = json"""{ "a": {"b": {"c": 1, "d": {"e": 3}}, "f": 5}, "g": 4 }"""
 
       "create a circe JSON object from complete paths" in {
-        val res = fromCirceFullPaths(
-          List(
-            "a.b.c" -> 1.asJson,
-            "a.b.d.e" -> 3.asJson,
-            "a.f" -> 5.asJson,
-            "g" -> 4.asJson))
+        val res =
+          fromCirceFullPaths(List("a.b.c" -> 1.asJson, "a.b.d.e" -> 3.asJson, "a.f" -> 5.asJson, "g" -> 4.asJson))
 
         res mustEqual expectedJson
       }
 
       "create a circe JSON object from complete paths (with a custom separator)" in {
-        val res = fromCirceFullPaths(
-          List(
-            "a-b-c" -> 1.asJson,
-            "a-b-d-e" -> 3.asJson,
-            "a-f" -> 5.asJson,
-            "g" -> 4.asJson), "-")
+        val res =
+          fromCirceFullPaths(List("a-b-c" -> 1.asJson, "a-b-d-e" -> 3.asJson, "a-f" -> 5.asJson, "g" -> 4.asJson), "-")
 
         res mustEqual expectedJson
       }

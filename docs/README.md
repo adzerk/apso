@@ -47,6 +47,7 @@ Please take into account that the library is still in an experimental stage and 
     - [CredentialStore](#credentialstore)
     - [S3Bucket](#s3bucket)
     - [SerializableAWSCredentials](#serializableawscredentials)
+- [Caching](#caching)
 - [Collections](#collections)
     - [Trie](#trie)
     - [TypedMap](#typedmap)
@@ -326,7 +327,7 @@ The `ExtraMiscDirectives` trait exposes the directives `cacheControlMaxAge(maxAg
 
 ### ProxySupport
 
-The `ProxySupport` traits adds helper methods to proxy requests to a given uri, either directly (`proxyTo`), or with the unmatched path and query parameters of the current context (`proxyToUnmatchedPath`).
+The `ProxySupport` traits adds helper methods to proxy requests to a given uri, either directly (`proxyTo`), or with the unmatched path and query parameters of the current context (`proxyToUnmatchedPath`). In order for the client IP to be correctly propagated in `X-Forward-For` headers, the `ProxySupport` trait requires the `akka.http.server.remote-address-attribute` setting to be `on`.
 
 ## Amazon Web Services
 
@@ -375,6 +376,51 @@ The `S3Bucket` class wraps an instance of `AmazonS3Client` (from AWS SDK for Jav
 ### SerializableAWSCredentials
 
 The `SerializableAWSCredentials` class provides a serializable container for AWS credentials, extending the `AWSCredentials` class (from AWS SDK for Java).
+
+## Caching
+The `apso-caching` module provides provides utilities for caching. 
+
+To use it in an existing SBT project, add the following dependency to your `build.sbt`:
+
+```scala
+libraryDependencies += "com.velocidi" %% "apso-caching" % "@VERSION@"
+```
+
+Apso provides utilities to simplify the caching of method calls, with [ScalaCache](https://cb372.github.io/scalacache/) and using either `Guava` or `Caffeine` as underlying cache implementations. 
+
+These utilities are provided as `cached()` and `cachedF()` extension methods over all `FunctionN[]` types:
+
+```scala mdoc:reset
+import scala.concurrent._
+import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
+
+import java.util.concurrent.atomic.AtomicInteger
+
+import com.velocidi.apso.caching._
+
+val x = new AtomicInteger(0)
+
+val cachedFn = ((i: Int) => {
+  val value = x.getAndAdd(i)
+  value
+}).cached(config.Cache.Caffeine(Some(3), None))
+
+cachedFn(2)
+cachedFn(2)
+x
+
+val y = new AtomicInteger(0)
+
+val cachedFutFn = ((i: Int) => Future {
+  val value = y.getAndAdd(i)
+  value
+}).cachedF(config.Cache.Guava(Some(2), None))
+
+Await.result(cachedFutFn(3), Duration.Inf)
+Await.result(cachedFutFn(3), Duration.Inf)
+y
+```
 
 ## Collections
 

@@ -16,32 +16,34 @@
 
 package com.velocidi.apso.caching
 
-import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import scala.concurrent.duration.Duration
-import scala.concurrent.{ ExecutionContext, Future, Promise }
-import scala.util.{ Failure, Success }
+import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.util.{Failure, Success}
+
+import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap
 
 object LruCache {
 
   //# source-quote-LruCache-apply
-  /**
-   * Creates a new [[ExpiringLruCache]] or
-   * [[SimpleLruCache]] instance depending on whether
-   * a non-zero and finite timeToLive and/or timeToIdle is set or not.
-   */
+  /** Creates a new [[ExpiringLruCache]] or
+    * [[SimpleLruCache]] instance depending on whether
+    * a non-zero and finite timeToLive and/or timeToIdle is set or not.
+    */
   def apply[V](
-    maxCapacity: Int = 500,
-    initialCapacity: Int = 16,
-    timeToLive: Duration = Duration.Inf,
-    timeToIdle: Duration = Duration.Inf): Cache[V] = {
+      maxCapacity: Int = 500,
+      initialCapacity: Int = 16,
+      timeToLive: Duration = Duration.Inf,
+      timeToIdle: Duration = Duration.Inf
+  ): Cache[V] = {
     //#
     def check(dur: Duration, name: String) =
       require(
         dur != Duration.Zero,
         s"Behavior of LruCache.apply changed: Duration.Zero not allowed any more for $name parameter. To disable " +
-          "expiration use Duration.Inf instead of Duration.Zero")
+          "expiration use Duration.Inf instead of Duration.Zero"
+      )
     // migration help
     check(timeToLive, "timeToLive")
     check(timeToIdle, "timeToIdle")
@@ -53,12 +55,11 @@ object LruCache {
   }
 }
 
-/**
- * A thread-safe implementation of [[Cache]].
- * The cache has a defined maximum number of entries it can store. After the maximum capacity is reached new
- * entries cause old ones to be evicted in a last-recently-used manner, i.e. the entries that haven't been accessed for
- * the longest time are evicted first.
- */
+/** A thread-safe implementation of [[Cache]].
+  * The cache has a defined maximum number of entries it can store. After the maximum capacity is reached new
+  * entries cause old ones to be evicted in a last-recently-used manner, i.e. the entries that haven't been accessed for
+  * the longest time are evicted first.
+  */
 final class SimpleLruCache[V](val maxCapacity: Int, val initialCapacity: Int) extends Cache[V] {
   require(maxCapacity >= 0, "maxCapacity must not be negative")
   require(initialCapacity <= maxCapacity, "initialCapacity must be <= maxCapacity")
@@ -92,33 +93,35 @@ final class SimpleLruCache[V](val maxCapacity: Int, val initialCapacity: Int) ex
   def keys: Set[Any] = store.keySet().asScala.toSet
 
   def ascendingKeys(limit: Option[Int] = None) =
-    limit.map { lim => store.ascendingKeySetWithLimit(lim) }
+    limit
+      .map { lim => store.ascendingKeySetWithLimit(lim) }
       .getOrElse(store.ascendingKeySet())
-      .iterator().asScala
+      .iterator()
+      .asScala
 
   def size = store.size
 }
 
-/**
- * A thread-safe implementation of [[Cache]].
- * The cache has a defined maximum number of entries is can store. After the maximum capacity has been reached new
- * entries cause old ones to be evicted in a last-recently-used manner, i.e. the entries that haven't been accessed for
- * the longest time are evicted first.
- * In addition this implementation optionally supports time-to-live as well as time-to-idle expiration.
- * The former provides an upper limit to the time period an entry is allowed to remain in the cache while the latter
- * limits the maximum time an entry is kept without having been accessed. If both values are non-zero the time-to-live
- * has to be strictly greater than the time-to-idle.
- * Note that expired entries are only evicted upon next access (or by being thrown out by the capacity constraint), so
- * they might prevent gargabe collection of their values for longer than expected.
- *
- * @param timeToLive the time-to-live in millis, zero for disabling ttl-expiration
- * @param timeToIdle the time-to-idle in millis, zero for disabling tti-expiration
- */
-final class ExpiringLruCache[V](maxCapacity: Long, initialCapacity: Int,
-    timeToLive: Duration, timeToIdle: Duration) extends Cache[V] {
+/** A thread-safe implementation of [[Cache]].
+  * The cache has a defined maximum number of entries is can store. After the maximum capacity has been reached new
+  * entries cause old ones to be evicted in a last-recently-used manner, i.e. the entries that haven't been accessed for
+  * the longest time are evicted first.
+  * In addition this implementation optionally supports time-to-live as well as time-to-idle expiration.
+  * The former provides an upper limit to the time period an entry is allowed to remain in the cache while the latter
+  * limits the maximum time an entry is kept without having been accessed. If both values are non-zero the time-to-live
+  * has to be strictly greater than the time-to-idle.
+  * Note that expired entries are only evicted upon next access (or by being thrown out by the capacity constraint), so
+  * they might prevent gargabe collection of their values for longer than expected.
+  *
+  * @param timeToLive the time-to-live in millis, zero for disabling ttl-expiration
+  * @param timeToIdle the time-to-idle in millis, zero for disabling tti-expiration
+  */
+final class ExpiringLruCache[V](maxCapacity: Long, initialCapacity: Int, timeToLive: Duration, timeToIdle: Duration)
+    extends Cache[V] {
   require(
     !timeToLive.isFinite || !timeToIdle.isFinite || timeToLive > timeToIdle,
-    s"timeToLive($timeToLive) must be greater than timeToIdle($timeToIdle)")
+    s"timeToLive($timeToLive) must be greater than timeToIdle($timeToIdle)"
+  )
 
   private[caching] val store = new ConcurrentLinkedHashMap.Builder[Any, Entry[V]]
     .initialCapacity(initialCapacity)
@@ -169,9 +172,9 @@ final class ExpiringLruCache[V](maxCapacity: Long, initialCapacity: Int,
   }
 
   def remove(key: Any) = store.remove(key) match {
-    case null => None
+    case null                      => None
     case entry if (isAlive(entry)) => Some(entry.future)
-    case _ => None
+    case _                         => None
   }
 
   def clear(): Unit = { store.clear() }
@@ -179,9 +182,11 @@ final class ExpiringLruCache[V](maxCapacity: Long, initialCapacity: Int,
   def keys: Set[Any] = store.keySet().asScala.toSet
 
   def ascendingKeys(limit: Option[Int] = None) =
-    limit.map { lim => store.ascendingKeySetWithLimit(lim) }
+    limit
+      .map { lim => store.ascendingKeySetWithLimit(lim) }
       .getOrElse(store.ascendingKeySet())
-      .iterator().asScala
+      .iterator()
+      .asScala
 
   def size = store.size
 
@@ -199,8 +204,8 @@ private[caching] class Entry[T](val promise: Promise[T]) {
     lastAccessed = Timestamp.now
   }
   override def toString = future.value match {
-    case Some(Success(value)) => value.toString
+    case Some(Success(value))     => value.toString
     case Some(Failure(exception)) => exception.toString
-    case None => "pending"
+    case None                     => "pending"
   }
 }

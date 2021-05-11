@@ -5,23 +5,19 @@ import java.net.URI
 import scala.concurrent.duration._
 import scala.util.Try
 
-import com.typesafe.config.{ Config, ConfigFactory, ConfigRenderOptions }
+import com.typesafe.config.{Config, ConfigFactory, ConfigRenderOptions}
 import io.circe._
-import io.circe.generic.semiauto.{ deriveDecoder, deriveEncoder }
+import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 import io.circe.parser._
 import org.joda.time.format.ISODateTimeFormat
-import org.joda.time.{ Duration => _, _ }
-import squants.market.{ Currency, MoneyContext }
+import org.joda.time.{Duration => _, _}
+import squants.market.{Currency, MoneyContext}
 
 import com.velocidi.apso.json.syntax._
 
-/**
- * Provides additional JsonFormats not available in the `DefaultJsonProtocol`.
- */
-object ExtraJsonProtocol
-  extends ExtraTimeJsonProtocol
-  with ExtraHttpJsonProtocol
-  with ExtraMiscJsonProtocol
+/** Provides additional JsonFormats not available in the `DefaultJsonProtocol`.
+  */
+object ExtraJsonProtocol extends ExtraTimeJsonProtocol with ExtraHttpJsonProtocol with ExtraMiscJsonProtocol
 
 trait ExtraTimeJsonProtocol {
   private[this] def tryToParseDuration(duration: String): Try[FiniteDuration] =
@@ -47,21 +43,6 @@ trait ExtraTimeJsonProtocol {
     Encoder[String].contramap(_.toString)
   implicit val periodDecoder: Decoder[Period] =
     Decoder[String].emapPrettyTry(v => Try(new Period(v)))
-}
-
-trait ExtraHttpJsonProtocol {
-
-  implicit val uriEncoder: Encoder[URI] =
-    Encoder[String].contramap(_.toString)
-  implicit val uriDecoder: Decoder[URI] =
-    Decoder[String].emapPrettyTry(v => Try(new URI(v)))
-}
-
-trait ExtraMiscJsonProtocol {
-  implicit val configEncoder: Encoder[Config] =
-    Encoder[Json].contramap(conf => parse(conf.root.render(ConfigRenderOptions.concise())).fold(throw _, identity))
-  implicit val configDecoder: Decoder[Config] =
-    Decoder[Json].emapPrettyTry(json => Try(ConfigFactory.parseString(json.toString)))
 
   implicit val dateTimeEncoder: Encoder[DateTime] = new Encoder[DateTime] {
     private val stringEncoder = Encoder[String]
@@ -76,32 +57,54 @@ trait ExtraMiscJsonProtocol {
     Encoder[String].contramap(_.toString)
   implicit val localDateDecoder: Decoder[LocalDate] =
     Decoder[String].emapPrettyTry(v => Try(new LocalDate(v)))
+}
 
-  implicit def currencyDecoder(implicit moneyContext: MoneyContext): Decoder[Currency] = Decoder[String].emapPrettyTry(Currency(_))
+object ExtraTimeJsonProtocol extends ExtraTimeJsonProtocol
+
+trait ExtraHttpJsonProtocol {
+  implicit val uriEncoder: Encoder[URI] =
+    Encoder[String].contramap(_.toString)
+  implicit val uriDecoder: Decoder[URI] =
+    Decoder[String].emapPrettyTry(v => Try(new URI(v)))
+}
+
+object ExtraHttpJsonProtocol extends ExtraHttpJsonProtocol
+
+trait ExtraMiscJsonProtocol {
+  implicit val configEncoder: Encoder[Config] =
+    Encoder[Json].contramap(conf => parse(conf.root.render(ConfigRenderOptions.concise())).fold(throw _, identity))
+  implicit val configDecoder: Decoder[Config] =
+    Decoder[Json].emapPrettyTry(json => Try(ConfigFactory.parseString(json.toString)))
+
+  implicit def currencyDecoder(implicit moneyContext: MoneyContext): Decoder[Currency] =
+    Decoder[String].emapPrettyTry(Currency(_))
   implicit val currencyEncoder: Encoder[Currency] = Encoder[String].contramap(_.toString)
 
-  /**
-   * Serializes a map as an array of key-value objects.
-   *
-   * @tparam K the type of the keys of the map
-   * @tparam V the types of the value of the map
-   * @return an instance of `Encoder` for the map
-   */
+  /** Serializes a map as an array of key-value objects.
+    *
+    * @tparam K the type of the keys of the map
+    * @tparam V the types of the value of the map
+    * @return an instance of `Encoder` for the map
+    */
   def mapJsonArrayEncoder[K: Encoder, V: Encoder]: Encoder[Map[K, V]] =
     Encoder[List[MapEntry[K, V]]].contramap(_.toList.map { case (k, v) => MapEntry(k, v) })
 
-  /**
-   * Deserializes a map from array of key-value objects.
-   *
-   * @tparam K the type of the keys of the map
-   * @tparam V the types of the value of the map
-   * @return an instance of `Decoder` for the map
-   */
+  /** Deserializes a map from array of key-value objects.
+    *
+    * @tparam K the type of the keys of the map
+    * @tparam V the types of the value of the map
+    * @return an instance of `Decoder` for the map
+    */
   def mapJsonArrayDecoder[K: Decoder, V: Decoder]: Decoder[Map[K, V]] =
     Decoder[List[MapEntry[K, V]]].map(_.flatMap(me => Some(me.key, me.value)).toMap)
 
   private case class MapEntry[K, V](key: K, value: V)
   private implicit def mapEntryEncoder[K: Encoder, V: Encoder]: Encoder[MapEntry[K, V]] = deriveEncoder[MapEntry[K, V]]
   private implicit def mapEntryDecoder[K: Decoder, V: Decoder]: Decoder[MapEntry[K, V]] =
-    deriveDecoder[MapEntry[K, V]].validate(_.keys.exists(k => k.exists(_ == "key") && k.exists(_ == "value")), "Expected a json object with 'key' and 'value' as keys")
+    deriveDecoder[MapEntry[K, V]].validate(
+      _.keys.exists(k => k.exists(_ == "key") && k.exists(_ == "value")),
+      "Expected a json object with 'key' and 'value' as keys"
+    )
 }
+
+object ExtraMiscJsonProtocol extends ExtraMiscJsonProtocol

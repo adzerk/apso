@@ -15,44 +15,48 @@ class InsistentInputStreamSpec extends Specification {
 
     val testList = (1 to 100).map(_.toByte)
 
-    val testGoodInputStream = () => new InputStream {
-      val iter = testList.iterator
-      def read(): Int = iter.next()
-    }
+    val testGoodInputStream = () =>
+      new InputStream {
+        val iter = testList.iterator
+        def read(): Int = iter.next()
+      }
 
-    val testBuggyInputStream = () => new FailNextInputStream {
-      val iter = testList.iterator
-      def read(): Int = {
-        if (fail) {
-          fail = false
-          throw new Exception("bad read")
-        } else {
-          iter.next()
+    val testBuggyInputStream = () =>
+      new FailNextInputStream {
+        val iter = testList.iterator
+        def read(): Int = {
+          if (fail) {
+            fail = false
+            throw new Exception("bad read")
+          } else {
+            iter.next()
+          }
+        }
+        override def skip(l: Long) = {
+          iter.drop(l.toInt)
+          l
         }
       }
-      override def skip(l: Long) = {
-        iter.drop(l.toInt)
-        l
-      }
-    }
 
-    val testOptimizedBuggyInputStream = (offset: Long) => new FailNextInputStream {
-      val iter = testList.drop(offset.toInt).iterator
-      def read(): Int = {
-        if (fail) {
-          fail = false
-          throw new Exception("bad read")
-        } else {
-          iter.next()
+    val testOptimizedBuggyInputStream = (offset: Long) =>
+      new FailNextInputStream {
+        val iter = testList.drop(offset.toInt).iterator
+        def read(): Int = {
+          if (fail) {
+            fail = false
+            throw new Exception("bad read")
+          } else {
+            iter.next()
+          }
         }
+        override def skip(l: Long) = throw new Exception("unoptimized skip")
       }
-      override def skip(l: Long) = throw new Exception("unoptimized skip")
-    }
 
-    val testBadInputStream = () => new InputStream {
-      val iter = testList.iterator
-      def read(): Int = throw new Exception("bad read")
-    }
+    val testBadInputStream = () =>
+      new InputStream {
+        val iter = testList.iterator
+        def read(): Int = throw new Exception("bad read")
+      }
 
     "have a working input stream interface" in {
 

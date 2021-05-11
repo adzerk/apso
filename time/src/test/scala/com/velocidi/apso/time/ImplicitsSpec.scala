@@ -2,6 +2,7 @@ package com.velocidi.apso.time
 
 import com.github.nscala_time.time.Imports._
 import org.specs2.mutable._
+
 import Implicits._
 
 class ImplicitsSpec extends Specification {
@@ -11,13 +12,18 @@ class ImplicitsSpec extends Specification {
       val endDate = "2014-01-03".toLocalDate
 
       (startDate to endDate) === IndexedSeq(
-        "2014-01-01".toLocalDate, "2014-01-02".toLocalDate, "2014-01-03".toLocalDate)
+        "2014-01-01".toLocalDate,
+        "2014-01-02".toLocalDate,
+        "2014-01-03".toLocalDate
+      )
 
-      (startDate until endDate) === IndexedSeq(
-        "2014-01-01".toLocalDate, "2014-01-02".toLocalDate)
+      (startDate until endDate) === IndexedSeq("2014-01-01".toLocalDate, "2014-01-02".toLocalDate)
 
       (startDate until "2014-01-06".toLocalDate by 2.days) === IndexedSeq(
-        "2014-01-01".toLocalDate, "2014-01-03".toLocalDate, "2014-01-05".toLocalDate)
+        "2014-01-01".toLocalDate,
+        "2014-01-03".toLocalDate,
+        "2014-01-05".toLocalDate
+      )
     }
 
     "support conversion to UTC DateTime" in {
@@ -89,11 +95,7 @@ class ImplicitsSpec extends Specification {
       interval.split(0) === Seq.empty
       interval.split(-1) must throwAn[IllegalArgumentException]
       interval.split(5).size === 5
-      interval.split(4) === Seq(
-        new Interval(0, 24),
-        new Interval(25, 49),
-        new Interval(50, 74),
-        new Interval(75, 99))
+      interval.split(4) === Seq(new Interval(0, 24), new Interval(25, 49), new Interval(50, 74), new Interval(75, 99))
     }
   }
 }

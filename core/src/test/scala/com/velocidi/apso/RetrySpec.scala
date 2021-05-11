@@ -1,9 +1,10 @@
 package com.velocidi.apso
 
-import org.specs2.concurrent.ExecutionEnv
-import org.specs2.mutable.Specification
 import scala.concurrent.Future
 import scala.util.Failure
+
+import org.specs2.concurrent.ExecutionEnv
+import org.specs2.mutable.Specification
 
 class RetrySpec(implicit ee: ExecutionEnv) extends Specification with FutureExtraMatchers {
 
@@ -70,19 +71,19 @@ class RetrySpec(implicit ee: ExecutionEnv) extends Specification with FutureExtr
       var attempts = 0
       val retries = 10
 
-      val f = try {
-        Retry.retry[Any](retries) {
-          attempts = attempts + 1
-          throw new OutOfMemoryError("Doomed")
+      val f =
+        try {
+          Retry.retry[Any](retries) {
+            attempts = attempts + 1
+            throw new OutOfMemoryError("Doomed")
+          }
+        } catch {
+          case _: OutOfMemoryError =>
+            Failure(new RuntimeException("Failed previously with out of memory!"))
         }
-      } catch {
-        case _: OutOfMemoryError =>
-          Failure(new RuntimeException("Failed previously with out of memory!"))
-      }
 
-      eventually(f must beAFailedTry.like {
-        case ex: RuntimeException =>
-          ex.getMessage must beEqualTo("Failed previously with out of memory!")
+      eventually(f must beAFailedTry.like { case ex: RuntimeException =>
+        ex.getMessage must beEqualTo("Failed previously with out of memory!")
       })
 
       attempts must beEqualTo(1) // 1 attempt

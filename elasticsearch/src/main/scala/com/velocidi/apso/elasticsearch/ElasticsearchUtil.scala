@@ -3,7 +3,7 @@ package com.velocidi.apso.elasticsearch
 import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.http.JavaClient
 import org.apache.http.HttpHost
-import org.apache.http.auth.{ AuthScope, UsernamePasswordCredentials }
+import org.apache.http.auth.{AuthScope, UsernamePasswordCredentials}
 import org.apache.http.impl.client.BasicCredentialsProvider
 import org.elasticsearch.client.RestClient
 
@@ -29,7 +29,8 @@ object ElasticsearchUtil {
     }
 
     val restClient =
-      RestClient.builder(new HttpHost(esConfig.host, esConfig.port, protocol))
+      RestClient
+        .builder(new HttpHost(esConfig.host, esConfig.port, protocol))
         .setHttpClientConfigCallback(_.setDefaultCredentialsProvider(credsProvider))
         .build()
 

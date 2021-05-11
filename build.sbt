@@ -1,56 +1,87 @@
-import scalariform.formatter.preferences._
 import ReleaseTransformations._
+import spray.boilerplate.BoilerplatePlugin
 
 organization in ThisBuild := "com.velocidi"
 
-crossScalaVersions in ThisBuild := Seq("2.12.10", "2.13.1")
-scalaVersion in ThisBuild := "2.12.10"
+crossScalaVersions in ThisBuild := Seq("2.12.12", "2.13.4")
+scalaVersion in ThisBuild := "2.12.12"
 
 def module(project: Project, moduleName: String) =
   (project in file(moduleName))
     .settings(name := s"apso-$moduleName")
     .settings(commonSettings: _*)
 
-lazy val akkaHttp      = module(project, "akka-http").dependsOn(core, testkit % Test)
-lazy val aws           = module(project, "aws").dependsOn(core)
-lazy val caching       = module(project, "caching")
+lazy val akka          = module(project, "akka")
+lazy val akkaHttp      = module(project, "akka-http").dependsOn(log, core % Test, testkit % Test)
+lazy val aws           = module(project, "aws").dependsOn(core, log)
+lazy val caching       = module(project, "caching").enablePlugins(BoilerplatePlugin)
 lazy val collections   = module(project, "collections")
 lazy val core          = module(project, "core").dependsOn(testkit % Test)
-lazy val elasticsearch = module(project, "elasticsearch").dependsOn(core, testkit % Test)
-lazy val encryption    = module(project, "encryption").dependsOn(core)
+lazy val elasticsearch = module(project, "elasticsearch").dependsOn(log, testkit % Test)
+lazy val encryption    = module(project, "encryption").dependsOn(log)
 lazy val hashing       = module(project, "hashing")
 lazy val io            = module(project, "io").dependsOn(aws, testkit % Test)
-lazy val json          = module(project, "json").dependsOn(core, collections)
-lazy val profiling     = module(project, "profiling").dependsOn(core)
+lazy val json          = module(project, "json")
+lazy val log           = module(project, "log")
+lazy val profiling     = module(project, "profiling").dependsOn(core, log)
 lazy val testkit       = module(project, "testkit")
 lazy val time          = module(project, "time")
 
 lazy val apso = (project in file("."))
   .settings(commonSettings: _*)
   .settings(name := "apso")
-  .dependsOn(akkaHttp, aws, caching, collections, core, elasticsearch, encryption, hashing, io, json, profiling, time)
-  .aggregate(akkaHttp, aws, caching, collections, core, elasticsearch, encryption, hashing, io, json, profiling, testkit, time)
-
+  .dependsOn(
+    akka,
+    akkaHttp,
+    aws,
+    caching,
+    collections,
+    core,
+    elasticsearch,
+    encryption,
+    hashing,
+    io,
+    json,
+    log,
+    profiling,
+    time
+  )
+  .aggregate(
+    akka,
+    akkaHttp,
+    aws,
+    caching,
+    collections,
+    core,
+    elasticsearch,
+    encryption,
+    hashing,
+    io,
+    json,
+    log,
+    profiling,
+    testkit,
+    time
+  )
 
 lazy val docs = (project in file("apso-docs"))
   .dependsOn(apso)
   .settings(commonSettings: _*)
   .settings(
+    // format: off
     mdocOut := baseDirectory.in(ThisBuild).value,
 
     mdocVariables := Map(
-      "VERSION" -> "0.16.2" // This version should be set to the currently released version.
+      "VERSION" -> "0.16.10" // This version should be set to the currently released version.
     ),
 
-    // This is necessary because `aws-java-sdk-s3` has the `provided` scope in apso-aws
-    libraryDependencies ++= Seq(Dependencies.AwsJavaSdkS3),
-
     skip in publish := true
+    // format: on
   )
   .enablePlugins(MdocPlugin)
 
-
 lazy val commonSettings = Seq(
+  // format: off
   resolvers ++= Seq(
     Resolver.sonatypeRepo("snapshots"),
     Resolver.typesafeRepo("snapshots"),
@@ -58,9 +89,12 @@ lazy val commonSettings = Seq(
     "Bintray Scalaz Releases"       at "https://dl.bintray.com/scalaz/releases",
     "JCenter Repository"            at "https://jcenter.bintray.com/"),
 
-  scalariformPreferences := scalariformPreferences.value
-    .setPreference(DanglingCloseParenthesis, Prevent)
-    .setPreference(DoubleIndentConstructorArguments, true),
+  scalafmtOnCompile := true,
+
+  // Enable Scalafix and the OrganizeImports rule.
+  semanticdbEnabled := true,
+  semanticdbVersion := scalafixSemanticdb.revision,
+  scalafixOnCompile := true,
 
   scalacOptions ++= {
     lazy val commonFlags = Seq(
@@ -102,7 +136,12 @@ lazy val commonSettings = Seq(
       url("https://github.com/velocidi/apso"),
       "scm:git@github.com:velocidi/apso.git"
     )
-  ))
+  )
+  // format: on
+)
+
+// Enable the OrganizeImports Scalafix rule.
+scalafixDependencies in ThisBuild += "com.github.liancheng" %% "organize-imports" % "0.5.0"
 
 releaseCrossBuild := true
 releaseTagComment := s"Release ${(version in ThisBuild).value}"
@@ -120,4 +159,5 @@ releaseProcess := Seq[ReleaseStep](
   releaseStepCommand("sonatypeBundleRelease"),
   setNextVersion,
   commitNextVersion,
-  pushChanges)
+  pushChanges
+)

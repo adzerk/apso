@@ -1,16 +1,15 @@
 package com.velocidi.apso.collection
 
-import org.specs2.mutable._
 import org.specs2.matcher.MatchResult
+import org.specs2.mutable._
 
 class TrieSpec extends Specification {
   "A Trie" should {
     def checkTree[A, B](input: Seq[A], v: B, trie: Trie[A, B]): MatchResult[_] = {
       input match {
         case Seq(h, t @ _*) =>
-          trie.nodes.get(h) must beLike {
-            case Some(trie) =>
-              checkTree(t, v, trie)
+          trie.nodes.get(h) must beLike { case Some(trie) =>
+            checkTree(t, v, trie)
           }
 
         case _ =>

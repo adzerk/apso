@@ -1,11 +1,11 @@
 package com.velocidi.apso
 
+import scala.concurrent._
+import scala.concurrent.duration._
+
 import org.specs2.execute.AsResult
 import org.specs2.matcher._
 import org.specs2.mutable.SpecificationLike
-
-import scala.concurrent._
-import scala.concurrent.duration._
 
 trait FutureExtraMatchers { this: SpecificationLike =>
 
@@ -15,9 +15,9 @@ trait FutureExtraMatchers { this: SpecificationLike =>
   }
 
   implicit class RichFutureExtraMatcher[T: AsResult](m: => T) {
-    /**
-     * @return a matcher that needs to eventually match, after a given number of retries.
-     */
+
+    /** @return a matcher that needs to eventually match, after a given number of retries.
+      */
     def eventually(retries: Int): T = EventuallyMatchers.eventually(retries, 100.milliseconds)(m)
   }
 

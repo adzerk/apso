@@ -1,10 +1,9 @@
 package com.velocidi.apso.io
 
-import java.io.{ File, InputStream }
+import java.io.{File, InputStream}
 import java.nio.file.Files
 import java.util.UUID
 
-import org.specs2.mutable.Specification
 import scala.io.Source
 import scala.util.Try
 
