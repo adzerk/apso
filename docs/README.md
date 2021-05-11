@@ -620,6 +620,65 @@ Apso includes a bunch of utilities to work with JSON serialization and deseriali
 libraryDependencies += "com.velocidi" %% "apso-json" % "@VERSION@"
 ```
 
+### ExtraJsonProtocol
+
+The `ExtraJsonProtocol` object combines three traits that provide extra `Encoders` and `Decoders` (of [circe](https://circe.github.io/circe/)) for some relevant types. The `Encoders` and `Decoders` are provided on each trait for the following types:
+
+* ExtraTimeJsonProtocol: `FiniteDuration`, `Interval` and `Period`;	
+* ExtraHttpJsonProtocol: `URI`;	
+* ExtraMiscJsonProtocol: `Config`, `DateTime`, `LocalDate` and `Currency`. It also includes the non-implicit methods `mapJsonArrayEncoder[K, V]` and `mapJsonArrayDecoder[K, V]` which serialize and deserialize a map as an array of key-value objects.
+
+### JSON
+The `json` package provides some implicits around [circe](https://circe.github.io/circe/)'s `Json` to unwrap JSON values, merge two `Json` and create `Json` from a sequence of dot-separated paths with the corresponding leaf values. It also provides methods to access and delete fields on the `Json` object. See the following for sample usage:	
+
+```scala mdoc:reset:silent
+import com.velocidi.apso.json.Implicits._		
+import io.circe.syntax._
+import io.circe.Json
+
+"a".asJson		
+"2".asJson		
+val js1 = Json.obj(
+  "a" := 2,
+  "b" := 3,
+  "d" := Json.obj("f" := 6))
+	
+val js2 = Json.obj(
+            "c" := 4,
+            "d" := Json.obj("e" := 5))
+```
+```scala mdoc	
+js1.deepMerge(js2).spaces2	
+
+fromCirceFullPaths(Seq(	
+   "a" -> 1.asJson,	
+   "b.c" -> 2.asJson,	
+   "b.d" -> 3.asJson,	
+   "e" -> "xpto".asJson,	
+   "f.g.h" -> 5.asJson)).spaces2
+
+js1.getField[Int]("a")
+js1.getField[Int]("d.f")
+js1.getField[Int]("x")
+
+js1.deleteField("a")
+js1.deleteField("d.f")
+js1.deleteField("x")	
+```
+
+### JsonConvert
+The `JsonConvert` object contains helpers for converting between JSON values and other structures. See the following for sample usage:	
+
+```scala mdoc:reset
+import com.velocidi.apso.json._
+
+JsonConvert.toCirceJson("abcd")
+
+JsonConvert.toCirceJson(1)
+	
+JsonConvert.toCirceJson(Map(1 -> 2, 3 -> 4))	
+```
+
 ## Profiling
 
 The `profiling` module of apso provides utilities to help with profiling the running process.

@@ -726,6 +726,108 @@ Apso includes a bunch of utilities to work with JSON serialization and deseriali
 libraryDependencies += "com.velocidi" %% "apso-json" % "0.16.10"
 ```
 
+### ExtraJsonProtocol
+
+The `ExtraJsonProtocol` object combines three traits that provide extra `Encoders` and `Decoders` (of [circe](https://circe.github.io/circe/)) for some relevant types. The `Encoders` and `Decoders` are provided on each trait for the following types:
+
+* ExtraTimeJsonProtocol: `FiniteDuration`, `Interval` and `Period`;	
+* ExtraHttpJsonProtocol: `URI`;	
+* ExtraMiscJsonProtocol: `Config`, `DateTime`, `LocalDate` and `Currency`. It also includes the non-implicit methods `mapJsonArrayEncoder[K, V]` and `mapJsonArrayDecoder[K, V]` which serialize and deserialize a map as an array of key-value objects.
+
+### JSON
+The `json` package provides some implicits around [circe](https://circe.github.io/circe/)'s `Json` to unwrap JSON values, merge two `Json` and create `Json` from a sequence of dot-separated paths with the corresponding leaf values. It also provides methods to access and delete fields on the `Json` object. See the following for sample usage:	
+
+```scala
+import com.velocidi.apso.json.Implicits._		
+import io.circe.syntax._
+import io.circe.Json
+
+"a".asJson		
+"2".asJson		
+val js1 = Json.obj(
+  "a" := 2,
+  "b" := 3,
+  "d" := Json.obj("f" := 6))
+	
+val js2 = Json.obj(
+            "c" := 4,
+            "d" := Json.obj("e" := 5))
+```
+```scala
+js1.deepMerge(js2).spaces2	
+// res62: String = """{
+//   "c" : 4,
+//   "d" : {
+//     "e" : 5,
+//     "f" : 6
+//   },
+//   "a" : 2,
+//   "b" : 3
+// }"""	
+
+fromCirceFullPaths(Seq(	
+   "a" -> 1.asJson,	
+   "b.c" -> 2.asJson,	
+   "b.d" -> 3.asJson,	
+   "e" -> "xpto".asJson,	
+   "f.g.h" -> 5.asJson)).spaces2
+// res63: String = """{
+//   "f" : {
+//     "g" : {
+//       "h" : 5
+//     }
+//   },
+//   "e" : "xpto",
+//   "b" : {
+//     "d" : 3,
+//     "c" : 2
+//   },
+//   "a" : 1
+// }"""
+
+js1.getField[Int]("a")
+// res64: Option[Int] = Some(2)
+js1.getField[Int]("d.f")
+// res65: Option[Int] = Some(6)
+js1.getField[Int]("x")
+// res66: Option[Int] = None
+
+js1.deleteField("a")
+// res67: Json = JObject(
+//   object[b -> 3,d -> {
+//   "f" : 6
+// }]
+// )
+js1.deleteField("d.f")
+// res68: Json = JObject(
+//   object[a -> 2,b -> 3,d -> {
+//   
+// }]
+// )
+js1.deleteField("x")	
+// res69: Json = JObject(
+//   object[a -> 2,b -> 3,d -> {
+//   "f" : 6
+// }]
+// )
+```
+
+### JsonConvert
+The `JsonConvert` object contains helpers for converting between JSON values and other structures. See the following for sample usage:	
+
+```scala
+import com.velocidi.apso.json._
+
+JsonConvert.toCirceJson("abcd")
+// res71: io.circe.Json = JString("abcd")
+
+JsonConvert.toCirceJson(1)
+// res72: io.circe.Json = JNumber(JsonLong(1L))
+	
+JsonConvert.toCirceJson(Map(1 -> 2, 3 -> 4))	
+// res73: io.circe.Json = JObject(object[1 -> 2,3 -> 4])
+```
+
 ## Profiling
 
 The `profiling` module of apso provides utilities to help with profiling the running process.
@@ -764,10 +866,10 @@ import com.velocidi.apso.time._
 import com.velocidi.apso.time.Implicits._
 
 (new DateTime("2012-01-01") to new DateTime("2012-01-01")).toList
-// res60: List[DateTime] = List(2012-01-01T00:00:00.000Z)
+// res75: List[DateTime] = List(2012-01-01T00:00:00.000Z)
 
 (new DateTime("2012-02-01") until new DateTime("2012-03-01") by 1.day)
-// res61: IterableInterval = SteppedInterval(
+// res76: IterableInterval = SteppedInterval(
 //   2012-02-01T00:00:00.000Z,
 //   2012-02-02T00:00:00.000Z,
 //   2012-02-03T00:00:00.000Z,
@@ -800,7 +902,7 @@ import com.velocidi.apso.time.Implicits._
 // )
 
 (new DateTime("2012-01-01") until new DateTime("2012-02-01") by 2.minutes)
-// res62: IterableInterval = SteppedInterval(
+// res77: IterableInterval = SteppedInterval(
 //   2012-01-01T00:00:00.000Z,
 //   2012-01-01T00:02:00.000Z,
 //   2012-01-01T00:04:00.000Z,
