@@ -8,7 +8,7 @@ import org.specs2.mutable.Specification
 
 class JsonConvertSpec extends Specification with EitherMatchers {
   "JsonConvert" should {
-    "be able to produce Spray Json models" in {
+    "be able to produce Json models" in {
       "by converting scala objects to JSON" in {
         JsonConvert.toJson(Map("a" -> 2, "b" -> Map(3 -> 7))) mustEqual parse(
           """{ "a": 2, "b": { "3": 7 }}"""

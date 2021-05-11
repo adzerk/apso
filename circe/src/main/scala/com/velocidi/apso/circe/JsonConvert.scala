@@ -5,14 +5,13 @@ import scala.collection.JavaConverters._
 import io.circe.Json
 import io.circe.syntax._
 
-/** Object containing helpers for converting between JSON values and other
-  * structures.
+/** Object containing helpers for converting between JSON values and other structures.
   */
 object JsonConvert {
 
-  /** Converts an object to a circe JSON value using the most suitable data types.
+  /** Converts an object to a [[io.circe.Json]] value using the most suitable data types.
     * @param obj the object to convert
-    * @return the given object converted to a circe JSON value.
+    * @return the given object converted to a [[io.circe.Json]] value.
     */
   def toJson(obj: Any): Json = obj match {
     case null           => Json.Null

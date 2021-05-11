@@ -61,7 +61,7 @@ object Implicits {
     def getField[A: Decoder](fieldPath: String, separator: Char = '.'): Option[A] =
       getCursor(fieldPath, separator).as[A].fold(_ => None, Some(_))
 
-    /** Delete a field on a json object.
+    /** Deletes a field on a json object.
       *
       * Eg. {"a":1,"b":{"c":2},"d":null}.deleteField("b.c") = {"a":1,"b":{},"d":null}
       *
