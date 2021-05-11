@@ -631,7 +631,7 @@ The `ExtraJsonProtocol` object combines three traits that provide extra `Encoder
 ### JSON
 The `json` package provides some implicits around [circe](https://circe.github.io/circe/)'s `Json` to unwrap JSON values, merge two `Json` and create `Json` from a sequence of dot-separated paths with the corresponding leaf values. It also provides methods to access and delete fields on the `Json` object. See the following for sample usage:	
 
-```scala mdoc:reset
+```scala mdoc:reset:silent
 import com.velocidi.apso.json.Implicits._		
 import io.circe.syntax._
 import io.circe.Json
@@ -646,7 +646,8 @@ val js1 = Json.obj(
 val js2 = Json.obj(
             "c" := 4,
             "d" := Json.obj("e" := 5))
-	
+```
+```scala mdoc	
 js1.deepMerge(js2).spaces2	
 
 fromCirceFullPaths(Seq(	
