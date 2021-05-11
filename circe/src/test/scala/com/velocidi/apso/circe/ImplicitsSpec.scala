@@ -1,11 +1,11 @@
-package com.velocidi.apso.json
+package com.velocidi.apso.circe
 
 import io.circe.generic.semiauto._
 import io.circe.literal._
 import io.circe.syntax._
 import org.specs2.mutable.Specification
 
-import com.velocidi.apso.json.Implicits._
+import com.velocidi.apso.circe.Implicits._
 
 class ImplicitsSpec extends Specification {
   "The Apso Json Implicits should" should {
@@ -13,16 +13,16 @@ class ImplicitsSpec extends Specification {
     "provide a method to create a JSON object from complete paths" in {
       val expectedJson = json"""{ "a": {"b": {"c": 1, "d": {"e": 3}}, "f": 5}, "g": 4 }"""
 
-      "create a circe JSON object from complete paths" in {
+      "create a JSON object from complete paths" in {
         val res =
-          fromCirceFullPaths(List("a.b.c" -> 1.asJson, "a.b.d.e" -> 3.asJson, "a.f" -> 5.asJson, "g" -> 4.asJson))
+          fromFullPaths(List("a.b.c" -> 1.asJson, "a.b.d.e" -> 3.asJson, "a.f" -> 5.asJson, "g" -> 4.asJson))
 
         res mustEqual expectedJson
       }
 
-      "create a circe JSON object from complete paths (with a custom separator)" in {
+      "create a JSON object from complete paths (with a custom separator)" in {
         val res =
-          fromCirceFullPaths(List("a-b-c" -> 1.asJson, "a-b-d-e" -> 3.asJson, "a-f" -> 5.asJson, "g" -> 4.asJson), "-")
+          fromFullPaths(List("a-b-c" -> 1.asJson, "a-b-d-e" -> 3.asJson, "a-f" -> 5.asJson, "g" -> 4.asJson), "-")
 
         res mustEqual expectedJson
       }

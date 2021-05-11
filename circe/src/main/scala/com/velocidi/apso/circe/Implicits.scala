@@ -1,4 +1,4 @@
-package com.velocidi.apso.json
+package com.velocidi.apso.circe
 
 import scala.util.Try
 
@@ -61,7 +61,7 @@ object Implicits {
     def getField[A: Decoder](fieldPath: String, separator: Char = '.'): Option[A] =
       getCursor(fieldPath, separator).as[A].fold(_ => None, Some(_))
 
-    /** Delete a field on a json object.
+    /** Deletes a field on a json object.
       *
       * Eg. {"a":1,"b":{"c":2},"d":null}.deleteField("b.c") = {"a":1,"b":{},"d":null}
       *
@@ -95,7 +95,7 @@ object Implicits {
     * @param separatorRegex regex to use to separate fields
     * @return the resulting Json object
     */
-  def fromCirceFullPaths(paths: Seq[(String, Json)], separatorRegex: String = "\\."): Json = {
+  def fromFullPaths(paths: Seq[(String, Json)], separatorRegex: String = "\\."): Json = {
     def createJson(keys: Seq[String], value: Json): Json = {
       keys match {
         case Nil    => value
@@ -106,7 +106,7 @@ object Implicits {
     paths match {
       case Nil => Json.obj()
       case (path, value) :: rem =>
-        createJson(path.split(separatorRegex).toList, value).deepMerge(fromCirceFullPaths(rem, separatorRegex))
+        createJson(path.split(separatorRegex).toList, value).deepMerge(fromFullPaths(rem, separatorRegex))
     }
   }
 

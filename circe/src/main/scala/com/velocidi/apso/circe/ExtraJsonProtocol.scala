@@ -1,4 +1,4 @@
-package com.velocidi.apso.json
+package com.velocidi.apso.circe
 
 import java.net.URI
 
@@ -13,9 +13,9 @@ import org.joda.time.format.ISODateTimeFormat
 import org.joda.time.{Duration => _, _}
 import squants.market.{Currency, MoneyContext}
 
-import com.velocidi.apso.json.syntax._
+import com.velocidi.apso.circe.syntax._
 
-/** Provides additional JsonFormats not available in the `DefaultJsonProtocol`.
+/** Provides Encoders and Decoders for some relevant types.
   */
 object ExtraJsonProtocol extends ExtraTimeJsonProtocol with ExtraHttpJsonProtocol with ExtraMiscJsonProtocol
 
@@ -80,7 +80,7 @@ trait ExtraMiscJsonProtocol {
     Decoder[String].emapPrettyTry(Currency(_))
   implicit val currencyEncoder: Encoder[Currency] = Encoder[String].contramap(_.toString)
 
-  /** Serializes a map as an array of key-value objects.
+  /** Encodes a map as an array of key-value objects.
     *
     * @tparam K the type of the keys of the map
     * @tparam V the types of the value of the map
@@ -89,7 +89,7 @@ trait ExtraMiscJsonProtocol {
   def mapJsonArrayEncoder[K: Encoder, V: Encoder]: Encoder[Map[K, V]] =
     Encoder[List[MapEntry[K, V]]].contramap(_.toList.map { case (k, v) => MapEntry(k, v) })
 
-  /** Deserializes a map from array of key-value objects.
+  /** Decodes a map from an array of key-value objects.
     *
     * @tparam K the type of the keys of the map
     * @tparam V the types of the value of the map
