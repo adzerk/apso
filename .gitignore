@@ -1,12 +1,23 @@
 # project output directory
 target/
 
-# system and IDE setting files
-.DS_Store
+# sbt
 .bsp
+
+# system
+.DS_Store
+
+# IntelliJ IDEA
+*.iml
 .idea
 .idea_modules
+
+# ENSIME
 .ensime
-.ensime_lucene
 .ensime_cache
-*.iml
+.ensime_lucene
+
+# Metals
+.bloop
+.metals
+metals.sbt
