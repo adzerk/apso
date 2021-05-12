@@ -1,10 +1,10 @@
 import ReleaseTransformations._
 import spray.boilerplate.BoilerplatePlugin
 
-organization in ThisBuild := "com.velocidi"
+ThisBuild / organization := "com.velocidi"
 
-crossScalaVersions in ThisBuild := Seq("2.12.12", "2.13.4")
-scalaVersion in ThisBuild := "2.12.12"
+ThisBuild / crossScalaVersions := Seq("2.12.12", "2.13.4")
+ThisBuild / scalaVersion := "2.12.12"
 
 def module(project: Project, moduleName: String) =
   (project in file(moduleName))
@@ -69,13 +69,13 @@ lazy val docs = (project in file("apso-docs"))
   .settings(commonSettings: _*)
   .settings(
     // format: off
-    mdocOut := baseDirectory.in(ThisBuild).value,
+    mdocOut := (ThisBuild / baseDirectory).value,
 
     mdocVariables := Map(
       "VERSION" -> "0.16.10" // This version should be set to the currently released version.
     ),
 
-    skip in publish := true
+    publish / skip := true
     // format: on
   )
   .enablePlugins(MdocPlugin)
@@ -126,7 +126,7 @@ lazy val commonSettings = Seq(
   publishTo := sonatypePublishToBundle.value,
 
   publishMavenStyle := true,
-  publishArtifact in Test := false,
+  Test / publishArtifact := false,
   pomIncludeRepository := { _ => false },
 
   licenses := Seq("Apache License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
@@ -141,11 +141,11 @@ lazy val commonSettings = Seq(
 )
 
 // Enable the OrganizeImports Scalafix rule.
-scalafixDependencies in ThisBuild += "com.github.liancheng" %% "organize-imports" % "0.5.0"
+ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.5.0"
 
 releaseCrossBuild := true
-releaseTagComment := s"Release ${(version in ThisBuild).value}"
-releaseCommitMessage := s"Set version to ${(version in ThisBuild).value}"
+releaseTagComment := s"Release ${(ThisBuild / version).value}"
+releaseCommitMessage := s"Set version to ${(ThisBuild / version).value}"
 
 releaseProcess := Seq[ReleaseStep](
   checkSnapshotDependencies,
