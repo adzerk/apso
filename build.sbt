@@ -3,8 +3,8 @@ import spray.boilerplate.BoilerplatePlugin
 
 ThisBuild / organization := "com.velocidi"
 
-ThisBuild / crossScalaVersions := Seq("2.12.12", "2.13.4")
-ThisBuild / scalaVersion := "2.12.12"
+ThisBuild / crossScalaVersions := Seq("2.12.13", "2.13.5")
+ThisBuild / scalaVersion := "2.12.13"
 
 def module(project: Project, moduleName: String) =
   (project in file(moduleName))
