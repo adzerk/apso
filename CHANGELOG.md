@@ -17,7 +17,7 @@ This is the first version with a Changelog, albeit not being the first version o
 ### Security
 
 
-[Unreleased]: https://github.com/velocidi/apso/compare/0.18.0...HEAD
+[Unreleased]: https://github.com/velocidi/apso/compare/v0.18.0...HEAD
 
 ***
 
