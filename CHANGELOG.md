@@ -7,6 +7,7 @@ This is the first version with a Changelog, albeit not being the first version o
 ### Added
 
 ### Changed
+- Update Scala, dependencies and plugins versions ([#142](https://github.com/velocidi/apso/pull/142)).
 
 ### Deprecated
 
