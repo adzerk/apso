@@ -2,30 +2,30 @@ import sbt._
 
 object Dependencies {
   object Versions {
-    val Akka                    = "2.6.10"
+    val Akka                    = "2.6.15"
     val AkkaHttp                = "10.2.4"
     val AkkaTestkitSpecs2       = "0.3.0"
-    val Aws                     = "1.11.928"
-    val BouncyCastle            = "1.68"
-    val Cats                    = "2.1.0"
-    val Circe                   = "0.13.0"
+    val Aws                     = "1.12.17"
+    val BouncyCastle            = "1.69"
+    val Cats                    = "2.6.1"
+    val Circe                   = "0.14.1"
     val CommonsCodec            = "1.15"
     val ConcurrentLinkedHashMap = "1.4.2"
     val Elastic4s               = "7.10.0"
     val FastMd5                 = "2.7.1"
     val JodaTime                = "2.10.10"
-    val JUnit                   = "4.12"
-    val Log4jCore               = "2.12.1"
-    val NscalaTime              = "2.26.0"
-    val ScalaCheck              = "1.14.3"
-    val ScalaLogging            = "3.9.2"
+    val JUnit                   = "4.13.2"
+    val Log4jCore               = "2.14.1"
+    val NscalaTime              = "2.28.0"
+    val ScalaCheck              = "1.15.4"
+    val ScalaLogging            = "3.9.4"
     val ScalaPool               = "0.4.3"
-    val ScalaTest               = "3.2.3"
-    val Shapeless               = "2.3.3"
-    val SimpleJmx               = "1.17"
-    val Specs2                  = "4.8.3"
-    val Squants                 = "1.7.0"
-    val SshJ                    = "0.30.0"
+    val ScalaTest               = "3.2.9"
+    val Shapeless               = "2.3.7"
+    val SimpleJmx               = "1.19"
+    val Specs2                  = "4.12.1"
+    val Squants                 = "1.8.0"
+    val SshJ                    = "0.31.0"
     val TypesafeConfig          = "1.4.1"
     val UnirestJava             = "1.4.9"
   }
@@ -41,8 +41,8 @@ object Dependencies {
   val AkkaTestkit                = "com.typesafe.akka"        %% "akka-testkit"             % Versions.Akka
   val AkkaTestkitSpecs2          = "net.ruippeixotog"         %% "akka-testkit-specs2"      % Versions.AkkaTestkitSpecs2
   val ApacheHttpAsyncClient      = "org.apache.httpcomponents" % "httpasyncclient"          % "4.1.4"
-  val ApacheHttpClient           = "org.apache.httpcomponents" % "httpclient"               % "4.5.10"
-  val ApacheHttpCore             = "org.apache.httpcomponents" % "httpcore"                 % "4.4.12"
+  val ApacheHttpClient           = "org.apache.httpcomponents" % "httpclient"               % "4.5.13"
+  val ApacheHttpCore             = "org.apache.httpcomponents" % "httpcore"                 % "4.4.14"
   val AwsJavaSdkCore             = "com.amazonaws"             % "aws-java-sdk-core"        % Versions.Aws
   val AwsJavaSdkS3               = "com.amazonaws"             % "aws-java-sdk-s3"          % Versions.Aws
   val BouncyCastlePkix           = "org.bouncycastle"          % "bcpkix-jdk15on"           % Versions.BouncyCastle
