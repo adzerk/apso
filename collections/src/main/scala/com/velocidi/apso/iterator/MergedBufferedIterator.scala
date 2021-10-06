@@ -1,5 +1,6 @@
 package com.velocidi.apso.iterator
 
+import scala.collection.BufferedIterator
 import scala.collection.mutable.PriorityQueue
 
 case class MergedBufferedIterator[T](iterators: List[BufferedIterator[T]])(implicit ord: Ordering[T])

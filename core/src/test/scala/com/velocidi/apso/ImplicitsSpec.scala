@@ -1,5 +1,6 @@
 package com.velocidi.apso
 
+import scala.collection.compat._
 import scala.util.Random
 
 import org.specs2.ScalaCheck
@@ -39,12 +40,12 @@ class ImplicitsSpec extends Specification with ScalaCheck with FutureExtraMatche
       rand.setSeed(0)
       val runs = 10000
       val n = 5
-      val elems = Stream.iterate(0, 50) { _ + 1 }
+      val elems = immutable.LazyList.iterate(0, 50) { _ + 1 }
 
       val tests = (1 to runs).map { _ => rand.chooseN(elems, n) }
 
       tests.map(_.size).toSet === Set(n)
-      val elementCounts: Map[Int, Int] = tests.flatten.groupBy(identity).mapValues(_.size).toMap
+      val elementCounts: Map[Int, Int] = tests.flatten.groupBy(identity).view.mapValues(_.size).toMap
 
       elementCounts.keys.size must beCloseTo(elems.size +/- 5)
 

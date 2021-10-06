@@ -6,6 +6,7 @@ libraryDependencies ++= Seq(
   CirceGeneric,
   CirceParser,
   JodaTime       % Provided,
+  ScalaCollectionCompat,
   Shapeless,
   Squants        % Provided,
   TypesafeConfig % Provided,

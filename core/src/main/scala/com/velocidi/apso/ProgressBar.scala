@@ -1,6 +1,6 @@
 package com.velocidi.apso
 
-import scala.compat.Platform._
+import java.lang.System.currentTimeMillis
 
 /** A widget for printing a dynamic progress bar in a console.
   * @param total the number representing the full progress bar
@@ -16,7 +16,7 @@ case class ProgressBar(
     throughputTransformer: Double => Double = identity
 ) {
   private[this] var done = 0L
-  private[this] val startTimestamp = currentTime
+  private[this] val startTimestamp = currentTimeMillis
 
   private[this] val workchars = List('|', '/', '-', '\\')
   private[this] var lastChar = 0
@@ -28,19 +28,19 @@ case class ProgressBar(
 
   /** Increase the progress by one.
     */
-  def tick() {
+  def tick(): Unit = {
     tick(1)
   }
 
   /** Increase the progress by the given number of units.
     * @param inc the number of progress units to increase
     */
-  def tick(inc: Long) {
+  def tick(inc: Long): Unit = {
     if (!isFinished) {
       done += inc
       if (done > total) done = total
 
-      val currentTimestamp = currentTime
+      val currentTimestamp = currentTimeMillis()
       val throughput =
         done.toDouble / (currentTimestamp - startTimestamp) * 1000
 

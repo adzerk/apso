@@ -30,6 +30,7 @@ object Dependencies {
     val UnirestJava             = "1.4.9"
   }
 
+  val ScalaCollectionCompat      = "org.scala-lang.modules"   %% "scala-collection-compat"  % "2.5.0"
   val AkkaActor                  = "com.typesafe.akka"        %% "akka-actor"               % Versions.Akka
   val AkkaActorTyped             = "com.typesafe.akka"        %% "akka-actor-typed"         % Versions.Akka
   val AkkaActorTestkitTyped      = "com.typesafe.akka"        %% "akka-actor-testkit-typed" % Versions.Akka

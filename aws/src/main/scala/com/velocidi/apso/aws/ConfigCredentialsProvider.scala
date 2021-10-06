@@ -17,5 +17,5 @@ case class ConfigCredentialsProvider(
   def getCredentials: AWSCredentials =
     new BasicAWSCredentials(config.getString(accessKeyPath), config.getString(secretKeyPath))
 
-  def refresh() {}
+  def refresh() = {}
 }

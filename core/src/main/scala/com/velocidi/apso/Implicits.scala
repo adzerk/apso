@@ -1,8 +1,10 @@
 package com.velocidi.apso
 
 import scala.annotation.tailrec
-import scala.collection.generic.CanBuildFrom
+import scala.collection.compat._
 import scala.util.{Random, Try}
+
+import com.velocidi.apso.util.ScalaVersionSpecific.FactoryCompat
 
 /** Object containing implicit classes and methods of general purpose.
   */
@@ -28,9 +30,9 @@ object Implicits {
       * @return this sequence merged with the given traversable
       */
     def mergeSorted[U >: T, That](
-        it: TraversableOnce[U]
-    )(implicit bf: CanBuildFrom[CC[T], U, That], ord: Ordering[U]): That = {
-      val b = bf(seq)
+        it: IterableOnce[U]
+    )(implicit bf: FactoryCompat[U, That], ord: Ordering[U]): That = {
+      val b = bf.newBuilder()
 
       if (seq.isEmpty) b ++= it
       else {
@@ -38,9 +40,9 @@ object Implicits {
         var thisNext: T = thisIt.next()
         var finished = false
 
-        for (elem <- it) {
+        for (elem <- it.iterator) {
 
-          def takeFromThis() {
+          def takeFromThis(): Unit = {
             if (!finished && ord.lt(thisNext, elem)) {
               b += thisNext
               if (thisIt.hasNext) thisNext = thisIt.next() else finished = true
@@ -60,10 +62,10 @@ object Implicits {
     }
   }
 
-  /** Implicit class that provides new methods for traversable-once collections.
-    * @param it the traversable-once collection to which the new methods are provided.
+  /** Implicit class that provides new methods for iterable-once collections.
+    * @param it the iterable-once collection to which the new methods are provided.
     */
-  final implicit class ApsoTraversableOnce[T](val it: TraversableOnce[T]) extends AnyVal {
+  final implicit class ApsoIterableOnce[T](val it: IterableOnce[T]) extends AnyVal {
 
     /** Returns the average of the elements of this collection.
       * @param num either an instance of `Numeric` or an instance of `Fractional`, defining a set of
@@ -79,11 +81,11 @@ object Implicits {
         case n: Integral[A]   => n.quot
         case _                => sys.error("Numeric does not support division!")
       }
-      val res = it.foldLeft((num.zero, num.zero)) { (acc, e) =>
+      val res = it.iterator.foldLeft((num.zero, num.zero)) { (acc, e) =>
         (num.plus(acc._1, e), num.plus(acc._2, num.one))
       }
       if (res._2 == num.zero)
-        throw new IllegalArgumentException("The traversable should not be empty!")
+        throw new IllegalArgumentException("The iterable should not be empty!")
       div(res._1, res._2)
     }
   }
@@ -162,7 +164,7 @@ object Implicits {
       *         otherwise. Not choosing any element can happen if the weights of the elements do not
       *         sum up to the maximum value of `r`.
       */
-    def monteCarlo[T](seq: Traversable[T], valueFunc: T => Double, r: Double): Option[T] =
+    def monteCarlo[T](seq: Iterable[T], valueFunc: T => Double, r: Double): Option[T] =
       if (seq.isEmpty) None
       else {
         val v = valueFunc(seq.head)
@@ -177,7 +179,7 @@ object Implicits {
       *         otherwise. Not choosing any element can happen if the weights of the elements do not
       *         sum up to the maximum value of `r`.
       */
-    @inline def monteCarlo[T](seq: Traversable[(T, Double)], r: Double = rand.nextDouble()): Option[T] =
+    @inline def monteCarlo[T](seq: Iterable[(T, Double)], r: Double = rand.nextDouble()): Option[T] =
       monteCarlo(seq, { p: (T, Double) => p._2 }, r).map(_._1)
 
     /** Chooses a random element of a traversable using the reservoir sampling technique, traversing
@@ -186,8 +188,8 @@ object Implicits {
       * @tparam T the type of the elements
       * @return the selected element wrapped in a `Some`, or `None` if the traversable is empty.
       */
-    def reservoirSample[T](seq: TraversableOnce[T]): Option[T] =
-      seq
+    def reservoirSample[T](seq: IterableOnce[T]): Option[T] =
+      seq.iterator
         .foldLeft((None: Option[T], 1)) { case ((curr, n), candidate) =>
           (if (rand.nextDouble() < 1.0 / n) Some(candidate) else curr, n + 1)
         }
@@ -198,7 +200,7 @@ object Implicits {
       * @tparam T the type of the elements
       * @return an infinite stream of weighted samples of a sequence.
       */
-    def samples[T](seq: Traversable[T], valueFunc: T => Double): Iterator[T] = {
+    def samples[T](seq: Iterable[T], valueFunc: T => Double): Iterator[T] = {
       if (seq.isEmpty) Iterator.empty
       else {
         val len = seq.size
@@ -245,7 +247,7 @@ object Implicits {
       * @tparam T the type of the elements
       * @return an infinite stream of weighted samples of a sequence.
       */
-    @inline def samples[T](seq: Traversable[(T, Double)]): Iterator[T] =
+    @inline def samples[T](seq: Iterable[(T, Double)]): Iterator[T] =
       samples(seq, { p: (T, Double) => p._2 }).map(_._1)
 
     /** Returns a decreasingly ordered stream of n doubles in [0, 1], according to a
@@ -255,8 +257,8 @@ object Implicits {
       * @param n amount of numbers to generate
       * @return ordered stream of doubles
       */
-    def decreasingUniformStream(n: Int): Stream[Double] =
-      Stream
+    def decreasingUniformStream(n: Int): immutable.LazyList[Double] =
+      immutable.LazyList
         .iterate((n + 1, 1.0), n + 1) { case (i, currMax) => (i - 1, currMax * math.pow(rand.nextDouble(), 1.0 / i)) }
         .tail
         .map(_._2)
@@ -268,7 +270,7 @@ object Implicits {
       * @param n amount of numbers to generate
       * @return ordered stream of doubles
       */
-    def increasingUniformStream(n: Int): Stream[Double] =
+    def increasingUniformStream(n: Int): immutable.LazyList[Double] =
       decreasingUniformStream(n).map(1 - _)
   }
 

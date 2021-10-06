@@ -57,7 +57,7 @@ class ElasticsearchBulkInserter(
   }
 
   private[this] def checkElasticsearch(): Future[Boolean] = {
-    client.execute(clusterHealth).map(_.result.status != "red")
+    client.execute(clusterHealth()).map(_.result.status != "red")
   }
 
   private[this] def becomeElasticsearchUp(): Unit = {
@@ -218,14 +218,14 @@ class ElasticsearchBulkInserter(
 
     log.info("Stopping Bulk Inserter...")
     val stop = if (buffer.nonEmpty) flush().andThen { case _ => client.close() }
-    else Future(client.close)
+    else Future(client.close())
 
     Try(Await.result(stop, timeoutOnStop)).failed.foreach { ex =>
       log.warn("Failed to cleanly stop Bulk Inserter!", ex)
     }
   }
 
-  private def addMsgToBuffer(msg: IndexRequest) = buffer = Message(sender, msg) :: buffer
+  private def addMsgToBuffer(msg: IndexRequest) = buffer = Message(sender(), msg) :: buffer
 }
 
 /** Companion object for the `ElasticsearchBulkInserter` actor.

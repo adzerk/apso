@@ -1,5 +1,7 @@
 package com.velocidi.apso.iterator
 
+import scala.collection.compat._
+
 import org.specs2.mutable._
 
 import com.velocidi.apso.iterator.Implicits._
@@ -13,9 +15,20 @@ class ImplicitsSpec extends Specification {
       Seq(2).iterator.buffered.mergeSorted(Seq(5).iterator.buffered).toList === List(2, 5)
       Seq(5).iterator.buffered.mergeSorted(Seq(2).iterator.buffered).toList === List(2, 5)
 
-      List(1, 3, 5).iterator.buffered.mergeSorted(Stream(2, 4).iterator.buffered).toList === List(1, 2, 3, 4, 5)
+      List(1, 3, 5).iterator.buffered.mergeSorted(immutable.LazyList(2, 4).iterator.buffered).toList === List(
+        1,
+        2,
+        3,
+        4,
+        5
+      )
 
-      Stream(1, 3, 5).iterator.buffered.mergeSorted(List(2, 4).iterator.buffered).toStream === Stream(1, 2, 3, 4, 5)
+      immutable
+        .LazyList(1, 3, 5)
+        .iterator
+        .buffered
+        .mergeSorted(List(2, 4).iterator.buffered)
+        .to(immutable.LazyList) === immutable.LazyList(1, 2, 3, 4, 5)
 
       trait Base { val x: Int }
       case class Impl1(x: Int) extends Base

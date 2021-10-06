@@ -54,6 +54,7 @@ object Retry {
               ) => // it would be indifferent to use a Throwable here because Try don't catch Fatal exceptions
             inBetweenSleep.foreach(d => Thread.sleep(d.toMillis))
             retry[T](maxRetries - 1, inBetweenSleep)(f)
+          case res => res
         }
     }
   }

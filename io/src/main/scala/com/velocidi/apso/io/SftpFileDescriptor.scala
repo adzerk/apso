@@ -3,8 +3,8 @@ package com.velocidi.apso.io
 import java.io.{FileDescriptor => _, _}
 import java.util.concurrent.{ConcurrentHashMap, TimeoutException}
 
-import scala.collection.JavaConverters._
 import scala.concurrent.duration._
+import scala.jdk.CollectionConverters._
 import scala.util.{Properties, Try}
 
 import com.typesafe.config.ConfigFactory
@@ -104,7 +104,7 @@ case class SftpFileDescriptor(
 
   def list: Iterator[SftpFileDescriptor] =
     if (isDirectory) {
-      sftp(_.ls(path)).asScala.toIterator.map { r =>
+      sftp(_.ls(path)).asScala.iterator.map { r =>
         this.child(r.getName).copy(_fileAttributes = Some(r.getAttributes))
       }
     } else {

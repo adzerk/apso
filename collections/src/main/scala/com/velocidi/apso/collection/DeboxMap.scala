@@ -95,7 +95,7 @@ object DeboxMap {
     val map = ofDim[A, B](ks.length)
     val limit = ks.length - 1
     @inline
-    @tailrec def loop(i: Int) {
+    @tailrec def loop(i: Int): Unit = {
       map(ks(i)) = vs(i)
       if (i < limit) loop(i + 1)
     }
@@ -329,10 +329,10 @@ final class DeboxMap[
     * @param f the function that is applied for its side-effect to every element.
     *        The result of function `f` is discarded.
     */
-  final def foreach(f: (A, B) => Unit) {
+  final def foreach(f: (A, B) => Unit) = {
     @inline
     @tailrec
-    def loop(i: Int, count: Int, limit: Int) {
+    def loop(i: Int, count: Int, limit: Int): Unit = {
       val c = if (buckets(i) == 3) {
         f(keys(i), vals(i))
         count + 1
@@ -400,7 +400,7 @@ final class DeboxMap[
     loop(i, i)
   }
 
-  final def resize() {
+  final def resize() = {
     val size = keys.length
     val factor = if (size < 10000) 4 else 2
 
@@ -412,7 +412,7 @@ final class DeboxMap[
 
     @inline
     @tailrec
-    def loop(i: Int, limit: Int) {
+    def loop(i: Int, limit: Int): Unit = {
       if (buckets(i) == 3) {
         val item = keys(i)
         val j = hash(item, nextmask, nextkeys, nextbs)

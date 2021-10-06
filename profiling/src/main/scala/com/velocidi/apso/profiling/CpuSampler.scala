@@ -50,7 +50,7 @@ class CpuSampler(samplePeriod: Long = 100, flushPeriod: Long = 10000, logger: Lo
   /** Flushes the stored profiling data to the logger.
     * @param timestamp the timestamp to use when writing the entries to the logger
     */
-  def flush(timestamp: Long = System.currentTimeMillis()) {
+  def flush(timestamp: Long = System.currentTimeMillis()) = {
     aggregateAll(timestamp).foreach(t => logger.debug(s"$t"))
     lastFlush = System.currentTimeMillis()
   }
@@ -64,12 +64,12 @@ class CpuSampler(samplePeriod: Long = 100, flushPeriod: Long = 10000, logger: Lo
       acc.update(entry, acc.getOrElseUpdate(entry, 0) + 1)
     }
 
-    acc.toIterator.map { p =>
+    acc.iterator.map { p =>
       Entry(timestamp, p._1, p._2, if (total == 0) 0.0 else p._2.toDouble / total)
     }
   }
 
-  private[this] def sampleLoop() {
+  private[this] def sampleLoop() = {
     while (active) {
       val time = System.currentTimeMillis()
 
@@ -91,7 +91,7 @@ class CpuSampler(samplePeriod: Long = 100, flushPeriod: Long = 10000, logger: Lo
   /** Stops the data collecting and flushes the remaining data to the logger, causing the thread to
     * stop eventually.
     */
-  def stop() {
+  def stop() = {
     active = false
     flush()
   }

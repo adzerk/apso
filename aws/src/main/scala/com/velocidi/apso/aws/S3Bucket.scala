@@ -3,7 +3,7 @@ package com.velocidi.apso.aws
 import java.io._
 import java.util.concurrent.{Executors, ThreadFactory}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try}
 
 import com.amazonaws.auth._
@@ -212,7 +212,7 @@ class S3Bucket(
     * @param key the remote pathname for the file
     * @param acl the `CannedAccessControlList` to be applied to the Amazon S3 object
     */
-  def setAcl(key: String, acl: CannedAccessControlList) {
+  def setAcl(key: String, acl: CannedAccessControlList) = {
     log.info(s"Setting 's3://$bucketName/$key' permissions to '$acl'")
     s3.setObjectAcl(bucketName, key, acl)
   }
