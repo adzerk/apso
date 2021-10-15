@@ -103,6 +103,7 @@ lazy val commonSettings = Seq(
       "-language:implicitConversions",
       "-feature",
       "-unchecked",
+      "-Xfatal-warnings",
       "-Ywarn-dead-code")
 
     def withCommon(flags: String*) =
