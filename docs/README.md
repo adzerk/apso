@@ -273,7 +273,7 @@ def m() = {
     throw new Exception()
 }
 
-Retry.retry(10)(m)
+Retry.retry(10)(m())
 ```
 
 ### TryWith
@@ -455,7 +455,7 @@ The `TypedMap` is a map that associates types with values. It can be used as fol
 ```scala mdoc:reset
 import com.velocidi.apso.collection._
 
-val m = TypedMap("one", 2, 3l)
+val m = TypedMap("one", 2, 3L)
 
 m[String]
 
@@ -483,7 +483,7 @@ The `CircularIterator` is an iterator that iterates over its elements in a circu
 ```scala mdoc:reset
 import com.velocidi.apso.iterator.CircularIterator
 
-val circularIterator = CircularIterator(List(1, 2, 3).toIterator)
+val circularIterator = CircularIterator(List(1, 2, 3).iterator)
 
 circularIterator.take(10).toList
 ```
@@ -495,7 +495,7 @@ The `CompositeIterator` is an iterator that wraps a list of other iterators and 
 ```scala mdoc:reset
 import com.velocidi.apso.iterator.CompositeIterator
 
-val compositeIterator = CompositeIterator(List(1, 2, 3).toIterator, List(4, 5, 6).toIterator, List(7, 8, 9).toIterator)
+val compositeIterator = CompositeIterator(List(1, 2, 3).iterator, List(4, 5, 6).iterator, List(7, 8, 9).iterator)
 
 compositeIterator.take(9).toList
 ```
@@ -508,10 +508,10 @@ The `MergedBufferedIterator` is a collection of sorted `BufferedIterators` that 
 import com.velocidi.apso.iterator.MergedBufferedIterator
 
 val it1 = MergedBufferedIterator(List(
-         (0 to 3).toIterator.buffered,
-         (0 to 8).toIterator.buffered,
-         (0 to 15).toIterator.buffered,
-         (0 to 11).toIterator.buffered))
+         (0 to 3).iterator.buffered,
+         (0 to 8).iterator.buffered,
+         (0 to 15).iterator.buffered,
+         (0 to 11).iterator.buffered))
 
 it1.toList
 

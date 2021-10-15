@@ -139,7 +139,7 @@ Apso provides implicit conversions from `String`, `Seq[_]`, `Map[_, _]`, `Seq[Ma
 import com.velocidi.apso.Implicits._
 
 Seq(1, 3, 5).mergeSorted(Seq(2, 4))
-// res6: Seq[Int] = List(1, 2, 3, 4, 5)
+// res6: Array[Int] = Array(1, 2, 3, 4, 5)
 
 (0 to 15).average
 // res7: Int = 7
@@ -158,16 +158,16 @@ val rand = new scala.util.Random(1)
 ```
 ```scala
 rand.choose((0 to 15).toSeq)
-// res11: Option[Int] = Some(11)
+// res11: Option[Int] = Some(value = 11)
 
 rand.choose((0 to 15).toSeq)
-// res12: Option[Int] = Some(1)
+// res12: Option[Int] = Some(value = 1)
 
 rand.choose((0 to 15).toSeq)
-// res13: Option[Int] = Some(6)
+// res13: Option[Int] = Some(value = 6)
 
 rand.choose((0 to 15).toSeq)
-// res14: Option[Int] = Some(6)
+// res14: Option[Int] = Some(value = 6)
 
 rand.chooseN((0 to 15).toSeq, 4)
 // res15: Seq[Int] = List(9, 8, 3, 0)
@@ -286,8 +286,8 @@ def m() = {
     throw new Exception()
 }
 
-Retry.retry(10)(m)
-// res22: util.Try[Int] = Success(6)
+Retry.retry(10)(m())
+// res22: util.Try[Int] = Success(value = 6)
 ```
 
 ### TryWith
@@ -319,11 +319,11 @@ def badHandler(resource: Closeable) = {
 TryWith(buildResource)(goodHandler)
 // good resource
 // Resource is now Closed
-// res24: util.Try[Unit] = Success(())
+// res24: util.Try[Unit] = Success(value = ())
 
 TryWith(buildResource)(badHandler)
 // Resource is now Closed
-// res25: util.Try[Nothing] = Failure(java.lang.Exception)
+// res25: util.Try[Nothing] = Failure(exception = java.lang.Exception)
 ```
 
 ## Akka HTTP
@@ -467,39 +467,65 @@ The `Trie` class is an implementation of an immutable trie. An example usage fol
 import com.velocidi.apso.collection._
 
 val t = Trie[Char, Int]()
-// t: Trie[Char, Int] = Trie(None, Map())
+// t: Trie[Char, Int] = Trie(value = None, nodes = Map())
 
 val nt = t.set("one", 1).set("two", 2).set("three", 3).set("four", 4)
 // nt: Trie[Char, Int] = Trie(
-//   None,
-//   Map(
-//     'o' -> Trie(None, Map('n' -> Trie(None, Map('e' -> Trie(Some(1), Map()))))),
+//   value = None,
+//   nodes = Map(
+//     'o' -> Trie(
+//       value = None,
+//       nodes = Map(
+//         'n' -> Trie(
+//           value = None,
+//           nodes = Map('e' -> Trie(value = Some(value = 1), nodes = Map()))
+//         )
+//       )
+//     ),
 //     't' -> Trie(
-//       None,
-//       Map(
-//         'w' -> Trie(None, Map('o' -> Trie(Some(2), Map()))),
+//       value = None,
+//       nodes = Map(
+//         'w' -> Trie(
+//           value = None,
+//           nodes = Map('o' -> Trie(value = Some(value = 2), nodes = Map()))
+//         ),
 //         'h' -> Trie(
-//           None,
-//           Map(
-//             'r' -> Trie(None, Map('e' -> Trie(None, Map('e' -> Trie(Some(3), Map())))))
+//           value = None,
+//           nodes = Map(
+//             'r' -> Trie(
+//               value = None,
+//               nodes = Map(
+//                 'e' -> Trie(
+//                   value = None,
+//                   nodes = Map(
+//                     'e' -> Trie(value = Some(value = 3), nodes = Map())
+//                   )
+//                 )
+//               )
+//             )
 //           )
 //         )
 //       )
 //     ),
 //     'f' -> Trie(
-//       None,
-//       Map(
-//         'o' -> Trie(None, Map('u' -> Trie(None, Map('r' -> Trie(Some(4), Map())))))
-//       )
-//     )
-//   )
-// )
+//       value = None,
+//       nodes = Map(
+//         'o' -> Trie(
+//           value = None,
+//           nodes = Map(
+//             'u' -> Trie(
+//               value = None,
+//               nodes = Map('r' -> Trie(value = Some(value = 4), nodes = Map()))
+//             )
+//           )
+//         )
+// ...
 
 nt.get("one")
-// res36: Option[Int] = Some(1)
+// res36: Option[Int] = Some(value = 1)
 
 nt.get("two")
-// res37: Option[Int] = Some(2)
+// res37: Option[Int] = Some(value = 2)
 
 nt.get("five")
 // res38: Option[Int] = None
@@ -512,7 +538,7 @@ The `TypedMap` is a map that associates types with values. It can be used as fol
 ```scala
 import com.velocidi.apso.collection._
 
-val m = TypedMap("one", 2, 3l)
+val m = TypedMap("one", 2, 3L)
 // m: TypedMap[Any] = Map(java.lang.String -> one, Int -> 2, Long -> 3)
 
 m[String]
@@ -525,13 +551,13 @@ m[Long]
 // res42: Long = 3L
 
 m.get[String]
-// res43: Option[String] = Some("one")
+// res43: Option[String] = Some(value = "one")
 
 m.get[Int]
-// res44: Option[Int] = Some(2)
+// res44: Option[Int] = Some(value = 2)
 
 m.get[Long]
-// res45: Option[Long] = Some(3L)
+// res45: Option[Long] = Some(value = 3L)
 
 m.get[Char]
 // res46: Option[Char] = None
@@ -548,7 +574,7 @@ The `CircularIterator` is an iterator that iterates over its elements in a circu
 ```scala
 import com.velocidi.apso.iterator.CircularIterator
 
-val circularIterator = CircularIterator(List(1, 2, 3).toIterator)
+val circularIterator = CircularIterator(List(1, 2, 3).iterator)
 // circularIterator: CircularIterator[Int] = non-empty iterator
 
 circularIterator.take(10).toList
@@ -562,7 +588,7 @@ The `CompositeIterator` is an iterator that wraps a list of other iterators and 
 ```scala
 import com.velocidi.apso.iterator.CompositeIterator
 
-val compositeIterator = CompositeIterator(List(1, 2, 3).toIterator, List(4, 5, 6).toIterator, List(7, 8, 9).toIterator)
+val compositeIterator = CompositeIterator(List(1, 2, 3).iterator, List(4, 5, 6).iterator, List(7, 8, 9).iterator)
 // compositeIterator: CompositeIterator[Int] = empty iterator
 
 compositeIterator.take(9).toList
@@ -577,10 +603,10 @@ The `MergedBufferedIterator` is a collection of sorted `BufferedIterators` that 
 import com.velocidi.apso.iterator.MergedBufferedIterator
 
 val it1 = MergedBufferedIterator(List(
-         (0 to 3).toIterator.buffered,
-         (0 to 8).toIterator.buffered,
-         (0 to 15).toIterator.buffered,
-         (0 to 11).toIterator.buffered))
+         (0 to 3).iterator.buffered,
+         (0 to 8).iterator.buffered,
+         (0 to 15).iterator.buffered,
+         (0 to 11).iterator.buffered))
 // it1: MergedBufferedIterator[Int] = empty iterator
 
 it1.toList
@@ -786,27 +812,27 @@ fromFullPaths(Seq(
 // }"""
 
 js1.getField[Int]("a")
-// res64: Option[Int] = Some(2)
+// res64: Option[Int] = Some(value = 2)
 js1.getField[Int]("d.f")
-// res65: Option[Int] = Some(6)
+// res65: Option[Int] = Some(value = 6)
 js1.getField[Int]("x")
 // res66: Option[Int] = None
 
 js1.deleteField("a")
 // res67: Json = JObject(
-//   object[b -> 3,d -> {
+//   value = object[b -> 3,d -> {
 //   "f" : 6
 // }]
 // )
 js1.deleteField("d.f")
 // res68: Json = JObject(
-//   object[a -> 2,b -> 3,d -> {
+//   value = object[a -> 2,b -> 3,d -> {
 //   
 // }]
 // )
 js1.deleteField("x")	
 // res69: Json = JObject(
-//   object[a -> 2,b -> 3,d -> {
+//   value = object[a -> 2,b -> 3,d -> {
 //   "f" : 6
 // }]
 // )
@@ -819,13 +845,13 @@ The `JsonConvert` object contains helpers for converting between JSON values and
 import com.velocidi.apso.circe._
 
 JsonConvert.toJson("abcd")
-// res71: io.circe.Json = JString("abcd")
+// res71: io.circe.Json = JString(value = "abcd")
 
 JsonConvert.toJson(1)
-// res72: io.circe.Json = JNumber(JsonLong(1L))
+// res72: io.circe.Json = JNumber(value = JsonLong(value = 1L))
 	
 JsonConvert.toJson(Map(1 -> 2, 3 -> 4))	
-// res73: io.circe.Json = JObject(object[1 -> 2,3 -> 4])
+// res73: io.circe.Json = JObject(value = object[1 -> 2,3 -> 4])
 ```
 
 ## Profiling
@@ -869,7 +895,7 @@ import com.velocidi.apso.time.Implicits._
 // res75: List[DateTime] = List(2012-01-01T00:00:00.000Z)
 
 (new DateTime("2012-02-01") until new DateTime("2012-03-01") by 1.day)
-// res76: IterableInterval = SteppedInterval(
+// res76: IterableInterval = IndexedSeq(
 //   2012-02-01T00:00:00.000Z,
 //   2012-02-02T00:00:00.000Z,
 //   2012-02-03T00:00:00.000Z,
@@ -902,7 +928,7 @@ import com.velocidi.apso.time.Implicits._
 // )
 
 (new DateTime("2012-01-01") until new DateTime("2012-02-01") by 2.minutes)
-// res77: IterableInterval = SteppedInterval(
+// res77: IterableInterval = IndexedSeq(
 //   2012-01-01T00:00:00.000Z,
 //   2012-01-01T00:02:00.000Z,
 //   2012-01-01T00:04:00.000Z,
