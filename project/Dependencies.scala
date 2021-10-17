@@ -30,7 +30,6 @@ object Dependencies {
     val UnirestJava             = "1.4.9"
   }
 
-  val ScalaCollectionCompat      = "org.scala-lang.modules"   %% "scala-collection-compat"  % "2.5.0"
   val AkkaActor                  = "com.typesafe.akka"        %% "akka-actor"               % Versions.Akka
   val AkkaActorTyped             = "com.typesafe.akka"        %% "akka-actor-typed"         % Versions.Akka
   val AkkaActorTestkitTyped      = "com.typesafe.akka"        %% "akka-actor-testkit-typed" % Versions.Akka
@@ -69,6 +68,7 @@ object Dependencies {
   val NscalaTime                 = "com.github.nscala-time"     %% "nscala-time"                  % Versions.NscalaTime
   val ScalaCheck                 = "org.scalacheck"             %% "scalacheck"                   % Versions.ScalaCheck
   val ScalaLogging               = "com.typesafe.scala-logging" %% "scala-logging"                % Versions.ScalaLogging
+  val ScalaCollectionCompat      = "org.scala-lang.modules"   %% "scala-collection-compat"  % "2.5.0"
   val ScalaPool                  = "io.github.andrebeat"        %% "scala-pool"                   % Versions.ScalaPool
   val ScalaTestCore              = "org.scalatest"              %% "scalatest-core"               % Versions.ScalaTest
   val Shapeless                  = "com.chuusai"                %% "shapeless"                    % Versions.Shapeless
