@@ -103,6 +103,7 @@ lazy val commonSettings = Seq(
       "-language:implicitConversions",
       "-feature",
       "-unchecked",
+      "-deprecation",
       "-Xfatal-warnings",
       "-Ywarn-dead-code")
 
@@ -112,13 +113,10 @@ lazy val commonSettings = Seq(
     CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, 12)) =>
         withCommon(
-          "-deprecation",
-          "-Xfatal-warnings",
           "-Ywarn-unused-import")
 
       case _ =>
         withCommon(
-          "-deprecation",
           "-Ywarn-unused:imports")
     }
   },
