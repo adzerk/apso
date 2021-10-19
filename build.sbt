@@ -23,7 +23,7 @@ lazy val encryption    = module(project, "encryption").dependsOn(log)
 lazy val hashing       = module(project, "hashing")
 lazy val io            = module(project, "io").dependsOn(aws, testkit % Test)
 lazy val log           = module(project, "log")
-lazy val profiling     = module(project, "profiling").dependsOn(core, log)
+lazy val profiling     = module(project, "profiling").dependsOn(log)
 lazy val testkit       = module(project, "testkit")
 lazy val time          = module(project, "time")
 
