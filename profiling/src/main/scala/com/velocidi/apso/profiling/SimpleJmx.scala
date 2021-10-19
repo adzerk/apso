@@ -1,19 +1,29 @@
 package com.velocidi.apso.profiling
 
+import java.net.ServerSocket
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
 import com.j256.simplejmx.server.JmxServer
 
-import com.velocidi.apso.{Logging, NetUtils}
+import com.velocidi.apso.Logging
 
 trait SimpleJmx extends Logging {
 
   def startJmx(jmxConfig: config.Jmx): Future[JmxServer] = {
 
     def tryStart(port: Option[Int] = None) = {
-      val jmx = new JmxServer(port.getOrElse(NetUtils.availablePort()))
+      // Returns an unused port.
+      def availablePort(): Int = {
+        val socket = new ServerSocket(0)
+        val port = socket.getLocalPort
+        socket.close()
+        port
+      }
+
+      val jmx = new JmxServer(port.getOrElse(availablePort()))
       jmx.start()
       jmx
     }
