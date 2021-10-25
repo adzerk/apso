@@ -1,7 +1,5 @@
 package com.velocidi.apso
 
-import java.lang.System.currentTimeMillis
-
 /** A widget for printing a dynamic progress bar in a console.
   * @param total the number representing the full progress bar
   * @param width the line width of the progress bar
@@ -16,7 +14,7 @@ case class ProgressBar(
     throughputTransformer: Double => Double = identity
 ) {
   private[this] var done = 0L
-  private[this] val startTimestamp = currentTimeMillis
+  private[this] val startTimestamp = java.lang.System.currentTimeMillis
 
   private[this] val workchars = List('|', '/', '-', '\\')
   private[this] var lastChar = 0
@@ -40,7 +38,7 @@ case class ProgressBar(
       done += inc
       if (done > total) done = total
 
-      val currentTimestamp = currentTimeMillis()
+      val currentTimestamp = java.lang.System.currentTimeMillis
       val throughput =
         done.toDouble / (currentTimestamp - startTimestamp) * 1000
 
