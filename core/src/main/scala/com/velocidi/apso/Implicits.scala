@@ -4,8 +4,6 @@ import scala.annotation.tailrec
 import scala.collection.compat._
 import scala.util.{Random, Try}
 
-import com.velocidi.apso.util.ScalaVersionSpecific.FactoryCompat
-
 /** Object containing implicit classes and methods of general purpose.
   */
 object Implicits {
@@ -31,8 +29,8 @@ object Implicits {
       */
     def mergeSorted[U >: T, That](
         it: IterableOnce[U]
-    )(implicit bf: FactoryCompat[U, That], ord: Ordering[U]): That = {
-      val b = bf.newBuilder()
+    )(implicit bf: Factory[U, That], ord: Ordering[U]): That = {
+      val b = bf.newBuilder
 
       if (seq.isEmpty) b ++= it
       else {
