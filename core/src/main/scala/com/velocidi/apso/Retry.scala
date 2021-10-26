@@ -52,7 +52,6 @@ object Retry {
           case Failure(_) =>
             inBetweenSleep.foreach(d => Thread.sleep(d.toMillis))
             retry[T](maxRetries - 1, inBetweenSleep)(f)
-          case res => res
         }
     }
   }
