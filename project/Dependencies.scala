@@ -67,6 +67,7 @@ object Dependencies {
   val Log4jCore                  = "org.apache.logging.log4j"    % "log4j-core"                   % Versions.Log4jCore
   val NscalaTime                 = "com.github.nscala-time"     %% "nscala-time"                  % Versions.NscalaTime
   val ScalaCheck                 = "org.scalacheck"             %% "scalacheck"                   % Versions.ScalaCheck
+  val ScalaCollectionCompat      = "org.scala-lang.modules"     %% "scala-collection-compat"      % "2.5.0"
   val ScalaLogging               = "com.typesafe.scala-logging" %% "scala-logging"                % Versions.ScalaLogging
   val ScalaPool                  = "io.github.andrebeat"        %% "scala-pool"                   % Versions.ScalaPool
   val ScalaTestCore              = "org.scalatest"              %% "scalatest-core"               % Versions.ScalaTest

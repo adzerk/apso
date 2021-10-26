@@ -87,6 +87,8 @@ case class S3FileDescriptor(
         case (h1 :: t1, h2 :: t2) if h1 == h2 => removePrefix(t1, t2)
         case (Nil, s)                         => s
         case (_, Nil)                         => Nil
+        case (s1, s2) =>
+          throw new RuntimeException(s"Trying to remove prefix from strings with different prefixes: $s1 and $s2.")
       }
     }
 
@@ -96,7 +98,7 @@ case class S3FileDescriptor(
 
     s3Elements.map { case (newElement, info) =>
       this.copy(elements = elements :+ newElement, summary = Some(info))
-    }.toIterator
+    }.iterator
   }
 
   def listAllFilesWithPrefix(prefix: String): Iterator[S3FileDescriptor] = {

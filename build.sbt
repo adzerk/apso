@@ -4,7 +4,7 @@ import spray.boilerplate.BoilerplatePlugin
 ThisBuild / organization := "com.velocidi"
 
 ThisBuild / crossScalaVersions := Seq("2.12.15", "2.13.6")
-ThisBuild / scalaVersion := "2.12.15"
+ThisBuild / scalaVersion := "2.13.6"
 
 def module(project: Project, moduleName: String) =
   (project in file(moduleName))
@@ -103,6 +103,8 @@ lazy val commonSettings = Seq(
       "-language:implicitConversions",
       "-feature",
       "-unchecked",
+      "-deprecation",
+      "-Xfatal-warnings",
       "-Ywarn-dead-code")
 
     def withCommon(flags: String*) =
@@ -111,8 +113,6 @@ lazy val commonSettings = Seq(
     CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, 12)) =>
         withCommon(
-          "-deprecation",
-          "-Xfatal-warnings",
           "-Ywarn-unused-import")
 
       case _ =>

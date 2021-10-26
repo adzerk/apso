@@ -1,5 +1,7 @@
 package com.velocidi.apso.iterator
 
+import scala.collection.BufferedIterator
+
 /** Object containing implicit classes and methods of general purpose on iterators.
   */
 object Implicits {
