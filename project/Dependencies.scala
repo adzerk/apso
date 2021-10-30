@@ -2,29 +2,29 @@ import sbt._
 
 object Dependencies {
   object Versions {
-    val Akka                    = "2.6.15"
-    val AkkaHttp                = "10.2.4"
+    val Akka                    = "2.6.17"
+    val AkkaHttp                = "10.2.6"
     val AkkaTestkitSpecs2       = "0.3.0"
-    val Aws                     = "1.12.17"
+    val Aws                     = "1.12.99"
     val BouncyCastle            = "1.69"
     val Cats                    = "2.6.1"
     val Circe                   = "0.14.1"
     val CommonsCodec            = "1.15"
     val ConcurrentLinkedHashMap = "1.4.2"
-    val Elastic4s               = "7.10.0"
+    val Elastic4s               = "7.10.9"
     val FastMd5                 = "2.7.1"
-    val JodaTime                = "2.10.10"
+    val JodaTime                = "2.10.13"
     val JUnit                   = "4.13.2"
     val Log4jCore               = "2.14.1"
     val NscalaTime              = "2.28.0"
     val ScalaCheck              = "1.15.4"
     val ScalaLogging            = "3.9.4"
     val ScalaPool               = "0.4.3"
-    val ScalaTest               = "3.2.9"
+    val ScalaTest               = "3.2.10"
     val Shapeless               = "2.3.7"
     val SimpleJmx               = "1.19"
-    val Specs2                  = "4.12.1"
-    val Squants                 = "1.8.0"
+    val Specs2                  = "4.12.12"
+    val Squants                 = "1.8.3"
     val SshJ                    = "0.31.0"
     val TypesafeConfig          = "1.4.1"
     val UnirestJava             = "1.4.9"
@@ -60,7 +60,7 @@ object Dependencies {
   val Elastic4sTestkit           = "com.sksamuel.elastic4s"     %% "elastic4s-testkit"            % Versions.Elastic4s
   val Elasticsearch              = "org.elasticsearch"           % "elasticsearch"                % "7.10.2"
   val ElasticsearchClusterRunner = "org.codelibs"                % "elasticsearch-cluster-runner" % "7.10.2.0"
-  val ElasticsearchRestClient    = "org.elasticsearch.client"    % "elasticsearch-rest-client"    % "7.10.1"
+  val ElasticsearchRestClient    = "org.elasticsearch.client"    % "elasticsearch-rest-client"    % "7.10.2"
   val FastMd5                    = "com.joyent.util"             % "fast-md5"                     % Versions.FastMd5
   val JodaTime                   = "joda-time"                   % "joda-time"                    % Versions.JodaTime
   val JUnit                      = "junit"                       % "junit"                        % Versions.JUnit
