@@ -11,12 +11,18 @@ object Retry {
 
   /** Tries to perform a Future[T] until it succeeds or until maximum retries is reached.
     *
-    * @param maxRetries the number of retries, 10 by default
-    * @param inBetweenSleep the duration to wait between attempts, 100 milliseconds by default
-    * @param f the function that returns the Future[T]
-    * @param ec the implicit execution context
-    * @tparam T the type of what the future completes with
-    * @return the Future[T]
+    * @param maxRetries
+    *   the number of retries, 10 by default
+    * @param inBetweenSleep
+    *   the duration to wait between attempts, 100 milliseconds by default
+    * @param f
+    *   the function that returns the Future[T]
+    * @param ec
+    *   the implicit execution context
+    * @tparam T
+    *   the type of what the future completes with
+    * @return
+    *   the Future[T]
     */
   def retryFuture[T](maxRetries: Int = 10, inBetweenSleep: Option[FiniteDuration] = Some(100.millis))(
       f: => Future[T]
@@ -37,11 +43,16 @@ object Retry {
 
   /** Tries to perform a function `f` until it succeeds or until maximum retries is reached.
     *
-    * @param maxRetries the number of retries, 10 by default
-    * @param inBetweenSleep the duration to wait between attempts, 100 milliseconds by default
-    * @param f the function
-    * @tparam T the type of what the function returns
-    * @return a Try of the `f` function result
+    * @param maxRetries
+    *   the number of retries, 10 by default
+    * @param inBetweenSleep
+    *   the duration to wait between attempts, 100 milliseconds by default
+    * @param f
+    *   the function
+    * @tparam T
+    *   the type of what the function returns
+    * @return
+    *   a Try of the `f` function result
     */
   def retry[T](maxRetries: Int = 10, inBetweenSleep: Option[FiniteDuration] = Some(100.millis))(f: => T): Try[T] = {
     maxRetries match {

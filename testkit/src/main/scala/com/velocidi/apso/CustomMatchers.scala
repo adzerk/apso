@@ -27,8 +27,8 @@ trait CustomMatchers extends SpecificationLike {
     }
   }
 
-  /** Return a successful MatchResult[T].
-    * This is useful to explicitly expose a value outside a Matcher which can later be accessed with `_.expectable.value`.
+  /** Return a successful MatchResult[T]. This is useful to explicitly expose a value outside a Matcher which can later
+    * be accessed with `_.expectable.value`.
     */
   def offer[T](result: T): MatchResult[T] = Matcher.result(test = true, "ok", createExpectable(result))
 }

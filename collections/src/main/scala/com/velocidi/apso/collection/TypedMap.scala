@@ -2,8 +2,7 @@ package com.velocidi.apso.collection
 
 import scala.reflect.ClassTag
 
-/** Typed map that associates types with values.
-  * Based on http://stackoverflow.com/a/7337610/4243494
+/** Typed map that associates types with values. Based on http://stackoverflow.com/a/7337610/4243494
   */
 class TypedMap[T] private (val inner: Map[ClassTag[_], T]) {
   def +[U >: T, L <: U](t: Typed[L]) = new TypedMap[U](inner.+[U](t.toPair))

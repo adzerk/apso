@@ -8,7 +8,8 @@ object NetUtils {
 
   /** Returns an unused port.
     *
-    * @return an unused port.
+    * @return
+    *   an unused port.
     */
   def availablePort(): Int = {
     val socket = new ServerSocket(0)

@@ -18,33 +18,22 @@ import net.schmizz.sshj.xfer.InMemorySourceFile
 
 import com.velocidi.apso.Logging
 
-/** A `FileDescriptor` for files served over SFTP. This file descriptor only supports absolute paths.
-  * The SSH connections for a given host are pooled.
+/** A `FileDescriptor` for files served over SFTP. This file descriptor only supports absolute paths. The SSH
+  * connections for a given host are pooled.
   *
   * The URI for this `FileDescriptor` should be in the format:
-  * - `sftp://<username>@<hostname>:<port>/<absolute-path>`
+  *   - `sftp://<username>@<hostname>:<port>/<absolute-path>`
   *
-  * Both the username and port are optional. Additionally, the credentials config expects an object
-  * with the following format:
+  * Both the username and port are optional. Additionally, the credentials config expects an object with the following
+  * format:
   *
-  * `sftp {
-  *    default = {
-  *      username = <username>
-  *      password = <password>
-  *    }
-  *  }`
+  * `sftp { default = { username = <username> password = <password> } }`
   *
-  * Or if using public key authentication:
-  * `sftp {
-  *    default = {
-  *      username = <username>
-  *      keypair-file = <key filename>
-  *      passphrase = <passphrase>
-  *    }
-  *  }`
+  * Or if using public key authentication: `sftp { default = { username = <username> keypair-file = <key filename>
+  * passphrase = <passphrase> } }`
   *
-  * What is considered as an `id` for credentials handling is the `hostname` of the file descriptor,
-  * therefore it is possible to provide credentials for a specific `hostname`.
+  * What is considered as an `id` for credentials handling is the `hostname` of the file descriptor, therefore it is
+  * possible to provide credentials for a specific `hostname`.
   */
 case class SftpFileDescriptor(
     host: String,
@@ -300,7 +289,7 @@ object SftpFileDescriptor {
 
     pool.tryAcquire(leaseAcquireMaxDuration) match {
       case Some(lease) => lease
-      case None        => throw new TimeoutException(s"Failed to acquire a SFTP client within $leaseAcquireMaxDuration.")
+      case None => throw new TimeoutException(s"Failed to acquire a SFTP client within $leaseAcquireMaxDuration.")
     }
   }
 
@@ -354,7 +343,7 @@ object SftpFileDescriptor {
       path.split("/").toList match {
         case Nil              => Nil
         case "" :: hd :: tail => hd :: tail
-        case _                => throw new IllegalArgumentException("Error parsing SFTP URI. Only absolute paths are supported.")
+        case _ => throw new IllegalArgumentException("Error parsing SFTP URI. Only absolute paths are supported.")
       }
 
     SftpFileDescriptor(host, port, username, password, elements, identity)

@@ -140,41 +140,55 @@ case class S3FileDescriptor(
 object S3FileDescriptor {
 
   /** Creates an S3FileDescriptor from a path string extracting the bucket and the path
-    * @param path the uri without the protocol, containing the bucket and path
-    * @return a s3 file descriptor
+    * @param path
+    *   the uri without the protocol, containing the bucket and path
+    * @return
+    *   a s3 file descriptor
     */
   def apply(path: String): S3FileDescriptor = apply(path, None)
 
   /** Creates an S3FileDescriptor from a path string extracting the bucket and the path
-    * @param path the uri without the protocol, containing the bucket and path
-    * @param credentialsConfig the config containing the credentials
-    * @return a s3 file descriptor
+    * @param path
+    *   the uri without the protocol, containing the bucket and path
+    * @param credentialsConfig
+    *   the config containing the credentials
+    * @return
+    *   a s3 file descriptor
     */
   def apply(path: String, credentialsConfig: config.Credentials.S3): S3FileDescriptor =
     apply(path, credentials.read(credentialsConfig, path))
 
   /** Creates an S3FileDescriptor from a path string extracting the bucket and the path
-    * @param path the uri without the protocol, containing the bucket and path
-    * @param credentials credentials for accessing the s3 bucket
-    * @return a s3 file descriptor
+    * @param path
+    *   the uri without the protocol, containing the bucket and path
+    * @param credentials
+    *   credentials for accessing the s3 bucket
+    * @return
+    *   a s3 file descriptor
     */
   def apply(path: String, credentials: BasicAWSCredentials): S3FileDescriptor = {
     apply(path, Some(SerializableAWSCredentials(credentials)))
   }
 
   /** Creates an S3FileDescriptor from a path string extracting the bucket and the path
-    * @param path the uri without the protocol, containing the bucket and path
-    * @param credentials serializable credentials for accessing the s3 bucket
-    * @return a s3 file descriptor
+    * @param path
+    *   the uri without the protocol, containing the bucket and path
+    * @param credentials
+    *   serializable credentials for accessing the s3 bucket
+    * @return
+    *   a s3 file descriptor
     */
   def apply(path: String, credentials: SerializableAWSCredentials): S3FileDescriptor = {
     apply(path, Some(credentials))
   }
 
   /** Creates an S3FileDescriptor from a path string extracting the bucket and the path
-    * @param path the uri without the protocol, containing the bucket and path
-    * @param credentials optional credentials for accessing the s3 bucket
-    * @return a s3 file descriptor
+    * @param path
+    *   the uri without the protocol, containing the bucket and path
+    * @param credentials
+    *   optional credentials for accessing the s3 bucket
+    * @return
+    *   a s3 file descriptor
     */
   private def apply(path: String, credentials: Option[SerializableAWSCredentials]): S3FileDescriptor = {
     path.split('/').toList match {
@@ -199,8 +213,8 @@ object S3FileDescriptor {
     }
   }
 
-  /** This Map caches S3Buckets so that each S3FileDescriptor does not need to have it's own
-    * internal object to access the bucket.
+  /** This Map caches S3Buckets so that each S3FileDescriptor does not need to have it's own internal object to access
+    * the bucket.
     */
   private val s3Buckets = TrieMap.empty[String, S3Bucket]
 }

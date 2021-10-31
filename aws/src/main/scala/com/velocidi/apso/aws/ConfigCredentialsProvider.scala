@@ -4,9 +4,12 @@ import com.amazonaws.auth._
 import com.typesafe.config.{Config, ConfigFactory}
 
 /** AWS credentials provider that retrieves credentials from a typesafe configuration.
-  * @param config the typesafe configuration
-  * @param accessKeyPath the path in the configuration that contains the access key
-  * @param secretKeyPath the path in the configuration that contains the secret key
+  * @param config
+  *   the typesafe configuration
+  * @param accessKeyPath
+  *   the path in the configuration that contains the access key
+  * @param secretKeyPath
+  *   the path in the configuration that contains the secret key
   */
 case class ConfigCredentialsProvider(
     config: Config = ConfigFactory.load(),

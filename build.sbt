@@ -4,7 +4,7 @@ import spray.boilerplate.BoilerplatePlugin
 ThisBuild / organization := "com.velocidi"
 
 ThisBuild / crossScalaVersions := Seq("2.12.15", "2.13.6")
-ThisBuild / scalaVersion := "2.13.6"
+ThisBuild / scalaVersion       := "2.13.6"
 
 def module(project: Project, moduleName: String) =
   (project in file(moduleName))
@@ -143,8 +143,8 @@ lazy val commonSettings = Seq(
 // Enable the OrganizeImports Scalafix rule.
 ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.5.0"
 
-releaseCrossBuild := true
-releaseTagComment := s"Release ${(ThisBuild / version).value}"
+releaseCrossBuild    := true
+releaseTagComment    := s"Release ${(ThisBuild / version).value}"
 releaseCommitMessage := s"Set version to ${(ThisBuild / version).value}"
 
 releaseProcess := Seq[ReleaseStep](

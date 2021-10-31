@@ -11,7 +11,8 @@ import com.velocidi.apso.Logging
 
 /** Utility class to handle decrypting data to string format and, optionally, handle base64 encoded data.
   *
-  * @param decryptor the underlying Cipher object that allows to decrypt the data.
+  * @param decryptor
+  *   the underlying Cipher object that allows to decrypt the data.
   */
 class Decryptor(decryptor: Cipher) extends EncryptionErrorHandling {
   def apply(s: String): Option[String] = decrypt(s)

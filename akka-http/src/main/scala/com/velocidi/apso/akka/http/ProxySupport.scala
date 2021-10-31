@@ -24,9 +24,9 @@ import com.velocidi.apso.Logging
   * is continuously active and ready to route incoming requests.
   *
   * For one-off requests or requests to previously unknown hosts, this trait defines two routes:
-  * - `proxySingleTo` takes the original request and proxies it to the proxy URI;
-  * - `proxySingleToUnmatchedPath` copies only the unmatched path from the original URI, and adds it to the path of the
-  * proxy URI.
+  *   - `proxySingleTo` takes the original request and proxies it to the proxy URI;
+  *   - `proxySingleToUnmatchedPath` copies only the unmatched path from the original URI, and adds it to the path of
+  *     the proxy URI.
   *
   * In order for the client ip to be propagated in `X-Forwarded-For` headers, the
   * `akka.http.server.remote-address-attribute` config setting must be set to "on".
@@ -85,8 +85,10 @@ trait ProxySupport extends ClientIPDirectives {
 
   /** Proxies a single request to a destination URI.
     *
-    * @param uri the target URI
-    * @return a route that handles requests by proxying them to the given URI.
+    * @param uri
+    *   the target URI
+    * @return
+    *   a route that handles requests by proxying them to the given URI.
     */
   def proxySingleTo(uri: Uri): Route = proxy() { case (ip, ctx) =>
     ctx.request.withUri(uri).withHeaders(getHeaders(ip, ctx.request.headers.toList))
@@ -95,8 +97,10 @@ trait ProxySupport extends ClientIPDirectives {
   /** Proxies a single request to a destination base URI. The target URI is created by concatenating the base URI with
     * the unmatched path.
     *
-    * @param uri the target base URI
-    * @return a route that handles requests by proxying them to the given URI.
+    * @param uri
+    *   the target base URI
+    * @return
+    *   a route that handles requests by proxying them to the given URI.
     */
   def proxySingleToUnmatchedPath(uri: Uri): Route = proxy() { case (ip, ctx) =>
     ctx.request
@@ -104,24 +108,29 @@ trait ProxySupport extends ClientIPDirectives {
       .withHeaders(getHeaders(ip, ctx.request.headers.toList))
   }
 
-  /** Proxies a single request to a destination URI.
-    * The response in not streamed, but converted to a strict entity with a set timeout.
+  /** Proxies a single request to a destination URI. The response in not streamed, but converted to a strict entity with
+    * a set timeout.
     *
-    * @param uri the target URI
-    * @param timeout maximum time to wait for the full response.
-    * @return a route that handles requests by proxying them to the given URI.
+    * @param uri
+    *   the target URI
+    * @param timeout
+    *   maximum time to wait for the full response.
+    * @return
+    *   a route that handles requests by proxying them to the given URI.
     */
   def strictProxySingleTo(uri: Uri, timeout: FiniteDuration): Route = proxy(Some(timeout)) { case (ip, ctx) =>
     ctx.request.withUri(uri).withHeaders(getHeaders(ip, ctx.request.headers.toList))
   }
 
   /** Proxies a single request to a destination base URI. The target URI is created by concatenating the base URI with
-    * the unmatched path.
-    * The response in not streamed, but converted to a strict entity with a set timeout.
+    * the unmatched path. The response in not streamed, but converted to a strict entity with a set timeout.
     *
-    * @param uri the target base URI
-    * @param timeout maximum time to wait for the full response.
-    * @return a route that handles requests by proxying them to the given URI.
+    * @param uri
+    *   the target base URI
+    * @param timeout
+    *   maximum time to wait for the full response.
+    * @return
+    *   a route that handles requests by proxying them to the given URI.
     */
   def strictProxySingleToUnmatchedPath(uri: Uri, timeout: FiniteDuration): Route = proxy(Some(timeout)) {
     case (ip, ctx) =>
@@ -136,10 +145,14 @@ trait ProxySupport extends ClientIPDirectives {
   /** A representation of a reverse proxy for a remote host. This class internally materializes a flow that is
     * continuously active and ready to route incoming requests.
     *
-    * @param host the target host
-    * @param port the target port
-    * @param reqQueueSize the maximum size of the queue of pending backend requests
-    * @param strictTimeout maximum time to wait for the full response.
+    * @param host
+    *   the target host
+    * @param port
+    *   the target port
+    * @param reqQueueSize
+    *   the maximum size of the queue of pending backend requests
+    * @param strictTimeout
+    *   maximum time to wait for the full response.
     */
   class Proxy(
       host: String,
@@ -180,9 +193,12 @@ trait ProxySupport extends ClientIPDirectives {
 
     /** Sends a manually crafted request to a destination URI.
       *
-      * @param req the HTTP Request
-      * @param failOnDrop if the future should fail when the message is dropped, or complete with a 503
-      * @return the request result.
+      * @param req
+      *   the HTTP Request
+      * @param failOnDrop
+      *   if the future should fail when the message is dropped, or complete with a 503
+      * @return
+      *   the request result.
       */
     def sendRequest(req: HttpRequest, failOnDrop: Boolean): Future[RouteResult] = {
       val promise = Promise[RouteResult]()
@@ -199,8 +215,10 @@ trait ProxySupport extends ClientIPDirectives {
 
     /** Proxies a request to a destination URI.
       *
-      * @param uri the target URI
-      * @return a route that handles requests by proxying them to the given URI.
+      * @param uri
+      *   the target URI
+      * @return
+      *   a route that handles requests by proxying them to the given URI.
       */
     def proxyTo(uri: Uri): Route = {
       optionalRemoteAddress { ip => ctx =>
