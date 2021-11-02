@@ -26,7 +26,7 @@ import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap
 
 object LruCache {
 
-  //# source-quote-LruCache-apply
+  // # source-quote-LruCache-apply
   /** Creates a new [[ExpiringLruCache]] or [[SimpleLruCache]] instance depending on whether a non-zero and finite
     * timeToLive and/or timeToIdle is set or not.
     */
@@ -36,7 +36,7 @@ object LruCache {
       timeToLive: Duration = Duration.Inf,
       timeToIdle: Duration = Duration.Inf
   ): Cache[V] = {
-    //#
+    // #
     def check(dur: Duration, name: String) =
       require(
         dur != Duration.Zero,
