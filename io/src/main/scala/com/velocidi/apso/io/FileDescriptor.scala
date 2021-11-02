@@ -127,9 +127,14 @@ trait FileDescriptor {
   def children(names: String*): FileDescriptor =
     names.foldLeft(this)((acc, c) => acc.child(c))
 
-  /** Changes the path of the file descriptor using unix's cd syntax related to the current directory. Ex: Go back to
-    * directories: ../.. Go to child directories: foo/bar Go to sibling directory: ../foo Absolute path changes are not
-    * supported.
+  /** Changes the path of the file descriptor using unix's cd syntax related to the current directory.
+    *
+    * Ex:
+    *   - Go back to directories: ../..
+    *   - Go to child directories: foo/bar
+    *   - Go to sibling directory: ../foo
+    *
+    * Absolute path changes are not supported.
     * @param pathString
     *   the cd command
     * @return

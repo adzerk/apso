@@ -103,9 +103,10 @@ object Implicits {
     */
   final implicit class ApsoMap[A, B](val map: Map[A, B]) extends AnyVal {
 
-    /** Merges a given map with this map. The map is constructed as follows: <ul> <li>Keys present in one of thw two
-      * maps are present in the merged map; <li>Keys in both maps are present in the merged map with a value given by
-      * `f(thisValue, thatValue)`; </ul>
+    /** Merges a given map with this map. The map is constructed as follows:
+      *   - Keys present in one of thw two maps are present in the merged map;
+      *   - Keys in both maps are present in the merged map with a value given by `f(thisValue, thatValue)`;
+      *
       * @param that
       *   the map to be merged with this map
       * @param f

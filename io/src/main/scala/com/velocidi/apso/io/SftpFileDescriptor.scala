@@ -27,10 +27,26 @@ import com.velocidi.apso.Logging
   * Both the username and port are optional. Additionally, the credentials config expects an object with the following
   * format:
   *
-  * `sftp { default = { username = <username> password = <password> } }`
+  * {{{
+  * sftp {
+  *   default = {
+  *     username = <username>
+  *     password = <password>
+  *   }
+  * }
+  * }}}
   *
-  * Or if using public key authentication: `sftp { default = { username = <username> keypair-file = <key filename>
-  * passphrase = <passphrase> } }`
+  * Or if using public key authentication:
+  *
+  * {{{
+  * sftp {
+  *   default = {
+  *     username = <username>
+  *     keypair-file = <key filename>
+  *     passphrase = <passphrase>
+  *   }
+  * }
+  * }}}
   *
   * What is considered as an `id` for credentials handling is the `hostname` of the file descriptor, therefore it is
   * possible to provide credentials for a specific `hostname`.
