@@ -11,9 +11,12 @@ import com.velocidi.apso.Logging
 /** A InputStream that wraps another InputStream, retrying failed reads. This is useful for input streams that can have
   * transient failures (eg HTTP input streams).
   *
-  * @param streamBuilder function that returns a new stream starting at a certain position.
-  * @param maxRetries maximum number of times to retry a read
-  * @param backoff optional duration to wait between retries
+  * @param streamBuilder
+  *   function that returns a new stream starting at a certain position.
+  * @param maxRetries
+  *   maximum number of times to retry a read
+  * @param backoff
+  *   optional duration to wait between retries
   */
 class InsistentInputStream(
     streamBuilder: (Long) => InputStream,

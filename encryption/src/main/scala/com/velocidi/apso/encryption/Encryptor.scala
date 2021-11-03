@@ -11,7 +11,8 @@ import com.velocidi.apso.Logging
 
 /** Utility class to handle encrypting data to string format and, optionally, handle base64 encoded data.
   *
-  * @param encryptor the underlying Cipher object that allows to encrypt the data.
+  * @param encryptor
+  *   the underlying Cipher object that allows to encrypt the data.
   */
 class Encryptor(encryptor: Cipher) extends EncryptionErrorHandling with Logging {
   def apply(data: String) = encrypt(data)

@@ -12,19 +12,24 @@ object Geo {
 
   private[this] val EARTH_RADIUS = 6371.009 // kilometers
 
-  /** Returns the distance in kilometers between two points on the planet Earth, calculated by the
-    * spherical law of cosines (https://en.wikipedia.org/wiki/Great-circle_distance#Formulas).
-    * @param p1 the coordinates of the first point
-    * @param p2 the coordinates of the second point
-    * @return the distance in kilometers between two points on the planet Earth.
+  /** Returns the distance in kilometers between two points on the planet Earth, calculated by the spherical law of
+    * cosines (https://en.wikipedia.org/wiki/Great-circle_distance#Formulas).
+    * @param p1
+    *   the coordinates of the first point
+    * @param p2
+    *   the coordinates of the second point
+    * @return
+    *   the distance in kilometers between two points on the planet Earth.
     */
   def distance(p1: Coordinates, p2: Coordinates) =
     distanceFrom(p1)(p2)
 
-  /** Returns a function that measures the distance to the point `p1` on the planet Earth, calculated
-    * by the spherical law of cosines (https://en.wikipedia.org/wiki/Great-circle_distance#Formulas).
-    * @param p1 the coordinates of the first point
-    * @return a function that given a point `p2` returns the distance in kilometers to the point `p1`.
+  /** Returns a function that measures the distance to the point `p1` on the planet Earth, calculated by the spherical
+    * law of cosines (https://en.wikipedia.org/wiki/Great-circle_distance#Formulas).
+    * @param p1
+    *   the coordinates of the first point
+    * @return
+    *   a function that given a point `p2` returns the distance in kilometers to the point `p1`.
     */
   def distanceFrom(p1: Coordinates): Coordinates => Double = {
     val lat1 = toRadians(p1._1)

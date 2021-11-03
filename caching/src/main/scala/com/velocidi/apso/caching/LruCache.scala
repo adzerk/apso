@@ -26,10 +26,8 @@ import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap
 
 object LruCache {
 
-  //# source-quote-LruCache-apply
-  /** Creates a new [[ExpiringLruCache]] or
-    * [[SimpleLruCache]] instance depending on whether
-    * a non-zero and finite timeToLive and/or timeToIdle is set or not.
+  /** Creates a new [[ExpiringLruCache]] or [[SimpleLruCache]] instance depending on whether a non-zero and finite
+    * timeToLive and/or timeToIdle is set or not.
     */
   def apply[V](
       maxCapacity: Int = 500,
@@ -37,7 +35,6 @@ object LruCache {
       timeToLive: Duration = Duration.Inf,
       timeToIdle: Duration = Duration.Inf
   ): Cache[V] = {
-    //#
     def check(dur: Duration, name: String) =
       require(
         dur != Duration.Zero,
@@ -55,10 +52,9 @@ object LruCache {
   }
 }
 
-/** A thread-safe implementation of [[Cache]].
-  * The cache has a defined maximum number of entries it can store. After the maximum capacity is reached new
-  * entries cause old ones to be evicted in a last-recently-used manner, i.e. the entries that haven't been accessed for
-  * the longest time are evicted first.
+/** A thread-safe implementation of [[Cache]]. The cache has a defined maximum number of entries it can store. After the
+  * maximum capacity is reached new entries cause old ones to be evicted in a last-recently-used manner, i.e. the
+  * entries that haven't been accessed for the longest time are evicted first.
   */
 final class SimpleLruCache[V](val maxCapacity: Int, val initialCapacity: Int) extends Cache[V] {
   require(maxCapacity >= 0, "maxCapacity must not be negative")
@@ -102,19 +98,19 @@ final class SimpleLruCache[V](val maxCapacity: Int, val initialCapacity: Int) ex
   def size = store.size
 }
 
-/** A thread-safe implementation of [[Cache]].
-  * The cache has a defined maximum number of entries is can store. After the maximum capacity has been reached new
-  * entries cause old ones to be evicted in a last-recently-used manner, i.e. the entries that haven't been accessed for
-  * the longest time are evicted first.
-  * In addition this implementation optionally supports time-to-live as well as time-to-idle expiration.
-  * The former provides an upper limit to the time period an entry is allowed to remain in the cache while the latter
-  * limits the maximum time an entry is kept without having been accessed. If both values are non-zero the time-to-live
-  * has to be strictly greater than the time-to-idle.
+/** A thread-safe implementation of [[Cache]]. The cache has a defined maximum number of entries is can store. After the
+  * maximum capacity has been reached new entries cause old ones to be evicted in a last-recently-used manner, i.e. the
+  * entries that haven't been accessed for the longest time are evicted first. In addition this implementation
+  * optionally supports time-to-live as well as time-to-idle expiration. The former provides an upper limit to the time
+  * period an entry is allowed to remain in the cache while the latter limits the maximum time an entry is kept without
+  * having been accessed. If both values are non-zero the time-to-live has to be strictly greater than the time-to-idle.
   * Note that expired entries are only evicted upon next access (or by being thrown out by the capacity constraint), so
   * they might prevent gargabe collection of their values for longer than expected.
   *
-  * @param timeToLive the time-to-live in millis, zero for disabling ttl-expiration
-  * @param timeToIdle the time-to-idle in millis, zero for disabling tti-expiration
+  * @param timeToLive
+  *   the time-to-live in millis, zero for disabling ttl-expiration
+  * @param timeToIdle
+  *   the time-to-idle in millis, zero for disabling tti-expiration
   */
 final class ExpiringLruCache[V](maxCapacity: Long, initialCapacity: Int, timeToLive: Duration, timeToIdle: Duration)
     extends Cache[V] {

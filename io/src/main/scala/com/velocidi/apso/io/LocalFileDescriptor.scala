@@ -153,10 +153,10 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
 
   def delete(): Boolean = file.delete()
 
-  /** Deletes the directory associated with the file descriptor by recursively deleting all the
-    * directories and files inside it. Symbolic links are not followed and are just deleted as
-    * "regular" files.
-    * @return `true` if the delete was successful, `false` otherwise.
+  /** Deletes the directory associated with the file descriptor by recursively deleting all the directories and files
+    * inside it. Symbolic links are not followed and are just deleted as "regular" files.
+    * @return
+    *   `true` if the delete was successful, `false` otherwise.
     */
   def deleteDir(): Boolean = {
     def aux(fd: LocalFileDescriptor): Boolean = {
@@ -171,8 +171,10 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
   def mkdirs(): Boolean = exists || file.mkdirs()
 
   /** Renames the file pointed by the file descriptor
-    * @param to the file descriptor to be renamed to
-    * @return a Some of the renamed file descriptor if successful, otherwise None.
+    * @param to
+    *   the file descriptor to be renamed to
+    * @return
+    *   a Some of the renamed file descriptor if successful, otherwise None.
     */
   def rename(to: LocalFileDescriptor): Option[LocalFileDescriptor] = {
     to.parent().mkdirs()
@@ -180,7 +182,8 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
   }
 
   /** Writes the given string `str` to the file pointed by the file descriptor
-    * @param str the string to write to the file
+    * @param str
+    *   the string to write to the file
     */
   def write(str: String): Unit = {
     parent().mkdirs()
@@ -188,7 +191,8 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
   }
 
   /** Writes the given byteArray to file pointed by the file descriptor
-    * @param byteArray the byte array to write to the file
+    * @param byteArray
+    *   the byte array to write to the file
     */
   def write(byteArray: Array[Byte]): Unit = {
     parent().mkdirs()
@@ -196,7 +200,8 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
   }
 
   /** Reads the file pointed by the file descriptor and returns it in string format
-    * @return the contents of the file in string format
+    * @return
+    *   the contents of the file in string format
     */
   def readString: String = Source.fromFile(file, "UTF-8").mkString
 

@@ -5,7 +5,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import scalacache.{Id, Mode}
 
 /** Represents a container mode for a cached value.
-  * @tparam F the container type, e.g., Future, Try.
+  * @tparam F
+  *   the container type, e.g., Future, Try.
   */
 trait ModeImpl[F[_]] {
   def mode: Mode[F]

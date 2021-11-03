@@ -1,11 +1,14 @@
 package com.velocidi.apso
 
 /** A widget for printing a dynamic progress bar in a console.
-  * @param total the number representing the full progress bar
-  * @param width the line width of the progress bar
-  * @param throughputUnit the throughput unit that is being measured
-  * @param throughputTransformer a function to transform the measured throughput
-  *                              value, before displaying it
+  * @param total
+  *   the number representing the full progress bar
+  * @param width
+  *   the line width of the progress bar
+  * @param throughputUnit
+  *   the throughput unit that is being measured
+  * @param throughputTransformer
+  *   a function to transform the measured throughput value, before displaying it
   */
 case class ProgressBar(
     total: Long = 100,
@@ -31,7 +34,8 @@ case class ProgressBar(
   }
 
   /** Increase the progress by the given number of units.
-    * @param inc the number of progress units to increase
+    * @param inc
+    *   the number of progress units to increase
     */
   def tick(inc: Long): Unit = {
     if (!isFinished) {
@@ -65,7 +69,8 @@ case class ProgressBar(
   }
 
   /** Returns `true` if this progress bar is full.
-    * @return `true` if this progress bar is full, `false` otherwise.
+    * @return
+    *   `true` if this progress bar is full, `false` otherwise.
     */
   def isFinished = done >= total
 }

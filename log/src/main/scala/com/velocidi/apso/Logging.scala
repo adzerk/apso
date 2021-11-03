@@ -6,8 +6,7 @@ import com.typesafe.scalalogging.Logger
   */
 trait Logging {
 
-  /** The `Logger` object. This logger will have the same name as the concrete class
-    * into which this trait is mixed-in.
+  /** The `Logger` object. This logger will have the same name as the concrete class into which this trait is mixed-in.
     */
   lazy val log = Logger(getClass)
 }
@@ -16,8 +15,7 @@ trait Logging {
   */
 trait StrictLogging {
 
-  /** The `Logger` object. This logger will have the same name as the concrete class
-    * into which this trait is mixed-in.
+  /** The `Logger` object. This logger will have the same name as the concrete class into which this trait is mixed-in.
     */
   val log = Logger(getClass)
 }

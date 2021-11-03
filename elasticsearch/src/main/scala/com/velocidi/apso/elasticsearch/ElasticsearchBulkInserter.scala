@@ -15,9 +15,8 @@ import io.circe.Json
 
 import com.velocidi.apso.Logging
 
-/** An actor responsible for inserting tracking events into Elasticsearch.
-  * This actor buffers requests until either the configured flush timer is
-  * triggered or the buffer hits the max size.
+/** An actor responsible for inserting tracking events into Elasticsearch. This actor buffers requests until either the
+  * configured flush timer is triggered or the buffer hits the max size.
   */
 class ElasticsearchBulkInserter(
     esConfig: config.Elasticsearch,
@@ -94,12 +93,16 @@ class ElasticsearchBulkInserter(
     }
   }
 
-  /** Given a list of messages that were sent for indexing and the corresponding bulk response, it returns a list
-    * of failed messages and notifies the sender of the successful ones. The retry counter of the failed messages is also incremented.
+  /** Given a list of messages that were sent for indexing and the corresponding bulk response, it returns a list of
+    * failed messages and notifies the sender of the successful ones. The retry counter of the failed messages is also
+    * incremented.
     *
-    * @param sentBuffer the list of messages that were sent for bulk indexing on Elasticsearch
-    * @param bulkResponse the Elasticsearch response for the bulk indexing of the `sentBuffer`
-    * @return an iterator of [[Message]] corresponding to those in `sentBuffer` that failed to index in Elasticsearch
+    * @param sentBuffer
+    *   the list of messages that were sent for bulk indexing on Elasticsearch
+    * @param bulkResponse
+    *   the Elasticsearch response for the bulk indexing of the `sentBuffer`
+    * @return
+    *   an iterator of [[Message]] corresponding to those in `sentBuffer` that failed to index in Elasticsearch
     */
   private[this] def notifyOfSuccessfulAndGetFailed(
       sentBuffer: Iterable[Message],
@@ -238,7 +241,8 @@ object ElasticsearchBulkInserter extends Logging {
   private case class Message(sender: ActorRef, msg: IndexRequest)
 
   /** Message containing an object to insert
-    * @param obj the JSON object to publish
+    * @param obj
+    *   the JSON object to publish
     */
   case class Insert(obj: Json, index: String) {
     def toRequest: IndexRequest = indexInto(index).doc(obj)
@@ -262,9 +266,12 @@ object ElasticsearchBulkInserter extends Logging {
 
   /** Creates a Props for `ElasticsearchBulkInserter`.
     *
-    * @param esConfig the elasticsearch configuration to use
-    * @param logErrorsAsWarnings whether errors should be logged as warnings
-    * @return a `Props` for `ElasticsearchBulkInserter`.
+    * @param esConfig
+    *   the elasticsearch configuration to use
+    * @param logErrorsAsWarnings
+    *   whether errors should be logged as warnings
+    * @return
+    *   a `Props` for `ElasticsearchBulkInserter`.
     */
   def props(esConfig: config.Elasticsearch, logErrorsAsWarnings: Boolean = false): Props =
     Props(new ElasticsearchBulkInserter(esConfig, logErrorsAsWarnings))

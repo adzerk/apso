@@ -28,11 +28,14 @@ case class MergedBufferedIterator[T](iterators: List[BufferedIterator[T]])(impli
 
   def hasNext: Boolean = nonEmptyIterators.nonEmpty
 
-  /** Lazily merges this buffered iterator with another buffered iterator assuming that both collections
-    * are already sorted.
-    * @param thatIt the iterator  to merge with this one
-    * @tparam U element type of the resulting collection
-    * @return the merged iterators
+  /** Lazily merges this buffered iterator with another buffered iterator assuming that both collections are already
+    * sorted.
+    * @param thatIt
+    *   the iterator to merge with this one
+    * @tparam U
+    *   element type of the resulting collection
+    * @return
+    *   the merged iterators
     */
   def mergeSorted[U >: T](thatIt: BufferedIterator[U])(implicit ord: Ordering[U]): BufferedIterator[U] =
     thatIt match {

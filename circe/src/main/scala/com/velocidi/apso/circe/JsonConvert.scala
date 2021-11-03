@@ -11,8 +11,10 @@ import io.circe.syntax._
 object JsonConvert {
 
   /** Converts an object to a [[io.circe.Json]] value using the most suitable data types.
-    * @param obj the object to convert
-    * @return the given object converted to a [[io.circe.Json]] value.
+    * @param obj
+    *   the object to convert
+    * @return
+    *   the given object converted to a [[io.circe.Json]] value.
     */
   def toJson(obj: Any): Json = obj match {
     case null           => Json.Null

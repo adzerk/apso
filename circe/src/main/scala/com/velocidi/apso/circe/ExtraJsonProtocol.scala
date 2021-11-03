@@ -82,18 +82,24 @@ trait ExtraMiscJsonProtocol {
 
   /** Encodes a map as an array of key-value objects.
     *
-    * @tparam K the type of the keys of the map
-    * @tparam V the types of the value of the map
-    * @return an instance of `Encoder` for the map
+    * @tparam K
+    *   the type of the keys of the map
+    * @tparam V
+    *   the types of the value of the map
+    * @return
+    *   an instance of `Encoder` for the map
     */
   def mapJsonArrayEncoder[K: Encoder, V: Encoder]: Encoder[Map[K, V]] =
     Encoder[List[MapEntry[K, V]]].contramap(_.toList.map { case (k, v) => MapEntry(k, v) })
 
   /** Decodes a map from an array of key-value objects.
     *
-    * @tparam K the type of the keys of the map
-    * @tparam V the types of the value of the map
-    * @return an instance of `Decoder` for the map
+    * @tparam K
+    *   the type of the keys of the map
+    * @tparam V
+    *   the types of the value of the map
+    * @return
+    *   an instance of `Decoder` for the map
     */
   def mapJsonArrayDecoder[K: Decoder, V: Decoder]: Decoder[Map[K, V]] =
     Decoder[List[MapEntry[K, V]]].map(_.flatMap(me => Some(me.key, me.value)).toMap)

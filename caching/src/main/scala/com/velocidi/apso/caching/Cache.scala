@@ -32,8 +32,8 @@ trait Cache[V] { cache =>
 
   class Keyed(key: Any) {
 
-    /** Returns either the cached Future for the key or evaluates the given call-by-name argument
-      * which produces either a value instance of type `V` or a `Future[V]`.
+    /** Returns either the cached Future for the key or evaluates the given call-by-name argument which produces either
+      * a value instance of type `V` or a `Future[V]`.
       */
     def apply(magnet: => ValueMagnet[V])(implicit ec: ExecutionContext): Future[V] =
       cache.apply(
@@ -43,20 +43,20 @@ trait Cache[V] { cache =>
           catch { case NonFatal(e) => Future.failed(e) }
       )
 
-    /** Returns either the cached Future for the key or evaluates the given function which
-      * should lead to eventual completion of the promise.
+    /** Returns either the cached Future for the key or evaluates the given function which should lead to eventual
+      * completion of the promise.
       */
     def apply[U](f: Promise[V] => U)(implicit ec: ExecutionContext): Future[V] =
       cache.apply(key, () => { val p = Promise[V](); f(p); p.future })
   }
 
-  /** Returns either the cached Future for the given key or evaluates the given value generating
-    * function producing a `Future[V]`.
+  /** Returns either the cached Future for the given key or evaluates the given value generating function producing a
+    * `Future[V]`.
     */
   def apply(key: Any, genValue: () => Future[V])(implicit ec: ExecutionContext): Future[V]
 
-  /** Retrieves the future instance that is currently in the cache for the given key.
-    * Returns None if the key has no corresponding cache entry.
+  /** Retrieves the future instance that is currently in the cache for the given key. Returns None if the key has no
+    * corresponding cache entry.
     */
   def get(key: Any): Option[Future[V]]
 
@@ -68,24 +68,22 @@ trait Cache[V] { cache =>
     */
   def clear(): Unit
 
-  /** Returns the set of keys in the cache, in no particular order
-    * Should return in roughly constant time.
-    * Note that this number might not reflect the exact keys of active, unexpired
-    * cache entries, since expired entries are only evicted upon next access
-    * (or by being thrown out by a capacity constraint).
+  /** Returns the set of keys in the cache, in no particular order Should return in roughly constant time. Note that
+    * this number might not reflect the exact keys of active, unexpired cache entries, since expired entries are only
+    * evicted upon next access (or by being thrown out by a capacity constraint).
     */
   def keys: Set[Any]
 
-  /** Returns a snapshot view of the keys as an iterator, traversing the keys from the least likely
-    * to be retained to the most likely.  Note that this is not constant time.
-    * @param limit No more than limit keys will be returned
+  /** Returns a snapshot view of the keys as an iterator, traversing the keys from the least likely to be retained to
+    * the most likely. Note that this is not constant time.
+    * @param limit
+    *   No more than limit keys will be returned
     */
   def ascendingKeys(limit: Option[Int] = None): Iterator[Any]
 
-  /** Returns the upper bound for the number of currently cached entries.
-    * Note that this number might not reflect the exact number of active, unexpired
-    * cache entries, since expired entries are only evicted upon next access
-    * (or by being thrown out by a capacity constraint).
+  /** Returns the upper bound for the number of currently cached entries. Note that this number might not reflect the
+    * exact number of active, unexpired cache entries, since expired entries are only evicted upon next access (or by
+    * being thrown out by a capacity constraint).
     */
   def size: Int
 }

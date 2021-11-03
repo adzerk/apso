@@ -2,11 +2,15 @@ package com.velocidi.apso.collection
 
 /** An immutable implementation of a Trie (https://en.wikipedia.org/wiki/Trie).
   *
-  * @param value the optional value of this node
-  * @param nodes the descendants of this node
+  * @param value
+  *   the optional value of this node
+  * @param nodes
+  *   the descendants of this node
   *
-  * @tparam K the type param of keys in the nodes
-  * @tparam V the type param of values stored in the trie
+  * @tparam K
+  *   the type param of keys in the nodes
+  * @tparam V
+  *   the type param of values stored in the trie
   */
 case class Trie[K, V](value: Option[V] = None, nodes: Map[K, Trie[K, V]] = Map[K, Trie[K, V]]()) {
 

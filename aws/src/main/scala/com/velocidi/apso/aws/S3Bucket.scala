@@ -20,10 +20,11 @@ import com.velocidi.apso.{Logging, TryWith}
 /** A representation of an Amazon's S3 bucket. This class wraps an `AmazonS3Client` and provides a higher level
   * interface for pushing and pulling files to and from a bucket.
   *
-  * @param bucketName          the name of the bucket
-  * @param credentialsProvider optional AWS credentials provider to use (since AWSCredentials are not serializable).
-  *                            If the parameter is not supplied, they will be retrieved from the
-  *                            [[CredentialStore]].
+  * @param bucketName
+  *   the name of the bucket
+  * @param credentialsProvider
+  *   optional AWS credentials provider to use (since AWSCredentials are not serializable). If the parameter is not
+  *   supplied, they will be retrieved from the [[CredentialStore]].
   */
 class S3Bucket(
     val bucketName: String,
@@ -99,11 +100,13 @@ class S3Bucket(
 
   private[this] def sanitizeKey(key: String) = if (key.startsWith("./")) key.drop(2) else key
 
-  /** Returns size of the file in the location specified by `key` in the bucket. If the file doesn't
-    * exist the return value is 0.
+  /** Returns size of the file in the location specified by `key` in the bucket. If the file doesn't exist the return
+    * value is 0.
     *
-    * @param key the remote pathname for the file
-    * @return the size of the file in the location specified by `key` in the bucket if the exists, 0 otherwise.
+    * @param key
+    *   the remote pathname for the file
+    * @return
+    *   the size of the file in the location specified by `key` in the bucket if the exists, 0 otherwise.
     */
   def size(key: String): Long = retry {
     s3.getObjectMetadata(bucketName, key).getContentLength
@@ -111,8 +114,10 @@ class S3Bucket(
 
   /** Returns a list of objects in a bucket matching a given prefix.
     *
-    * @param prefix the prefix to match
-    * @return a list of objects in a bucket matching a given prefix.
+    * @param prefix
+    *   the prefix to match
+    * @return
+    *   a list of objects in a bucket matching a given prefix.
     */
   def getObjectsWithMatchingPrefix(prefix: String, includeDirectories: Boolean = false): Iterator[S3ObjectSummary] = {
     log.info(s"Finding files matching prefix '$prefix'...")
@@ -130,17 +135,22 @@ class S3Bucket(
 
   /** Returns a list of filenames and directories in a bucket matching a given prefix.
     *
-    * @param prefix the prefix to match
-    * @return a list of filenames in a bucket matching a given prefix.
+    * @param prefix
+    *   the prefix to match
+    * @return
+    *   a list of filenames in a bucket matching a given prefix.
     */
   def getFilesWithMatchingPrefix(prefix: String, includeDirectories: Boolean = false): Iterator[String] =
     getObjectsWithMatchingPrefix(prefix, includeDirectories).map(_.getKey)
 
   /** Pushes a given local `File` to the location specified by `key` in the bucket.
     *
-    * @param key the remote pathname for the file
-    * @param file the local `File` to push
-    * @return true if the push was successful, false otherwise.
+    * @param key
+    *   the remote pathname for the file
+    * @param file
+    *   the local `File` to push
+    * @return
+    *   true if the push was successful, false otherwise.
     */
   def push(key: String, file: File): Boolean = retry {
     log.info(s"Pushing file '${file.getPath}' to 's3://$bucketName/$key'")
@@ -151,10 +161,14 @@ class S3Bucket(
 
   /** Pushes a given `InputStream` to the location specified by `key` in the bucket.
     *
-    * @param key the remote pathname for the file
-    * @param inputStream the `InputStream` to push
-    * @param length the content lenght (setting this to `None` can impact performance
-    * @return true if the push was successful, false otherwise.
+    * @param key
+    *   the remote pathname for the file
+    * @param inputStream
+    *   the `InputStream` to push
+    * @param length
+    *   the content lenght (setting this to `None` can impact performance
+    * @return
+    *   true if the push was successful, false otherwise.
     */
   def push(key: String, inputStream: InputStream, length: Option[Long]): Boolean = retry {
     log.info(s"Pushing to 's3://$bucketName/$key'")
@@ -167,18 +181,22 @@ class S3Bucket(
 
   /** Deletes the file in the location specified by `key` in the bucket.
     *
-    * @param key the remote pathname for the file
-    * @return true if the deletion was successful, false otherwise.
+    * @param key
+    *   the remote pathname for the file
+    * @return
+    *   true if the deletion was successful, false otherwise.
     */
   def delete(key: String): Boolean = retry {
     s3.deleteObject(bucketName, sanitizeKey(key))
   }.isDefined
 
-  /** Checks if the file in the location specified by `key` in the bucket exists.
-    * It returns false if just checking for the bucket existence.
+  /** Checks if the file in the location specified by `key` in the bucket exists. It returns false if just checking for
+    * the bucket existence.
     *
-    * @param key the remote pathname for the file
-    * @return true if the file exists, false otherwise.
+    * @param key
+    *   the remote pathname for the file
+    * @return
+    *   true if the file exists, false otherwise.
     */
   def exists(key: String): Boolean = retry {
     key.nonEmpty && s3.doesObjectExist(bucketName, key)
@@ -186,8 +204,10 @@ class S3Bucket(
 
   /** Checks if the location specified by `key` is a directory.
     *
-    * @param key the remote pathname to the directory
-    * @return true if the path is a directory, false otherwise.
+    * @param key
+    *   the remote pathname to the directory
+    * @return
+    *   true if the path is a directory, false otherwise.
     */
   def isDirectory(key: String): Boolean = retry {
     s3.listObjects(
@@ -201,7 +221,8 @@ class S3Bucket(
 
   /** Checks whether the bucket exists
     *
-    * @return true if the bucket exists, false otherwise.
+    * @return
+    *   true if the bucket exists, false otherwise.
     */
   def bucketExists: Boolean = retry {
     s3.doesBucketExistV2(bucketName)
@@ -209,8 +230,10 @@ class S3Bucket(
 
   /** Sets an access control list on a given Amazon S3 object.
     *
-    * @param key the remote pathname for the file
-    * @param acl the `CannedAccessControlList` to be applied to the Amazon S3 object
+    * @param key
+    *   the remote pathname for the file
+    * @param acl
+    *   the `CannedAccessControlList` to be applied to the Amazon S3 object
     */
   def setAcl(key: String, acl: CannedAccessControlList) = {
     log.info(s"Setting 's3://$bucketName/$key' permissions to '$acl'")
@@ -219,8 +242,10 @@ class S3Bucket(
 
   /** Creates an empty directory at the given `key` location
     *
-    * @param key the remote pathname to the directory
-    * @return  true if the directory was created successfully, false otherwise.
+    * @param key
+    *   the remote pathname to the directory
+    * @return
+    *   true if the directory was created successfully, false otherwise.
     */
   def createDirectory(key: String): Boolean = retry {
     log.info(s"Creating directory in 's3://$bucketName/$key'")
@@ -232,11 +257,13 @@ class S3Bucket(
     s3.putObject(new PutObjectRequest(bucketName, sanitizeKey(key) + "/", emptyContent, metadata))
   }.isDefined
 
-  /** Backups a remote file with the given `key`. A backup consists in copying the supplied file to a backup folder under
-    * the same bucket and folder the file is currently in.
+  /** Backups a remote file with the given `key`. A backup consists in copying the supplied file to a backup folder
+    * under the same bucket and folder the file is currently in.
     *
-    * @param key the remote pathname to backup
-    * @return true if the backup was successful, false otherwise.
+    * @param key
+    *   the remote pathname to backup
+    * @return
+    *   true if the backup was successful, false otherwise.
     */
   def backup(key: String): Boolean = retry {
     val sanitizedKey = sanitizeKey(key)
@@ -254,9 +281,12 @@ class S3Bucket(
 
   /** Pulls a remote file with the given `key`, to the local storage in the pathname provided by `destination`.
     *
-    * @param key the remote pathname to pull from
-    * @param destination the local pathname to pull to
-    * @return true if the pull was successful, false otherwise
+    * @param key
+    *   the remote pathname to pull from
+    * @param destination
+    *   the local pathname to pull to
+    * @return
+    *   true if the pull was successful, false otherwise
     */
   def pull(key: String, destination: String): Boolean = retry {
     log.info(s"Pulling 's3://$bucketName/$key' to '$destination'")
