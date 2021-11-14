@@ -404,8 +404,8 @@ final class DeboxMap[
     }
 
     that match {
-      case that: DeboxMap[A, B] => equalsInner(this, that) && equalsInner(that, this)
-      case _                    => false
+      case that: DeboxMap[A @unchecked, B @unchecked] => equalsInner(this, that) && equalsInner(that, this)
+      case _                                          => false
     }
   }
 
