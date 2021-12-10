@@ -15,7 +15,6 @@ object Dependencies {
     val FastMd5                 = "2.7.1"
     val JodaTime                = "2.10.13"
     val JUnit                   = "4.13.2"
-    val Log4jCore               = "2.14.1"
     val NscalaTime              = "2.30.0"
     val ScalaCheck              = "1.15.4"
     val ScalaLogging            = "3.9.4"
@@ -64,7 +63,6 @@ object Dependencies {
   val FastMd5                    = "com.joyent.util"             % "fast-md5"                     % Versions.FastMd5
   val JodaTime                   = "joda-time"                   % "joda-time"                    % Versions.JodaTime
   val JUnit                      = "junit"                       % "junit"                        % Versions.JUnit
-  val Log4jCore                  = "org.apache.logging.log4j"    % "log4j-core"                   % Versions.Log4jCore
   val NscalaTime                 = "com.github.nscala-time"     %% "nscala-time"                  % Versions.NscalaTime
   val ScalaCheck                 = "org.scalacheck"             %% "scalacheck"                   % Versions.ScalaCheck
   val ScalaCollectionCompat      = "org.scala-lang.modules"     %% "scala-collection-compat"      % "2.5.0"
