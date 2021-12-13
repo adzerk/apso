@@ -2,7 +2,7 @@ package com.velocidi.apso
 
 import com.typesafe.scalalogging.Logger
 
-/** Trait to mixin a Log4j2 `Logger` object. The `Logger` object is initialized lazily.
+/** Trait to mixin an SLF4J `Logger` object. The `Logger` object is initialized lazily.
   */
 trait Logging {
 
@@ -11,7 +11,7 @@ trait Logging {
   lazy val log = Logger(getClass)
 }
 
-/** Trait to mixin a Log4j2 `Logger` object. The `Logger` object is initialized strictly.
+/** Trait to mixin an SLF4J `Logger` object. The `Logger` object is initialized strictly.
   */
 trait StrictLogging {
 
