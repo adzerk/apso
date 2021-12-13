@@ -188,7 +188,7 @@ JreVersionHelper.jreVersion
 
 ### Logging
 
-The `Logging` and `StrictLogging` traits allows mixing in Log4j2 `Logger` objects. The difference between the two is that in the former the `Logger` object is initialized lazily, while in the latter it is initialized strictly:
+The `Logging` and `StrictLogging` traits allows mixing in SLF4J `Logger` objects. The difference between the two is that in the former the `Logger` object is initialized lazily, while in the latter it is initialized strictly:
 
 ```scala
 import com.velocidi.apso.Logging
