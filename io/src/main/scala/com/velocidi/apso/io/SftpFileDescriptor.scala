@@ -205,12 +205,12 @@ case class SftpFileDescriptor(
   override def equals(other: Any): Boolean = other match {
     case that: SftpFileDescriptor =>
       username == that.username &&
-        host == that.host &&
-        port == that.port &&
-        username == that.username &&
-        password == that.password &&
-        identity == that.identity &&
-        path == that.path
+      host == that.host &&
+      port == that.port &&
+      username == that.username &&
+      password == that.password &&
+      identity == that.identity &&
+      path == that.path
     case _ => false
   }
 }
