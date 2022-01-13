@@ -6,8 +6,8 @@ object Dependencies {
     val AkkaHttp                = "10.2.6"
     val AkkaTestkitSpecs2       = "0.3.0"
     val Aws                     = "1.12.99"
-    val BouncyCastle            = "1.69"
-    val Cats                    = "2.6.1"
+    val BouncyCastle            = "1.70"
+    val Cats                    = "2.7.0"
     val Circe                   = "0.14.1"
     val CommonsCodec            = "1.15"
     val ConcurrentLinkedHashMap = "1.4.2"
@@ -65,7 +65,7 @@ object Dependencies {
   val JUnit                      = "junit"                       % "junit"                        % Versions.JUnit
   val NscalaTime                 = "com.github.nscala-time"     %% "nscala-time"                  % Versions.NscalaTime
   val ScalaCheck                 = "org.scalacheck"             %% "scalacheck"                   % Versions.ScalaCheck
-  val ScalaCollectionCompat      = "org.scala-lang.modules"     %% "scala-collection-compat"      % "2.5.0"
+  val ScalaCollectionCompat      = "org.scala-lang.modules"     %% "scala-collection-compat"      % "2.6.0"
   val ScalaLogging               = "com.typesafe.scala-logging" %% "scala-logging"                % Versions.ScalaLogging
   val ScalaPool                  = "io.github.andrebeat"        %% "scala-pool"                   % Versions.ScalaPool
   val ScalaTestCore              = "org.scalatest"              %% "scalatest-core"               % Versions.ScalaTest
