@@ -39,9 +39,9 @@ object Dependencies {
   val AkkaStreamTestkit          = "com.typesafe.akka"        %% "akka-stream-testkit"      % Versions.Akka
   val AkkaTestkit                = "com.typesafe.akka"        %% "akka-testkit"             % Versions.Akka
   val AkkaTestkitSpecs2          = "net.ruippeixotog"         %% "akka-testkit-specs2"      % Versions.AkkaTestkitSpecs2
-  val ApacheHttpAsyncClient      = "org.apache.httpcomponents" % "httpasyncclient"          % "4.1.4"
+  val ApacheHttpAsyncClient      = "org.apache.httpcomponents" % "httpasyncclient"          % "4.1.5"
   val ApacheHttpClient           = "org.apache.httpcomponents" % "httpclient"               % "4.5.13"
-  val ApacheHttpCore             = "org.apache.httpcomponents" % "httpcore"                 % "4.4.14"
+  val ApacheHttpCore             = "org.apache.httpcomponents" % "httpcore"                 % "4.4.15"
   val AwsJavaSdkCore             = "com.amazonaws"             % "aws-java-sdk-core"        % Versions.Aws
   val AwsJavaSdkS3               = "com.amazonaws"             % "aws-java-sdk-s3"          % Versions.Aws
   val BouncyCastlePkix           = "org.bouncycastle"          % "bcpkix-jdk15on"           % Versions.BouncyCastle
