@@ -16,11 +16,7 @@ class ImplicitsSpec extends Specification {
       Seq(5).iterator.buffered.mergeSorted(Seq(2).iterator.buffered).toList === List(2, 5)
 
       List(1, 3, 5).iterator.buffered.mergeSorted(LazyList(2, 4).iterator.buffered).toList === List(
-        1,
-        2,
-        3,
-        4,
-        5
+        1, 2, 3, 4, 5
       )
 
       LazyList(1, 3, 5).iterator.buffered
