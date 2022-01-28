@@ -4,7 +4,7 @@ import java.io._
 import java.util.concurrent.{Executors, ThreadFactory}
 
 import scala.jdk.CollectionConverters._
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success, Try, Using}
 
 import com.amazonaws.auth._
 import com.amazonaws.client.builder.ExecutorFactory
@@ -14,8 +14,8 @@ import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.amazonaws.{AmazonClientException, AmazonServiceException, ClientConfiguration}
 import com.typesafe.config.ConfigFactory
 
+import com.velocidi.apso.Logging
 import com.velocidi.apso.aws.S3Bucket.S3ObjectDownloader
-import com.velocidi.apso.{Logging, TryWith}
 
 /** A representation of an Amazon's S3 bucket. This class wraps an `AmazonS3Client` and provides a higher level
   * interface for pushing and pulling files to and from a bucket.
@@ -290,7 +290,7 @@ class S3Bucket(
     */
   def pull(key: String, destination: String): Boolean = retry {
     log.info(s"Pulling 's3://$bucketName/$key' to '$destination'")
-    TryWith(new S3ObjectDownloader(s3, bucketName, sanitizeKey(key), destination))(_.download()).get
+    Using(new S3ObjectDownloader(s3, bucketName, sanitizeKey(key), destination))(_.download()).get
     log.info(s"Downloaded 's3://$bucketName/$key' to '$destination'. Closing files.")
   }.isDefined
 

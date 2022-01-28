@@ -37,7 +37,6 @@ Please take into account that the library is still in an experimental stage and 
     - [ProgressBar](#progressbar)
     - [Reflect](#reflect)
     - [Retry](#retry)
-    - [TryWith](#trywith)
 - [Akka HTTP](#akka-http)
     - [ClientIPDirectives](#clientipdirectives)
     - [ExtraMiscDirectives](#extramiscdirectives)
@@ -274,37 +273,6 @@ def m() = {
 }
 
 Retry.retry(10)(m())
-```
-
-### TryWith
-
-The `TryWith` object mimics the [try-with-resources](https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html)
-construct from Java world, or a loan pattern, where a given function can try to use a `Closeable`
-resource which shall automatically be disposed off and closed properly afterwards.
-
-```scala mdoc:reset
-import java.io.Closeable
-
-import com.velocidi.apso.TryWith
-
-def buildResource = new Closeable {
-  override def toString: String = "good resource"
-  def close(): Unit = {
-    println("Resource is now Closed")
-  }
-}
-
-def goodHandler(resource: Closeable) = {
-  println(resource)
-}
-
-def badHandler(resource: Closeable) = {
-  throw new Exception()
-}
-
-TryWith(buildResource)(goodHandler)
-
-TryWith(buildResource)(badHandler)
 ```
 
 ## Akka HTTP
