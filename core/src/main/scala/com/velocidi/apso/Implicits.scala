@@ -2,7 +2,7 @@ package com.velocidi.apso
 
 import scala.annotation.tailrec
 import scala.collection.compat._
-import scala.util.{Random, Try}
+import scala.util.{Random, Try, Using}
 
 /** Object containing implicit classes and methods of general purpose.
   */
@@ -321,7 +321,7 @@ object Implicits {
       * @return
       *   the value returned by the code block.
       */
-    def use[T](f: U => T): T = TryWith(res)(f).get
+    def use[T](f: U => T): T = Using(res)(f).get
 
     /** Uses this resource and closes it afterwards.
       *
@@ -335,6 +335,6 @@ object Implicits {
       * @return
       *   a `Try` of the value returned by the code block.
       */
-    def tryUse[T](f: U => T): Try[T] = TryWith(res)(f)
+    def tryUse[T](f: U => T): Try[T] = Using(res)(f)
   }
 }

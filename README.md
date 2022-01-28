@@ -37,7 +37,6 @@ Please take into account that the library is still in an experimental stage and 
     - [ProgressBar](#progressbar)
     - [Reflect](#reflect)
     - [Retry](#retry)
-    - [TryWith](#trywith)
 - [Akka HTTP](#akka-http)
     - [ClientIPDirectives](#clientipdirectives)
     - [ExtraMiscDirectives](#extramiscdirectives)
@@ -290,42 +289,6 @@ Retry.retry(10)(m())
 // res22: util.Try[Int] = Success(value = 6)
 ```
 
-### TryWith
-
-The `TryWith` object mimics the [try-with-resources](https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html)
-construct from Java world, or a loan pattern, where a given function can try to use a `Closeable`
-resource which shall automatically be disposed off and closed properly afterwards.
-
-```scala
-import java.io.Closeable
-
-import com.velocidi.apso.TryWith
-
-def buildResource = new Closeable {
-  override def toString: String = "good resource"
-  def close(): Unit = {
-    println("Resource is now Closed")
-  }
-}
-
-def goodHandler(resource: Closeable) = {
-  println(resource)
-}
-
-def badHandler(resource: Closeable) = {
-  throw new Exception()
-}
-
-TryWith(buildResource)(goodHandler)
-// good resource
-// Resource is now Closed
-// res24: util.Try[Unit] = Success(value = ())
-
-TryWith(buildResource)(badHandler)
-// Resource is now Closed
-// res25: util.Try[Nothing] = Failure(exception = java.lang.Exception)
-```
-
 ## Akka HTTP
 
 The `akka-http` module provides additional [directives](https://doc.akka.io/docs/akka-http/current/routing-dsl/directives/index.html#directives) to be used in [akka-http](https://doc.akka.io/docs/akka-http/current/index.html).
@@ -428,11 +391,11 @@ val cachedFn = ((i: Int) => {
 // cachedFn: MemoizeFn1[scalacache.package.Id, Int, Int] = <function1>
 
 cachedFn(2)
-// res29: scalacache.package.Id[Int] = 0
+// res26: scalacache.package.Id[Int] = 0
 cachedFn(2)
-// res30: scalacache.package.Id[Int] = 0
+// res27: scalacache.package.Id[Int] = 0
 x
-// res31: AtomicInteger = 2
+// res28: AtomicInteger = 2
 
 val y = new AtomicInteger(0)
 // y: AtomicInteger = 3
@@ -444,11 +407,11 @@ val cachedFutFn = ((i: Int) => Future {
 // cachedFutFn: MemoizeFn1[Future, Int, Int] = <function1>
 
 Await.result(cachedFutFn(3), Duration.Inf)
-// res32: Int = 0
+// res29: Int = 0
 Await.result(cachedFutFn(3), Duration.Inf)
-// res33: Int = 0
+// res30: Int = 0
 y
-// res34: AtomicInteger = 3
+// res31: AtomicInteger = 3
 ```
 
 ## Collections
@@ -522,13 +485,13 @@ val nt = t.set("one", 1).set("two", 2).set("three", 3).set("four", 4)
 // ...
 
 nt.get("one")
-// res36: Option[Int] = Some(value = 1)
+// res33: Option[Int] = Some(value = 1)
 
 nt.get("two")
-// res37: Option[Int] = Some(value = 2)
+// res34: Option[Int] = Some(value = 2)
 
 nt.get("five")
-// res38: Option[Int] = None
+// res35: Option[Int] = None
 ```
 
 ### TypedMap
@@ -542,25 +505,25 @@ val m = TypedMap("one", 2, 3L)
 // m: TypedMap[Any] = Map(java.lang.String -> one, Int -> 2, Long -> 3)
 
 m[String]
-// res40: String = "one"
+// res37: String = "one"
 
 m[Int]
-// res41: Int = 2
+// res38: Int = 2
 
 m[Long]
-// res42: Long = 3L
+// res39: Long = 3L
 
 m.get[String]
-// res43: Option[String] = Some(value = "one")
+// res40: Option[String] = Some(value = "one")
 
 m.get[Int]
-// res44: Option[Int] = Some(value = 2)
+// res41: Option[Int] = Some(value = 2)
 
 m.get[Long]
-// res45: Option[Long] = Some(value = 3L)
+// res42: Option[Long] = Some(value = 3L)
 
 m.get[Char]
-// res46: Option[Char] = None
+// res43: Option[Char] = None
 ```
 
 ### Iterators
@@ -578,7 +541,7 @@ val circularIterator = CircularIterator(List(1, 2, 3).iterator)
 // circularIterator: CircularIterator[Int] = non-empty iterator
 
 circularIterator.take(10).toList
-// res48: List[Int] = List(1, 2, 3, 1, 2, 3, 1, 2, 3, 1)
+// res45: List[Int] = List(1, 2, 3, 1, 2, 3, 1, 2, 3, 1)
 ```
 
 #### CompositeIterator
@@ -592,7 +555,7 @@ val compositeIterator = CompositeIterator(List(1, 2, 3).iterator, List(4, 5, 6).
 // compositeIterator: CompositeIterator[Int] = empty iterator
 
 compositeIterator.take(9).toList
-// res50: List[Int] = List(1, 2, 3, 4, 5, 6, 7, 8, 9)
+// res47: List[Int] = List(1, 2, 3, 4, 5, 6, 7, 8, 9)
 ```
 
 #### MergedBufferedIterator
@@ -610,7 +573,7 @@ val it1 = MergedBufferedIterator(List(
 // it1: MergedBufferedIterator[Int] = empty iterator
 
 it1.toList
-// res52: List[Int] = List(
+// res49: List[Int] = List(
 //   0,
 //   0,
 //   0,
@@ -660,7 +623,7 @@ val it2 = MergedBufferedIterator(List(
 // it2: MergedBufferedIterator[Int] = non-empty iterator
 
 it2.mergeSorted(Iterator(4, 6).buffered).toList
-// res53: List[Int] = List(1, 2, 3, 4, 5, 6)
+// res50: List[Int] = List(1, 2, 3, 4, 5, 6)
 ```
 
 ## Encryption
@@ -703,10 +666,10 @@ libraryDependencies += "com.velocidi" %% "apso-hashing" % "0.16.10"
 import com.velocidi.apso.hashing.Implicits._
 
 "abcd".md5
-// res56: String = "e2fc714c4727ee9395f324cd2e7f331f"
+// res53: String = "e2fc714c4727ee9395f324cd2e7f331f"
 
 "abcd".murmurHash
-// res57: Long = 7785666560123423118L
+// res54: Long = 7785666560123423118L
 ```
 
 ## IO
@@ -781,7 +744,7 @@ val js2 = Json.obj(
 ```
 ```scala
 js1.deepMerge(js2).spaces2	
-// res62: String = """{
+// res59: String = """{
 //   "c" : 4,
 //   "d" : {
 //     "e" : 5,
@@ -797,7 +760,7 @@ fromFullPaths(Seq(
    "b.d" -> 3.asJson,	
    "e" -> "xpto".asJson,	
    "f.g.h" -> 5.asJson)).spaces2
-// res63: String = """{
+// res60: String = """{
 //   "f" : {
 //     "g" : {
 //       "h" : 5
@@ -812,26 +775,26 @@ fromFullPaths(Seq(
 // }"""
 
 js1.getField[Int]("a")
-// res64: Option[Int] = Some(value = 2)
+// res61: Option[Int] = Some(value = 2)
 js1.getField[Int]("d.f")
-// res65: Option[Int] = Some(value = 6)
+// res62: Option[Int] = Some(value = 6)
 js1.getField[Int]("x")
-// res66: Option[Int] = None
+// res63: Option[Int] = None
 
 js1.deleteField("a")
-// res67: Json = JObject(
+// res64: Json = JObject(
 //   value = object[b -> 3,d -> {
 //   "f" : 6
 // }]
 // )
 js1.deleteField("d.f")
-// res68: Json = JObject(
+// res65: Json = JObject(
 //   value = object[a -> 2,b -> 3,d -> {
 //   
 // }]
 // )
 js1.deleteField("x")	
-// res69: Json = JObject(
+// res66: Json = JObject(
 //   value = object[a -> 2,b -> 3,d -> {
 //   "f" : 6
 // }]
@@ -845,13 +808,13 @@ The `JsonConvert` object contains helpers for converting between JSON values and
 import com.velocidi.apso.circe._
 
 JsonConvert.toJson("abcd")
-// res71: io.circe.Json = JString(value = "abcd")
+// res68: io.circe.Json = JString(value = "abcd")
 
 JsonConvert.toJson(1)
-// res72: io.circe.Json = JNumber(value = JsonLong(value = 1L))
+// res69: io.circe.Json = JNumber(value = JsonLong(value = 1L))
 	
 JsonConvert.toJson(Map(1 -> 2, 3 -> 4))	
-// res73: io.circe.Json = JObject(value = object[1 -> 2,3 -> 4])
+// res70: io.circe.Json = JObject(value = object[1 -> 2,3 -> 4])
 ```
 
 ## Profiling
@@ -892,10 +855,10 @@ import com.velocidi.apso.time._
 import com.velocidi.apso.time.Implicits._
 
 (new DateTime("2012-01-01") to new DateTime("2012-01-01")).toList
-// res75: List[DateTime] = List(2012-01-01T00:00:00.000Z)
+// res72: List[DateTime] = List(2012-01-01T00:00:00.000Z)
 
 (new DateTime("2012-02-01") until new DateTime("2012-03-01") by 1.day)
-// res76: IterableInterval = IndexedSeq(
+// res73: IterableInterval = IndexedSeq(
 //   2012-02-01T00:00:00.000Z,
 //   2012-02-02T00:00:00.000Z,
 //   2012-02-03T00:00:00.000Z,
@@ -928,7 +891,7 @@ import com.velocidi.apso.time.Implicits._
 // )
 
 (new DateTime("2012-01-01") until new DateTime("2012-02-01") by 2.minutes)
-// res77: IterableInterval = IndexedSeq(
+// res74: IterableInterval = IndexedSeq(
 //   2012-01-01T00:00:00.000Z,
 //   2012-01-01T00:02:00.000Z,
 //   2012-01-01T00:04:00.000Z,
