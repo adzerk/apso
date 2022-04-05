@@ -2,8 +2,8 @@ package com.velocidi.apso.akka.http
 
 import java.net.InetAddress
 
-import scala.concurrent.Future
 import scala.concurrent.duration._
+import scala.concurrent.{Future, Promise}
 
 import akka.NotUsed
 import akka.http.scaladsl.Http
@@ -25,7 +25,8 @@ import com.velocidi.apso.NetUtils._
 class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Specs2RouteTest with ProxySupport {
 
   trait MockServer extends Scope {
-    def serverResponse(req: HttpRequest) = HttpResponse(entity = req.uri.toRelative.toString)
+    def serverResponse(req: HttpRequest): Future[HttpResponse] =
+      Future.successful(HttpResponse(entity = req.uri.toRelative.toString))
 
     val (interface, port) = ("localhost", availablePort())
 
@@ -34,7 +35,7 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
       val serverFlow: Flow[HttpRequest, HttpResponse, NotUsed] = Flow
         .apply[HttpRequest]
         .filter(_.method != HttpMethods.DELETE)
-        .map(serverResponse)
+        .mapAsync(1)(serverResponse)
       Http().newServerAt(interface, port).bindFlow(serverFlow)
     }
 
@@ -160,7 +161,9 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
         status == OK
         responseAs[String] must be_==("/remote-proxy")
       }
+    }
 
+    "respect the failOnDrop flag" in new MockServer {
       def parseResult(result: RouteResult): Future[String] = result match {
         case Complete(res) if res.status.intValue() == 200 =>
           res.entity.toStrict(10.seconds).map { r => r.data.utf8String }
@@ -168,13 +171,14 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
         case _             => Future.failed(new Exception("Failed to parse result"))
       }
 
-      proxy
-        .sendRequest(Get("/proxied"), failOnDrop = false)
-        .flatMap(parseResult) must be_==("/proxied").awaitFor(10.seconds)
+      val latch = Promise[Unit]()
+
+      override def serverResponse(req: HttpRequest): Future[HttpResponse] =
+        latch.future.flatMap(_ => super.serverResponse(req))
 
       val badProxy = new Proxy(interface, port, reqQueueSize = 1)
-      // Fill the bad proxy
-      (0 to 10).foreach(x => badProxy.sendRequest(Delete("/proxied-" + x), failOnDrop = false))
+      // Fill the bad proxy. We're trying to fill the maximum number of available connections here.
+      (0 to 300).foreach(x => badProxy.sendRequest(Get(s"/proxied-$x"), failOnDrop = false))
 
       badProxy.sendRequest(Get("/proxied"), failOnDrop = true).failed.map(_.getMessage) must be_==(
         "Dropping request (Queue is full)"
@@ -183,11 +187,19 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
       badProxy
         .sendRequest(Get("/proxied"), failOnDrop = false)
         .flatMap(parseResult) must be_==("503").awaitFor(10.seconds)
+
+      latch.success(())
+
+      proxy
+        .sendRequest(Get("/proxied"), failOnDrop = false)
+        .flatMap(parseResult) must be_==("/proxied").awaitFor(10.seconds)
     }
 
     "do not send unwanted headers" in new MockServer {
       override def serverResponse(req: HttpRequest) =
-        HttpResponse(entity = req.headers.map(header => s"${header.name}: ${header.value}").mkString("\n"))
+        Future.successful(
+          HttpResponse(entity = req.headers.map(header => s"${header.name}: ${header.value}").mkString("\n"))
+        )
       Get("/get-path-proxied").withHeaders(
         Host("expecteddomain.com"),
         `Raw-Request-URI`("somedomain.com")
@@ -206,7 +218,7 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
               ips
             }
             .getOrElse(Seq.empty)
-          HttpResponse(entity = forwardedForIps.mkString(", "), headers = req.headers)
+          Future.successful(HttpResponse(entity = forwardedForIps.mkString(", "), headers = req.headers))
         }
       }
 
