@@ -11,9 +11,9 @@ import akka.http.scaladsl.model.headers._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.RouteResult.Complete
 import akka.http.scaladsl.server.{Directive1, RequestContext, Route, RouteResult}
+import akka.stream.Materializer
 import akka.stream.QueueOfferResult.{Dropped, Enqueued, Failure => OfferFailure, QueueClosed}
 import akka.stream.scaladsl.{Keep, Sink, Source}
-import akka.stream.{Materializer, OverflowStrategy}
 import com.typesafe.config.ConfigFactory
 
 import com.velocidi.apso.Logging
@@ -165,7 +165,7 @@ trait ProxySupport extends ClientIPDirectives {
     import system.dispatcher
 
     private[this] lazy val source =
-      Source.queue[(HttpRequest, Promise[RouteResult])](reqQueueSize, OverflowStrategy.dropNew)
+      Source.queue[(HttpRequest, Promise[RouteResult])](reqQueueSize)
 
     private[this] lazy val flow = strictTimeout match {
       case None => Http().cachedHostConnectionPool[Promise[RouteResult]](host, port)
@@ -202,7 +202,7 @@ trait ProxySupport extends ClientIPDirectives {
       */
     def sendRequest(req: HttpRequest, failOnDrop: Boolean): Future[RouteResult] = {
       val promise = Promise[RouteResult]()
-      queue.offer(req -> promise).flatMap {
+      queue.offer(req -> promise) match {
         case Enqueued         => promise.future
         case OfferFailure(ex) => Future.failed(new RuntimeException("Queue offering failed", ex))
         case QueueClosed      => Future.failed(new RuntimeException("Queue is completed before call!?"))
