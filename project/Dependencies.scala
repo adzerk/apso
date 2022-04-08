@@ -16,7 +16,7 @@ object Dependencies {
     val JodaTime                = "2.10.14"
     val JUnit                   = "4.13.2"
     val NscalaTime              = "2.30.0"
-    val ScalaCheck              = "1.15.4"
+    val ScalaCheck              = "1.16.0"
     val ScalaLogging            = "3.9.4"
     val ScalaPool               = "0.4.3"
     val ScalaTest               = "3.2.11"
