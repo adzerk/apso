@@ -14,6 +14,12 @@
 
 ### Security
 
+## [0.18.3] - 2022-05-11
+
+This is a maintenance release, with only dependency updates. 
+
+[0.18.3]: https://github.com/velocidi/apso/compare/v0.18.2...v0.18.3
+
 ## [0.18.2] - 2022-02-24
 
 ### Removed
@@ -30,7 +36,7 @@ This is the first version with a Changelog, albeit not being the first version o
 - Update Scala, dependencies and plugins versions ([#142](https://github.com/velocidi/apso/pull/142)).
 
 [0.18.1]: https://github.com/velocidi/apso/compare/v0.18.0...v0.18.1
-[Unreleased]: https://github.com/velocidi/apso/compare/v0.18.2...HEAD
+[Unreleased]: https://github.com/velocidi/apso/compare/v0.18.3...HEAD
 
 ***
 
