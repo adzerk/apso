@@ -45,6 +45,7 @@ trait NoSpecElasticsearchTestKit {
       .numOfNode(1)
       .disableESLogger()
       .useLogger()
+      .moduleTypes("org.elasticsearch.transport.Netty4Plugin")
   )
 
   val httpPort = runner.getNode(0).settings().getAsInt("http.port", 9201)
