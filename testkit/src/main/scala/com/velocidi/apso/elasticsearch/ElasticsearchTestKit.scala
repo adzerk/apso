@@ -1,5 +1,7 @@
 package com.velocidi.apso.elasticsearch
 
+import java.nio.file.Files
+
 import scala.concurrent.duration._
 import scala.util.Random
 
@@ -26,6 +28,8 @@ trait ElasticsearchTestKit extends NoSpecElasticsearchTestKit with AfterAll {
 }
 
 trait NoSpecElasticsearchTestKit {
+  lazy val temporaryDirectory = Files.createTempDirectory("es-cluster-runner").toAbsolutePath.toString
+
   lazy val runner = new ElasticsearchClusterRunner().onBuild((_, settingsBuilder: Settings.Builder) => {
     settingsBuilder.put("http.cors.enabled", true)
     settingsBuilder.put("http.cors.allow-origin", "*")
@@ -43,6 +47,7 @@ trait NoSpecElasticsearchTestKit {
       .numOfNode(1)
       .disableESLogger()
       .useLogger()
+      .basePath(temporaryDirectory)
   )
 
   val httpPort = runner.getNode(0).settings().getAsInt("http.port", 9201)
