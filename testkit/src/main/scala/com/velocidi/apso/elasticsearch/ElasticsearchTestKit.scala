@@ -30,6 +30,8 @@ trait NoSpecElasticsearchTestKit {
     settingsBuilder.put("http.cors.enabled", true)
     settingsBuilder.put("http.cors.allow-origin", "*")
     settingsBuilder.put("discovery.type", "single-node")
+    settingsBuilder.put("cluster.routing.allocation.disk.threshold_enabled", false)
+    settingsBuilder.put("monitor.fs.health.enabled", false)
   })
 
   runner.build(
