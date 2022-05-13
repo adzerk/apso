@@ -50,7 +50,7 @@ trait NoSpecElasticsearchTestKit {
     val client = ElasticClient(JavaClient(ElasticProperties(s"http://localhost:$httpPort")))
   }
 
-  lazy val esClient = underlying.client
+  val esClient = underlying.client
 
   // base templates
 
