@@ -57,7 +57,7 @@ trait NoSpecElasticsearchTestKit {
   esClient
     .execute(
       CreateIndexTemplateRequest("default", "*")
-        .settings(Map("number_of_replicas" -> 1, "number_of_shards" -> 1))
+        .settings(Map("number_of_replicas" -> 0, "number_of_shards" -> 1))
         .mappings(
           Iterable(
             MappingDefinition().dynamicTemplates(
