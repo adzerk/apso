@@ -30,6 +30,8 @@ trait NoSpecElasticsearchTestKit {
     settingsBuilder.put("http.cors.enabled", true)
     settingsBuilder.put("http.cors.allow-origin", "*")
     settingsBuilder.put("discovery.type", "single-node")
+    settingsBuilder.put("cluster.routing.allocation.disk.threshold_enabled", false)
+    settingsBuilder.put("monitor.fs.health.enabled", false)
   })
 
   runner.build(
@@ -43,6 +45,7 @@ trait NoSpecElasticsearchTestKit {
       .numOfNode(1)
       .disableESLogger()
       .useLogger()
+      .moduleTypes("org.elasticsearch.transport.Netty4Plugin")
   )
 
   val httpPort = runner.getNode(0).settings().getAsInt("http.port", 9201)
@@ -50,14 +53,14 @@ trait NoSpecElasticsearchTestKit {
     val client = ElasticClient(JavaClient(ElasticProperties(s"http://localhost:$httpPort")))
   }
 
-  lazy val esClient = underlying.client
+  val esClient = underlying.client
 
   // base templates
 
   esClient
     .execute(
       CreateIndexTemplateRequest("default", "*")
-        .settings(Map("number_of_replicas" -> 1, "number_of_shards" -> 1))
+        .settings(Map("number_of_replicas" -> 0, "number_of_shards" -> 1))
         .mappings(
           Iterable(
             MappingDefinition().dynamicTemplates(
