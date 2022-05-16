@@ -28,6 +28,7 @@ trait ElasticsearchTestKit extends NoSpecElasticsearchTestKit with AfterAll {
 }
 
 trait NoSpecElasticsearchTestKit {
+  // This directory is deleted by the `.clean()` method from ElasticsearchClusterRunner.
   lazy val esBasePath = Files.createTempDirectory("es-cluster-runner").toAbsolutePath.toString
 
   lazy val runner = new ElasticsearchClusterRunner().onBuild((_, settingsBuilder: Settings.Builder) => {
