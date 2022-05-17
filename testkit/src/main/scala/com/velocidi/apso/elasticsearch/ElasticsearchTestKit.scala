@@ -29,7 +29,7 @@ trait ElasticsearchTestKit extends NoSpecElasticsearchTestKit with AfterAll {
 
 trait NoSpecElasticsearchTestKit {
   // This directory is deleted by the `.clean()` method from ElasticsearchClusterRunner.
-  val esBasePath = Files.createTempDirectory("es-cluster-runner").toAbsolutePath.toString
+  lazy val esBasePath = Files.createTempDirectory("es-cluster-runner").toAbsolutePath.toString
 
   val runner = new ElasticsearchClusterRunner().onBuild((_, settingsBuilder: Settings.Builder) => {
     settingsBuilder.put("http.cors.enabled", true)
