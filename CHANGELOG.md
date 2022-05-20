@@ -14,6 +14,15 @@
 
 ### Security
 
+## [0.18.4] - 2022-05-20
+
+### Changed
+- Disable some Elasticsearch features on ElasticsearchTestKit ([#262](https://github.com/velocidi/apso/pull/262)). 
+- Allow Elasticsearch base path to be overridden on ElasticsearchTestKit ([#263](https://github.com/velocidi/apso/pull/263)).
+- Dependency updates.
+
+[0.18.4]: https://github.com/velocidi/apso/compare/v0.18.3...v0.18.4
+
 ## [0.18.3] - 2022-05-11
 
 This is a maintenance release, with only dependency updates. 
@@ -36,7 +45,7 @@ This is the first version with a Changelog, albeit not being the first version o
 - Update Scala, dependencies and plugins versions ([#142](https://github.com/velocidi/apso/pull/142)).
 
 [0.18.1]: https://github.com/velocidi/apso/compare/v0.18.0...v0.18.1
-[Unreleased]: https://github.com/velocidi/apso/compare/v0.18.3...HEAD
+[Unreleased]: https://github.com/velocidi/apso/compare/v0.18.4...HEAD
 
 ***
 
