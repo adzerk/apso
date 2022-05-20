@@ -8,7 +8,7 @@ object Dependencies {
     val Aws                     = "1.12.222"
     val BouncyCastle            = "1.70"
     val Cats                    = "2.7.0"
-    val Circe                   = "0.14.1"
+    val Circe                   = "0.14.2"
     val CommonsCodec            = "1.15"
     val ConcurrentLinkedHashMap = "1.4.2"
     val Elastic4s               = "7.10.9"
