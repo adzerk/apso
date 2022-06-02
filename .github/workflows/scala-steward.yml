@@ -1,0 +1,20 @@
+# This workflow will run every day at 9:00AM
+
+on:
+  schedule:
+    - cron: '0 9 * * *'
+
+name: Launch Scala Steward
+
+jobs:
+  scala-steward:
+    runs-on: ubuntu-latest
+    name: Launch Scala Steward
+    steps:
+      - name: Launch Scala Steward
+        uses: scala-steward-org/scala-steward-action@v2
+        with:
+          github-token: ${{ secrets.BACO_SCALA_STEWARD_TOKEN }}
+          author-email: baco@velocidi.com
+          author-name: Baco
+          timeout: 5min
