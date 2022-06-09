@@ -6,7 +6,7 @@ object Dependencies {
     val AkkaHttp                = "10.2.9"
     val AkkaTestkitSpecs2       = "0.3.0"
     val Aws                     = "1.12.236"
-    val BouncyCastle            = "1.70"
+    val BouncyCastle            = "1.71"
     val Cats                    = "2.7.0"
     val Circe                   = "0.14.2"
     val CommonsCodec            = "1.15"
@@ -44,8 +44,8 @@ object Dependencies {
   val ApacheHttpCore             = "org.apache.httpcomponents" % "httpcore"                 % "4.4.15"
   val AwsJavaSdkCore             = "com.amazonaws"             % "aws-java-sdk-core"        % Versions.Aws
   val AwsJavaSdkS3               = "com.amazonaws"             % "aws-java-sdk-s3"          % Versions.Aws
-  val BouncyCastlePkix           = "org.bouncycastle"          % "bcpkix-jdk15on"           % Versions.BouncyCastle
-  val BouncyCastleProvider       = "org.bouncycastle"          % "bcprov-jdk15on"           % Versions.BouncyCastle
+  val BouncyCastlePkix           = "org.bouncycastle"          % "bcpkix-jdk18on"           % Versions.BouncyCastle
+  val BouncyCastleProvider       = "org.bouncycastle"          % "bcprov-jdk18on"           % Versions.BouncyCastle
   val CatsCore                   = "org.typelevel"            %% "cats-core"                % Versions.Cats
   val CirceCore                  = "io.circe"                 %% "circe-core"               % Versions.Circe
   val CirceGeneric               = "io.circe"                 %% "circe-generic"            % Versions.Circe
