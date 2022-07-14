@@ -82,12 +82,14 @@ lazy val docs = (project in file("apso-docs"))
 
 lazy val commonSettings = Seq(
   // format: off
-  resolvers ++= Seq(
-    Resolver.sonatypeRepo("snapshots"),
-    Resolver.typesafeRepo("snapshots"),
-    "Spray Repository"              at "https://repo.spray.io/",
-    "Bintray Scalaz Releases"       at "https://dl.bintray.com/scalaz/releases",
-    "JCenter Repository"            at "https://jcenter.bintray.com/"),
+  resolvers ++= 
+    Resolver.sonatypeOssRepos("snapshots") ++
+      Seq(
+        Resolver.typesafeRepo("snapshots"),
+        "Spray Repository"              at "https://repo.spray.io/",
+        "Bintray Scalaz Releases"       at "https://dl.bintray.com/scalaz/releases",
+        "JCenter Repository"            at "https://jcenter.bintray.com/"
+      ),
 
   scalafmtOnCompile := true,
 
