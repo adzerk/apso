@@ -1,7 +1,7 @@
 import Dependencies._
 
 libraryDependencies ++= Seq(
-  AkkaActor             % Provided,
+  AkkaActor                % Provided,
   ApacheHttpAsyncClient,
   ApacheHttpClient,
   ApacheHttpCore,
@@ -10,9 +10,9 @@ libraryDependencies ++= Seq(
   Elastic4sCore,
   ElasticsearchRestClient,
   ScalaLogging,
-  AkkaActorTestkitTyped % Test,
-  AkkaHttpTestkit       % Test,
-  AkkaTestkitSpecs2     % Test,
-  Specs2Core            % Test,
-  Specs2ScalaCheck      % Test
+  AkkaActorTestkitTyped    % Test,
+  AkkaHttpTestkit          % Test,
+  AkkaTestkitSpecs2Classic % Test,
+  Specs2Core               % Test,
+  Specs2ScalaCheck         % Test
 )
