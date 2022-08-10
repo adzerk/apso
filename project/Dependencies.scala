@@ -24,7 +24,7 @@ object Dependencies {
     val SimpleJmx               = "1.19"
     val Specs2                  = "4.16.1"
     val Squants                 = "1.8.3"
-    val SshJ                    = "0.33.0"
+    val SshJ                    = "0.34.0"
     val TypesafeConfig          = "1.4.2"
     val UnirestJava             = "1.4.9"
   }
