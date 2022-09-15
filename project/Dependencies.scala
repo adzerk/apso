@@ -2,10 +2,10 @@ import sbt._
 
 object Dependencies {
   object Versions {
-    val Akka                    = "2.6.19"
-    val AkkaHttp                = "10.2.9"
+    val Akka                    = "2.6.20"
+    val AkkaHttp                = "10.2.10"
     val AkkaTestkitSpecs2       = "0.3.1"
-    val Aws                     = "1.12.296"
+    val Aws                     = "1.12.300"
     val BouncyCastle            = "1.71.1"
     val Cats                    = "2.8.0"
     val Circe                   = "0.14.2"
@@ -20,7 +20,7 @@ object Dependencies {
     val ScalaLogging            = "3.9.5"
     val ScalaPool               = "0.4.3"
     val ScalaTest               = "3.2.13"
-    val Shapeless               = "2.3.9"
+    val Shapeless               = "2.3.10"
     val SimpleJmx               = "1.19"
     val Specs2                  = "4.16.1"
     val Squants                 = "1.8.3"

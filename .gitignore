@@ -21,3 +21,6 @@ target/
 .bloop
 .metals
 metals.sbt
+
+# VS Code
+.vscode
