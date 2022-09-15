@@ -11,7 +11,7 @@ object Dependencies {
     val Circe                   = "0.14.2"
     val CommonsCodec            = "1.15"
     val ConcurrentLinkedHashMap = "1.4.2"
-    val Elastic4s               = "7.10.9"
+    val Elastic4s               = "7.10.10"
     val FastMd5                 = "2.7.1"
     val JodaTime                = "2.11.1"
     val JUnit                   = "4.13.2"

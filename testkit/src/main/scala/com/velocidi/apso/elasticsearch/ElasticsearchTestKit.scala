@@ -6,10 +6,11 @@ import scala.concurrent.duration._
 import scala.util.Random
 
 import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.fields.KeywordField
 import com.sksamuel.elastic4s.http.JavaClient
 import com.sksamuel.elastic4s.requests.indexes.CreateIndexTemplateRequest
+import com.sksamuel.elastic4s.requests.mappings.MappingDefinition
 import com.sksamuel.elastic4s.requests.mappings.dynamictemplate.DynamicTemplateRequest
-import com.sksamuel.elastic4s.requests.mappings.{KeywordField, MappingDefinition}
 import com.sksamuel.elastic4s.testkit._
 import com.sksamuel.elastic4s.{ElasticClient, ElasticProperties}
 import org.codelibs.elasticsearch.runner.ElasticsearchClusterRunner
@@ -65,7 +66,7 @@ trait NoSpecElasticsearchTestKit {
 
   esClient
     .execute(
-      CreateIndexTemplateRequest("default", "*")
+      CreateIndexTemplateRequest("default", Seq("*"))
         .settings(Map("number_of_replicas" -> 0, "number_of_shards" -> 1))
         .mappings(
           Iterable(
