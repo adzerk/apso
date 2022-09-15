@@ -30,7 +30,7 @@ class ElasticsearchBulkInserter(
 
   private[this] val bulkInserterConfig = esConfig.bulkInserter.getOrElse {
     val fallback = config.Elasticsearch.BulkInserter(1.second, 10.seconds, 1000, 3)
-    log.warn(
+    logErrorOrWarning(
       "Bulk inserter settings for sending documents to Elasticsearch were not found in the config. " +
         s"A default configuration will be used: $fallback"
     )
@@ -167,7 +167,7 @@ class ElasticsearchBulkInserter(
       becomeElasticsearchUp()
 
     case ElasticsearchDown =>
-      log.warn(
+      logErrorOrWarning(
         "Cannot connect to Elasticsearch. There may be some configuration problem or the cluster may be " +
           "temporarily down."
       )
@@ -192,7 +192,7 @@ class ElasticsearchBulkInserter(
       if (buffer.nonEmpty) flush()
 
     case ElasticsearchDown =>
-      log.warn("Elasticsearch seems to be down. Waiting for cluster to recover")
+      logErrorOrWarning("Elasticsearch seems to be down. Waiting for cluster to recover")
       periodicFlush.cancel()
       becomeElasticsearchDown()
       context.system.scheduler.scheduleOnce(2.seconds, self, CheckElasticsearch)
@@ -224,7 +224,7 @@ class ElasticsearchBulkInserter(
     else Future(client.close())
 
     Try(Await.result(stop, timeoutOnStop)).failed.foreach { ex =>
-      log.warn("Failed to cleanly stop Bulk Inserter!", ex)
+      logErrorOrWarning("Failed to cleanly stop Bulk Inserter!", Some(ex))
     }
   }
 
