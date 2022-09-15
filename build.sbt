@@ -6,6 +6,10 @@ ThisBuild / organization := "com.velocidi"
 ThisBuild / crossScalaVersions := Seq("2.12.16", "2.13.8")
 ThisBuild / scalaVersion       := "2.13.8"
 
+// Workaround for incompatible scala-xml versions taken from https://github.com/scala/bug/issues/12632. scala-xml 1.x
+// and scala-xml 2.x are "mostly" binary compatible.
+ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
+
 def module(project: Project, moduleName: String) =
   (project in file(moduleName))
     .settings(name := s"apso-$moduleName")
