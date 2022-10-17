@@ -13,7 +13,7 @@ object Dependencies {
     val ConcurrentLinkedHashMap = "1.4.2"
     val Elastic4s               = "7.10.10"
     val FastMd5                 = "2.7.1"
-    val JodaTime                = "2.11.1"
+    val JodaTime                = "2.11.2"
     val JUnit                   = "4.13.2"
     val NscalaTime              = "2.32.0"
     val ScalaCheck              = "1.17.0"
