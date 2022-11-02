@@ -76,10 +76,10 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpeci
       val bulkInserter = testBulkInserter(maxBufferSize = 5)
 
       for (i <- 1 to 3) bulkInserter ! Insert(Json.obj("id" := i), msgIndex)
-      numberOfHits(msgIndex) must not(be_==(3).retry())
+      numberOfHits(msgIndex) must not(be_==(3L).retry())
 
       for (i <- 4 to 5) bulkInserter ! Insert(Json.obj("id" := i), msgIndex)
-      numberOfHits(msgIndex) must be_==(5).retry(eventuallyRetries = 30)
+      numberOfHits(msgIndex) must be_==(5L).retry(eventuallyRetries = 30)
     }
 
     "collect events and send them in bulk to Elasticsearch after a periodic flush occurs" in {
@@ -90,9 +90,9 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpeci
       for (i <- 1 to 5) bulkInserter ! Insert(Json.obj("id" := i), msgIndex)
 
       Thread.sleep(5000)
-      numberOfHits(msgIndex) must be_==(0).retry(eventuallyRetries = 10)
+      numberOfHits(msgIndex) must be_==(0L).retry(eventuallyRetries = 10)
       Thread.sleep(7500)
-      numberOfHits(msgIndex) must be_==(5).retry(eventuallyRetries = 10)
+      numberOfHits(msgIndex) must be_==(5L).retry(eventuallyRetries = 10)
     }
 
     "correctly handle errors and retry document insertion errors" in {
@@ -109,21 +109,21 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpeci
       // insert a (valid) document
       bulkInserter ! Insert(Json.obj("name" := "test1"), msgIndex)
       bulkInserter ! Insert(Json.obj("name" := "test2"), msgIndex)
-      numberOfHits(msgIndex) must be_==(2).retry(eventuallyRetries = 30)
+      numberOfHits(msgIndex) must be_==(2L).retry(eventuallyRetries = 30)
 
       // try to insert a (invalid) document; this one should stay on the buffer for retry later on...
       bulkInserter ! Insert(Json.obj("name" := "test3"), msgIndex)
       bulkInserter ! Insert(Json.obj("name" := "test4", "other" := "dynamic_field_value"), msgIndex)
-      numberOfHits(msgIndex) must not(be_==(4).retry())
-      numberOfHits(msgIndex) must be_==(3).retry()
+      numberOfHits(msgIndex) must not(be_==(4L).retry())
+      numberOfHits(msgIndex) must be_==(3L).retry()
 
       // now, change the mapping so that new fields are allowed...
       esClient.execute(putMapping(msgIndex) rawSource """{"dynamic":true,"properties":{"name":{"type":"text"}}}""") must
         beAnInstanceOf[RequestSuccess[_]].awaitFor(5.seconds)
       bulkInserter ! Insert(Json.obj("name" := "test5"), msgIndex)
-      numberOfHits(msgIndex) must be_==(5).retry(eventuallyRetries = 30)
+      numberOfHits(msgIndex) must be_==(5L).retry(eventuallyRetries = 30)
       esClient.execute(search(msgIndex) query matchQuery("other", "dynamic_field_value")).map(_.result.totalHits) must
-        be_==(1).retry(eventuallyRetries = 30)
+        be_==(1L).retry(eventuallyRetries = 30)
     }
 
     "correctly send error back to client only when retries are exhausted" in {
@@ -141,32 +141,32 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpeci
         // insert valid documents
         bulkInserter ! Insert(Json.obj("name" := "test1"), msgIndex)
         bulkInserter ! Insert(Json.obj("name" := "test2"), msgIndex)
-        numberOfHits(msgIndex) must be_==(2).retry(eventuallyRetries = 30)
+        numberOfHits(msgIndex) must be_==(2L).retry(eventuallyRetries = 30)
 
         // insert an invalid document that will be retried
         val probe = TestProbe()
         bulkInserter.!(Insert(Json.obj("name" := "test3", "other" := "dynamic_field_value"), msgIndex))(probe.ref)
-        numberOfHits(msgIndex) must be_==(2).retry(eventuallyRetries = 30)
+        numberOfHits(msgIndex) must be_==(2L).retry(eventuallyRetries = 30)
         probe must not(receive.like { case Status.Failure(_) => ok })
 
         // after this valid one, the failed one above will be retried...
         bulkInserter ! Insert(Json.obj("name" := "test4"), msgIndex)
-        numberOfHits(msgIndex) must be_==(3).retry(eventuallyRetries = 30)
+        numberOfHits(msgIndex) must be_==(3L).retry(eventuallyRetries = 30)
         probe must not(receive.like { case Status.Failure(_) => ok })
 
         // after this valid one, the failed one above will be retried...
         bulkInserter ! Insert(Json.obj("name" := "test5"), msgIndex)
-        numberOfHits(msgIndex) must be_==(4).retry(eventuallyRetries = 30)
+        numberOfHits(msgIndex) must be_==(4L).retry(eventuallyRetries = 30)
         probe must not(receive.like { case Status.Failure(_) => ok })
 
         // after this valid one, the failed one above will be retried...
         bulkInserter ! Insert(Json.obj("name" := "test6"), msgIndex)
-        numberOfHits(msgIndex) must be_==(5).retry(eventuallyRetries = 30)
+        numberOfHits(msgIndex) must be_==(5L).retry(eventuallyRetries = 30)
         probe must not(receive.like { case Status.Failure(_) => ok })
 
         // after this valid one, finally the error will be sent back to the client
         bulkInserter ! Insert(Json.obj("name" := "test7"), msgIndex)
-        numberOfHits(msgIndex) must be_==(6).retry(eventuallyRetries = 30)
+        numberOfHits(msgIndex) must be_==(6L).retry(eventuallyRetries = 30)
         probe must receive.like { case Status.Failure(_) => ok }
       }
 
@@ -184,7 +184,7 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv) extends AkkaSpeci
         // insert an invalid document that will be retried
         val probe = TestProbe()
         bulkInserter.!(Insert(Json.obj("name" := "test3", "other" := "dynamic_field_value"), msgIndex))(probe.ref)
-        numberOfHits(msgIndex) must be_==(0).retry(eventuallyRetries = 30)
+        numberOfHits(msgIndex) must be_==(0L).retry(eventuallyRetries = 30)
         probe must receive.like { case Status.Failure(_) => ok }.eventually(30, 2.seconds)
       }
     }
