@@ -7,7 +7,7 @@ object Dependencies {
     val AkkaTestkitSpecs2       = "0.3.1"
     val Aws                     = "1.12.341"
     val BouncyCastle            = "1.72"
-    val Cats                    = "2.8.0"
+    val Cats                    = "2.9.0"
     val Circe                   = "0.14.3"
     val CommonsCodec            = "1.15"
     val ConcurrentLinkedHashMap = "1.4.2"
