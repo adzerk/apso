@@ -5,7 +5,7 @@ object Dependencies {
     val Akka                    = "2.6.20"
     val AkkaHttp                = "10.2.10"
     val AkkaTestkitSpecs2       = "0.3.1"
-    val Aws                     = "1.12.341"
+    val Aws                     = "2.17.113"
     val BouncyCastle            = "1.72"
     val Cats                    = "2.9.0"
     val Circe                   = "0.14.3"
@@ -42,8 +42,8 @@ object Dependencies {
   val ApacheHttpAsyncClient      = "org.apache.httpcomponents" % "httpasyncclient"             % "4.1.5"
   val ApacheHttpClient           = "org.apache.httpcomponents" % "httpclient"                  % "4.5.13"
   val ApacheHttpCore             = "org.apache.httpcomponents" % "httpcore"                    % "4.4.15"
-  val AwsJavaSdkCore             = "com.amazonaws"             % "aws-java-sdk-core"           % Versions.Aws
-  val AwsJavaSdkS3               = "com.amazonaws"             % "aws-java-sdk-s3"             % Versions.Aws
+  val AwsJavaSdkCore             = "software.amazon.awssdk"    % "core"                        % Versions.Aws
+  val AwsJavaSdkS3               = "software.amazon.awssdk"    % "s3"                          % Versions.Aws
   val BouncyCastlePkix           = "org.bouncycastle"          % "bcpkix-jdk18on"              % Versions.BouncyCastle
   val BouncyCastleProvider       = "org.bouncycastle"          % "bcprov-jdk18on"              % Versions.BouncyCastle
   val CatsCore                   = "org.typelevel"            %% "cats-core"                   % Versions.Cats
