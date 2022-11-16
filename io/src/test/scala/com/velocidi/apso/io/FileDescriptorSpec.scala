@@ -2,8 +2,8 @@ package com.velocidi.apso.io
 
 import scala.util.Try
 
-import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import org.specs2.mutable.Specification
+import software.amazon.awssdk.auth.credentials.{AwsBasicCredentials, StaticCredentialsProvider}
 
 import com.velocidi.apso.CustomMatchers
 import com.velocidi.apso.aws.S3Bucket
@@ -55,7 +55,10 @@ class FileDescriptorSpec extends Specification with CustomMatchers {
         case s3: S3FileDescriptor =>
           s3 must beSerializable
           s3.bucket must beEqualTo(
-            new S3Bucket("test", () => new AWSStaticCredentialsProvider(new BasicAWSCredentials("a", "b")))
+            new S3Bucket(
+              "test",
+              () => StaticCredentialsProvider.create(AwsBasicCredentials.create("a", "b"))
+            )
           )
       }
     }
