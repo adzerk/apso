@@ -327,8 +327,8 @@ The `ConfigCredentialsProvider` is an `AWSCredentialsProvider` (from AWS SDK for
 
 ```scala
 import com.velocidi.apso.aws._
-
 import com.typesafe.config._
+import software.amazon.awssdk.auth.credentials.AwsCredentials
 
 val confProvider = ConfigCredentialsProvider(
   config = ConfigFactory.parseString("""{
@@ -340,11 +340,11 @@ val confProvider = ConfigCredentialsProvider(
   accessKeyPath = "aws.access-key",
   secretKeyPath = "aws.secret-key")
 
-val credentials = confProvider.getCredentials
+val credentials = confProvider.resolveCredentials()
 
-credentials.getAWSAccessKeyId
+credentials.accessKeyId()
 
-credentials.getAWSSecretKey
+credentials.secretAccessKey()
 ```
 
 ### CredentialStore
