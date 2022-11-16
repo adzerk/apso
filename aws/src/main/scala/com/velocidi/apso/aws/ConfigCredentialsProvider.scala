@@ -1,7 +1,7 @@
 package com.velocidi.apso.aws
 
-import com.amazonaws.auth._
 import com.typesafe.config.{Config, ConfigFactory}
+import software.amazon.awssdk.auth.credentials._
 
 /** AWS credentials provider that retrieves credentials from a typesafe configuration.
   * @param config
@@ -15,10 +15,10 @@ case class ConfigCredentialsProvider(
     config: Config = ConfigFactory.load(),
     accessKeyPath: String = "aws.access-key",
     secretKeyPath: String = "aws.secret-key"
-) extends AWSCredentialsProvider {
-
-  def getCredentials: AWSCredentials =
-    new BasicAWSCredentials(config.getString(accessKeyPath), config.getString(secretKeyPath))
+) extends AwsCredentialsProvider {
 
   def refresh() = {}
+
+  override def resolveCredentials(): AwsCredentials =
+    AwsBasicCredentials.create(config.getString(accessKeyPath), config.getString(secretKeyPath))
 }
