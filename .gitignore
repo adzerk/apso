@@ -24,3 +24,6 @@ metals.sbt
 
 # VS Code
 .vscode
+
+# asdf
+.tool-versions
