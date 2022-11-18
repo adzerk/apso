@@ -5,7 +5,7 @@ object Dependencies {
     val Akka                    = "2.6.20"
     val AkkaHttp                = "10.2.10"
     val AkkaTestkitSpecs2       = "0.3.1"
-    val Aws                     = "1.12.341"
+    val Aws                     = "1.12.345"
     val BouncyCastle            = "1.72"
     val Cats                    = "2.9.0"
     val Circe                   = "0.14.3"
