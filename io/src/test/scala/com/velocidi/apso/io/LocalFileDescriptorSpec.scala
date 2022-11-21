@@ -31,18 +31,16 @@ class LocalFileDescriptorSpec extends Specification {
 
     "retrieve the last modified timestamp of a file" in {
       // We're relying on IO being slow here. There's a good chance a very fast IO will result in the same timestamps
-      // for `before`, `lm1`, `lm2` and `after`. Either way, these checks should all hold as invariants, even if looking
-      // at an additional last modified timestamp (`lm2`) doesn't add much to the test.
+      // for `lm1`, `lm2` and `lm3`. Either way, these checks should all hold as invariants.
       val fd1 = LocalFileDescriptor("/tmp") / randomFolder / randomString
-      val before = System.currentTimeMillis()
       fd1.write("hello world")
       val lm1 = fd1.lastModifiedTimestamp
-      lm1 must be_>=(before)
-      fd1.write("hello world!")
+      fd1.write("hello world1")
       val lm2 = fd1.lastModifiedTimestamp
       lm2 must be_>=(lm1)
-      val after = System.currentTimeMillis()
-      lm2 must be_<=(after)
+      fd1.write("hello world2")
+      val lm3 = fd1.lastModifiedTimestamp
+      lm3 must be_>=(lm2)
     }
 
     "move up the hierarchy correctly" in {
