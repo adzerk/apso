@@ -36,6 +36,11 @@ case class S3FileDescriptor(
     case None       => bucket.size(builtPath)
   }
 
+  def lastModifiedTimestamp = summary match {
+    case Some(info) => info.getLastModified().getTime()
+    case None       => bucket.lastModified(builtPath)
+  }
+
   def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean): Boolean = {
     if (localTarget.isDirectory) {
       throw new Exception("File descriptor points to a directory")
