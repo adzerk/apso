@@ -36,10 +36,7 @@ case class S3FileDescriptor(
     case None       => bucket.size(builtPath)
   }
 
-  def lastModifiedTimestamp = summary match {
-    case Some(info) => info.getLastModified().getTime()
-    case None       => bucket.lastModified(builtPath)
-  }
+  def lastModifiedTimestamp = summary.fold(bucket.lastModified(builtPath))(_.getLastModified().getTime())
 
   def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean): Boolean = {
     if (localTarget.isDirectory) {

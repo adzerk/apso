@@ -122,9 +122,8 @@ class S3Bucket(
     *   the last modified timestamp of the file in the location specified by `key` in the bucket if it exists, 0L
     *   otherwise.
     */
-  def lastModified(key: String): Long = retry {
-    s3.getObjectMetadata(bucketName, key).getLastModified().getTime()
-  }.getOrElse(0)
+  def lastModified(key: String): Long =
+    retry(s3.getObjectMetadata(bucketName, key).getLastModified().getTime()).getOrElse(0)
 
   /** Returns a list of objects in a bucket matching a given prefix.
     *
