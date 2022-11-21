@@ -17,36 +17,36 @@ class LocalFileDescriptorSpec extends Specification {
 
     def randomString = UUID.randomUUID().toString.take(10)
 
-    "Have a correct absolute path after right after initialization" in {
+    "have a correct absolute path after right after initialization" in {
       val file = new File("/tmp/one/two/three")
       val fd = LocalFileDescriptor("/tmp/one/two/three")
       file.getAbsolutePath == fd.path
     }
 
-    "Retrieve the size of a file" in {
+    "retrieve the size of a file" in {
       val fd1 = LocalFileDescriptor("/tmp") / randomFolder / randomString
       fd1.write("hello world")
       fd1.size === "hello world".getBytes.length
     }
 
-    "Move up the hierarchy correctly" in {
+    "move up the hierarchy correctly" in {
       LocalFileDescriptor("/tmp/one/two/three").parent() == LocalFileDescriptor("/tmp/one/two")
       LocalFileDescriptor("/tmp/one/two/three").parent(3) == LocalFileDescriptor("/tmp")
     }
 
-    "Move down the hierarchy correctly" in {
+    "move down the hierarchy correctly" in {
       LocalFileDescriptor("/tmp") / "one" / "two" === LocalFileDescriptor("/tmp/one/two")
       LocalFileDescriptor("/tmp").child("one") === LocalFileDescriptor("/tmp/one")
       LocalFileDescriptor("/tmp").children("one", "two") === LocalFileDescriptor("/tmp/one/two")
       LocalFileDescriptor("/tmp") / "wrong" !== LocalFileDescriptor("/tmp/right")
     }
 
-    "Move horizontaly in the hierarchy correctly" in {
+    "move horizontaly in the hierarchy correctly" in {
       LocalFileDescriptor("/tmp/one/two").sibling("foo") === LocalFileDescriptor("/tmp/one/foo")
       LocalFileDescriptor("/tmp/one/two").sibling(_ + ".tmp") === LocalFileDescriptor("/tmp/one/two.tmp")
     }
 
-    "Write and read to the file associated with the file descriptor" in {
+    "write and read to the file associated with the file descriptor" in {
       val fd = LocalFileDescriptor("/tmp") / randomFolder / randomString
       fd.exists must beFalse
       fd.write("test")
@@ -55,7 +55,7 @@ class LocalFileDescriptorSpec extends Specification {
       fd.delete()
     }
 
-    "Delete a existing file associated with the file descriptor" in {
+    "delete a existing file associated with the file descriptor" in {
       val fd = LocalFileDescriptor("/tmp") / randomFolder / randomString
       fd.exists must beFalse
       fd.write("test")
@@ -64,7 +64,7 @@ class LocalFileDescriptorSpec extends Specification {
       fd.exists must beFalse
     }
 
-    "Delete a directory associated with the file descriptor" in {
+    "delete a directory associated with the file descriptor" in {
       val symlinkFd = LocalFileDescriptor("/tmp") / randomString / randomString
       symlinkFd.write("test")
 
@@ -84,12 +84,12 @@ class LocalFileDescriptorSpec extends Specification {
       symlinkFd.delete()
     }
 
-    "Have a correctly working 'cd' interface" in {
+    "have a correctly working 'cd' interface" in {
       LocalFileDescriptor("/tmp/one/two/three").cd("../four/./five") ===
         LocalFileDescriptor("/tmp/one/two/four/five")
     }
 
-    "Create intermediary folders when required" in {
+    "create intermediary folders when required" in {
       val fd = LocalFileDescriptor("/tmp") / randomFolder / randomString
       val f = fd.children("one", "two")
       f.exists must beFalse
@@ -99,7 +99,7 @@ class LocalFileDescriptorSpec extends Specification {
       f.exists must beTrue
     }
 
-    "Download a file correctly to a file" in {
+    "download a file correctly to a file" in {
       val fd1 = LocalFileDescriptor("/tmp") / randomFolder / randomString
       val fd2 = LocalFileDescriptor("/tmp") / randomFolder / randomString
 
@@ -113,7 +113,7 @@ class LocalFileDescriptorSpec extends Specification {
       file2.readString must beEqualTo("hello world")
     }
 
-    "Do not download file to a directory" in {
+    "do not download file to a directory" in {
       val fd1 = LocalFileDescriptor("/tmp") / randomFolder / randomString
       val fd2 = LocalFileDescriptor("/tmp") / randomFolder / randomString
 
@@ -126,7 +126,7 @@ class LocalFileDescriptorSpec extends Specification {
       Try(file1.download(dir2)) must beAFailedTry
     }
 
-    "Download a file correctly to a file in a safe manner" in {
+    "download a file correctly to a file in a safe manner" in {
       val fd1 = LocalFileDescriptor("/tmp") / randomFolder / randomString
       val fd2 = LocalFileDescriptor("/tmp") / randomFolder / randomString
 
@@ -141,8 +141,8 @@ class LocalFileDescriptorSpec extends Specification {
       file2.readString must beEqualTo("hello world")
     }
 
-    "Upload file correctly to a file" in {
-      "From another file" in {
+    "upload file correctly to a file" in {
+      "from another file" in {
         val fd1 = LocalFileDescriptor("/tmp") / randomFolder / randomString
         val fd2 = LocalFileDescriptor("/tmp") / randomFolder / randomString
 
@@ -156,7 +156,7 @@ class LocalFileDescriptorSpec extends Specification {
         file2.readString must beEqualTo("hello world")
       }
 
-      "From an InputStream" in {
+      "from an InputStream" in {
         val fd = LocalFileDescriptor("/tmp") / randomFolder / randomString
 
         val inputStream = new InputStream {
@@ -172,7 +172,7 @@ class LocalFileDescriptorSpec extends Specification {
       }
     }
 
-    "Do not upload file to a directory" in {
+    "do not upload file to a directory" in {
       val fd1 = LocalFileDescriptor("/tmp") / randomFolder / randomString
       val fd2 = LocalFileDescriptor("/tmp") / randomFolder / randomString
 
@@ -185,7 +185,7 @@ class LocalFileDescriptorSpec extends Specification {
       Try(dir2.upload(file1)) must beAFailedTry
     }
 
-    "Stream a file as bytes or lines" in {
+    "stream a file as bytes or lines" in {
       val fd1 = LocalFileDescriptor("/tmp") / randomFolder / randomString
       fd1.write("1\n2\n3\n4")
 
@@ -195,7 +195,7 @@ class LocalFileDescriptorSpec extends Specification {
       fd1.lines().toList === List("1", "2", "3", "4")
     }
 
-    "List files correctly" in {
+    "list files correctly" in {
       val fd = LocalFileDescriptor("/tmp") / randomFolder / randomString
       val files = (1 to 5).map(n => fd / n.toString)
 
@@ -203,7 +203,7 @@ class LocalFileDescriptorSpec extends Specification {
       fd.list.toSet === files.toSet
     }
 
-    "List files by prefix correctly" in {
+    "list files by prefix correctly" in {
       val fd = LocalFileDescriptor("/tmp") / randomFolder / randomString
       val files = (1 to 5).map(n => fd / ("a" * n))
 
@@ -212,7 +212,7 @@ class LocalFileDescriptorSpec extends Specification {
         files.filter(_.name.length > 2).toSet
     }
 
-    "List all files by prefix" in {
+    "list all files by prefix" in {
       val fd = LocalFileDescriptor("/tmp") / randomFolder / randomString
 
       val dir1 = fd / "aaa"
@@ -231,13 +231,13 @@ class LocalFileDescriptorSpec extends Specification {
       dir3.listAllFilesWithPrefix("") must beEmpty
     }
 
-    "Know whether the FD points to a directory" in {
+    "know whether the FD points to a directory" in {
       val fd = LocalFileDescriptor("/tmp") / randomFolder / randomString
       fd.mkdirs()
       fd.isDirectory must beTrue
     }
 
-    "Know whether the FD points to a file that exists" in {
+    "know whether the FD points to a file that exists" in {
       val fd = LocalFileDescriptor("/tmp") / randomFolder / randomString / "one"
       fd.write("one")
       fd.exists must beTrue
