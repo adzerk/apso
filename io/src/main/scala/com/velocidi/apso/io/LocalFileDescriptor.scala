@@ -30,6 +30,8 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
 
   def size = file.length()
 
+  def lastModifiedTimestamp = file.lastModified()
+
   def parent(n: Int): LocalFileDescriptor = {
     val parentPath = (1 to n).foldLeft(normalizedPath)((acc, _) => acc.getParent)
     LocalFileDescriptor(parentPath.toString)

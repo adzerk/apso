@@ -103,6 +103,8 @@ case class SftpFileDescriptor(
 
   def size = withFileAttributes(_.getSize)
 
+  def lastModifiedTimestamp = withFileAttributes(_.getMtime())
+
   def isDirectory: Boolean = withFileAttributes(_.getType == FileMode.Type.DIRECTORY)
 
   def exists: Boolean = fileAttributes.isDefined || sftp(c => c.statExistence(path) != null)
