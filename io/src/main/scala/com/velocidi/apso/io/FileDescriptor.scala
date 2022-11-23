@@ -29,6 +29,10 @@ trait FileDescriptor {
     */
   def size: Long
 
+  /** The last modified timestamp of the file associated with the file descriptor.
+    */
+  def lastModifiedTimestamp: Long
+
   /** Downloads the file to the given local destination. Both the source and the destination must point to a file.
     *
     * @param localTarget

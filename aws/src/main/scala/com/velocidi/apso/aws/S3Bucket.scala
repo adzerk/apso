@@ -103,6 +103,19 @@ class S3Bucket(
       .toLong
   }.getOrElse(0)
 
+  /** Returns the last modified timestamp of the file in the location specified by `key` in the bucket. If the file
+    * doesn't exist the return value is 0L. The decision to return 0L in those cases is to align with
+    * `java.io.File#lastModified()`'s behavior.
+    *
+    * @param key
+    *   the remote pathname for the file
+    * @return
+    *   the last modified timestamp of the file in the location specified by `key` in the bucket if it exists, 0L
+    *   otherwise.
+    */
+  def lastModified(key: String): Long =
+    retry(s3.getObjectMetadata(bucketName, key).getLastModified().getTime()).getOrElse(0)
+
   /** Returns a list of objects in a bucket matching a given prefix.
     *
     * @param prefix
