@@ -41,7 +41,7 @@ object Dependencies {
   val AkkaTestkitSpecs2Classic   = "net.ruippeixotog"         %% "akka-testkit-specs2-classic" % Versions.AkkaTestkitSpecs2
   val ApacheHttpAsyncClient      = "org.apache.httpcomponents" % "httpasyncclient"             % "4.1.5"
   val ApacheHttpClient           = "org.apache.httpcomponents" % "httpclient"                  % "4.5.14"
-  val ApacheHttpCore             = "org.apache.httpcomponents" % "httpcore"                    % "4.4.15"
+  val ApacheHttpCore             = "org.apache.httpcomponents" % "httpcore"                    % "4.4.16"
   val AwsJavaSdkCore             = "com.amazonaws"             % "aws-java-sdk-core"           % Versions.Aws
   val AwsJavaSdkS3               = "com.amazonaws"             % "aws-java-sdk-s3"             % Versions.Aws
   val BouncyCastlePkix           = "org.bouncycastle"          % "bcpkix-jdk18on"              % Versions.BouncyCastle
@@ -65,7 +65,7 @@ object Dependencies {
   val JUnit                      = "junit"                       % "junit"                        % Versions.JUnit
   val NscalaTime                 = "com.github.nscala-time"     %% "nscala-time"                  % Versions.NscalaTime
   val ScalaCheck                 = "org.scalacheck"             %% "scalacheck"                   % Versions.ScalaCheck
-  val ScalaCollectionCompat      = "org.scala-lang.modules"     %% "scala-collection-compat"      % "2.8.1"
+  val ScalaCollectionCompat      = "org.scala-lang.modules"     %% "scala-collection-compat"      % "2.9.0"
   val ScalaLogging               = "com.typesafe.scala-logging" %% "scala-logging"                % Versions.ScalaLogging
   val ScalaPool                  = "io.github.andrebeat"        %% "scala-pool"                   % Versions.ScalaPool
   val ScalaTestCore              = "org.scalatest"              %% "scalatest-core"               % Versions.ScalaTest
