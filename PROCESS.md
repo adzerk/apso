@@ -26,6 +26,15 @@ following the template.
 
 It's recommended to open a PR with the Changelog changes so that they can be reviewed by someone else from the team.
 
+### Publishing a snapshot version
+
+To publish a snapshot version to [Nexus Sonatype](https://oss.sonatype.org), simply use `sbt` to run `publish`. The 
+version will be published under the [Velocidi Snapshot repository](https://oss.sonatype.org/content/repositories/snapshots/com/velocidi/). 
+
 ### Releasing artifacts
 
-TO DO
+To release the artifacts in the [Velocidi Maven Repository](https://repo1.maven.org/maven2/com/velocidi/), simply use
+`sbt` to run `release`. 
+
+This will result in the releasing of all the `apso-*` libraries. Please ensure you are using `java 8` when releasing
+new versions.
