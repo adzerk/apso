@@ -57,9 +57,9 @@ object Dependencies {
   val Elastic4sClientEsJava      = "com.sksamuel.elastic4s"     %% "elastic4s-client-esjava"      % Versions.Elastic4s
   val Elastic4sCore              = "com.sksamuel.elastic4s"     %% "elastic4s-core"               % Versions.Elastic4s
   val Elastic4sTestkit           = "com.sksamuel.elastic4s"     %% "elastic4s-testkit"            % Versions.Elastic4s
-  val Elasticsearch              = "org.elasticsearch"           % "elasticsearch"                % "7.10.2"
+  val Elasticsearch              = "org.elasticsearch"           % "elasticsearch"                % "7.17.9"
   val ElasticsearchClusterRunner = "org.codelibs"                % "elasticsearch-cluster-runner" % "7.10.2.0"
-  val ElasticsearchRestClient    = "org.elasticsearch.client"    % "elasticsearch-rest-client"    % "7.10.2"
+  val ElasticsearchRestClient    = "org.elasticsearch.client"    % "elasticsearch-rest-client"    % "7.17.9"
   val FastMd5                    = "com.joyent.util"             % "fast-md5"                     % Versions.FastMd5
   val JodaTime                   = "joda-time"                   % "joda-time"                    % Versions.JodaTime
   val JUnit                      = "junit"                       % "junit"                        % Versions.JUnit
