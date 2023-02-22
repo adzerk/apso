@@ -93,6 +93,7 @@ lazy val commonSettings = Seq(
         "Spray Repository"                  at  "https://repo.spray.io/",
         "Bintray Scalaz Releases"           at  "https://dl.bintray.com/scalaz/releases",
         "JCenter Repository"                at  "https://jcenter.bintray.com/",
+        // Necessary for org.codelibs:elasticsearch-cluster-runner, which moved to maven.codelibs.org after v7.11.x
         "Elasticsearch Cluster Repository"  at  "https://maven.codelibs.org/"
       ),
 
