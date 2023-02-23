@@ -12,7 +12,7 @@ object Dependencies {
     val CommonsCodec            = "1.15"
     val ConcurrentLinkedHashMap = "1.4.2"
     val Elastic4s               = "7.13.0"
-    val Elasticsearch           = "7.17.9"
+    val Elasticsearch           = "7.13.4"
     val FastMd5                 = "2.7.1"
     val JodaTime                = "2.12.2"
     val JUnit                   = "4.13.2"
