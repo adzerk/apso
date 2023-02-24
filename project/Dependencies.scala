@@ -5,7 +5,7 @@ object Dependencies {
     val Akka                    = "2.6.20"
     val AkkaHttp                = "10.2.10"
     val AkkaTestkitSpecs2       = "0.3.2"
-    val Aws                     = "1.12.408"
+    val Aws                     = "1.12.414"
     val BouncyCastle            = "1.72"
     val Cats                    = "2.9.0"
     val Circe                   = "0.14.4"
@@ -58,7 +58,6 @@ object Dependencies {
   val Elastic4sClientEsJava      = "com.sksamuel.elastic4s"     %% "elastic4s-client-esjava"      % Versions.Elastic4s
   val Elastic4sCore              = "com.sksamuel.elastic4s"     %% "elastic4s-core"               % Versions.Elastic4s
   val Elastic4sTestkit           = "com.sksamuel.elastic4s"     %% "elastic4s-testkit"            % Versions.Elastic4s
-  val Elasticsearch              = "org.elasticsearch"           % "elasticsearch"                % Versions.Elasticsearch
   val ElasticsearchClusterRunner = "org.codelibs"                % "elasticsearch-cluster-runner" % "7.13.4.0"
   val ElasticsearchRestClient    = "org.elasticsearch.client"    % "elasticsearch-rest-client"    % Versions.Elasticsearch
   val FastMd5                    = "com.joyent.util"             % "fast-md5"                     % Versions.FastMd5
