@@ -14,7 +14,7 @@
 
 ### Security
 
-## [0.18.7] - 2023-02-24
+## [0.18.7] - 2023-02-27
 
 ### Changed
 - Update elasticsearch-related dependencies to `7.16.x` ([#432](https://github.com/adzerk/apso/pull/432)).
