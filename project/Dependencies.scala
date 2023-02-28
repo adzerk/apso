@@ -11,8 +11,8 @@ object Dependencies {
     val Circe                   = "0.14.4"
     val CommonsCodec            = "1.15"
     val ConcurrentLinkedHashMap = "1.4.2"
-    val Elastic4s               = "7.17.4"
-    val Elasticsearch           = "7.17.9"
+    val Elastic4s               = "7.16.3"
+    val Elasticsearch           = "7.16.3"
     val FastMd5                 = "2.7.1"
     val JodaTime                = "2.12.2"
     val JUnit                   = "4.13.2"
@@ -58,7 +58,7 @@ object Dependencies {
   val Elastic4sClientEsJava      = "com.sksamuel.elastic4s"     %% "elastic4s-client-esjava"      % Versions.Elastic4s
   val Elastic4sCore              = "com.sksamuel.elastic4s"     %% "elastic4s-core"               % Versions.Elastic4s
   val Elastic4sTestkit           = "com.sksamuel.elastic4s"     %% "elastic4s-testkit"            % Versions.Elastic4s
-  val ElasticsearchClusterRunner = "org.codelibs"                % "elasticsearch-cluster-runner" % "7.17.1.0"
+  val ElasticsearchClusterRunner = "org.codelibs"                % "elasticsearch-cluster-runner" % "7.16.3.0"
   val ElasticsearchRestClient    = "org.elasticsearch.client"    % "elasticsearch-rest-client"    % Versions.Elasticsearch
   val FastMd5                    = "com.joyent.util"             % "fast-md5"                     % Versions.FastMd5
   val JodaTime                   = "joda-time"                   % "joda-time"                    % Versions.JodaTime
