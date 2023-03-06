@@ -22,7 +22,7 @@ object Dependencies {
     val ScalaPool               = "0.4.3"
     val ScalaTest               = "3.2.15"
     val Shapeless               = "2.3.10"
-    val SimpleJmx               = "2.1"
+    val SimpleJmx               = "2.2"
     val Specs2                  = "4.19.2"
     val Squants                 = "1.8.3"
     val SshJ                    = "0.35.0"
