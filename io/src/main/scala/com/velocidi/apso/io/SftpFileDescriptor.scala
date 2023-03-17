@@ -239,7 +239,7 @@ object SftpFileDescriptor {
       ssh.disconnect()
     }
   }
-  
+
   case class SftpFileDescriptorCredentials(host: String, port: String, auth: Either[Identity, String])
 
   implicit def sftpClientToSFTPClient(c: SftpClient): SFTPClient = c.sftpClient
@@ -328,18 +328,18 @@ object SftpFileDescriptor {
   }
 
   private[this] val credentials =
-    new FileDescriptorCredentials[config.Credentials.Sftp.Entry, (String, String, Either[Identity, String])] {
+    new FileDescriptorCredentials[config.Credentials.Sftp.Entry, SftpFileDescriptorCredentials] {
       def id(path: String) = splitMeta(path)._1
 
       def createCredentials(
           hostname: String,
           sftpConfig: config.Credentials.Sftp.Entry
-      ): (String, String, Either[Identity, String]) = {
+      ): SftpFileDescriptorCredentials = {
         sftpConfig match {
           case config.Credentials.Sftp.Entry.Basic(username, password) =>
-            (hostname, username, Right(password))
+            SftpFileDescriptorCredentials(hostname, username, Right(password))
           case config.Credentials.Sftp.Entry.PublicKey(username, keypairFile, passphrase) =>
-            (
+            SftpFileDescriptorCredentials(
               hostname,
               username,
               Left(Identity(Right(new File(Properties.userHome + "/.ssh/" + keypairFile)), passphrase))
@@ -376,14 +376,14 @@ object SftpFileDescriptor {
     apply(host, port, url, username, password, None)
   }
 
-  def apply(url: String, credentials: Option[(String, String, Either[Identity, String])]): SftpFileDescriptor = {
+  def apply(url: String, credentials: Option[SftpFileDescriptorCredentials]): SftpFileDescriptor = {
     val creds = credentials.getOrElse(throw new IllegalArgumentException(s"No credentials found."))
     val (_, port, _) = splitMeta(url)
 
     creds match {
-      case (host, username, Left(identity)) =>
+      case SftpFileDescriptorCredentials(host, username, Left(identity)) =>
         apply(host, port, url, username, None, Some(identity))
-      case (host, username, Right(password)) =>
+      case SftpFileDescriptorCredentials(host, username, Right(password)) =>
         apply(host, port, url, username, Some(password), None)
     }
   }
