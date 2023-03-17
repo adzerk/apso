@@ -9,6 +9,23 @@ import scala.util.{Failure, Success, Try}
   */
 object Retry {
 
+  private[this] final def retryFuture[T](maxRetries: Int = 10, inBetweenSleep: Option[FiniteDuration] = Some(100.millis))(
+    f: => Future[T]
+  )(implicit ec: ExecutionContext): Future[T] = {
+    maxRetries match {
+      case 0 =>
+        f
+      case _ =>
+        f recoverWith {
+          case NonFatal(
+          _
+          ) => // it would be indifferent to use a Throwable here because Futures don't catch Fatal exceptions
+            inBetweenSleep.foreach(d => Thread.sleep(d.toMillis))
+            retryFuture[T](maxRetries - 1, inBetweenSleep)(f)
+        }
+    }
+  }
+
   /** Tries to perform a Future[T] until it succeeds or until maximum retries is reached.
     *
     * @param maxRetries
@@ -24,22 +41,9 @@ object Retry {
     * @return
     *   the Future[T]
     */
-  def retryFuture[T](maxRetries: Int = 10, inBetweenSleep: Option[FiniteDuration] = Some(100.millis))(
+  def retryFuture[T](maxRetries: Int = 10, inBetweenSleep: FiniteDuration = 100.millis)(
       f: => Future[T]
-  )(implicit ec: ExecutionContext): Future[T] = {
-    maxRetries match {
-      case 0 =>
-        f
-      case _ =>
-        f recoverWith {
-          case NonFatal(
-                _
-              ) => // it would be indifferent to use a Throwable here because Futures don't catch Fatal exceptions
-            inBetweenSleep.foreach(d => Thread.sleep(d.toMillis))
-            retryFuture[T](maxRetries - 1, inBetweenSleep)(f)
-        }
-    }
-  }
+  )(implicit ec: ExecutionContext): Future[T] = retryFuture(maxRetries, Option(inBetweenSleep))(f)
 
   private[this] final def retry[T](maxRetries: Int, inBetweenSleep: Option[FiniteDuration])(f: => T): Try[T] = {
     maxRetries match {
@@ -67,7 +71,6 @@ object Retry {
     * @return
     *   a Try of the `f` function result
     */
-  def retry[T](maxRetries: Int = 10, inBetweenSleep: FiniteDuration = 100.millis)(f: => T): Try[T] = {
+  def retry[T](maxRetries: Int = 10, inBetweenSleep: FiniteDuration = 100.millis)(f: => T): Try[T] =
     retry(maxRetries, Option(inBetweenSleep))(f)
-  }
 }
