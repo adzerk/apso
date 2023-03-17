@@ -9,17 +9,15 @@ import scala.util.{Failure, Success, Try}
   */
 object Retry {
 
-  private[this] final def retryFuture[T](maxRetries: Int = 10, inBetweenSleep: Option[FiniteDuration] = Some(100.millis))(
-    f: => Future[T]
-  )(implicit ec: ExecutionContext): Future[T] = {
+  private[this] final def retryFuture[T](maxRetries: Int, inBetweenSleep: Option[FiniteDuration])(f: => Future[T])(implicit ec: ExecutionContext): Future[T] = {
     maxRetries match {
       case 0 =>
         f
       case _ =>
         f recoverWith {
           case NonFatal(
-          _
-          ) => // it would be indifferent to use a Throwable here because Futures don't catch Fatal exceptions
+                _
+              ) => // it would be indifferent to use a Throwable here because Futures don't catch Fatal exceptions
             inBetweenSleep.foreach(d => Thread.sleep(d.toMillis))
             retryFuture[T](maxRetries - 1, inBetweenSleep)(f)
         }
@@ -50,7 +48,7 @@ object Retry {
       case 0 => Try(f)
       case _ =>
         Try(f) match {
-          case res@Success(_) => res
+          case res @ Success(_) => res
           case Failure(_) =>
             inBetweenSleep.foreach(d => Thread.sleep(d.toMillis))
             retry[T](maxRetries - 1, inBetweenSleep)(f)
