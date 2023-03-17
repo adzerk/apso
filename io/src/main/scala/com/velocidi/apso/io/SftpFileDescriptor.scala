@@ -239,6 +239,8 @@ object SftpFileDescriptor {
       ssh.disconnect()
     }
   }
+  
+  case class SftpFileDescriptorCredentials(host: String, port: String, auth: Either[Identity, String])
 
   implicit def sftpClientToSFTPClient(c: SftpClient): SFTPClient = c.sftpClient
 
