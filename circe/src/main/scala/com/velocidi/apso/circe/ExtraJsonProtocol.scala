@@ -77,7 +77,7 @@ trait ExtraMiscJsonProtocol {
     Decoder[Json].emapPrettyTry(json => Try(ConfigFactory.parseString(json.toString)))
 
   implicit def currencyDecoder(implicit moneyContext: MoneyContext): Decoder[Currency] =
-    Decoder[String].emapPrettyTry(Currency(_))
+    Decoder[String].emapPrettyTry(s => Currency(s.toUpperCase))
   implicit val currencyEncoder: Encoder[Currency] = Encoder[String].contramap(_.toString)
 
   /** Encodes a map as an array of key-value objects.

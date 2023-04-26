@@ -106,12 +106,12 @@ class ExtraJsonProtocolSpec extends Specification {
 
     "provide an Encoder and Decoder for Currency" in {
       implicit val moneyContext: MoneyContext = MoneyContext(EUR, defaultCurrencySet, Nil)
-      val currency: Currency = USD
-      val currencyString = """"USD""""
+      val usd: Currency = USD
 
-      currency.asJson.noSpaces mustEqual currencyString
-      decode[Currency](currencyString) must beRight(currency)
-      decode[Currency]("EU") must beLeft
+      usd.asJson.noSpaces mustEqual "\"USD\""
+      decode[Currency]("\"USD\"") must beRight(usd)
+      decode[Currency]("\"usd\"") must beRight(usd)
+      decode[Currency]("\"EU\"") must beLeft
     }
 
     "provide an Encoder and Decoder for a Map as an array of json objects" in {
