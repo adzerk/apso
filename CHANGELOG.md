@@ -20,7 +20,7 @@ Use the following schema when setting up the Changelog for a new release. Remove
 
 ## [0.18.8] - 2023-04-27
 
-This release includes several dependency updates, some updates to make existing APIs more friendlier and a change to a
+This release includes several dependency updates, some updates to make existing APIs friendlier and a change to a
 `Decoder` for extra flexibility.
 
 We have updated the `Retry` API to make it more convenient to override the default timeout in between sleeps. We
