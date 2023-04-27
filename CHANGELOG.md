@@ -18,6 +18,47 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.18.8] - 2023-04-27
+
+This release includes several dependency updates, some updates to make existing APIs more friendlier and a change to a
+`Decoder` for extra flexibility.
+
+We have updated the `Retry` API to make it more convenient to override the default timeout in between sleeps. We
+previously had to do something like the following:
+
+```scala
+Retry.retry(maxRetries = 5, inBetweenSleep = Some(2.seconds))(f)
+```
+
+But are now able to provide a duration directly, without wrapping it in an `Option`:
+
+```scala
+Retry.retry(maxRetries = 5, inBetweenSleep = 2.seconds)(f)
+```
+
+We have also promoted the SFTP file descriptor credentials from a tuple to a dedicated data type:
+
+```scala
+case class Credentials(host: String, port: String, auth: Either[Identity, String])
+```
+
+Additionally, the `Decoder` for [Squants](https://github.com/typelevel/squants)'s `Currency` was updated to become case
+insensitive, meaning that, for example, both `"usd"` and `"USD"` now decode to the same `USD` currency.
+
+### Changed
+- Update circe-core, circe-generic, circe-literal, circe-parser to 0.14.5 ([#441](https://github.com/adzerk/apso/pull/441)).
+- Update simplejmx to 2.2 ([#443](https://github.com/adzerk/apso/pull/443)).
+- Add `SFTP` file descriptor credentials ([#449](https://github.com/adzerk/apso/pull/449)).
+- Enchance `Retry` API ([#450](https://github.com/adzerk/apso/pull/450)).
+- Update joda-time to 2.12.5 ([#458](https://github.com/adzerk/apso/pull/458)).
+- Update bcpkix-jdk18on, bcprov-jdk18on to 1.73 ([#463](https://github.com/adzerk/apso/pull/463)).
+- Update aws-java-sdk-core to 1.12.450 ([#464](https://github.com/adzerk/apso/pull/464)).
+- Make the `Decoder` for `Currency` case insensitive ([#467](https://github.com/adzerk/apso/pull/467)).
+- Update aws-java-sdk-s3 to 1.12.457 ([#468](https://github.com/adzerk/apso/pull/468)).
+- Update scala-collection-compat to 2.10.0 ([#469](https://github.com/adzerk/apso/pull/469)).
+
+[0.18.8]: https://github.com/velocidi/apso/compare/v0.18.7...v0.18.8
+
 ## [0.18.7] - 2023-02-28
 
 ### Changed
