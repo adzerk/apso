@@ -65,7 +65,7 @@ object Dependencies {
   val JUnit                      = "junit"                       % "junit"                        % Versions.JUnit
   val NscalaTime                 = "com.github.nscala-time"     %% "nscala-time"                  % Versions.NscalaTime
   val ScalaCheck                 = "org.scalacheck"             %% "scalacheck"                   % Versions.ScalaCheck
-  val ScalaCollectionCompat      = "org.scala-lang.modules"     %% "scala-collection-compat"      % "2.9.0"
+  val ScalaCollectionCompat      = "org.scala-lang.modules"     %% "scala-collection-compat"      % "2.10.0"
   val ScalaLogging               = "com.typesafe.scala-logging" %% "scala-logging"                % Versions.ScalaLogging
   val ScalaPool                  = "io.github.andrebeat"        %% "scala-pool"                   % Versions.ScalaPool
   val ScalaTestCore              = "org.scalatest"              %% "scalatest-core"               % Versions.ScalaTest
