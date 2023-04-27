@@ -1,5 +1,8 @@
 # Changelog
 
+<!--
+Use the following schema when setting up the Changelog for a new release. Remove empty sections before publishing.
+
 ## [Unreleased]
 
 ### Added
@@ -13,6 +16,7 @@
 ### Fixed
 
 ### Security
+-->
 
 ## [0.18.7] - 2023-02-28
 
@@ -60,7 +64,6 @@ This is the first version with a Changelog, albeit not being the first version o
 - Update Scala, dependencies and plugins versions ([#142](https://github.com/velocidi/apso/pull/142)).
 
 [0.18.1]: https://github.com/velocidi/apso/compare/v0.18.0...v0.18.1
-[Unreleased]: https://github.com/velocidi/apso/compare/v0.18.4...HEAD
 
 ***
 
