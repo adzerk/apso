@@ -36,7 +36,7 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ## [0.18.4] - 2022-05-20
 
 ### Changed
-- Disable some Elasticsearch features on ElasticsearchTestKit ([#262](https://github.com/velocidi/apso/pull/262)). 
+- Disable some Elasticsearch features on ElasticsearchTestKit ([#262](https://github.com/velocidi/apso/pull/262)).
 - Allow Elasticsearch base path to be overridden on ElasticsearchTestKit ([#263](https://github.com/velocidi/apso/pull/263)).
 - Dependency updates.
 
@@ -44,7 +44,7 @@ Use the following schema when setting up the Changelog for a new release. Remove
 
 ## [0.18.3] - 2022-05-11
 
-This is a maintenance release, with only dependency updates. 
+This is a maintenance release, with only dependency updates.
 
 [0.18.3]: https://github.com/velocidi/apso/compare/v0.18.2...v0.18.3
 
