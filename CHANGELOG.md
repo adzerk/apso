@@ -43,7 +43,7 @@ case class Credentials(host: String, port: String, auth: Either[Identity, String
 ```
 
 Additionally, the `Decoder` for [Squants](https://github.com/typelevel/squants)'s `Currency` was updated to become case
-insensitive, meaning that, for example, both `"usd"` and `"USD"` now decode to the same `USD` currency.
+insensitive. This means that, for example, both `"usd"` and `"USD"` now decode to the same `USD` currency.
 
 ### Changed
 - Update circe-core, circe-generic, circe-literal, circe-parser to 0.14.5 ([#441](https://github.com/adzerk/apso/pull/441)).
