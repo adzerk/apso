@@ -99,7 +99,7 @@ lazy val commonSettings = Seq(
 
   scalafmtOnCompile := true,
 
-  // Enable Scalafix and the OrganizeImports rule.
+  // Enable Scalafix.
   semanticdbEnabled := true,
   semanticdbVersion := scalafixSemanticdb.revision,
   scalafixOnCompile := true,
@@ -147,9 +147,6 @@ lazy val commonSettings = Seq(
   )
   // format: on
 )
-
-// Enable the OrganizeImports Scalafix rule.
-ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0"
 
 releaseCrossBuild    := true
 releaseTagComment    := s"Release ${(ThisBuild / version).value}"
