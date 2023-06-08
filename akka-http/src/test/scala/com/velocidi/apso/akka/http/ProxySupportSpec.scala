@@ -76,7 +76,7 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
   val localIp1 = IP(InetAddress.getByName("127.0.0.1"))
   val localIp2 = IP(InetAddress.getByName("127.0.0.2"))
 
-  implicit val timeout = RouteTestTimeout(5.seconds)
+  implicit val timeout: RouteTestTimeout = RouteTestTimeout(5.seconds)
 
   "An akka-http proxy support directive" should {
 
