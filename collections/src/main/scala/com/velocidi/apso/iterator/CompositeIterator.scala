@@ -78,6 +78,7 @@ class CompositeIterator[A](
 /** Companion object containing a factory for composite iterators.
   */
 object CompositeIterator {
+  @deprecated("The stack overflow caused by Iterator.++ should be fixed in recent Scala versions.", "0.15.0")
   def apply[A](its: Iterator[A]*): CompositeIterator[A] =
     its.headOption
       .map { head =>
