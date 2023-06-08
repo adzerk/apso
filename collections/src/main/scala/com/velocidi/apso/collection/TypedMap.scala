@@ -33,8 +33,9 @@ class Typed[A](value: A)(implicit val key: ClassTag[A]) {
   def toPair: (ClassTag[_], A) = (key, value)
 }
 object Typed {
-  implicit def toTyped[A: ClassTag](a: A) = new Typed(a)
-  implicit def toTypable[A](a: A) = new {
-    def typedAs[T >: A: ClassTag](implicit ct: ClassTag[T]) = new Typed[T](a)(ct)
+  implicit def toTyped[A: ClassTag](a: A): Typed[A] = new Typed(a)
+
+  implicit class TypableOps[A](val a: A) extends AnyVal {
+    def typedAs[T >: A: ClassTag](implicit ct: ClassTag[T]): Typed[T] = new Typed[T](a)(ct)
   }
 }
