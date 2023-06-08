@@ -5,10 +5,11 @@ import scala.collection.mutable.PriorityQueue
 
 case class MergedBufferedIterator[T](iterators: List[BufferedIterator[T]])(implicit ord: Ordering[T])
     extends BufferedIterator[T] {
-  private[this] implicit lazy val bufferedIteratorOrdering = new Ordering[BufferedIterator[T]] {
-    def compare(i1: BufferedIterator[T], i2: BufferedIterator[T]) =
-      ord.compare(i2.head, i1.head)
-  }
+  private[this] implicit lazy val bufferedIteratorOrdering: Ordering[BufferedIterator[T]] =
+    new Ordering[BufferedIterator[T]] {
+      def compare(i1: BufferedIterator[T], i2: BufferedIterator[T]) =
+        ord.compare(i2.head, i1.head)
+    }
 
   private[this] lazy val nonEmptyIterators = {
     val pq = new PriorityQueue[BufferedIterator[T]]

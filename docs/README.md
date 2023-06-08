@@ -52,7 +52,6 @@ Please take into account that the library is still in an experimental stage and 
     - [TypedMap](#typedmap)
     - [Iterators](#iterators)
         - [CircularIterator](#circulariterator)
-        - [CompositeIterator](#compositeiterator)
         - [MergedBufferedIterator](#mergedbufferediterator)
 - [Encryption](#encryption)
 - [Hashing](#hashing)
@@ -454,18 +453,6 @@ import com.velocidi.apso.iterator.CircularIterator
 val circularIterator = CircularIterator(List(1, 2, 3).iterator)
 
 circularIterator.take(10).toList
-```
-
-#### CompositeIterator
-
-The `CompositeIterator` is an iterator that wraps a list of other iterators and iterates over its elements sequentially. It handles compositions of a large number of iterators in a more efficient way than simply concatenating them, avoiding stack overflows in particular. It supports appending of new iterators while keeping its efficiency. See the following for sample usage:
-
-```scala mdoc:reset
-import com.velocidi.apso.iterator.CompositeIterator
-
-val compositeIterator = CompositeIterator(List(1, 2, 3).iterator, List(4, 5, 6).iterator, List(7, 8, 9).iterator)
-
-compositeIterator.take(9).toList
 ```
 
 #### MergedBufferedIterator

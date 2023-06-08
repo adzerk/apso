@@ -52,7 +52,6 @@ Please take into account that the library is still in an experimental stage and 
     - [TypedMap](#typedmap)
     - [Iterators](#iterators)
         - [CircularIterator](#circulariterator)
-        - [CompositeIterator](#compositeiterator)
         - [MergedBufferedIterator](#mergedbufferediterator)
 - [Encryption](#encryption)
 - [Hashing](#hashing)
@@ -544,20 +543,6 @@ circularIterator.take(10).toList
 // res45: List[Int] = List(1, 2, 3, 1, 2, 3, 1, 2, 3, 1)
 ```
 
-#### CompositeIterator
-
-The `CompositeIterator` is an iterator that wraps a list of other iterators and iterates over its elements sequentially. It handles compositions of a large number of iterators in a more efficient way than simply concatenating them, avoiding stack overflows in particular. It supports appending of new iterators while keeping its efficiency. See the following for sample usage:
-
-```scala
-import com.velocidi.apso.iterator.CompositeIterator
-
-val compositeIterator = CompositeIterator(List(1, 2, 3).iterator, List(4, 5, 6).iterator, List(7, 8, 9).iterator)
-// compositeIterator: CompositeIterator[Int] = empty iterator
-
-compositeIterator.take(9).toList
-// res47: List[Int] = List(1, 2, 3, 4, 5, 6, 7, 8, 9)
-```
-
 #### MergedBufferedIterator
 
 The `MergedBufferedIterator` is a collection of sorted `BufferedIterators` that allows traversing them in order, while also providing a `mergeSorted` method to merge with another sorted `BufferedIterator`. See the following for sample usage:
@@ -573,7 +558,7 @@ val it1 = MergedBufferedIterator(List(
 // it1: MergedBufferedIterator[Int] = empty iterator
 
 it1.toList
-// res49: List[Int] = List(
+// res47: List[Int] = List(
 //   0,
 //   0,
 //   0,
@@ -623,7 +608,7 @@ val it2 = MergedBufferedIterator(List(
 // it2: MergedBufferedIterator[Int] = non-empty iterator
 
 it2.mergeSorted(Iterator(4, 6).buffered).toList
-// res50: List[Int] = List(1, 2, 3, 4, 5, 6)
+// res48: List[Int] = List(1, 2, 3, 4, 5, 6)
 ```
 
 ## Encryption
@@ -666,10 +651,10 @@ libraryDependencies += "com.velocidi" %% "apso-hashing" % "0.18.8"
 import com.velocidi.apso.hashing.Implicits._
 
 "abcd".md5
-// res53: String = "e2fc714c4727ee9395f324cd2e7f331f"
+// res51: String = "e2fc714c4727ee9395f324cd2e7f331f"
 
 "abcd".murmurHash
-// res54: Long = 7785666560123423118L
+// res52: Long = 7785666560123423118L
 ```
 
 ## IO
@@ -744,7 +729,7 @@ val js2 = Json.obj(
 ```
 ```scala
 js1.deepMerge(js2).spaces2
-// res59: String = """{
+// res57: String = """{
 //   "c" : 4,
 //   "d" : {
 //     "e" : 5,
@@ -760,7 +745,7 @@ fromFullPaths(Seq(
    "b.d" -> 3.asJson,
    "e" -> "xpto".asJson,
    "f.g.h" -> 5.asJson)).spaces2
-// res60: String = """{
+// res58: String = """{
 //   "f" : {
 //     "g" : {
 //       "h" : 5
@@ -775,26 +760,26 @@ fromFullPaths(Seq(
 // }"""
 
 js1.getField[Int]("a")
-// res61: Option[Int] = Some(value = 2)
+// res59: Option[Int] = Some(value = 2)
 js1.getField[Int]("d.f")
-// res62: Option[Int] = Some(value = 6)
+// res60: Option[Int] = Some(value = 6)
 js1.getField[Int]("x")
-// res63: Option[Int] = None
+// res61: Option[Int] = None
 
 js1.deleteField("a")
-// res64: Json = JObject(
+// res62: Json = JObject(
 //   value = object[b -> 3,d -> {
 //   "f" : 6
 // }]
 // )
 js1.deleteField("d.f")
-// res65: Json = JObject(
+// res63: Json = JObject(
 //   value = object[a -> 2,b -> 3,d -> {
 //   
 // }]
 // )
 js1.deleteField("x")
-// res66: Json = JObject(
+// res64: Json = JObject(
 //   value = object[a -> 2,b -> 3,d -> {
 //   "f" : 6
 // }]
@@ -808,13 +793,13 @@ The `JsonConvert` object contains helpers for converting between JSON values and
 import com.velocidi.apso.circe._
 
 JsonConvert.toJson("abcd")
-// res68: io.circe.Json = JString(value = "abcd")
+// res66: io.circe.Json = JString(value = "abcd")
 
 JsonConvert.toJson(1)
-// res69: io.circe.Json = JNumber(value = JsonLong(value = 1L))
+// res67: io.circe.Json = JNumber(value = JsonLong(value = 1L))
 
 JsonConvert.toJson(Map(1 -> 2, 3 -> 4))
-// res70: io.circe.Json = JObject(value = object[1 -> 2,3 -> 4])
+// res68: io.circe.Json = JObject(value = object[1 -> 2,3 -> 4])
 ```
 
 ## Profiling
@@ -855,10 +840,10 @@ import com.velocidi.apso.time._
 import com.velocidi.apso.time.Implicits._
 
 (new DateTime("2012-01-01") to new DateTime("2012-01-01")).toList
-// res72: List[DateTime] = List(2012-01-01T00:00:00.000Z)
+// res70: List[DateTime] = List(2012-01-01T00:00:00.000Z)
 
 (new DateTime("2012-02-01") until new DateTime("2012-03-01") by 1.day)
-// res73: IterableInterval = IndexedSeq(
+// res71: IterableInterval = IndexedSeq(
 //   2012-02-01T00:00:00.000Z,
 //   2012-02-02T00:00:00.000Z,
 //   2012-02-03T00:00:00.000Z,
@@ -891,7 +876,7 @@ import com.velocidi.apso.time.Implicits._
 // ))
 
 (new DateTime("2012-01-01") until new DateTime("2012-02-01") by 2.minutes)
-// res74: IterableInterval = IndexedSeq(
+// res72: IterableInterval = IndexedSeq(
 //   2012-01-01T00:00:00.000Z,
 //   2012-01-01T00:02:00.000Z,
 //   2012-01-01T00:04:00.000Z,

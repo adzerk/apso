@@ -29,7 +29,9 @@ class DeboxMapSpec extends Specification with ScalaCheck {
       }
   }
 
-  implicit def arbDeboxMap[A: Arbitrary: ClassTag, B: Arbitrary: ClassTag] = Arbitrary(genDeboxMap[A, B])
+  implicit def arbDeboxMap[A: Arbitrary: ClassTag, B: Arbitrary: ClassTag]: Arbitrary[DeboxMap[A, B]] = Arbitrary(
+    genDeboxMap[A, B]
+  )
 
   "A DeboxMap" should {
 

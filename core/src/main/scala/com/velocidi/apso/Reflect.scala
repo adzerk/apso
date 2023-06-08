@@ -13,7 +13,7 @@ object Reflect {
     *   a new instance of the given class.
     */
   def newInstance[T](className: String): T =
-    Class.forName(className).newInstance.asInstanceOf[T]
+    Class.forName(className).getDeclaredConstructor().newInstance().asInstanceOf[T]
 
   /** Returns a companion object by its qualified name.
     * @param objName

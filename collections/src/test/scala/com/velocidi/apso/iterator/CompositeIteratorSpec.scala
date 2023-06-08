@@ -2,6 +2,7 @@ package com.velocidi.apso.iterator
 
 import org.specs2.mutable._
 
+@deprecated("The stack overflow caused by Iterator.++ should be fixed in recent Scala versions.", "0.15.0")
 class CompositeIteratorSpec extends Specification {
   isolated
 
