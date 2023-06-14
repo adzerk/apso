@@ -18,6 +18,22 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## TBA - TBA
+
+### Added
+
+### Changed
+- Remove elasticsearch testkit ([#490](https://github.com/adzerk/apso/pull/490)).
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+-->
+
 ## [0.18.8] - 2023-04-27
 
 This release includes several dependency updates, some updates to make existing APIs friendlier and a change to a
