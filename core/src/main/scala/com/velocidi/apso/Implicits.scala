@@ -176,8 +176,8 @@ object Implicits {
       *   the function that maps elements to weights
       * @param r
       *   the random value used to select the elements. If the default random value is used, the weighted selection uses
-      * 1.0 as the sum of all weights. To use another scale of weights, a random value between 0.0 and the maximum
-      * weight should be passed.
+      *   1.0 as the sum of all weights. To use another scale of weights, a random value between 0.0 and the maximum
+      *   weight should be passed.
       * @tparam T
       *   the type of the elements
       * @return
