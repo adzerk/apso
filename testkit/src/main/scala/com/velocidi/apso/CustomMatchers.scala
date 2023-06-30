@@ -16,9 +16,9 @@ trait CustomMatchers extends SpecificationLike {
     val out = new ObjectOutputStream(buffer)
     out.writeObject(obj) must
       not(throwA[NotSerializableException]) and not(throwAn[InvalidClassException])
-  // val in = new ObjectInputStream(new ByteArrayInputStream(buffer.toByteArray))
-  // in.readObject() must beAnInstanceOf[T] and
-  //   not(throwA[InvalidClassException]) and not(throwA[StreamCorruptedException])
+    // val in = new ObjectInputStream(new ByteArrayInputStream(buffer.toByteArray))
+    // in.readObject() must beAnInstanceOf[T] and
+    //   not(throwA[InvalidClassException]) and not(throwA[StreamCorruptedException])
   }
 
   def exist: Matcher[File] = new Matcher[File] {
