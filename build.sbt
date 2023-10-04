@@ -16,18 +16,17 @@ def module(project: Project, moduleName: String) =
     .settings(commonSettings: _*)
 
 lazy val akka          = module(project, "akka")
-lazy val akkaHttp      = module(project, "akka-http").dependsOn(log, core % Test, testkit % Test)
-lazy val aws           = module(project, "aws").dependsOn(core, log)
+lazy val akkaHttp      = module(project, "akka-http").dependsOn(core % Test, testkit % Test)
+lazy val aws           = module(project, "aws").dependsOn(core)
 lazy val caching       = module(project, "caching").enablePlugins(BoilerplatePlugin)
 lazy val circe         = module(project, "circe")
 lazy val collections   = module(project, "collections")
 lazy val core          = module(project, "core").dependsOn(testkit % Test)
-lazy val elasticsearch = module(project, "elasticsearch").dependsOn(log, testkit % Test)
-lazy val encryption    = module(project, "encryption").dependsOn(log)
+lazy val elasticsearch = module(project, "elasticsearch").dependsOn(testkit % Test)
+lazy val encryption    = module(project, "encryption")
 lazy val hashing       = module(project, "hashing")
 lazy val io            = module(project, "io").dependsOn(aws, testkit % Test)
-lazy val log           = module(project, "log")
-lazy val profiling     = module(project, "profiling").dependsOn(log)
+lazy val profiling     = module(project, "profiling")
 lazy val testkit       = module(project, "testkit")
 lazy val time          = module(project, "time")
 
@@ -46,7 +45,6 @@ lazy val apso = (project in file("."))
     encryption,
     hashing,
     io,
-    log,
     profiling,
     time
   )
@@ -62,7 +60,6 @@ lazy val apso = (project in file("."))
     encryption,
     hashing,
     io,
-    log,
     profiling,
     testkit,
     time

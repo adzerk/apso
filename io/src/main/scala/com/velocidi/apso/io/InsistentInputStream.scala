@@ -6,7 +6,7 @@ import scala.annotation.tailrec
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
 
-import com.velocidi.apso.Logging
+import com.typesafe.scalalogging.LazyLogging
 
 /** A InputStream that wraps another InputStream, retrying failed reads. This is useful for input streams that can have
   * transient failures (eg HTTP input streams).
@@ -23,7 +23,7 @@ class InsistentInputStream(
     maxRetries: Int = 10,
     backoff: Option[FiniteDuration] = None
 ) extends InputStream
-    with Logging {
+    with LazyLogging {
 
   def this(streamBuilder: () => InputStream, maxRetries: Int, backoff: Option[FiniteDuration]) =
     this(
@@ -73,7 +73,7 @@ class InsistentInputStream(
       case Failure(t) =>
         if (remainingTries <= 0) throw t
         else {
-          log.warn(s"Failed to read from stream: ${t.getMessage}")
+          logger.warn(s"Failed to read from stream: ${t.getMessage}")
           val nextRemainingTries = retryStreamCreation(remainingTries - 1)
           readRetries(nextRemainingTries, f)
         }

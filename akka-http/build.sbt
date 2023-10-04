@@ -1,6 +1,7 @@
 import Dependencies._
 
 libraryDependencies ++= Seq(
+  ScalaLogging,
   AkkaActor                % Provided,
   AkkaHttp                 % Provided,
   AkkaHttpCore             % Provided,
