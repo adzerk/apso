@@ -33,7 +33,6 @@ Please take into account that the library is still in an experimental stage and 
     - [Geo](#geo)
     - [Implicits](#implicits)
     - [JreVersionHelper](#jreversionhelper)
-    - [Logging](#logging)
     - [ProgressBar](#progressbar)
     - [Reflect](#reflect)
     - [Retry](#retry)
@@ -171,20 +170,6 @@ import com.velocidi.apso.JreVersionHelper
 
 JreVersionHelper.jreVersion
 // res0: (Int, Int) = (1, 8)
-```
-
-### Logging
-
-The `Logging` and `StrictLogging` traits allows mixing in SLF4J `Logger` objects. The difference between the two is that in the former the `Logger` object is initialized lazily, while in the latter it is initialized strictly:
-
-```scala mdoc:compile-only
-import com.velocidi.apso.Logging
-
-class A extends Logging {}
-
-val a = new A
-
-a.log.info("test")
 ```
 
 ### ProgressBar

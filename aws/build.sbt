@@ -1,6 +1,7 @@
 import Dependencies._
 
 libraryDependencies ++= Seq(
+  ScalaLogging,
   AwsJavaSdkS3,
   AwsJavaSdkCore,
   ScalaCollectionCompat,

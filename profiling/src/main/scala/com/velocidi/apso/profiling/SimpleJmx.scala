@@ -7,10 +7,9 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
 import com.j256.simplejmx.server.JmxServer
+import com.typesafe.scalalogging.LazyLogging
 
-import com.velocidi.apso.Logging
-
-trait SimpleJmx extends Logging {
+trait SimpleJmx extends LazyLogging {
 
   def startJmx(jmxConfig: config.Jmx): Future[JmxServer] = {
 
@@ -37,11 +36,11 @@ trait SimpleJmx extends Logging {
     Future {
       Try(tryStart(jmxConfig.port)).recover { case _ => tryStart() } match {
         case Success(jmx) =>
-          log.info(s"Bound JMX on port ${jmx.getServerPort}")
+          logger.info(s"Bound JMX on port ${jmx.getServerPort}")
           sys.addShutdownHook(jmx.stop())
           jmx
         case Failure(ex) =>
-          log.warn("Could not start JMX server", ex)
+          logger.warn("Could not start JMX server", ex)
           throw ex // produce a failed `Future`
       }
     }

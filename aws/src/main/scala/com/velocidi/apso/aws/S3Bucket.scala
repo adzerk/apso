@@ -13,8 +13,8 @@ import com.amazonaws.services.s3.transfer.{TransferManager, TransferManagerBuild
 import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.amazonaws.{AmazonClientException, AmazonServiceException, ClientConfiguration}
 import com.typesafe.config.ConfigFactory
+import com.typesafe.scalalogging.LazyLogging
 
-import com.velocidi.apso.Logging
 import com.velocidi.apso.aws.S3Bucket.S3ObjectDownloader
 
 /** A representation of an Amazon's S3 bucket. This class wraps an `AmazonS3Client` and provides a higher level
@@ -29,7 +29,7 @@ import com.velocidi.apso.aws.S3Bucket.S3ObjectDownloader
 class S3Bucket(
     val bucketName: String,
     private val credentialsProvider: () => AWSCredentialsProvider = () => CredentialStore
-) extends Logging
+) extends LazyLogging
     with Serializable {
 
   private[this] lazy val config = ConfigFactory.load()
@@ -133,11 +133,11 @@ class S3Bucket(
     *   a list of objects in a bucket matching a given prefix.
     */
   def getObjectsWithMatchingPrefix(prefix: String, includeDirectories: Boolean = false): Iterator[S3ObjectSummary] = {
-    log.info(s"Finding files matching prefix '$prefix'...")
+    logger.info(s"Finding files matching prefix '$prefix'...")
 
     val listings = Iterator.iterate(s3.listObjects(bucketName, sanitizeKey(prefix))) { listing =>
       if (listing.isTruncated) {
-        log.debug("Asking for another batch of objects...")
+        logger.debug("Asking for another batch of objects...")
         s3.listNextBatchOfObjects(listing)
       } else null
     }
@@ -166,7 +166,7 @@ class S3Bucket(
     *   true if the push was successful, false otherwise.
     */
   def push(key: String, file: File): Boolean = retry {
-    log.info(s"Pushing file '${file.getPath}' to 's3://$bucketName/$key'")
+    logger.info(s"Pushing file '${file.getPath}' to 's3://$bucketName/$key'")
     transferManager
       .upload(new PutObjectRequest(bucketName, sanitizeKey(key), file))
       .waitForUploadResult()
@@ -184,7 +184,7 @@ class S3Bucket(
     *   true if the push was successful, false otherwise.
     */
   def push(key: String, inputStream: InputStream, length: Option[Long]): Boolean = retry {
-    log.info(s"Pushing to 's3://$bucketName/$key'")
+    logger.info(s"Pushing to 's3://$bucketName/$key'")
     val metadata = new ObjectMetadata()
     length.foreach(metadata.setContentLength)
     transferManager
@@ -249,7 +249,7 @@ class S3Bucket(
     *   the `CannedAccessControlList` to be applied to the Amazon S3 object
     */
   def setAcl(key: String, acl: CannedAccessControlList) = {
-    log.info(s"Setting 's3://$bucketName/$key' permissions to '$acl'")
+    logger.info(s"Setting 's3://$bucketName/$key' permissions to '$acl'")
     s3.setObjectAcl(bucketName, key, acl)
   }
 
@@ -261,7 +261,7 @@ class S3Bucket(
     *   true if the directory was created successfully, false otherwise.
     */
   def createDirectory(key: String): Boolean = retry {
-    log.info(s"Creating directory in 's3://$bucketName/$key'")
+    logger.info(s"Creating directory in 's3://$bucketName/$key'")
 
     val emptyContent = new ByteArrayInputStream(Array[Byte]())
     val metadata = new ObjectMetadata()
@@ -302,13 +302,13 @@ class S3Bucket(
     *   true if the pull was successful, false otherwise
     */
   def pull(key: String, destination: String): Boolean = retry {
-    log.info(s"Pulling 's3://$bucketName/$key' to '$destination'")
+    logger.info(s"Pulling 's3://$bucketName/$key' to '$destination'")
     Using(new S3ObjectDownloader(s3, bucketName, sanitizeKey(key), destination))(_.download()).get
-    log.info(s"Downloaded 's3://$bucketName/$key' to '$destination'. Closing files.")
+    logger.info(s"Downloaded 's3://$bucketName/$key' to '$destination'. Closing files.")
   }.isDefined
 
   def stream(key: String, offset: Long = 0L): InputStream = {
-    log.info(s"Streaming 's3://$bucketName/$key' starting at $offset")
+    logger.info(s"Streaming 's3://$bucketName/$key' starting at $offset")
     val req =
       if (offset > 0) new GetObjectRequest(bucketName, sanitizeKey(key)).withRange(offset)
       else new GetObjectRequest(bucketName, sanitizeKey(key))
@@ -319,11 +319,11 @@ class S3Bucket(
     case ex: AmazonS3Exception =>
       ex.getStatusCode match {
         case 404 =>
-          log.error("The specified file does not exist", ex); true // no need to retry
+          logger.error("The specified file does not exist", ex); true // no need to retry
         case 403 =>
-          log.error("No permission to access the file", ex); true // no need to retry
+          logger.error("No permission to access the file", ex); true // no need to retry
         case _ =>
-          log.error(
+          logger.error(
             s"""|S3 service error: ${ex.getMessage}. Extended request id: ${ex.getExtendedRequestId}
                       |Additional details: ${ex.getAdditionalDetails}""".stripMargin,
             ex
@@ -332,28 +332,28 @@ class S3Bucket(
       }
 
     case ex: AmazonServiceException =>
-      log.error(s"Service error: ${ex.getMessage}", ex); ex.isRetryable
+      logger.error(s"Service error: ${ex.getMessage}", ex); ex.isRetryable
 
     case ex: AmazonClientException
         if ex.getMessage ==
           "Unable to load AWS credentials from any provider in the chain" =>
-      log.error("Unable to load AWS credentials", ex); true
+      logger.error("Unable to load AWS credentials", ex); true
 
     case ex: AmazonClientException =>
-      log.error("Client error pulling file", ex); ex.isRetryable
+      logger.error("Client error pulling file", ex); ex.isRetryable
 
     case ex: Exception =>
-      log.error("An error occurred", ex); false
+      logger.error("An error occurred", ex); false
   }
 
   private[this] def retry[T](f: => T, tries: Int = 3, sleepTime: Int = 5000): Option[T] =
-    if (tries == 0) { log.error("Max retries reached. Aborting S3 operation"); None }
+    if (tries == 0) { logger.error("Max retries reached. Aborting S3 operation"); None }
     else
       Try(f) match {
         case Success(res) => Some(res)
         case Failure(e) if !handler(e) =>
           if (tries > 1) {
-            log.warn(s"Error during S3 operation. Retrying in ${sleepTime}ms (${tries - 1} more times)")
+            logger.warn(s"Error during S3 operation. Retrying in ${sleepTime}ms (${tries - 1} more times)")
             Thread.sleep(sleepTime)
           }
           retry(f, tries - 1, sleepTime)

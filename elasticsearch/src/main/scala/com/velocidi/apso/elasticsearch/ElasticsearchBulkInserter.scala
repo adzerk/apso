@@ -11,9 +11,8 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.requests.bulk.{BulkResponse, BulkResponseItem}
 import com.sksamuel.elastic4s.requests.indexes.IndexRequest
 import com.sksamuel.elastic4s.{ElasticClient, Indexable}
+import com.typesafe.scalalogging.LazyLogging
 import io.circe.Json
-
-import com.velocidi.apso.Logging
 
 /** An actor responsible for inserting tracking events into Elasticsearch. This actor buffers requests until either the
   * configured flush timer is triggered or the buffer hits the max size.
@@ -23,7 +22,7 @@ class ElasticsearchBulkInserter(
     logErrorsAsWarnings: Boolean,
     timeoutOnStop: FiniteDuration = 3.seconds
 ) extends Actor
-    with Logging {
+    with LazyLogging {
   import ElasticsearchBulkInserter._
 
   implicit private[this] val ec: ExecutionContext = context.system.dispatcher
@@ -48,10 +47,10 @@ class ElasticsearchBulkInserter(
 
   private[this] def logErrorOrWarning(msg: => String, throwable: Option[Throwable] = None): Unit = {
     (logErrorsAsWarnings, throwable) match {
-      case (true, Some(t))  => log.warn(msg, t)
-      case (true, None)     => log.warn(msg)
-      case (false, Some(t)) => log.error(msg, t)
-      case (false, None)    => log.error(msg)
+      case (true, Some(t))  => logger.warn(msg, t)
+      case (true, None)     => logger.warn(msg)
+      case (false, Some(t)) => logger.error(msg, t)
+      case (false, None)    => logger.error(msg)
     }
   }
 
@@ -84,7 +83,7 @@ class ElasticsearchBulkInserter(
       Nil
     } else {
       tryCountMap(msg) = tryCount
-      log.info(
+      logger.info(
         "Error inserting document in Elasticsearch: {}. Will retry {} more times",
         item.error,
         maxTryCount - tryCount
@@ -163,7 +162,7 @@ class ElasticsearchBulkInserter(
     case msg: Message => buffer = msg :: buffer
 
     case ElasticsearchUp =>
-      log.info("Elasticsearch is up. Bulk inserter will start sending requests")
+      logger.info("Elasticsearch is up. Bulk inserter will start sending requests")
       becomeElasticsearchUp()
 
     case ElasticsearchDown =>
@@ -210,7 +209,7 @@ class ElasticsearchBulkInserter(
       checkElasticsearch().collect { case true => self ! ElasticsearchUp }
 
     case ElasticsearchUp =>
-      log.info("Elasticsearch is up. Bulk inserting started")
+      logger.info("Elasticsearch is up. Bulk inserting started")
       periodicCheck.cancel()
       becomeElasticsearchUp()
       self ! Flush
@@ -219,7 +218,7 @@ class ElasticsearchBulkInserter(
   override def postStop() = {
     super.postStop()
 
-    log.info("Stopping Bulk Inserter...")
+    logger.info("Stopping Bulk Inserter...")
     val stop = if (buffer.nonEmpty) flush().andThen { case _ => client.close() }
     else Future(client.close())
 
@@ -233,7 +232,7 @@ class ElasticsearchBulkInserter(
 
 /** Companion object for the `ElasticsearchBulkInserter` actor.
   */
-object ElasticsearchBulkInserter extends Logging {
+object ElasticsearchBulkInserter {
   implicit object JsonIndexable extends Indexable[Json] {
     def json(js: Json) = js.noSpaces
   }

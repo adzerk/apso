@@ -8,6 +8,7 @@ import scala.jdk.CollectionConverters._
 import scala.util.{Properties, Try}
 
 import com.typesafe.config.ConfigFactory
+import com.typesafe.scalalogging.LazyLogging
 import io.github.andrebeat.pool.{Lease, Pool}
 import net.schmizz.sshj._
 import net.schmizz.sshj.common.SSHException
@@ -15,8 +16,6 @@ import net.schmizz.sshj.sftp._
 import net.schmizz.sshj.transport.verification._
 import net.schmizz.sshj.userauth.password.PasswordUtils
 import net.schmizz.sshj.xfer.InMemorySourceFile
-
-import com.velocidi.apso.Logging
 
 /** A `FileDescriptor` for files served over SFTP. This file descriptor only supports absolute paths. The SSH
   * connections for a given host are pooled.
@@ -61,7 +60,7 @@ case class SftpFileDescriptor(
     @transient private var _fileAttributes: Option[FileAttributes] = None
 ) extends FileDescriptor
     with RemoteFileDescriptor
-    with Logging {
+    with LazyLogging {
 
   type Self = SftpFileDescriptor
 
@@ -82,8 +81,8 @@ case class SftpFileDescriptor(
         case e: SFTPException if e.getStatusCode == Response.StatusCode.NO_SUCH_FILE =>
           throw new FileNotFoundException(toString)
         case e @ (_: SSHException | _: IOException) if retries > 0 =>
-          log.warn(s"[$host] ${e.getMessage}. Retrying in 10 seconds...")
-          log.debug(s"Failure cause: ${e.getCause}")
+          logger.warn(s"[$host] ${e.getMessage}. Retrying in 10 seconds...")
+          logger.debug(s"Failure cause: ${e.getCause}")
           Thread.sleep(10000)
           doConnect(retries - 1)
       }
@@ -141,7 +140,7 @@ case class SftpFileDescriptor(
     require(!localTarget.isDirectory, s"Local file descriptor can't point to a directory: ${localTarget.path}")
     require(!isDirectory, s"Remote file descriptor can't point to a directory: ${this.path}")
 
-    log.info(s"Downloading '$toString' to '$localTarget'")
+    logger.info(s"Downloading '$toString' to '$localTarget'")
 
     if (localTarget.parent().mkdirs()) {
       val downloadFile = if (safeDownloading) localTarget.sibling(_ + ".tmp") else localTarget
@@ -157,7 +156,7 @@ case class SftpFileDescriptor(
     require(!localTarget.isDirectory, s"Local file descriptor can't point to a directory: ${localTarget.path}")
     require(!exists || !isDirectory, s"Remote file descriptor can't point to a directory: ${this.path}")
 
-    log.info(s"Uploading '$localTarget' to '$toString'")
+    logger.info(s"Uploading '$localTarget' to '$toString'")
 
     parent().mkdirs() &&
     Try(sftp(_.put(localTarget.path, path))).isSuccess
@@ -166,7 +165,7 @@ case class SftpFileDescriptor(
   def upload(inputStream: InputStream, length: Option[Long]): Boolean = {
     require(!exists || !isDirectory, s"Remote file descriptor can't point to a directory: ${this.path}")
 
-    log.info(s"Uploading to '$toString'")
+    logger.info(s"Uploading to '$toString'")
 
     val sourceFile = new InMemorySourceFile {
       override def getLength: Long = length.getOrElse(0)

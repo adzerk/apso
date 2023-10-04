@@ -15,8 +15,7 @@ import akka.stream.Materializer
 import akka.stream.QueueOfferResult.{Dropped, Enqueued, Failure => OfferFailure, QueueClosed}
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import com.typesafe.config.ConfigFactory
-
-import com.velocidi.apso.Logging
+import com.typesafe.scalalogging.LazyLogging
 
 /** Adds proxy to akka-http services to proxy requests to other hosts.
   *
@@ -160,7 +159,7 @@ trait ProxySupport extends ClientIPDirectives {
       reqQueueSize: Int = defaultQueueSize,
       strictTimeout: Option[FiniteDuration] = None
   )(implicit system: ActorSystem, mat: Materializer)
-      extends Logging {
+      extends LazyLogging {
 
     import system.dispatcher
 
@@ -207,7 +206,7 @@ trait ProxySupport extends ClientIPDirectives {
         case OfferFailure(ex) => Future.failed(new RuntimeException("Queue offering failed", ex))
         case QueueClosed      => Future.failed(new RuntimeException("Queue is completed before call!?"))
         case Dropped =>
-          log.warn(s"Request queue for $host:$port is full")
+          logger.warn(s"Request queue for $host:$port is full")
           if (failOnDrop) Future.failed(new RuntimeException("Dropping request (Queue is full)"))
           else Future.successful(Complete(HttpResponse(StatusCodes.ServiceUnavailable)))
       }

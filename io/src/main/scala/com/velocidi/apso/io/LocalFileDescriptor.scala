@@ -6,10 +6,11 @@ import java.nio.file.{Files, Path, Paths, StandardCopyOption}
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
-import com.velocidi.apso.Implicits.ApsoCloseable
-import com.velocidi.apso.Logging
+import com.typesafe.scalalogging.LazyLogging
 
-case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with Logging {
+import com.velocidi.apso.Implicits.ApsoCloseable
+
+case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with LazyLogging {
 
   @transient private[this] var _normalizedPath: Path = _
 
@@ -75,7 +76,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
 
       result match {
         case Success(_)  => if (safeDownloading) downloadFile.rename(localTarget)
-        case Failure(ex) => log.warn(s"File copy failed ($ex)")
+        case Failure(ex) => logger.warn(s"File copy failed ($ex)")
       }
 
       result.isSuccess
@@ -93,7 +94,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
 
       result match {
         case Success(_)  =>
-        case Failure(ex) => log.warn(s"File copy failed ($ex)")
+        case Failure(ex) => logger.warn(s"File copy failed ($ex)")
       }
 
       result.isSuccess
@@ -111,7 +112,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
 
       result match {
         case Success(_)  =>
-        case Failure(ex) => log.warn(s"File copy failed ($ex)")
+        case Failure(ex) => logger.warn(s"File copy failed ($ex)")
       }
 
       result.isSuccess

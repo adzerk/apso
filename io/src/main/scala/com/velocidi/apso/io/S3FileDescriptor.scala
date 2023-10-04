@@ -7,7 +7,6 @@ import scala.collection.concurrent.TrieMap
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.services.s3.model.S3ObjectSummary
 
-import com.velocidi.apso.Logging
 import com.velocidi.apso.aws.{S3Bucket, SerializableAWSCredentials}
 
 case class S3FileDescriptor(
@@ -15,8 +14,7 @@ case class S3FileDescriptor(
     protected val elements: List[String],
     private var summary: Option[S3ObjectSummary] = None
 ) extends FileDescriptor
-    with RemoteFileDescriptor
-    with Logging {
+    with RemoteFileDescriptor {
 
   type Self = S3FileDescriptor
 

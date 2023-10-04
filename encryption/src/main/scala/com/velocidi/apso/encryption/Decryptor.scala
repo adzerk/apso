@@ -5,9 +5,8 @@ import java.security.{Key, MessageDigest}
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 
+import com.typesafe.scalalogging.LazyLogging
 import org.apache.commons.codec.binary.Base64
-
-import com.velocidi.apso.Logging
 
 /** Utility class to handle decrypting data to string format and, optionally, handle base64 encoded data.
   *
@@ -30,19 +29,19 @@ class Decryptor(decryptor: Cipher) extends EncryptionErrorHandling {
 /** Provides the `apply` methods that allow to more easily create a [[Decryptor]] object by directly specifying the
   * transformation and key, or a keystore holding the key parameters.
   */
-object Decryptor extends EncryptionUtils with Logging {
+object Decryptor extends EncryptionUtils with LazyLogging {
 
   private def loadDecryptionCipher(transformation: String, key: Key): Option[Cipher] = handle(
     {
-      log.debug(s"Building Decryptor using Transformation '$transformation' and Key Algorithm '${key.getAlgorithm}'")
+      logger.debug(s"Building Decryptor using Transformation '$transformation' and Key Algorithm '${key.getAlgorithm}'")
       val cipher = Cipher.getInstance(transformation, provider)
       cipher.init(Cipher.DECRYPT_MODE, key)
       cipher
     },
     { ex: Throwable =>
-      log.warn(s"Cipher Transformation: $transformation")
-      log.warn("Cipher Key: " + key)
-      log.warn(s"Impossible to create Decryption Cipher!", ex)
+      logger.warn(s"Cipher Transformation: $transformation")
+      logger.warn("Cipher Key: " + key)
+      logger.warn(s"Impossible to create Decryption Cipher!", ex)
     }
   )
 
