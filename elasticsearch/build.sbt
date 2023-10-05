@@ -9,13 +9,12 @@ libraryDependencies ++= Seq(
   Elastic4sClientEsJava,
   Elastic4sCore,
   ElasticsearchRestClient,
-  AkkaActorTestkitTyped      % Test,
   AkkaHttpTestkit            % Test,
+  AkkaSlf4J % Test,
   AkkaTestkitSpecs2Classic   % Test,
   Elastic4sTestkit           % Test,
   ElasticsearchClusterRunner % Test,
   Log4JCore                  % Test,
   Log4JSlf4j                 % Test,
-  Specs2Core                 % Test,
-  Specs2ScalaCheck           % Test
+  Specs2Core                 % Test
 )
