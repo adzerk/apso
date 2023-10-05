@@ -38,7 +38,7 @@ object Dependencies {
   val AkkaHttp                   = "com.typesafe.akka"                     %% "akka-http"                    % Versions.AkkaHttp
   val AkkaHttpCore               = "com.typesafe.akka"                     %% "akka-http-core"               % Versions.AkkaHttp
   val AkkaHttpTestkit            = "com.typesafe.akka"                     %% "akka-http-testkit"            % Versions.AkkaHttp
-  val AkkaSlf4J                   = "com.typesafe.akka"               %% "akka-slf4j"                            % Versions.Akka
+  val AkkaSlf4J                  = "com.typesafe.akka"                     %% "akka-slf4j"                   % Versions.Akka
   val AkkaStream                 = "com.typesafe.akka"                     %% "akka-stream"                  % Versions.Akka
   val AkkaStreamTestkit          = "com.typesafe.akka"                     %% "akka-stream-testkit"          % Versions.Akka
   val AkkaTestkit                = "com.typesafe.akka"                     %% "akka-testkit"                 % Versions.Akka
