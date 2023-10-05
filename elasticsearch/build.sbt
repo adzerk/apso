@@ -1,7 +1,6 @@
 import Dependencies._
 
 libraryDependencies ++= Seq(
-  ScalaLogging,
   AkkaActor                  % Provided,
   ApacheHttpAsyncClient,
   ApacheHttpClient,
@@ -10,12 +9,13 @@ libraryDependencies ++= Seq(
   Elastic4sClientEsJava,
   Elastic4sCore,
   ElasticsearchRestClient,
-  ScalaLogging,
   AkkaActorTestkitTyped      % Test,
   AkkaHttpTestkit            % Test,
   AkkaTestkitSpecs2Classic   % Test,
   Elastic4sTestkit           % Test,
   ElasticsearchClusterRunner % Test,
+  Log4JCore                  % Test,
+  Log4JSlf4j                 % Test,
   Specs2Core                 % Test,
   Specs2ScalaCheck           % Test
 )
