@@ -39,15 +39,15 @@ Several dependencies were update to their latest versions. You can see all the d
 
 ### Changed
 - Stop depending on `scala-logging` for logging purposes inside `ElasticsearchBulkInserter` and use  `ActorLogging` instead ([#550](https://github.com/adzerk/apso/pull/550)).
-- Updated scala version to 2.13.12 ([#540](https://github.com/adzerk/apso/pull/540)).
-- Updated other dependencies.
+- Update Scala version to 2.13.12 ([#540](https://github.com/adzerk/apso/pull/540)).
+- Update other dependencies.
 
 ### Deprecated
-- Deprecated `CompositeIterator` ([#488](https://github.com/adzerk/apso/pull/488)).
+- Deprecate `CompositeIterator` ([#488](https://github.com/adzerk/apso/pull/488)).
 
 ### Removed
 - Remove Elasticsearch TestKit ([#490](https://github.com/adzerk/apso/pull/490)).
-- Dropped `apso-log` project ([#549](https://github.com/adzerk/apso/pull/549)).
+- Drop apso-log project ([#549](https://github.com/adzerk/apso/pull/549)).
 
 [0.19.0]: https://github.com/velocidi/apso/compare/v0.18.8...v0.19.0
 
