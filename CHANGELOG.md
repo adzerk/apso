@@ -32,7 +32,7 @@ dependency.
 
 Users of `apso-log` should migrate to [scala-logging](https://github.com/lightbend-labs/scala-logging) which provides
 `LazyLogging` and `StrictLogging` traits providing the same functionality of `Logging` and `StrictLogging` in `apso`,
-respectively.
+respectively, while being available for scala 2.13 and 3.
 
 Several dependencies were update to their latest versions. You can see all the dependencies and their versions in
 [here](https://github.com/adzerk/apso/blob/v0.19.0/project/Dependencies.scala).
