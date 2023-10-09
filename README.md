@@ -1,8 +1,8 @@
 <p align="center"><img src="https://raw.githubusercontent.com/velocidi/apso/master/apso.png"/></p>
 
-# Apso [![Build Status](https://github.com/velocidi/apso/workflows/CI/badge.svg?branch=master)](https://github.com/velocidi/apso/actions?query=workflow%3ACI+branch%3Amaster) [![Maven Central](https://img.shields.io/maven-central/v/com.velocidi/apso_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/com.velocidi/apso_2.12)
+# Apso [![Build Status](https://github.com/adzerk/apso/workflows/CI/badge.svg?branch=master)](https://github.com/adzerk/apso/actions?query=workflow%3ACI+branch%3Amaster) [![Maven Central](https://img.shields.io/maven-central/v/com.adzerk/apso_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/com.adzerk/apso_2.12)
 
-Apso is Velocidi's collection of Scala utility libraries. It provides a series of useful methods.
+Apso is Kevel's collection of Scala utility libraries. It provides a series of useful methods.
 
 ## Installation
 
@@ -760,7 +760,7 @@ js1.deleteField("a")
 js1.deleteField("d.f")
 // res62: Json = JObject(
 //   value = object[a -> 2,b -> 3,d -> {
-//   
+//
 // }]
 // )
 js1.deleteField("x")
