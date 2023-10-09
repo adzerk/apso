@@ -83,7 +83,7 @@ lazy val docs = (project in file("apso-docs"))
 
 lazy val commonSettings = Seq(
   // format: off
-  resolvers ++=
+  resolvers ++= 
     Resolver.sonatypeOssRepos("snapshots") ++
       Seq(
         Resolver.typesafeRepo("snapshots"),
