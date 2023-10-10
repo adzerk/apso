@@ -135,11 +135,11 @@ lazy val commonSettings = Seq(
   pomIncludeRepository := { _ => false },
 
   licenses := Seq("Apache License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
-  homepage := Some(url("https://github.com/velocidi/apso")),
+  homepage := Some(url("https://github.com/adzerk/apso")),
   scmInfo := Some(
     ScmInfo(
-      url("https://github.com/velocidi/apso"),
-      "scm:git@github.com:velocidi/apso.git"
+      url("https://github.com/adzerk/apso"),
+      "scm:git@github.com:adzerk/apso.git"
     )
   )
   // format: on
