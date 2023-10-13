@@ -20,14 +20,14 @@ Use the following schema when setting up the Changelog for a new release. Remove
 
 ## [0.19.0] - 2023-10-07
 
-This release focus mostly on updating dependencies and cleaning up code around apso-elasticsearch project. 
+This release focus mostly on updating dependencies and cleaning up code around apso-elasticsearch project.
 
-Most notably, we deprecated `CompositeIterator` and improved method signature typing as part of our 
-[scala version update](https://github.com/adzerk/apso/pull/488). We also dropped `ElasticsearchTestkit` and the 
-apso-log project. Together, these modifications should allow users of this library to have less dependency update 
-conflicts and provide easier update paths for Scala 3 while we wait for a release of Apso in Scala 3. 
+Most notably, we deprecated `CompositeIterator` and improved method signature typing as part of our
+[scala version update](https://github.com/adzerk/apso/pull/488). We also dropped `ElasticsearchTestkit` and the
+apso-log project. Together, these modifications should allow users of this library to have less dependency update
+conflicts and provide easier update paths for Scala 3 while we wait for a release of Apso in Scala 3.
 `ElasticsearchBulkInserter` was modified to rely on `ActorLogging` instead of `scala-logging` (through apso-log) which
-represented a blocker for Scala 3 projects cross-compiling with Scala 2.13 and having apso-elasticsearch as a 
+represented a blocker for Scala 3 projects cross-compiling with Scala 2.13 and having apso-elasticsearch as a
 dependency.
 
 Users of apso-log should migrate to [scala-logging](https://github.com/lightbend-labs/scala-logging) which provides
