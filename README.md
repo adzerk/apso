@@ -760,7 +760,7 @@ js1.deleteField("a")
 js1.deleteField("d.f")
 // res62: Json = JObject(
 //   value = object[a -> 2,b -> 3,d -> {
-//   
+//
 // }]
 // )
 js1.deleteField("x")
