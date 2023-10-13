@@ -112,7 +112,7 @@ The `Geo` object provides methods to compute distances in kilometers between two
 import com.velocidi.apso.Geo
 
 Geo.distance((41.1617609, -8.6024716), (41.1763745, -8.5964861))
-// res2: Double = 1.7004440762344684
+// res2: Double = 1.7004440788845807
 ```
 
 You can also have the distance function curried if you are computing distances from a fixed point:
@@ -122,7 +122,7 @@ val distFromOffice = Geo.distanceFrom((41.1617609, -8.6024716))
 ```
 ```scala
 distFromOffice((41.1763745, -8.5964861))
-// res3: Double = 1.7004440762344684
+// res3: Double = 1.7004440788845807
 
 distFromOffice((38.7223032, -9.1414664))
 // res4: Double = 275.118392477037
@@ -760,7 +760,7 @@ js1.deleteField("a")
 js1.deleteField("d.f")
 // res62: Json = JObject(
 //   value = object[a -> 2,b -> 3,d -> {
-//
+//   
 // }]
 // )
 js1.deleteField("x")
