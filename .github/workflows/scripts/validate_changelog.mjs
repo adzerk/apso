@@ -2,10 +2,10 @@
 
 import {readFileSync} from "fs";
 
-const CHANGELOG_VERSION_PREFIX = "#".repeat(2);
+const CHANGELOG_VERSION_PREFIX = "##";
 const CHANGELOG_VERSION_PATTERN = /^## \[\d+\.\d+\.\d+\] - \d{4}-\d{2}-\d{2}$/;
 const EXAMPLE_VERSION_LINE = "## [Unreleased]";
-const CHANGELOG_VERSION_SECTION_PREFIX = "#".repeat(3);
+const CHANGELOG_VERSION_SECTION_PREFIX = "###";
 const CHANGELOG_VERSION_VALID_SECTIONS = Object.freeze([
   "Added",
   "Changed",
