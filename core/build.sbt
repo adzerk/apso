@@ -1,9 +1,6 @@
 import Dependencies._
 
 libraryDependencies ++= Seq(
-  ApacheHttpAsyncClient,
-  ApacheHttpClient,
-  ApacheHttpCore,
   CirceCore,
   ScalaCollectionCompat,
   ScalaLogging,
