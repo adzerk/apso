@@ -28,7 +28,7 @@ object Dependencies {
     val Squants                 = "1.8.3"
     val SshJ                    = "0.37.0"
     val TypesafeConfig          = "1.4.3"
-    val UnirestJava             = "1.4.9"
+    val UnirestJava             = "4.2.0"
   }
 
   // scalafmt: { maxColumn = 200 }
@@ -83,6 +83,6 @@ object Dependencies {
   val Squants                    = "org.typelevel"                         %% "squants"                      % Versions.Squants
   val SshJ                       = "com.hierynomus"                         % "sshj"                         % Versions.SshJ
   val TypesafeConfig             = "com.typesafe"                           % "config"                       % Versions.TypesafeConfig
-  val UnirestJava                = "com.mashape.unirest"                    % "unirest-java"                 % Versions.UnirestJava
+  val UnirestJava                = "com.konghq"                             % "unirest-java-core"            % Versions.UnirestJava
   // scalafmt: { maxColumn = 120 }
 }

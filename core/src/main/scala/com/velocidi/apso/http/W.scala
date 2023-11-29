@@ -2,14 +2,9 @@ package com.velocidi.apso.http
 
 import scala.concurrent.duration._
 
-import com.mashape.unirest.http.{HttpResponse, Unirest}
-import com.mashape.unirest.request.{HttpRequest, HttpRequestWithBody}
 import com.typesafe.scalalogging.Logger
 import io.circe.Json
-import org.apache.http.client.config.{CookieSpecs, RequestConfig}
-import org.apache.http.impl.client.DefaultRedirectStrategy
-import org.apache.http.impl.nio.client.HttpAsyncClients
-import org.apache.http.protocol.HttpContext
+import kong.unirest.core.{CookieSpecs, HttpRequest, HttpRequestWithBody, HttpResponse, Unirest}
 
 object W {
   case class Timeout(duration: FiniteDuration)
@@ -17,27 +12,13 @@ object W {
   private[this] lazy val logger = Logger("W")
   private[this] lazy val defaultTimeout = Timeout(10.seconds)
 
-  private[this] object NeverRedirectStrategy extends DefaultRedirectStrategy {
-    override def isRedirected(
-        request: org.apache.http.HttpRequest,
-        response: org.apache.http.HttpResponse,
-        context: HttpContext
-    ) = false
-  }
+  Unirest
+    .config()
+    .cookieSpec(CookieSpecs.STANDARD)
+    .followRedirects(false)
+    .enableCookieManagement(false)
 
-  private[this] val reqConfig = RequestConfig.custom
-    .setCookieSpec(CookieSpecs.STANDARD)
-    .build()
-
-  Unirest.setAsyncHttpClient(
-    HttpAsyncClients.custom
-      .setDefaultRequestConfig(reqConfig)
-      .setRedirectStrategy(NeverRedirectStrategy)
-      .disableCookieManagement()
-      .build()
-  )
-
-  implicit private[this] class RichHttpRequest(val req: HttpRequest) {
+  implicit private[this] class RichHttpRequest[T <: HttpRequest[T]](val req: HttpRequest[T]) {
     def headers(headers: Map[String, Seq[String]]) = {
       headers.foldLeft(req) { case (acc, (k, vs)) =>
         vs.foldLeft(acc) { (acc2, v) => acc2.header(k, v) }
