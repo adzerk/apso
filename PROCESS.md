@@ -36,5 +36,5 @@ version will be published in [Sonatype's snapshots repository, under the Velocid
 To release the artifacts in the Sonatype's release repository, which eventually gets synced to
 [Maven Central](https://repo1.maven.org/maven2/com/velocidi/), simply use `sbt` to run `release`.
 
-This will result in the releasing of all the `apso-*` libraries. Please ensure you are using `java 8` when releasing
+This will result in the releasing of all the `apso-*` libraries. Please ensure you are using Java 11 when releasing
 new versions.
