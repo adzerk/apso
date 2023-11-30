@@ -28,6 +28,8 @@ The most notable dependency update is Unirest, to version 4.2.0, which solves co
 - Start using Java 11 ([#584](https://github.com/adzerk/apso/pull/584)).
 - Update other dependencies.
 
+[0.19.1]: https://github.com/velocidi/apso/compare/v0.18.0...v0.19.1
+
 ## [0.19.0] - 2023-10-07
 
 This release focus mostly on updating dependencies and cleaning up code around apso-elasticsearch project.
