@@ -18,7 +18,7 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
-## [0.19.1] - 2023-11-29
+## [0.19.1] - 2023-11-30
 
 This release focuses on starting to use Java 11 and updating dependencies.
 The most notable dependency update is Unirest, to version 4.2.0, which solves concurrency issues when using `W`.
