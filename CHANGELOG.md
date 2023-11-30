@@ -18,6 +18,18 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.19.1] - 2023-11-30
+
+This release focuses on starting to use Java 11 and updating dependencies.
+The most notable dependency update is Unirest, to version 4.2.0, which solves concurrency issues when using `W`.
+
+### Changed
+- Update Unirest to version 4.2.0 ([#583](https://github.com/adzerk/apso/pull/583)).
+- Start using Java 11 ([#584](https://github.com/adzerk/apso/pull/584)).
+- Update other dependencies.
+
+[0.19.1]: https://github.com/velocidi/apso/compare/v0.19.0...v0.19.1
+
 ## [0.19.0] - 2023-10-07
 
 This release focus mostly on updating dependencies and cleaning up code around apso-elasticsearch project.
