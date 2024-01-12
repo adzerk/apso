@@ -5,7 +5,7 @@ object Dependencies {
     val Akka                    = "2.6.20"
     val AkkaHttp                = "10.2.10"
     val AkkaTestkitSpecs2       = "0.3.2"
-    val Aws                     = "1.12.609"
+    val Aws                     = "1.12.635"
     val BouncyCastle            = "1.77"
     val Cats                    = "2.10.0"
     val Circe                   = "0.14.6"
@@ -15,7 +15,7 @@ object Dependencies {
     val Elasticsearch           = "7.16.3"
     val FastMd5                 = "2.7.1"
     val JUnit                   = "4.13.2"
-    val JodaTime                = "2.12.5"
+    val JodaTime                = "2.12.6"
     val Log4J                   = "2.22.1"
     val NscalaTime              = "2.32.0"
     val ScalaCheck              = "1.17.0"
@@ -24,11 +24,11 @@ object Dependencies {
     val ScalaTest               = "3.2.17"
     val Shapeless               = "2.3.10"
     val SimpleJmx               = "2.2"
-    val Specs2                  = "4.20.3"
+    val Specs2                  = "4.20.4"
     val Squants                 = "1.8.3"
-    val SshJ                    = "0.37.0"
+    val SshJ                    = "0.38.0"
     val TypesafeConfig          = "1.4.3"
-    val UnirestJava             = "4.2.1"
+    val UnirestJava             = "4.2.6"
   }
 
   // scalafmt: { maxColumn = 200 }
