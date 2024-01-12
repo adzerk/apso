@@ -100,6 +100,7 @@ W.delete("http://www.google.com/").getStatus
 // res3: Int = 405
 
 W.head("http://www.google.com/").getStatus
+// res4: Int = 302
 ```
 
 The POST and PUT methods can also receive the body as `JSON` (of [circe](https://github.com/circe/circe)), which adds the `Content-type` header accordingly.
@@ -181,6 +182,7 @@ The JreVersionHelper object provides helper methods to check the two most signif
 import com.velocidi.apso.JreVersionHelper
 
 JreVersionHelper.jreVersion
+// res0: (Int, Int) = (1, 8)
 ```
 
 ### ProgressBar
@@ -208,6 +210,7 @@ progress.tick(20)
 // 34% [==================>                                   ] / [ 0.46 ] ops/s
 
 progress.tick(30)
+// 64% [=================================>                    ] - [ 0.77 ] ops/s
 ```
 
 ### Reflect
@@ -675,6 +678,16 @@ ResourceUtil.getResourceStream("reference.conf")
 // res1: java.io.InputStream = java.io.BufferedInputStream@6f16d172
 
 ResourceUtil.getResourceAsString("reference.conf")
+// res2: String =
+// "apso {
+//   io {
+//     file-descriptor {
+//       sftp.max-connections-per-host = 8
+//       sftp.max-idle-time = 10s
+//     }
+//   }
+// }
+// "
 ```
 
 ## JSON
@@ -858,7 +871,7 @@ import com.velocidi.apso.time.Implicits._
 //   2012-02-27T00:00:00.000Z,
 //   2012-02-28T00:00:00.000Z,
 //   2012-02-29T00:00:00.000Z
-// ))
+// )
 
 (new DateTime("2012-01-01") until new DateTime("2012-02-01") by 2.minutes)
 // res71: IterableInterval = IndexedSeq(
