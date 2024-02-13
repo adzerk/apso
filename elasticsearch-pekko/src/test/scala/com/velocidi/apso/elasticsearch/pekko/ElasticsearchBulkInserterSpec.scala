@@ -1,20 +1,20 @@
-package com.velocidi.apso.elasticsearch
+package com.velocidi.apso.elasticsearch.pekko
 
 import scala.concurrent.duration._
 
-import akka.actor._
-import akka.testkit._
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.RequestSuccess
 import com.sksamuel.elastic4s.requests.searches._
 import io.circe.Json
 import io.circe.syntax._
+import org.apache.pekko.actor._
+import org.apache.pekko.testkit._
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.matcher.Matcher
 import org.specs2.mutable.SpecificationLike
 
-import com.velocidi.apso.elasticsearch.ElasticsearchBulkInserter.Insert
-import com.velocidi.apso.elasticsearch.config.Elasticsearch
+import com.velocidi.apso.elasticsearch.pekko.ElasticsearchBulkInserter.Insert
+import com.velocidi.apso.elasticsearch.pekko.config.Elasticsearch
 
 class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv)
     extends TestKit(ActorSystem("es-bulk-inserter-test"))

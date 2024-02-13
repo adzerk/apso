@@ -10,6 +10,5 @@ libraryDependencies ++= Seq(
   TypesafeConfig,
   AkkaActorTestkitTyped    % Test,
   AkkaHttpTestkit          % Test,
-  AkkaTestkitSpecs2Classic % Test,
   Specs2Core               % Test
 )

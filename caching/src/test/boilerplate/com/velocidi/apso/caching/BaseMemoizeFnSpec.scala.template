@@ -6,8 +6,8 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.Random
 
-import net.ruippeixotog.akka.testkit.specs2.mutable.AkkaSpecification
 import org.specs2.concurrent.ExecutionEnv
+import org.specs2.mutable.Specification
 
 class MemoizeFnWithGuavaSpec(implicit ee: ExecutionEnv) extends BaseMemoizeFnSpec()(ee) {
   def newConf(size: Option[Long] = None, ttl: Option[FiniteDuration] = None) = {
@@ -23,7 +23,7 @@ class MemoizeFnWithCaffeineSpec(implicit ee: ExecutionEnv) extends BaseMemoizeFn
   lazy val underlyingCacheName = "Caffeine"
 }
 
-abstract class BaseMemoizeFnSpec(implicit ee: ExecutionEnv) extends AkkaSpecification {
+abstract class BaseMemoizeFnSpec(implicit ee: ExecutionEnv) extends Specification {
 
   def newConf(size: Option[Long] = None, ttl: Option[FiniteDuration] = None): config.Cache
   def underlyingCacheName: String

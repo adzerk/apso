@@ -8,6 +8,5 @@ libraryDependencies ++= Seq(
   "com.google.guava"              % "guava"               % "28.0-jre", // This wasn't updated due to incompatibility with scalacache-guava
   ConcurrentLinkedHashMapLru,
   ScalaCollectionCompat,
-  AkkaTestkitSpecs2Classic        % Test,
   Specs2Core                      % Test
 )
