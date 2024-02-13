@@ -1,7 +1,7 @@
 package com.velocidi.apso.config
 
 import java.io.File
-import java.net.{MalformedURLException, URL}
+import java.net.{MalformedURLException, URI}
 
 import com.typesafe.config._
 import com.typesafe.config.impl.Parseable
@@ -66,7 +66,7 @@ object LazyConfigFactory {
         ConfigFactory.parseFile(new File(file), overrideOptions)
       } else {
         try {
-          ConfigFactory.parseURL(new URL(url), overrideOptions)
+          ConfigFactory.parseURL(new URI(url).toURL, overrideOptions)
         } catch {
           case e: MalformedURLException =>
             throw new ConfigException.Generic(
