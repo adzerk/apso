@@ -7,13 +7,14 @@ env:
 
 jobs:
   build:
-    name: Scala ${{ matrix.scala }}
+    name: Scala ${{ matrix.scala }} (Java ${{ matrix.java }})
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
         scala: ['2.12', '2.13']
+        java: ['11', '17', '21']
         include:
           - scala: '2.12'
             scala-version: 2.12.18
@@ -24,11 +25,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+      - name: Setup up JDK
+        uses: actions/setup-java@v4
         with:
           distribution: adopt
-          java-version: 11
+          java-version: ${{ matrix.java }}
+          cache: sbt
 
       - name: Cache sbt
         uses: coursier/cache-action@v6

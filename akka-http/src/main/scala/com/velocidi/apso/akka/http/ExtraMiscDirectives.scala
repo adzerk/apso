@@ -1,6 +1,6 @@
 package com.velocidi.apso.akka.http
 
-import java.net.URL
+import java.net.URI
 
 import scala.concurrent.duration._
 import scala.util.Try
@@ -40,7 +40,7 @@ trait ExtraMiscDirectives {
     */
   def optionalRefererHost: Directive1[Option[String]] =
     optionalHeaderValueByName("referer")
-      .map(_.flatMap(r => Try(new URL(r)).toOption.map(_.getHost)))
+      .map(_.flatMap(r => Try(new URI(r)).toOption.map(_.getHost)))
 }
 
 object ExtraMiscDirectives extends ExtraMiscDirectives
