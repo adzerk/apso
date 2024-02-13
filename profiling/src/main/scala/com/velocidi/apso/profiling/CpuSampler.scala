@@ -2,6 +2,7 @@ package com.velocidi.apso.profiling
 
 import java.lang.management.ManagementFactory
 
+import scala.annotation.nowarn
 import scala.collection.mutable
 
 import com.typesafe.scalalogging.Logger
@@ -44,7 +45,10 @@ class CpuSampler(samplePeriod: Long = 100, flushPeriod: Long = 10000, logger: Lo
 
   /** Captures the current call stacks of all live threads and stores relevant profiling data about them.
     */
+  @nowarn("cat=deprecation")
   def sample() = for {
+    // TODO Thread#getId is deprecated as of Java 19 and should be replaced with Thread#threadId.
+    // Unfortunately, this is only available since Java 19.
     info <- threadBean.dumpAllThreads(false, false) if info.getThreadId != Thread.currentThread.getId
     elem <- info.getStackTrace.headOption if shouldProfile(elem)
   } entries.enqueue(elem)
