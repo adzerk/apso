@@ -332,7 +332,7 @@ class S3Bucket(
       }
 
     case ex: AmazonServiceException =>
-      logger.error(s"Service error: ${ex.getMessage}", ex); ex.isRetryable
+      logger.error(s"Service error: ${ex.getMessage}", ex); !ex.isRetryable
 
     case ex: AmazonClientException
         if ex.getMessage ==
@@ -340,7 +340,7 @@ class S3Bucket(
       logger.error("Unable to load AWS credentials", ex); true
 
     case ex: AmazonClientException =>
-      logger.error("Client error pulling file", ex); ex.isRetryable
+      logger.error("Client error pulling file", ex); !ex.isRetryable
 
     case ex: Exception =>
       logger.error("An error occurred", ex); false
