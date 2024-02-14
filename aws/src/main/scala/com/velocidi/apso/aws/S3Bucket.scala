@@ -315,6 +315,8 @@ class S3Bucket(
     s3.getObject(req).getObjectContent
   }
 
+  /** FIXME: We should not rely on the [[AmazonClientException#isRetryable]] method since it's for internal use.
+   */
   private[this] def handler: PartialFunction[Throwable, Boolean] = {
     case ex: AmazonS3Exception =>
       ex.getStatusCode match {
