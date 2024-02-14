@@ -1,7 +1,7 @@
 package com.velocidi.apso
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future, blocking}
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
@@ -20,7 +20,7 @@ object Retry {
           case NonFatal(
                 _
               ) => // it would be indifferent to use a Throwable here because Futures don't catch Fatal exceptions
-            inBetweenSleep.foreach(d => Thread.sleep(d.toMillis))
+            inBetweenSleep.foreach(d => blocking(Thread.sleep(d.toMillis)))
             retryFuture[T](maxRetries - 1, inBetweenSleep)(f)
         }
     }
