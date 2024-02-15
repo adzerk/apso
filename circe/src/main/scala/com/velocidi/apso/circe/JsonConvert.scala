@@ -24,7 +24,9 @@ object JsonConvert {
     case b: Boolean  => b.asJson
     case str: String => str.asJson
     case map: Map[_, _] =>
-      Json.fromJsonObject(JsonObject.fromMap(map.map { case (k, v) => (k.toString, toJson(v)) }))
+      Json.fromJsonObject(
+        JsonObject.fromIterable(map.iterator.map { case (k, v) => (k.toString, toJson(v)) }.to(Iterable))
+      )
     case map: java.util.Map[_, _] =>
       Json.obj(map.asScala.map({ case (k, v) => (k.toString, toJson(v)) }).toList: _*)
     case t: IterableOnce[_]       => Json.fromValues(t.iterator.map(toJson).toVector)
