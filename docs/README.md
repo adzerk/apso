@@ -36,7 +36,7 @@ Please take into account that the library is still in an experimental stage and 
     - [ProgressBar](#progressbar)
     - [Reflect](#reflect)
     - [Retry](#retry)
-- [Akka HTTP](#akka-http)
+- [Akka HTTP/Pekko HTTP](#akka-http--pekko-http)
     - [ClientIPDirectives](#clientipdirectives)
     - [ExtraMiscDirectives](#extramiscdirectives)
     - [ProxySupport](#proxysupport)
@@ -259,9 +259,11 @@ def m() = {
 Retry.retry(10)(m())
 ```
 
-## Akka HTTP
+## Akka HTTP / Pekko HTTP
 
 The `akka-http` module provides additional [directives](https://doc.akka.io/docs/akka-http/current/routing-dsl/directives/index.html#directives) to be used in [akka-http](https://doc.akka.io/docs/akka-http/current/index.html).
+
+The same features are provided for Pekko under the `pekko-http` module.
 
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
