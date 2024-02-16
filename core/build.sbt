@@ -4,11 +4,11 @@ libraryDependencies ++= Seq(
   CirceCore,
   ScalaCollectionCompat,
   ScalaLogging,
-  TypesafeConfig           % Provided,
+  TypesafeConfig   % Provided,
   UnirestJava,
-  JUnit                    % Test,
-  ScalaCheck               % Test,
-  Specs2Core               % Test,
-  Specs2JUnit              % Test,
-  Specs2ScalaCheck         % Test
+  JUnit            % Test,
+  ScalaCheck       % Test,
+  Specs2Core       % Test,
+  Specs2JUnit      % Test,
+  Specs2ScalaCheck % Test
 )
