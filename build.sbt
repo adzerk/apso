@@ -5,7 +5,7 @@ ThisBuild / organization := "com.velocidi"
 
 ThisBuild / crossScalaVersions := Seq("2.12.18", "2.13.12")
 ThisBuild / scalaVersion       := "2.13.12"
-val javaVersion                 = "11"
+val javaVersion = "11"
 
 // Workaround for incompatible scala-xml versions taken from https://github.com/scala/bug/issues/12632. scala-xml 1.x
 // and scala-xml 2.x are "mostly" binary compatible.
