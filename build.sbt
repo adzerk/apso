@@ -15,20 +15,23 @@ def module(project: Project, moduleName: String) =
     .settings(name := s"apso-$moduleName")
     .settings(commonSettings: _*)
 
-lazy val akka          = module(project, "akka")
-lazy val akkaHttp      = module(project, "akka-http").dependsOn(core % Test, testkit % Test)
-lazy val aws           = module(project, "aws").dependsOn(core)
-lazy val caching       = module(project, "caching").enablePlugins(BoilerplatePlugin)
-lazy val circe         = module(project, "circe")
-lazy val collections   = module(project, "collections")
-lazy val core          = module(project, "core").dependsOn(testkit % Test)
-lazy val elasticsearch = module(project, "elasticsearch").dependsOn(testkit % Test)
-lazy val encryption    = module(project, "encryption")
-lazy val hashing       = module(project, "hashing")
-lazy val io            = module(project, "io").dependsOn(aws, testkit % Test)
-lazy val profiling     = module(project, "profiling")
-lazy val testkit       = module(project, "testkit")
-lazy val time          = module(project, "time")
+lazy val akka               = module(project, "akka")
+lazy val akkaHttp           = module(project, "akka-http").dependsOn(core % Test, testkit % Test)
+lazy val aws                = module(project, "aws").dependsOn(core)
+lazy val caching            = module(project, "caching").enablePlugins(BoilerplatePlugin)
+lazy val circe              = module(project, "circe")
+lazy val collections        = module(project, "collections")
+lazy val core               = module(project, "core").dependsOn(testkit % Test)
+lazy val elasticsearch      = module(project, "elasticsearch").dependsOn(testkit % Test)
+lazy val elasticsearchPekko = module(project, "elasticsearch-pekko").dependsOn(testkit % Test)
+lazy val encryption         = module(project, "encryption")
+lazy val hashing            = module(project, "hashing")
+lazy val io                 = module(project, "io").dependsOn(aws, testkit % Test)
+lazy val pekko              = module(project, "pekko")
+lazy val pekkoHttp          = module(project, "pekko-http").dependsOn(core % Test, testkit % Test)
+lazy val profiling          = module(project, "profiling")
+lazy val testkit            = module(project, "testkit")
+lazy val time               = module(project, "time")
 
 lazy val apso = (project in file("."))
   .settings(commonSettings: _*)
@@ -42,9 +45,12 @@ lazy val apso = (project in file("."))
     collections,
     core,
     elasticsearch,
+    elasticsearchPekko,
     encryption,
     hashing,
     io,
+    pekko,
+    pekkoHttp,
     profiling,
     time
   )
@@ -57,9 +63,12 @@ lazy val apso = (project in file("."))
     collections,
     core,
     elasticsearch,
+    elasticsearchPekko,
     encryption,
     hashing,
     io,
+    pekko,
+    pekkoHttp,
     profiling,
     testkit,
     time

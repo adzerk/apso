@@ -16,12 +16,10 @@
 
 package com.velocidi.apso.caching
 
-import net.ruippeixotog.akka.testkit.specs2.mutable.AkkaSpecification
 import org.specs2.concurrent.ExecutionEnv
+import org.specs2.mutable.Specification
 
-class SimpleLruCacheSpec(implicit ee: ExecutionEnv) extends AkkaSpecification {
-  import system.dispatcher
-
+class SimpleLruCacheSpec(implicit ee: ExecutionEnv) extends Specification {
   "not cache exceptions" in {
     val cache = new SimpleLruCache[String](10, 10)
     cache(1)((throw new RuntimeException("Naa")): String) must throwA[RuntimeException]("Naa").await

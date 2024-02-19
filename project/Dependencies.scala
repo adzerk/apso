@@ -4,7 +4,8 @@ object Dependencies {
   object Versions {
     val Akka                    = "2.6.20"
     val AkkaHttp                = "10.2.10"
-    val AkkaTestkitSpecs2       = "0.3.2"
+    val Pekko                   = "1.0.2"
+    val PekkoHttp               = "1.0.1"
     val Aws                     = "1.12.652"
     val BouncyCastle            = "1.77"
     val Cats                    = "2.10.0"
@@ -42,7 +43,6 @@ object Dependencies {
   val AkkaStream                 = "com.typesafe.akka"                     %% "akka-stream"                  % Versions.Akka
   val AkkaStreamTestkit          = "com.typesafe.akka"                     %% "akka-stream-testkit"          % Versions.Akka
   val AkkaTestkit                = "com.typesafe.akka"                     %% "akka-testkit"                 % Versions.Akka
-  val AkkaTestkitSpecs2Classic   = "net.ruippeixotog"                      %% "akka-testkit-specs2-classic"  % Versions.AkkaTestkitSpecs2
   val ApacheHttpAsyncClient      = "org.apache.httpcomponents"              % "httpasyncclient"              % "4.1.5"
   val ApacheHttpClient           = "org.apache.httpcomponents"              % "httpclient"                   % "4.5.14"
   val ApacheHttpCore             = "org.apache.httpcomponents"              % "httpcore"                     % "4.4.16"
@@ -68,6 +68,16 @@ object Dependencies {
   val Log4JCore                  = "org.apache.logging.log4j"               % "log4j-core"                   % Versions.Log4J
   val Log4JSlf4j                 = "org.apache.logging.log4j"               % "log4j-slf4j-impl"             % Versions.Log4J
   val NscalaTime                 = "com.github.nscala-time"                %% "nscala-time"                  % Versions.NscalaTime
+  val PekkoActor                 = "org.apache.pekko"                      %% "pekko-actor"                  % Versions.Pekko
+  val PekkoActorTestkitTyped     = "org.apache.pekko"                      %% "pekko-actor-testkit-typed"    % Versions.Pekko
+  val PekkoActorTyped            = "org.apache.pekko"                      %% "pekko-actor-typed"            % Versions.Pekko
+  val PekkoHttp                  = "org.apache.pekko"                      %% "pekko-http"                   % Versions.PekkoHttp
+  val PekkoHttpCore              = "org.apache.pekko"                      %% "pekko-http-core"              % Versions.PekkoHttp
+  val PekkoHttpTestkit           = "org.apache.pekko"                      %% "pekko-http-testkit"           % Versions.PekkoHttp
+  val PekkoSlf4J                 = "org.apache.pekko"                      %% "pekko-slf4j"                  % Versions.Pekko
+  val PekkoStream                = "org.apache.pekko"                      %% "pekko-stream"                 % Versions.Pekko
+  val PekkoStreamTestkit         = "org.apache.pekko"                      %% "pekko-stream-testkit"         % Versions.Pekko
+  val PekkoTestkit               = "org.apache.pekko"                      %% "pekko-testkit"                % Versions.Pekko
   val ScalaCheck                 = "org.scalacheck"                        %% "scalacheck"                   % Versions.ScalaCheck
   val ScalaCollectionCompat      = "org.scala-lang.modules"                %% "scala-collection-compat"      % "2.11.0"
   val ScalaLogging               = "com.typesafe.scala-logging"            %% "scala-logging"                % Versions.ScalaLogging
