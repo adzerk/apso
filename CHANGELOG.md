@@ -18,6 +18,29 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.19.2] - 2024-02-20
+
+This releases focuses on the addition of new Pekko modules, along with multiple performance improvements.
+
+It also fixes some issues with the retry logic when calling S3, where some errors were not being retried.
+
+### Added
+- Add Pekko subprojects ([#616](https://github.com/adzerk/apso/pull/616)).
+
+### Changed
+- Ensure that all classes are compiled with Java 11 bytecode ([#621](https://github.com/adzerk/apso/pull/621)).
+- Minor dependency updates.
+
+### Fixed
+- Fix compilation for Java 19+ ([#611](https://github.com/adzerk/apso/pull/611)).
+- Small improvement to JsonConvert performance ([#612](https://github.com/adzerk/apso/pull/612)).
+- Improve retry logic with S3 client ([#613](https://github.com/adzerk/apso/pull/613).
+- Mark Retry sleep as blocking ([#614](https://github.com/adzerk/apso/pull/614)).
+- Improvement to JsonConvert performance 2.0 ([#615](https://github.com/adzerk/apso/pull/615)).
+- Performance improvements converting Java Map to Json ([#622](https://github.com/adzerk/apso/pull/622)).
+
+[0.19.2]: https://github.com/velocidi/apso/compare/v0.19.1...v0.19.2
+
 ## [0.19.1] - 2023-11-30
 
 This release focuses on starting to use Java 11 and updating dependencies.
