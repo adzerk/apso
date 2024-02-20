@@ -39,6 +39,8 @@ It also fixes some issues with the retry logic when calling S3, where some error
 - Improvement to JsonConvert performance 2.0 ([#615](https://github.com/adzerk/apso/pull/615)).
 - Performance improvements converting Java Map to Json ([#622](https://github.com/adzerk/apso/pull/622)).
 
+[0.19.2]: https://github.com/velocidi/apso/compare/v0.19.1...v0.19.2
+
 ## [0.19.1] - 2023-11-30
 
 This release focuses on starting to use Java 11 and updating dependencies.
