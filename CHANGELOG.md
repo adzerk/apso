@@ -33,7 +33,7 @@ It also fixes some issues with the retry logic when calling S3, where some error
 
 ### Fixed
 - Fix compilation for Java 19+ ([#611](https://github.com/adzerk/apso/pull/611)).
-- Small improvement to JsonConvert performance ([#612](https://github.com/adzerk/apso/pull/611)).
+- Small improvement to JsonConvert performance ([#612](https://github.com/adzerk/apso/pull/612)).
 - Improve retry logic with S3 client ([#613](https://github.com/adzerk/apso/pull/613).
 - Mark Retry sleep as blocking ([#614](https://github.com/adzerk/apso/pull/614)).
 - Improvement to JsonConvert performance 2.0 ([#615](https://github.com/adzerk/apso/pull/615)).
