@@ -18,9 +18,19 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.19.3] - 2024-02-26
+
+### Added
+- Add `utcLocalDateTime` to `ApsoTimeDateTime` ([#628](https://github.com/adzerk/apso/pull/628)).
+
+### Changed
+- Minor dependency updates.
+
+[0.19.3]: https://github.com/velocidi/apso/compare/v0.19.2...v0.19.3
+
 ## [0.19.2] - 2024-02-20
 
-This releases focuses on the addition of new Pekko modules, along with multiple performance improvements.
+This release focuses on the addition of new Pekko modules, along with multiple performance improvements.
 
 It also fixes some issues with the retry logic when calling S3, where some errors were not being retried.
 
