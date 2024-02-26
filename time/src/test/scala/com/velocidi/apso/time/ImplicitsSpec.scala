@@ -47,6 +47,16 @@ class ImplicitsSpec extends Specification {
 
   "An ApsoTimeDateTime" should {
 
+    "support conversion to UTC LocalDateTime" in {
+      val localDateTime = LocalDateTime.parse("2014-01-01T01:10:58")
+      val dateTime = localDateTime.toDateTime(DateTimeZone.forID("NZ"))
+      val estLocalDateTime = dateTime.toLocalDateTime
+      val utcLocalDateTime = dateTime.utcLocalDateTime
+
+      estLocalDateTime === new LocalDateTime(2014, 1, 1, 1, 10, 58)
+      utcLocalDateTime === new LocalDateTime(2013, 12, 31, 12, 10, 58)
+    }
+
     "support conversion to UTC LocalDate" in {
       val localDate = "2014-01-01".toLocalDate
       val dateTime = localDate.toDateTimeAtStartOfDay.toDateTime(DateTimeZone.forID("EST"))

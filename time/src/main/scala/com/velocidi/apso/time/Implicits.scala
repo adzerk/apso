@@ -66,6 +66,12 @@ object Implicits {
     */
   final implicit class ApsoTimeDateTime(val d1: DateTime) extends AnyVal {
 
+    /** Returns a `LocalDateTime` corresponding to this `DateTime` at UTC.
+      * @return
+      *   a `LocalDateTime` corresponding to this `DateTime` at UTC.
+      */
+    def utcLocalDateTime: LocalDateTime = d1.withZone(DateTimeZone.UTC).toLocalDateTime
+
     /** Returns a `LocalDate` corresponding to this `DateTime` at UTC.
       * @return
       *   a `LocalDate` corresponding to this `DateTime` at UTC.
