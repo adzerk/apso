@@ -3,8 +3,8 @@ import spray.boilerplate.BoilerplatePlugin
 
 ThisBuild / organization := "com.velocidi"
 
-ThisBuild / crossScalaVersions := Seq("2.12.18", "2.13.12")
-ThisBuild / scalaVersion       := "2.13.12"
+ThisBuild / crossScalaVersions := Seq("2.12.18", "2.13.13")
+ThisBuild / scalaVersion       := "2.13.13"
 val javaVersion = "11"
 
 // Workaround for incompatible scala-xml versions taken from https://github.com/scala/bug/issues/12632. scala-xml 1.x
