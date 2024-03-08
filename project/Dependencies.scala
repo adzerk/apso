@@ -6,7 +6,7 @@ object Dependencies {
     val AkkaHttp                = "10.2.10"
     val Pekko                   = "1.0.2"
     val PekkoHttp               = "1.0.1"
-    val Aws                     = "1.12.673"
+    val Aws                     = "1.12.675"
     val BouncyCastle            = "1.77"
     val Cats                    = "2.10.0"
     val Circe                   = "0.14.6"
