@@ -79,7 +79,7 @@ object Dependencies {
   val PekkoStreamTestkit         = "org.apache.pekko"                      %% "pekko-stream-testkit"         % Versions.Pekko
   val PekkoTestkit               = "org.apache.pekko"                      %% "pekko-testkit"                % Versions.Pekko
   val ScalaCheck                 = "org.scalacheck"                        %% "scalacheck"                   % Versions.ScalaCheck
-  val ScalaCollectionCompat      = "org.scala-lang.modules"                %% "scala-collection-compat"      % "2.11.0"
+  val ScalaCollectionCompat      = "org.scala-lang.modules"                %% "scala-collection-compat"      % "2.12.0"
   val ScalaLogging               = "com.typesafe.scala-logging"            %% "scala-logging"                % Versions.ScalaLogging
   val ScalaPool                  = "io.github.andrebeat"                   %% "scala-pool"                   % Versions.ScalaPool
   val ScalaTestCore              = "org.scalatest"                         %% "scalatest-core"               % Versions.ScalaTest
