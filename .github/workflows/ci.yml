@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup up JDK
         uses: actions/setup-java@v4
@@ -52,12 +52,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18.18.0'
+          node-version: 'lts/*'
 
       - name: Validate Changelog formatting
         run: npx zx --install .github/workflows/scripts/validate_changelog.mjs
