@@ -24,36 +24,7 @@ This is a maintenance release focused on dependency updates and security fixes. 
 version of jackson-databind, which fixes CVE-2022-42004, CVE-2022-42003 and CVE-2020-36518.
 
 ### Changed
-- Update circe-core, circe-generic, ... to 0.14.7 ([#661](https://github.com/adzerk/apso/pull/661)).
-- Update aws-java-sdk-s3 to 1.12.708 ([#659](https://github.com/adzerk/apso/pull/659)).
-- Update aws-java-sdk-core to 1.12.706 ([#657](https://github.com/adzerk/apso/pull/657)).
-- Update nodejs version used in GitHub actions ([#656](https://github.com/adzerk/apso/pull/656)).
-- Update scalacheck to 1.18.0 ([#655](https://github.com/adzerk/apso/pull/655)).
-- Update bcpkix-jdk18on, bcprov-jdk18on to 1.78.1 ([#654](https://github.com/adzerk/apso/pull/654)).
-- Update scalacheck to 1.17.1 ([#653](https://github.com/adzerk/apso/pull/653)).
-- Update scala-collection-compat to 2.12.0 ([#652](https://github.com/adzerk/apso/pull/652)).
-- Update aws-java-sdk-s3 to 1.12.702 ([#651](https://github.com/adzerk/apso/pull/651)).
-- Update aws-java-sdk-core to 1.12.701 ([#650](https://github.com/adzerk/apso/pull/650)).
-- Update aws-java-sdk-s3 to 1.12.697 ([#649](https://github.com/adzerk/apso/pull/649)).
-- Update bcpkix-jdk18on, bcprov-jdk18on to 1.78 ([#648](https://github.com/adzerk/apso/pull/648)).
-- Update unirest-java-core to 4.3.1 ([#647](https://github.com/adzerk/apso/pull/647)).
-- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.696 ([#646](https://github.com/adzerk/apso/pull/646)).
-- Update aws-java-sdk-s3 to 1.12.693 ([#645](https://github.com/adzerk/apso/pull/645)).
-- Update scalafmt-core to 3.8.1 ([#644](https://github.com/adzerk/apso/pull/644)).
-- Update aws-java-sdk-core to 1.12.691 ([#643](https://github.com/adzerk/apso/pull/643)).
-- Update aws-java-sdk-s3 to 1.12.687 ([#642](https://github.com/adzerk/apso/pull/642)).
-- Update aws-java-sdk-core to 1.12.685 ([#641](https://github.com/adzerk/apso/pull/641)).
-- Update aws-java-sdk-s3 to 1.12.681 ([#640](https://github.com/adzerk/apso/pull/640)).
-- Update unirest-java-core to 4.3.0 ([#639](https://github.com/adzerk/apso/pull/639)).
-- Update aws-java-sdk-core to 1.12.679 ([#638](https://github.com/adzerk/apso/pull/638)).
-- Update log4j-core, log4j-slf4j-impl to 2.23.1 ([#637](https://github.com/adzerk/apso/pull/637)).
-- Update aws-java-sdk-s3 to 1.12.675 ([#636](https://github.com/adzerk/apso/pull/636)).
-- Update aws-java-sdk-core to 1.12.673 ([#635](https://github.com/adzerk/apso/pull/635)).
-- Update sbt-scalafix to 0.12.0 ([#634](https://github.com/adzerk/apso/pull/634)).
-- Update aws-java-sdk-s3 to 1.12.669 ([#633](https://github.com/adzerk/apso/pull/633)).
-- Update scala-library to 2.13.13 ([#632](https://github.com/adzerk/apso/pull/632)).
-- Update scala-library to 2.12.19 ([#631](https://github.com/adzerk/apso/pull/631)).
-- Update aws-java-sdk-core to 1.12.667 ([#630](https://github.com/adzerk/apso/pull/630)).
+- Minor dependency updates.
 
 ### Security
 - Force eviction of jackson-databind 2.13.1 ([#660](https://github.com/adzerk/apso/pull/660)).
