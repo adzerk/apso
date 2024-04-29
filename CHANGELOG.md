@@ -20,6 +20,9 @@ Use the following schema when setting up the Changelog for a new release. Remove
 
 ## [0.19.4] - TBD
 
+This is a maintenance release focused on dependency updates and security fixes. Most notably, this release updates the
+version of jackson-databind, which fixes CVE-2022-42004, CVE-2022-42003 and CVE-2020-36518.
+
 ### Changed
 - Update circe-core, circe-generic, ... to 0.14.7 ([#661](https://github.com/adzerk/apso/pull/661)).
 - Update aws-java-sdk-s3 to 1.12.708 ([#659](https://github.com/adzerk/apso/pull/659)).
