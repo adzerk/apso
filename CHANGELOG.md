@@ -55,6 +55,8 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 - Force eviction of jackson-databind 2.13.1 ([#660](https://github.com/adzerk/apso/pull/660)).
 
+[0.19.4]: https://github.com/velocidi/apso/compare/v0.19.3...master
+
 ## [0.19.3] - 2024-02-26
 
 ### Added
