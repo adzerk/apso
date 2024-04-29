@@ -29,7 +29,7 @@ version of jackson-databind, which fixes CVE-2022-42004, CVE-2022-42003 and CVE-
 ### Security
 - Force eviction of jackson-databind 2.13.1 ([#660](https://github.com/adzerk/apso/pull/660)).
 
-[0.19.4]: https://github.com/adzerk/apso/compare/v0.19.3...master
+[0.19.4]: https://github.com/adzerk/apso/compare/v0.19.3...v0.19.4
 
 ## [0.19.3] - 2024-02-26
 
