@@ -18,6 +18,19 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.19.4] - 2024-04-29
+
+This is a maintenance release focused on dependency updates and security fixes. Most notably, this release updates the
+version of jackson-databind, which fixes CVE-2022-42004, CVE-2022-42003 and CVE-2020-36518.
+
+### Changed
+- Minor dependency updates.
+
+### Security
+- Force eviction of jackson-databind 2.13.1 ([#660](https://github.com/adzerk/apso/pull/660)).
+
+[0.19.4]: https://github.com/adzerk/apso/compare/v0.19.3...master
+
 ## [0.19.3] - 2024-02-26
 
 ### Added
