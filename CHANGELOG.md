@@ -18,7 +18,7 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
-## [0.19.4] - TBD
+## [0.19.4] - 2024-04-29
 
 This is a maintenance release focused on dependency updates and security fixes. Most notably, this release updates the
 version of jackson-databind, which fixes CVE-2022-42004, CVE-2022-42003 and CVE-2020-36518.
