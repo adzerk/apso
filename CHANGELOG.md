@@ -18,6 +18,16 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.19.5] - 2024-05-02
+
+This is a maintenance release focused on the update of [Bouncy Castle's](https://www.bouncycastle.org/) libraries
+provided in apso-io, dealing with CVE-2024-29857, CVE-2024-30171, CVE-2024-30172 and SNYK-JAVA-ORGBOUNCYCASTLE-6612984.
+
+### Security
+- Override `bcprov-jdk18on` transient dependency ([#663](https://github.com/adzerk/apso/pull/663)).
+
+[0.19.5]: https://github.com/adzerk/apso/compare/v0.19.4...master
+
 ## [0.19.4] - 2024-04-29
 
 This is a maintenance release focused on dependency updates and security fixes. Most notably, this release updates the
