@@ -26,7 +26,7 @@ provided in apso-io, dealing with CVE-2024-29857, CVE-2024-30171, CVE-2024-30172
 ### Security
 - Override `bcprov-jdk18on` transient dependency ([#663](https://github.com/adzerk/apso/pull/663)).
 
-[0.19.5]: https://github.com/adzerk/apso/compare/v0.19.4...master
+[0.19.5]: https://github.com/adzerk/apso/compare/v0.19.4...v0.19.5
 
 ## [0.19.4] - 2024-04-29
 
