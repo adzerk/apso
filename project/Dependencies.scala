@@ -10,7 +10,7 @@ object Dependencies {
     val BouncyCastle            = "1.78.1"
     val Cats                    = "2.10.0"
     val Circe                   = "0.14.7"
-    val CommonsCodec            = "1.16.1"
+    val CommonsCodec            = "1.17.0"
     val ConcurrentLinkedHashMap = "1.4.2"
     val Elastic4s               = "7.16.3"
     val Elasticsearch           = "7.16.3"
