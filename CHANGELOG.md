@@ -23,7 +23,7 @@ Use the following schema when setting up the Changelog for a new release. Remove
 This release introduces a new configuration key, `aws.s3.max-connections`, for the maximum allowed connections of the S3
 client.
 
-#### Added
+### Added
 - Add `aws.s3.max-connections` setting for S3 client ([#677](https://github.com/adzerk/apso/pull/677)).
 
 ## [0.19.5] - 2024-05-02
