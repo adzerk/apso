@@ -26,6 +26,8 @@ client.
 ### Added
 - Add `aws.s3.max-connections` setting for S3 client ([#677](https://github.com/adzerk/apso/pull/677)).
 
+[0.19.6]: https://github.com/adzerk/apso/compare/v0.19.5...v0.19.6
+
 ## [0.19.5] - 2024-05-02
 
 This is a maintenance release focused on the update of [Bouncy Castle's](https://www.bouncycastle.org/) libraries
