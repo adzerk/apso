@@ -18,7 +18,7 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
-## [0.19.6] - 2025-05-17
+## [0.19.6] - 2024-05-17
 
 This release introduces a new configuration key, `aws.s3.max-connections`, for the maximum allowed connections of the S3
 client.
