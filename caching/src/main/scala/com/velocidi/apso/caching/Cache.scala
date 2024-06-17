@@ -20,6 +20,7 @@
 package com.velocidi.apso.caching
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.util.Try
 import scala.util.control.NonFatal
 
 /** General interface implemented by all spray cache implementations.
@@ -90,6 +91,6 @@ trait Cache[V] { cache =>
 
 class ValueMagnet[V](val future: Future[V])
 object ValueMagnet {
-  implicit def fromAny[V](block: V): ValueMagnet[V] = fromFuture(Future.successful(block))
+  implicit def fromAny[V](block: => V): ValueMagnet[V] = fromFuture(Future.fromTry(Try(block)))
   implicit def fromFuture[V](future: Future[V]): ValueMagnet[V] = new ValueMagnet(future)
 }

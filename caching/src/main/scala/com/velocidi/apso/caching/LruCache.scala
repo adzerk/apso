@@ -78,7 +78,7 @@ final class SimpleLruCache[V](val maxCapacity: Int, val initialCapacity: Int) ex
 
           promise.complete(value)
         }
-        future
+        promise.future
       case existingFuture => existingFuture
     }
   }
