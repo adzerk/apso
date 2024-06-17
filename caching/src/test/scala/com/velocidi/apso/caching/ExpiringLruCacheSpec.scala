@@ -85,8 +85,7 @@ class ExpiringLruCacheSpec(implicit ee: ExecutionEnv) extends Specification {
       cache(2)(Future.successful("B")) must beEqualTo("B").await
       cache(3)("C") must beEqualTo("C").await
       cache.store.toString === "{1=A, 2=B, 3=C}"
-      cache(4)("D")
-      Thread.sleep(10)
+      cache(4)("D") must beEqualTo("D").await
       cache.store.toString === "{2=B, 3=C, 4=D}"
       cache.size === 3
       cache.keys === Set(2, 3, 4)

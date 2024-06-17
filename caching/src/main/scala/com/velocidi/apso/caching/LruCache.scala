@@ -73,9 +73,10 @@ final class SimpleLruCache[V](val maxCapacity: Int, val initialCapacity: Int) ex
       case null =>
         val future = genValue()
         future.onComplete { value =>
-          promise.complete(value)
           // in case of exceptions we remove the cache entry (i.e. try again later)
           if (value.isFailure) store.remove(key, promise.future)
+
+          promise.complete(value)
         }
         future
       case existingFuture => existingFuture
