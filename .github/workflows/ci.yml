@@ -26,14 +26,16 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup up JDK
+        id: setup-java
         uses: actions/setup-java@v4
         with:
           distribution: adopt
           java-version: ${{ matrix.java }}
           cache: sbt
 
-      - name: Cache sbt
-        uses: coursier/cache-action@v6
+      - name: Update dependencies
+        if: steps.setup-java.outputs.cache-hit == 'false'
+        run: sbt +update
 
       - name: Compile and check format
         run: >-
