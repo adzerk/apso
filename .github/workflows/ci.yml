@@ -17,7 +17,7 @@ jobs:
         java: ['11', '17', '21']
         include:
           - scala: '2.12'
-            scala-version: 2.12.19
+            scala-version: 2.12.20
           - scala: '2.13'
             scala-version: 2.13.14
 
