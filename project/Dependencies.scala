@@ -19,7 +19,7 @@ object Dependencies {
     val JodaTime                = "2.12.7"
     val Log4J                   = "2.24.0"
     val NscalaTime              = "2.32.0"
-    val ScalaCheck              = "1.18.0"
+    val ScalaCheck              = "1.18.1"
     val ScalaLogging            = "3.9.5"
     val ScalaPool               = "0.4.3"
     val ScalaTest               = "3.2.19"
