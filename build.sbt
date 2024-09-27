@@ -3,8 +3,8 @@ import spray.boilerplate.BoilerplatePlugin
 
 ThisBuild / organization := "com.velocidi"
 
-ThisBuild / crossScalaVersions := Seq("2.12.20", "2.13.14")
-ThisBuild / scalaVersion       := "2.13.14"
+ThisBuild / crossScalaVersions := Seq("2.12.20", "2.13.15")
+ThisBuild / scalaVersion       := "2.13.15"
 
 val javaVersion = "11"
 
