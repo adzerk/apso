@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.velocidi.apso.caching
+package com.kevel.apso.caching
 
 import java.util.Random
 import java.util.concurrent.CountDownLatch

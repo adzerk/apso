@@ -1,4 +1,4 @@
-package com.velocidi.apso.pekko.http
+package com.kevel.apso.pekko.http
 
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{Future, Promise}

@@ -1,4 +1,4 @@
-package com.velocidi.apso.collection
+package com.kevel.apso.collection
 
 import org.specs2.matcher.Matcher
 import org.specs2.mutable._

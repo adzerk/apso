@@ -1,8 +1,8 @@
-package com.velocidi.apso.elasticsearch.config
+package com.kevel.apso.elasticsearch.config
 
 import scala.concurrent.duration._
 
-import com.velocidi.apso.elasticsearch.config.Elasticsearch.BulkInserter
+import com.kevel.apso.elasticsearch.config.Elasticsearch.BulkInserter
 
 case class Elasticsearch(
     host: String,

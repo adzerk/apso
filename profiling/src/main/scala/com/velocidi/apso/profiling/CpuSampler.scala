@@ -1,4 +1,4 @@
-package com.velocidi.apso.profiling
+package com.kevel.apso.profiling
 
 import java.lang.management.ManagementFactory
 
@@ -7,7 +7,7 @@ import scala.collection.mutable
 
 import com.typesafe.scalalogging.Logger
 
-import com.velocidi.apso.profiling.CpuSampler._
+import com.kevel.apso.profiling.CpuSampler._
 
 /** A lightweight CPU profiler based on call stack sampling.
   *

@@ -1,4 +1,4 @@
-package com.velocidi.apso.collection
+package com.kevel.apso.collection
 
 import scala.reflect.ClassTag
 

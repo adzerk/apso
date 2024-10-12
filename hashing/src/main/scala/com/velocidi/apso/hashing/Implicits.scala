@@ -1,4 +1,4 @@
-package com.velocidi.apso.hashing
+package com.kevel.apso.hashing
 
 import com.twmacinta.util.MD5
 

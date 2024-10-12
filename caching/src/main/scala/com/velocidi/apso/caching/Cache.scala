@@ -17,7 +17,7 @@
 // Copied from https://github.com/spray/spray/blob/master/spray-caching/src/main/scala/spray/caching/Cache.scala in
 // order to be compiled against Scala 2.12.
 
-package com.velocidi.apso.caching
+package com.kevel.apso.caching
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.Try

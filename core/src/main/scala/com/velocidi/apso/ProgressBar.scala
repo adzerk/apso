@@ -1,4 +1,4 @@
-package com.velocidi.apso
+package com.kevel.apso
 
 /** A widget for printing a dynamic progress bar in a console.
   * @param total

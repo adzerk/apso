@@ -1,4 +1,4 @@
-package com.velocidi.apso
+package com.kevel.apso
 
 import akka.actor.{Actor, ActorLogging}
 import akka.event.Logging

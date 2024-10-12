@@ -1,4 +1,4 @@
-package com.velocidi.apso
+package com.kevel.apso
 
 import scala.annotation.tailrec
 import scala.collection.compat._

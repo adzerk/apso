@@ -1,4 +1,4 @@
-package com.velocidi.apso
+package com.kevel.apso
 
 /** Provides utility classes and methods related to datetime libraries.
   */

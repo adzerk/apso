@@ -1,4 +1,4 @@
-package com.velocidi.apso.encryption
+package com.kevel.apso.encryption
 
 import java.io.InputStream
 import java.security._

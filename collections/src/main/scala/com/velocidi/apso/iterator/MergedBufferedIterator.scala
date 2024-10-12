@@ -1,4 +1,4 @@
-package com.velocidi.apso.iterator
+package com.kevel.apso.iterator
 
 import scala.collection.BufferedIterator
 import scala.collection.mutable.PriorityQueue

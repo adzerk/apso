@@ -1,4 +1,4 @@
-package com.velocidi.apso.akka.http
+package com.kevel.apso.akka.http
 
 import scala.concurrent.duration._
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.velocidi.apso.caching
+package com.kevel.apso.caching
 
 import scala.annotation.tailrec
 import scala.concurrent.duration.Duration

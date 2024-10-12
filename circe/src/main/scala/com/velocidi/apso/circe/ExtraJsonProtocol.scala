@@ -1,4 +1,4 @@
-package com.velocidi.apso.circe
+package com.kevel.apso.circe
 
 import java.net.URI
 
@@ -13,7 +13,7 @@ import org.joda.time.format.ISODateTimeFormat
 import org.joda.time.{Duration => _, _}
 import squants.market.{Currency, MoneyContext}
 
-import com.velocidi.apso.circe.syntax._
+import com.kevel.apso.circe.syntax._
 
 /** Provides Encoders and Decoders for some relevant types.
   */

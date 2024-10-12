@@ -1,4 +1,4 @@
-package com.velocidi.apso.akka.http
+package com.kevel.apso.akka.http
 
 import java.net.InetAddress
 
@@ -20,7 +20,7 @@ import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 
-import com.velocidi.apso.NetUtils._
+import com.kevel.apso.NetUtils._
 
 class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Specs2RouteTest with ProxySupport {
 

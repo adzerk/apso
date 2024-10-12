@@ -1,4 +1,4 @@
-package com.velocidi.apso
+package com.kevel.apso
 
 import org.specs2.mutable.Specification
 

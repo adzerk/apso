@@ -17,7 +17,7 @@
   * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   */
 
-package com.velocidi.apso.collection
+package com.kevel.apso.collection
 
 import scala.annotation.tailrec
 import scala.reflect.ClassTag

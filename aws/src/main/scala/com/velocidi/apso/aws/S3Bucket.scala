@@ -1,4 +1,4 @@
-package com.velocidi.apso.aws
+package com.kevel.apso.aws
 
 import java.io._
 import java.util.concurrent.{Executors, ThreadFactory}
@@ -15,7 +15,7 @@ import com.amazonaws.{AmazonClientException, AmazonServiceException, ClientConfi
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 
-import com.velocidi.apso.aws.S3Bucket.S3ObjectDownloader
+import com.kevel.apso.aws.S3Bucket.S3ObjectDownloader
 
 /** A representation of an Amazon's S3 bucket. This class wraps an `AmazonS3Client` and provides a higher level
   * interface for pushing and pulling files to and from a bucket.

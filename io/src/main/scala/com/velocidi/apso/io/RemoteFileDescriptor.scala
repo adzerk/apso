@@ -1,4 +1,4 @@
-package com.velocidi.apso.io
+package com.kevel.apso.io
 
 trait RemoteFileDescriptor { this: FileDescriptor =>
   type Self <: RemoteFileDescriptor

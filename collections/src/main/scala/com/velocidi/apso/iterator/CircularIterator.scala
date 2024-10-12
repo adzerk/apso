@@ -1,4 +1,4 @@
-package com.velocidi.apso.iterator
+package com.kevel.apso.iterator
 
 /** A wrapper around an iterator that iterates over its elements in a circular way.
   * @param it

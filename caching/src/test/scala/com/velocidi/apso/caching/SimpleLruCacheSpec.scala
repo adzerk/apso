@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.velocidi.apso.caching
+package com.kevel.apso.caching
 
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mutable.Specification

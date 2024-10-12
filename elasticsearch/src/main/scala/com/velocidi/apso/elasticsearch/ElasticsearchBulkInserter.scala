@@ -1,4 +1,4 @@
-package com.velocidi.apso.elasticsearch
+package com.kevel.apso.elasticsearch
 
 import scala.collection.mutable
 import scala.concurrent.duration._

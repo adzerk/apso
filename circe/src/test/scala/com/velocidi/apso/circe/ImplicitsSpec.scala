@@ -1,11 +1,11 @@
-package com.velocidi.apso.circe
+package com.kevel.apso.circe
 
 import io.circe.generic.semiauto._
 import io.circe.literal._
 import io.circe.syntax._
 import org.specs2.mutable.Specification
 
-import com.velocidi.apso.circe.Implicits._
+import com.kevel.apso.circe.Implicits._
 
 class ImplicitsSpec extends Specification {
   "The Apso Json Implicits should" should {

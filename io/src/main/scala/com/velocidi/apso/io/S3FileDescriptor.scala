@@ -1,4 +1,4 @@
-package com.velocidi.apso.io
+package com.kevel.apso.io
 
 import java.io.InputStream
 
@@ -7,7 +7,7 @@ import scala.collection.concurrent.TrieMap
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.services.s3.model.S3ObjectSummary
 
-import com.velocidi.apso.aws.{S3Bucket, SerializableAWSCredentials}
+import com.kevel.apso.aws.{S3Bucket, SerializableAWSCredentials}
 
 case class S3FileDescriptor(
     bucket: S3Bucket,

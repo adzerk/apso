@@ -1,4 +1,4 @@
-package com.velocidi.apso.time
+package com.kevel.apso.time
 
 import com.github.nscala_time.time.Imports._
 import org.joda.time.ReadableInterval

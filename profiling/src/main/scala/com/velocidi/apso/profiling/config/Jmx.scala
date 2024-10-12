@@ -1,4 +1,4 @@
-package com.velocidi.apso.profiling.config
+package com.kevel.apso.profiling.config
 
 /** Config class for SimpleJmx
   *

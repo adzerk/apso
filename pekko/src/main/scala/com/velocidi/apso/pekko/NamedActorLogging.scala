@@ -1,4 +1,4 @@
-package com.velocidi.apso.pekko
+package com.kevel.apso.pekko
 
 import org.apache.pekko.actor.{Actor, ActorLogging}
 import org.apache.pekko.event.Logging

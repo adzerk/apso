@@ -1,4 +1,4 @@
-package com.velocidi.apso.circe
+package com.kevel.apso.circe
 
 import java.net.URI
 

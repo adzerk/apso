@@ -1,4 +1,4 @@
-package com.velocidi.apso.collection
+package com.kevel.apso.collection
 
 /** An immutable implementation of a Trie (https://en.wikipedia.org/wiki/Trie).
   *

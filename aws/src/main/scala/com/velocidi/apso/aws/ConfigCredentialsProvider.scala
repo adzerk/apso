@@ -1,4 +1,4 @@
-package com.velocidi.apso.aws
+package com.kevel.apso.aws
 
 import com.amazonaws.auth._
 import com.typesafe.config.{Config, ConfigFactory}

@@ -1,4 +1,4 @@
-package com.velocidi.apso.elasticsearch.pekko
+package com.kevel.apso.elasticsearch.pekko
 
 import scala.concurrent.duration._
 
@@ -13,8 +13,8 @@ import org.specs2.concurrent.ExecutionEnv
 import org.specs2.matcher.Matcher
 import org.specs2.mutable.SpecificationLike
 
-import com.velocidi.apso.elasticsearch.pekko.ElasticsearchBulkInserter.Insert
-import com.velocidi.apso.elasticsearch.pekko.config.Elasticsearch
+import com.kevel.apso.elasticsearch.pekko.ElasticsearchBulkInserter.Insert
+import com.kevel.apso.elasticsearch.pekko.config.Elasticsearch
 
 class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv)
     extends TestKit(ActorSystem("es-bulk-inserter-test"))

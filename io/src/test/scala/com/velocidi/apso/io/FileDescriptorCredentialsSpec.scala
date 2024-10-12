@@ -1,8 +1,8 @@
-package com.velocidi.apso.io
+package com.kevel.apso.io
 
 import org.specs2.mutable.Specification
 
-import com.velocidi.apso.CustomMatchers
+import com.kevel.apso.CustomMatchers
 
 class FileDescriptorCredentialsSpec extends Specification with CustomMatchers {
 

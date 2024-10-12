@@ -1,4 +1,4 @@
-package com.velocidi.apso
+package com.kevel.apso
 
 import scala.collection.compat._
 import scala.util.Random
@@ -6,7 +6,7 @@ import scala.util.Random
 import org.specs2.ScalaCheck
 import org.specs2.mutable._
 
-import com.velocidi.apso.Implicits._
+import com.kevel.apso.Implicits._
 
 class ImplicitsSpec extends Specification with ScalaCheck with FutureExtraMatchers {
 

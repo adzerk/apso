@@ -1,4 +1,4 @@
-package com.velocidi.apso
+package com.kevel.apso
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future, blocking}

@@ -1,4 +1,4 @@
-package com.velocidi.apso
+package com.kevel.apso
 
 import scala.math.{abs, acos, cos, sin, toRadians}
 

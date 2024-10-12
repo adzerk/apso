@@ -1,4 +1,4 @@
-package com.velocidi.apso.io
+package com.kevel.apso.io
 
 import java.io.{FileDescriptor => _, _}
 import java.util.concurrent.{ConcurrentHashMap, TimeoutException}

@@ -1,4 +1,4 @@
-package com.velocidi.apso.caching.config
+package com.kevel.apso.caching.config
 
 import scala.concurrent.duration.FiniteDuration
 

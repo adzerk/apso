@@ -1,4 +1,4 @@
-package com.velocidi.apso.io
+package com.kevel.apso.io
 
 /** Trait that describes how a `FileDescriptor` extracts credentials from a config.
   *

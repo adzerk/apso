@@ -1,4 +1,4 @@
-package com.velocidi.apso.config
+package com.kevel.apso.config
 
 import java.io.File
 import java.net.{MalformedURLException, URI}

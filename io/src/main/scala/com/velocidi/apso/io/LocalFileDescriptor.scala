@@ -1,4 +1,4 @@
-package com.velocidi.apso.io
+package com.kevel.apso.io
 
 import java.io.{FileInputStream, FileWriter, InputStream}
 import java.nio.file.{Files, Path, Paths, StandardCopyOption}
@@ -8,7 +8,7 @@ import scala.util.{Failure, Success, Try}
 
 import com.typesafe.scalalogging.LazyLogging
 
-import com.velocidi.apso.Implicits.ApsoCloseable
+import com.kevel.apso.Implicits.ApsoCloseable
 
 case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with LazyLogging {
 

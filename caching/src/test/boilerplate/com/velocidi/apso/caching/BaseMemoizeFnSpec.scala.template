@@ -1,4 +1,4 @@
-package com.velocidi.apso.caching
+package com.kevel.apso.caching
 
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 

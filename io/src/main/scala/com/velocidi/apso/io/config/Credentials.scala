@@ -1,4 +1,4 @@
-package com.velocidi.apso.io.config
+package com.kevel.apso.io.config
 
 case class Credentials(sftp: Credentials.Sftp = Credentials.Sftp(), s3: Credentials.S3 = Credentials.S3())
 
