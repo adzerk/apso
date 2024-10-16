@@ -18,6 +18,12 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.20.0] - 2024-10-16
+
+This release is an exact copy of v0.19.7, but now published under the `com.kevel` namespace.
+
+[0.20.0]: https://github.com/adzerk/apso/compare/v0.19.7...v0.20.0
+
 ## [0.19.7] - 2024-10-16
 
 This release includes some bug fixes and dependency updates. It will also be last version of Apso published under the
