@@ -147,7 +147,6 @@ lazy val commonSettings = Seq(
 
   publishTo := sonatypePublishToBundle.value,
 
-  sonatypeRepository := "https://s01.oss.sonatype.org/service/local",
   publishMavenStyle := true,
   Test / publishArtifact := false,
   pomIncludeRepository := { _ => false },
@@ -162,8 +161,6 @@ lazy val commonSettings = Seq(
   )
   // format: on
 )
-
-ThisBuild / sonatypeCredentialHost := sonatypeCentralHost
 
 releaseCrossBuild    := true
 releaseTagComment    := s"Release ${(ThisBuild / version).value}"
