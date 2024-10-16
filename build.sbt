@@ -1,5 +1,6 @@
 import ReleaseTransformations._
 import spray.boilerplate.BoilerplatePlugin
+import xerial.sbt.Sonatype.sonatypeCentralHost
 
 ThisBuild / organization := "com.velocidi"
 
@@ -162,7 +163,7 @@ lazy val commonSettings = Seq(
   // format: on
 )
 
-ThisBuild / sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
+ThisBuild / sonatypeCredentialHost := sonatypeCentralHost
 
 releaseCrossBuild    := true
 releaseTagComment    := s"Release ${(ThisBuild / version).value}"
