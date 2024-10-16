@@ -146,6 +146,7 @@ lazy val commonSettings = Seq(
 
   publishTo := sonatypePublishToBundle.value,
 
+  sonatypeRepository := "https://s01.oss.sonatype.org/service/local",
   publishMavenStyle := true,
   Test / publishArtifact := false,
   pomIncludeRepository := { _ => false },
