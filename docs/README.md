@@ -85,7 +85,7 @@ The `LazyConfigFactory` object provides static methods for creating `Config` ins
 Apso provides a tiny wrapper for [Dispatch](http://dispatch.databinder.net/) with synchronous operations. It's called `W`, and the following shows some sample usage:
 
 ```scala mdoc:compile-only
-import com.velocidi.apso.http.W
+import com.kevel.apso.http.W
 
 W.get("http://www.google.com/").getStatus
 // res0: Int = 302
@@ -110,7 +110,7 @@ The POST and PUT methods can also receive the body as `JSON` (of [circe](https:/
 The `Geo` object provides methods to compute distances in kilometers between two points on the planet Earth, calculated using the spherical [law of cosines](https://en.wikipedia.org/wiki/Great-circle_distance#Formulas). Coordinates are represented by a pair of `Double` for latitude and longitude.
 
 ```scala mdoc:reset
-import com.velocidi.apso.Geo
+import com.kevel.apso.Geo
 
 Geo.distance((41.1617609, -8.6024716), (41.1763745, -8.5964861))
 ```
@@ -131,7 +131,7 @@ distFromOffice((38.7223032, -9.1414664))
 Apso provides implicit conversions from `String`, `Seq[_]`, `Map[_, _]`, `Seq[Map[_, _]]` and `AutoCloseable` to extended types that come packed with extended features.
 
 ```scala mdoc:reset
-import com.velocidi.apso.Implicits._
+import com.kevel.apso.Implicits._
 
 Seq(1, 3, 5).mergeSorted(Seq(2, 4))
 
@@ -166,7 +166,7 @@ rand.chooseN((0 to 15).toSeq, 4)
 The JreVersionHelper object provides helper methods to check the two most significant parts of the JRE version at runtime:
 
 ```scala mdoc:compile-only
-import com.velocidi.apso.JreVersionHelper
+import com.kevel.apso.JreVersionHelper
 
 JreVersionHelper.jreVersion
 // res0: (Int, Int) = (1, 8)
@@ -177,7 +177,7 @@ JreVersionHelper.jreVersion
 The `ProgressBar` represents a widget to print a dynamic progress bar in a console.
 
 ```scala mdoc:compile-only
-import com.velocidi.apso.ProgressBar
+import com.kevel.apso.ProgressBar
 
 val progress = ProgressBar(100)
 
@@ -205,17 +205,17 @@ progress.tick(30)
 The `Reflect` object contains helpers for reflection-related tasks, namely to create an instance of a given class given its fully qualified name and also to access singleton objects:
 
 ```scala
-scala> import com.velocidi.apso.Reflect
-import com.velocidi.apso.Reflect
+scala> import com.kevel.apso.Reflect
+import com.kevel.apso.Reflect
 
-scala> import com.velocidi.apso.collection._
-import com.velocidi.apso.collection._
+scala> import com.kevel.apso.collection._
+import com.kevel.apso.collection._
 
-scala> Reflect.newInstance[HMap[Nothing]]("com.velocidi.apso.collection.HMap")
-res0: com.velocidi.apso.collection.HMap[Nothing] = HMap()
+scala> Reflect.newInstance[HMap[Nothing]]("com.kevel.apso.collection.HMap")
+res0: com.kevel.apso.collection.HMap[Nothing] = HMap()
 
-scala> Reflect.companion[Reflect.type]("com.velocidi.apso.Reflect")
-res1: com.velocidi.apso.Reflect.type = com.velocidi.apso.Reflect$@3b1dbca
+scala> Reflect.companion[Reflect.type]("com.kevel.apso.Reflect")
+res1: com.kevel.apso.Reflect.type = com.kevel.apso.Reflect$@3b1dbca
 ```
 
 ### Retry
@@ -227,7 +227,7 @@ import scala.concurrent._
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import com.velocidi.apso.Retry
+import com.kevel.apso.Retry
 
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -298,7 +298,7 @@ libraryDependencies += "com.velocidi" %% "apso-aws" % "@VERSION@"
 The `ConfigCredentialsProvider` is an `AWSCredentialsProvider` (from AWS SDK for Java) that retrieves credentials from a typesafe configuration, allowing customization of its `Config` object, as well as the access key and secret key paths:
 
 ```scala mdoc:silent
-import com.velocidi.apso.aws._
+import com.kevel.apso.aws._
 
 import com.typesafe.config._
 
@@ -351,7 +351,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import java.util.concurrent.atomic.AtomicInteger
 
-import com.velocidi.apso.caching._
+import com.kevel.apso.caching._
 
 val x = new AtomicInteger(0)
 
@@ -389,7 +389,7 @@ libraryDependencies += "com.velocidi" %% "apso-collections" % "@VERSION@"
 The `Trie` class is an implementation of an immutable trie. An example usage follows:
 
 ```scala mdoc:reset
-import com.velocidi.apso.collection._
+import com.kevel.apso.collection._
 
 val t = Trie[Char, Int]()
 
@@ -407,7 +407,7 @@ nt.get("five")
 The `TypedMap` is a map that associates types with values. It can be used as follows:
 
 ```scala mdoc:reset
-import com.velocidi.apso.collection._
+import com.kevel.apso.collection._
 
 val m = TypedMap("one", 2, 3L)
 
@@ -435,7 +435,7 @@ Apso provides some utility iterators.
 The `CircularIterator` is an iterator that iterates over its elements in a circular way. See the following for sample usage:
 
 ```scala mdoc:reset
-import com.velocidi.apso.iterator.CircularIterator
+import com.kevel.apso.iterator.CircularIterator
 
 val circularIterator = CircularIterator(List(1, 2, 3).iterator)
 
@@ -447,7 +447,7 @@ circularIterator.take(10).toList
 The `MergedBufferedIterator` is a collection of sorted `BufferedIterators` that allows traversing them in order, while also providing a `mergeSorted` method to merge with another sorted `BufferedIterator`. See the following for sample usage:
 
 ```scala mdoc:reset
-import com.velocidi.apso.iterator.MergedBufferedIterator
+import com.kevel.apso.iterator.MergedBufferedIterator
 
 val it1 = MergedBufferedIterator(List(
          (0 to 3).iterator.buffered,
@@ -480,7 +480,7 @@ by loading a `KeyStore` file holding a symmetric key, and its use to encrypt and
 decrypt data:
 
 ```scala mdoc:compile-only
-import com.velocidi.apso.encryption._
+import com.kevel.apso.encryption._
 
 val encryptor = Encryptor("AES", getClass.getResourceAsStream("/keystoreFile.jceks"), "keystorePass", "keyAlias", "keyPass")
 
@@ -502,7 +502,7 @@ libraryDependencies += "com.velocidi" %% "apso-hashing" % "@VERSION@"
 ```
 
 ```scala mdoc:reset
-import com.velocidi.apso.hashing.Implicits._
+import com.kevel.apso.hashing.Implicits._
 
 "abcd".md5
 
@@ -532,8 +532,8 @@ Apso introduces the concept of a `FileDescriptor`: a representation of a file st
 The `ResourceUtil` object provides methods to access files available through Java's runtime environment classpath:
 
 ```scala mdoc:compile-only
-import com.velocidi.apso.io.ResourceUtil
-// import com.velocidi.apso.io.ResourceUtil
+import com.kevel.apso.io.ResourceUtil
+// import com.kevel.apso.io.ResourceUtil
 
 ResourceUtil.getResourceURL("reference.conf")
 // res0: String = /Users/jcazevedo/work/apso/apso/target/scala-2.11/classes/reference.conf
@@ -574,7 +574,7 @@ The `ExtraJsonProtocol` object combines three traits that provide extra `Encoder
 The `json` package provides some implicits around [circe](https://circe.github.io/circe/)'s `Json` to unwrap JSON values, merge two `Json` and create `Json` from a sequence of dot-separated paths with the corresponding leaf values. It also provides methods to access and delete fields on the `Json` object. See the following for sample usage:
 
 ```scala mdoc:reset:silent
-import com.velocidi.apso.circe.Implicits._
+import com.kevel.apso.circe.Implicits._
 import io.circe.syntax._
 import io.circe.Json
 
@@ -612,7 +612,7 @@ js1.deleteField("x")
 The `JsonConvert` object contains helpers for converting between JSON values and other structures. See the following for sample usage:
 
 ```scala mdoc:reset
-import com.velocidi.apso.circe._
+import com.kevel.apso.circe._
 
 JsonConvert.toJson("abcd")
 
@@ -654,9 +654,9 @@ See the following sample usages:
 ```scala mdoc:reset
 import com.github.nscala_time.time.Imports._
 
-import com.velocidi.apso.time._
+import com.kevel.apso.time._
 
-import com.velocidi.apso.time.Implicits._
+import com.kevel.apso.time.Implicits._
 
 (new DateTime("2012-01-01") to new DateTime("2012-01-01")).toList
 
