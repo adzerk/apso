@@ -161,6 +161,8 @@ lazy val commonSettings = Seq(
   // format: on
 )
 
+ThisBuild / sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
+
 releaseCrossBuild    := true
 releaseTagComment    := s"Release ${(ThisBuild / version).value}"
 releaseCommitMessage := s"Set version to ${(ThisBuild / version).value}"
