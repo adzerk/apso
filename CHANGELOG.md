@@ -18,6 +18,86 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.19.7] - 2024-10-16
+
+This release includes some bug fixes and dependency updates. It will also be last version of Apso published under the
+`com.velocidi` namespace. Future releases will start using the `com.kevel` namespace.
+
+### Added
+- Force empty line after top-level package statement ([#727](https://github.com/adzerk/apso/pull/727)).
+
+### Changed
+- Update shapeless to 2.3.12 ([#680](https://github.com/adzerk/apso/pull/680)).
+- Update aws-java-sdk-core to 1.12.726 ([#681](https://github.com/adzerk/apso/pull/681)).
+- Update aws-java-sdk-core to 1.12.731 ([#683](https://github.com/adzerk/apso/pull/683)).
+- Update cats-core to 2.12.0 ([#684](https://github.com/adzerk/apso/pull/684)).
+- Update aws-java-sdk-s3 to 1.12.733 ([#685](https://github.com/adzerk/apso/pull/685)).
+- Update aws-java-sdk-s3 to 1.12.739 ([#687](https://github.com/adzerk/apso/pull/687)).
+- Update specs2-common, specs2-core, ... to 4.20.7 ([#688](https://github.com/adzerk/apso/pull/688)).
+- Update aws-java-sdk-core to 1.12.742 ([#689](https://github.com/adzerk/apso/pull/689)).
+- Update aws-java-sdk-s3 to 1.12.744 ([#690](https://github.com/adzerk/apso/pull/690)).
+- Update scalafmt-core to 3.8.2 ([#691](https://github.com/adzerk/apso/pull/691)).
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.748 ([#696](https://github.com/adzerk/apso/pull/696)).
+- Update circe-core, circe-generic, ... to 0.14.8 ([#697](https://github.com/adzerk/apso/pull/697)).
+- Update sbt-mdoc to 2.5.3 ([#698](https://github.com/adzerk/apso/pull/698)).
+- Update scalatest-core to 3.2.19 ([#699](https://github.com/adzerk/apso/pull/699)).
+- Update aws-java-sdk-s3 to 1.12.750 ([#700](https://github.com/adzerk/apso/pull/700)).
+- Update pekko-actor, ... to 1.0.3 ([#701](https://github.com/adzerk/apso/pull/701)).
+- Update sbt-sonatype to 3.11.0 ([#702](https://github.com/adzerk/apso/pull/702)).
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.756 ([#703](https://github.com/adzerk/apso/pull/703)).
+- Update circe-core, circe-generic, ... to 0.14.9 ([#704](https://github.com/adzerk/apso/pull/704)).
+- Update aws-java-sdk-s3 to 1.12.759 ([#705](https://github.com/adzerk/apso/pull/705)).
+- Update sbt to 1.10.1 ([#706](https://github.com/adzerk/apso/pull/706)).
+- Update sbt-mdoc to 2.5.4 ([#707](https://github.com/adzerk/apso/pull/707)).
+- Update specs2-common, specs2-core, ... to 4.20.8 ([#708](https://github.com/adzerk/apso/pull/708)).
+- Update aws-java-sdk-core to 1.12.761 ([#709](https://github.com/adzerk/apso/pull/709)).
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.762 ([#710](https://github.com/adzerk/apso/pull/710)).
+- Update commons-codec to 1.17.1 ([#711](https://github.com/adzerk/apso/pull/711)).
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.765 ([#712](https://github.com/adzerk/apso/pull/712)).
+- Update unirest-java-core to 4.4.4 ([#713](https://github.com/adzerk/apso/pull/713)).
+- Update scalafmt-core to 3.8.3 ([#714](https://github.com/adzerk/apso/pull/714)).
+- Update sbt-sonatype to 3.11.1 ([#715](https://github.com/adzerk/apso/pull/715)).
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.767 ([#716](https://github.com/adzerk/apso/pull/716)).
+- Update sbt-sonatype to 3.11.2 ([#717](https://github.com/adzerk/apso/pull/717)).
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.768 ([#718](https://github.com/adzerk/apso/pull/718)).
+- Update aws-java-sdk-s3 to 1.12.769 ([#719](https://github.com/adzerk/apso/pull/719)).
+- Update sbt-sonatype to 3.11.3 ([#720](https://github.com/adzerk/apso/pull/720)).
+- Update aws-java-sdk-core to 1.12.770 ([#721](https://github.com/adzerk/apso/pull/721)).
+- Update pekko-actor, ... to 1.1.0 ([#722](https://github.com/adzerk/apso/pull/722)).
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.771 ([#723](https://github.com/adzerk/apso/pull/723)).
+- Update scala-library to 2.12.20 ([#724](https://github.com/adzerk/apso/pull/724)).
+- Update circe-core, circe-generic, ... to 0.14.10 ([#725](https://github.com/adzerk/apso/pull/725)).
+- Update log4j-core, log4j-slf4j-impl to 2.24.0 ([#726](https://github.com/adzerk/apso/pull/726)).
+- Update aws-java-sdk-s3 to 1.12.772 ([#728](https://github.com/adzerk/apso/pull/728)).
+- Update sshj to 0.39.0 ([#729](https://github.com/adzerk/apso/pull/729)).
+- Update pekko-actor, ... to 1.1.1 ([#730](https://github.com/adzerk/apso/pull/730)).
+- Update joda-time to 2.13.0 ([#731](https://github.com/adzerk/apso/pull/731)).
+- Update sbt to 1.10.2 ([#732](https://github.com/adzerk/apso/pull/732)).
+- Update scalacheck to 1.18.1 ([#733](https://github.com/adzerk/apso/pull/733)).
+- Update sbt-mdoc to 2.6.0 ([#734](https://github.com/adzerk/apso/pull/734)).
+- Update sbt-mdoc to 2.6.1 ([#735](https://github.com/adzerk/apso/pull/735)).
+- Update scala-library to 2.13.15 ([#736](https://github.com/adzerk/apso/pull/736)).
+- Update sbt-scalafix to 0.13.0 ([#737](https://github.com/adzerk/apso/pull/737)).
+- Update nscala-time to 2.34.0 ([#738](https://github.com/adzerk/apso/pull/738)).
+- Update log4j-core, log4j-slf4j-impl to 2.24.1 ([#739](https://github.com/adzerk/apso/pull/739)).
+- Update pekko-http, pekko-http-core, ... to 1.1.0 ([#740](https://github.com/adzerk/apso/pull/740)).
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.773 ([#741](https://github.com/adzerk/apso/pull/741)).
+- Update sbt-pgp to 2.3.0 ([#742](https://github.com/adzerk/apso/pull/742)).
+- Update pekko-actor-testkit-typed to 1.1.2 ([#743](https://github.com/adzerk/apso/pull/743)).
+- Update sbt-sonatype to 3.12.0 ([#744](https://github.com/adzerk/apso/pull/744)).
+- Update sbt-sonatype to 3.12.2 ([#746](https://github.com/adzerk/apso/pull/746)).
+- Update specs2-common, specs2-core, ... to 4.20.9 ([#747](https://github.com/adzerk/apso/pull/747)).
+
+### Removed
+- Remove the coursier/cache-action step ([#695](https://github.com/adzerk/apso/pull/695)).
+
+### Fixed
+- Fix race condition in LruCache when handling exceptions ([#692](https://github.com/adzerk/apso/pull/692)).
+- Fix `ValueMagnet` implicit conversion from `Any` ([#693](https://github.com/adzerk/apso/pull/693)).
+- Fix release date of 0.19.6 in the Changelog ([#694](https://github.com/adzerk/apso/pull/694)).
+
+[0.19.7]: https://github.com/adzerk/apso/compare/v0.19.6...v0.19.7
+
 ## [0.19.6] - 2024-05-17
 
 This release introduces a new configuration key, `aws.s3.max-connections`, for the maximum allowed connections of the S3
