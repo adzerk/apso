@@ -1,6 +1,6 @@
 <p align="center"><img src="https://raw.githubusercontent.com/adzerk/apso/master/apso.png"/></p>
 
-# Apso [![Build Status](https://github.com/adzerk/apso/workflows/CI/badge.svg?branch=master)](https://github.com/adzerk/apso/actions?query=workflow%3ACI+branch%3Amaster) [![Maven Central](https://img.shields.io/maven-central/v/com.velocidi/apso_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/com.velocidi/apso_2.12)
+# Apso [![Build Status](https://github.com/adzerk/apso/workflows/CI/badge.svg?branch=master)](https://github.com/adzerk/apso/actions?query=workflow%3ACI+branch%3Amaster) [![Maven Central](https://img.shields.io/maven-central/v/com.kevel/apso_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/com.kevel/apso_2.12)
 
 Apso is Kevel's collection of Scala utility libraries. It provides a series of useful methods.
 
@@ -11,7 +11,7 @@ Apso's latest release is built against Scala 2.12 and Scala 2.13.
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso" % "@VERSION@"
+libraryDependencies += "com.kevel" %% "apso" % "@VERSION@"
 ```
 
 The project is divided in modules, you can instead install only a specific module.
@@ -19,7 +19,7 @@ The project is divided in modules, you can instead install only a specific modul
 The TestKit is available under the `apso-testkit` project. You can include it only for the `test` configuration:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-testkit" % "@VERSION@" % "test"
+libraryDependencies += "com.kevel" %% "apso-testkit" % "@VERSION@" % "test"
 ```
 
 Please take into account that the library is still in an experimental stage and the interfaces might change for subsequent releases.
@@ -69,7 +69,7 @@ Please take into account that the library is still in an experimental stage and 
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-core" % "@VERSION@"
+libraryDependencies += "com.kevel" %% "apso-core" % "@VERSION@"
 ```
 
 ### Config
@@ -268,7 +268,7 @@ The same features are provided for Pekko under the `pekko-http` module.
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-akka-http" % "@VERSION@"
+libraryDependencies += "com.kevel" %% "apso-akka-http" % "@VERSION@"
 ```
 
 ### ClientIPDirectives
@@ -290,7 +290,7 @@ Apso provides a group of classes to ease the interaction with the Amazon Web Ser
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-aws" % "@VERSION@"
+libraryDependencies += "com.kevel" %% "apso-aws" % "@VERSION@"
 ```
 
 ### ConfigCredentialsProvider
@@ -337,7 +337,7 @@ The `apso-caching` module provides provides utilities for caching.
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-caching" % "@VERSION@"
+libraryDependencies += "com.kevel" %% "apso-caching" % "@VERSION@"
 ```
 
 Apso provides utilities to simplify the caching of method calls, with [ScalaCache](https://cb372.github.io/scalacache/) and using either `Guava` or `Caffeine` as underlying cache implementations.
@@ -381,7 +381,7 @@ y
 The `apso-collections` module provides some helpful collections. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-collections" % "@VERSION@"
+libraryDependencies += "com.kevel" %% "apso-collections" % "@VERSION@"
 ```
 
 ### Trie
@@ -472,7 +472,7 @@ creation of the underlying Cyphers.
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-encryption" % "@VERSION@"
+libraryDependencies += "com.kevel" %% "apso-encryption" % "@VERSION@"
 ```
 
 The following shows the creation of `Encryptor` and `Decryptor` objects,
@@ -498,7 +498,7 @@ decryptor.get.decryptToString(encryptor.get.encryptToSafeString(secretData).get)
 Apso provides utilities for various hashing functions. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-hashing" % "@VERSION@"
+libraryDependencies += "com.kevel" %% "apso-hashing" % "@VERSION@"
 ```
 
 ```scala mdoc:reset
@@ -516,7 +516,7 @@ Apso provides methods to deal with IO-related features in the `io` module.
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-io" % "@VERSION@"
+libraryDependencies += "com.kevel" %% "apso-io" % "@VERSION@"
 ```
 
 ### FileDescriptor
@@ -559,7 +559,7 @@ ResourceUtil.getResourceAsString("reference.conf")
 Apso includes a bunch of utilities to work with JSON serialization and deserialization, specifically with the [circe](https://circe.github.io/circe/) library. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-circe" % "@VERSION@"
+libraryDependencies += "com.kevel" %% "apso-circe" % "@VERSION@"
 ```
 
 ### ExtraJsonProtocol
@@ -628,7 +628,7 @@ The `profiling` module of apso provides utilities to help with profiling the run
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-profiling" % "@VERSION@"
+libraryDependencies += "com.kevel" %% "apso-profiling" % "@VERSION@"
 ```
 
 ### CpuSampler
@@ -646,7 +646,7 @@ The `apso-time` module provides utilities to work with `DateTime` and `LocalDate
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.velocidi" %% "apso-time" % "@VERSION@"
+libraryDependencies += "com.kevel" %% "apso-time" % "@VERSION@"
 ```
 
 See the following sample usages:

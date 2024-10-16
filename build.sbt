@@ -2,7 +2,7 @@ import ReleaseTransformations._
 import spray.boilerplate.BoilerplatePlugin
 import xerial.sbt.Sonatype.sonatypeCentralHost
 
-ThisBuild / organization := "com.velocidi"
+ThisBuild / organization := "com.kevel"
 
 ThisBuild / crossScalaVersions := Seq("2.12.20", "2.13.15")
 ThisBuild / scalaVersion       := "2.13.15"
@@ -85,7 +85,7 @@ lazy val docs = (project in file("apso-docs"))
     mdocOut := (ThisBuild / baseDirectory).value,
 
     mdocVariables := Map(
-      "VERSION" -> "0.18.8" // This version should be set to the currently released version.
+      "VERSION" -> "0.20.0" // This version should be set to the currently released version.
     ),
 
     publish / skip := true
@@ -161,6 +161,8 @@ lazy val commonSettings = Seq(
   )
   // format: on
 )
+
+ThisBuild / sonatypeCredentialHost := sonatypeCentralHost
 
 releaseCrossBuild    := true
 releaseTagComment    := s"Release ${(ThisBuild / version).value}"

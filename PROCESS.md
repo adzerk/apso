@@ -26,15 +26,10 @@ following the template.
 
 It's recommended to open a PR with the Changelog changes so that they can be reviewed by someone else from the team.
 
-### Publishing a snapshot version
-
-To publish a snapshot version to [Nexus Sonatype](https://oss.sonatype.org), simply use `sbt` to run `+publish`. The
-version will be published in [Sonatype's snapshots repository, under the Velocidi organization](https://oss.sonatype.org/content/repositories/snapshots/com/velocidi/).
-
 ### Releasing artifacts
 
 To release the artifacts in the Sonatype's release repository, which eventually gets synced to
-[Maven Central](https://repo1.maven.org/maven2/com/velocidi/), simply use `sbt` to run `release`.
+[Maven Central](https://repo1.maven.org/maven2/com/kevel), simply use `sbt` to run `release`.
 
 This will result in the releasing of all the `apso-*` libraries. Please ensure you are using Java 11 when releasing
 new versions.
