@@ -7,7 +7,7 @@ object Dependencies {
     val Pekko                   = "1.1.2"
     val PekkoHttp               = "1.1.0"
     val Aws                     = "1.12.777"
-    val BouncyCastle            = "1.78.1"
+    val BouncyCastle            = "1.79"
     val Cats                    = "2.12.0"
     val Circe                   = "0.14.10"
     val CommonsCodec            = "1.17.1"
