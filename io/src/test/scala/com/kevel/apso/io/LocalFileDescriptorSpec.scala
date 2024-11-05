@@ -1,6 +1,7 @@
 package com.kevel.apso.io
 
 import java.io.{File, InputStream}
+import java.net.URI
 import java.nio.file.Files
 import java.util.UUID
 
@@ -21,6 +22,13 @@ class LocalFileDescriptorSpec extends Specification {
       val file = new File("/tmp/one/two/three")
       val fd = LocalFileDescriptor("/tmp/one/two/three")
       file.getAbsolutePath == fd.path
+    }
+
+    "have a correct URI that exposes the full path" in {
+      val file = new File("/tmp/one/two/three")
+      val fd = LocalFileDescriptor("/tmp/one/two/three")
+      fd.uri ==== new URI("file:///tmp/one/two/three")
+      file.toURI() ==== fd.uri
     }
 
     "retrieve the size of a file" in {

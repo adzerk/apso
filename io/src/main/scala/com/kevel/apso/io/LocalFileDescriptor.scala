@@ -1,6 +1,7 @@
 package com.kevel.apso.io
 
 import java.io.{FileInputStream, FileWriter, InputStream}
+import java.net.URI
 import java.nio.file.{Files, Path, Paths, StandardCopyOption}
 
 import scala.io.Source
@@ -20,6 +21,9 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
   }
 
   lazy val path: String = file.getAbsolutePath
+
+  def uri: URI =
+    new URI(s"file://$path")
 
   lazy val name: String = file.getName
 
@@ -208,7 +212,8 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
     */
   def readString: String = Source.fromFile(file, "UTF-8").mkString
 
-  override def toString: String = s"file://$path"
+  override def toString: String =
+    uri.toString
 
   override def equals(other: Any): Boolean = other match {
     case that: LocalFileDescriptor => path == that.path

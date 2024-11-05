@@ -1,6 +1,7 @@
 package com.kevel.apso.io
 
 import java.io.{FileDescriptor => _, _}
+import java.net.URI
 import java.util.concurrent.{ConcurrentHashMap, TimeoutException}
 
 import scala.concurrent.duration._
@@ -99,6 +100,10 @@ case class SftpFileDescriptor(
       _fileAttributes = Some(sftp(_.stat(path)))
       withFileAttributes(f)
   }
+
+  def uri: URI =
+    if (port != 22) new URI(s"sftp://$username@$host:$port$path")
+    else new URI(s"sftp://$username@$host$path")
 
   def size = withFileAttributes(_.getSize)
 
@@ -200,8 +205,7 @@ case class SftpFileDescriptor(
   }
 
   override def toString: String =
-    if (port != 22) s"sftp://$username@$host:$port$path"
-    else s"sftp://$username@$host$path"
+    uri.toString
 
   override def equals(other: Any): Boolean = other match {
     case that: SftpFileDescriptor =>

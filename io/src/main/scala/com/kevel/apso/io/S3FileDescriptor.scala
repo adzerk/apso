@@ -1,6 +1,7 @@
 package com.kevel.apso.io
 
 import java.io.InputStream
+import java.net.URI
 
 import scala.collection.concurrent.TrieMap
 
@@ -28,6 +29,9 @@ case class S3FileDescriptor(
 
   protected def duplicate(elements: List[String]) =
     this.copy(elements = elements)
+
+  def uri: URI =
+    new URI(s"s3://$path")
 
   def size = summary match {
     case Some(info) => info.getSize
@@ -134,7 +138,8 @@ case class S3FileDescriptor(
     result
   }
 
-  override def toString: String = s"s3://$path"
+  override def toString: String =
+    uri.toString
 }
 
 object S3FileDescriptor {

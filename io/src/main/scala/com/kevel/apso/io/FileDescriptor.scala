@@ -1,6 +1,7 @@
 package com.kevel.apso.io
 
 import java.io.InputStream
+import java.net.URI
 
 import scala.io.Source
 
@@ -14,6 +15,13 @@ trait FileDescriptor {
     *   the unique identifier of this file in its location.
     */
   def path: String
+
+  /** Returns a Uniform Resource Identifier (URI) that references this file's location.
+    *
+    * @return
+    *   the URI that references this file's location.
+    */
+  def uri: URI
 
   /** The name of the file associated with the file descriptor.
     * @return
