@@ -18,6 +18,37 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.21.0] - 2024-11-06
+
+In this release we have added a `uri` method to the `FileDescriptor` data type. The `uri` method can be used to produce
+a `java.net.URI` from a `FileDescriptor`.
+
+```scala
+import com.kevel.apso.io._
+
+val localFD = FileDescriptor("file:///tmp/one/two/three")
+localFD.uri
+// Returns java.net.URI = file:///tmp/one/two/three
+
+val s3FD = FileDescriptor("s3://my-bucket/key")
+s3FD.uri
+// Returns java.net.URI = s3://my-bucket/key
+```
+
+### Added
+- Add a `uri` method to `FileDescriptor` ([#756](https://github.com/adzerk/apso/pull/756)).
+
+### Changed
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.776 ([#749](https://github.com/adzerk/apso/pull/749)).
+- Update sbt, scripted-plugin to 1.10.3 ([#750](https://github.com/adzerk/apso/pull/750)).
+- Update aws-java-sdk-s3 to 1.12.777 ([#751](https://github.com/adzerk/apso/pull/751)).
+- Update sbt, scripted-plugin to 1.10.4 ([#752](https://github.com/adzerk/apso/pull/752)).
+- Update bcpkix-jdk18on, bcprov-jdk18on to 1.79 ([#753](https://github.com/adzerk/apso/pull/753)).
+- Update unirest-java-core to 4.4.5 ([#754](https://github.com/adzerk/apso/pull/754)).
+- Update sbt, scripted-plugin to 1.10.5 ([#755](https://github.com/adzerk/apso/pull/755)).
+
+[0.21.0]: https://github.com/adzerk/apso/compare/v0.20.0...v0.21.0
+
 ## [0.20.0] - 2024-10-16
 
 This release is an exact copy of v0.19.7, but now published under the `com.kevel` namespace.
