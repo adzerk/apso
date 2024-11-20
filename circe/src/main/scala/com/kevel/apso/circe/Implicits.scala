@@ -1,5 +1,6 @@
 package com.kevel.apso.circe
 
+import scala.annotation.tailrec
 import scala.util.Try
 
 import io.circe._
@@ -110,10 +111,13 @@ object Implicits {
     *   the sequence of dot-separated (or other separator) paths
     * @param separatorRegex
     *   regex to use to separate fields
+    * @param acc
+    *   accumulator for the resulting Json object
     * @return
     *   the resulting Json object
     */
-  def fromFullPaths(paths: Seq[(String, Json)], separatorRegex: String = "\\."): Json = {
+  @tailrec
+  def fromFullPaths(paths: Seq[(String, Json)], separatorRegex: String = "\\.", acc: Json = Json.obj()): Json = {
     def createJson(keys: Seq[String], value: Json): Json = {
       keys match {
         case Nil    => value
@@ -122,9 +126,10 @@ object Implicits {
     }
 
     paths match {
-      case Nil => Json.obj()
+      case Nil => acc
       case (path, value) :: rem =>
-        createJson(path.split(separatorRegex).toList, value).deepMerge(fromFullPaths(rem, separatorRegex))
+        val newAcc = acc.deepMerge(createJson(path.split(separatorRegex).toList, value))
+        fromFullPaths(rem, separatorRegex, newAcc)
     }
   }
 
