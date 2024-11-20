@@ -111,13 +111,10 @@ object Implicits {
     *   the sequence of dot-separated (or other separator) paths
     * @param separatorRegex
     *   regex to use to separate fields
-    * @param acc
-    *   accumulator for the resulting Json object
     * @return
     *   the resulting Json object
     */
-  @tailrec
-  def fromFullPaths(paths: Seq[(String, Json)], separatorRegex: String = "\\.", acc: Json = Json.obj()): Json = {
+  def fromFullPaths(paths: Seq[(String, Json)], separatorRegex: String = "\\."): Json = {
     def createJson(keys: Seq[String], value: Json): Json = {
       keys match {
         case Nil    => value
@@ -125,12 +122,17 @@ object Implicits {
       }
     }
 
-    paths match {
-      case Nil => acc
-      case (path, value) :: rem =>
-        val newAcc = acc.deepMerge(createJson(path.split(separatorRegex).toList, value))
-        fromFullPaths(rem, separatorRegex, newAcc)
+    @tailrec
+    def fromFullPathsRec(paths: Seq[(String, Json)], acc: Json): Json = {
+      paths match {
+        case Nil => acc
+        case (path, value) :: rem =>
+          val newAcc = acc.deepMerge(createJson(path.split(separatorRegex).toList, value))
+          fromFullPathsRec(rem, newAcc)
+      }
     }
+
+    fromFullPathsRec(paths, Json.obj())
   }
 
   final implicit class ApsoJsonEncoder[A](val encoder: Encoder[A]) extends AnyVal {
