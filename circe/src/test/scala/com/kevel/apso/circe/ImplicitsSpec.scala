@@ -26,6 +26,11 @@ class ImplicitsSpec extends Specification {
 
         res mustEqual expectedJson
       }
+
+      "not throw a StackOverflowError for large lists of paths" in {
+        val paths = (1 to 10000).map(i => (s"a.v$i", i.asJson)).toList
+        fromFullPaths(paths, ".") must not(throwAn[StackOverflowError])
+      }
     }
 
     "provide a method to get the key set of a JSON Object" in {
