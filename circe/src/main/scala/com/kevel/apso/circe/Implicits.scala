@@ -1,5 +1,6 @@
 package com.kevel.apso.circe
 
+import scala.annotation.tailrec
 import scala.util.Try
 
 import io.circe._
@@ -121,11 +122,17 @@ object Implicits {
       }
     }
 
-    paths match {
-      case Nil => Json.obj()
-      case (path, value) :: rem =>
-        createJson(path.split(separatorRegex).toList, value).deepMerge(fromFullPaths(rem, separatorRegex))
+    @tailrec
+    def fromFullPathsRec(paths: Seq[(String, Json)], acc: Json): Json = {
+      paths match {
+        case Nil => acc
+        case (path, value) :: rem =>
+          val newAcc = acc.deepMerge(createJson(path.split(separatorRegex).toList, value))
+          fromFullPathsRec(rem, newAcc)
+      }
     }
+
+    fromFullPathsRec(paths, Json.obj())
   }
 
   final implicit class ApsoJsonEncoder[A](val encoder: Encoder[A]) extends AnyVal {
