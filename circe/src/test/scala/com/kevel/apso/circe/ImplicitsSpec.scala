@@ -33,8 +33,11 @@ class ImplicitsSpec extends Specification {
       }
 
       "giving precedence to the last path value if duplicate paths exist" in {
-        val res = fromFullPaths(List("a" -> 1.asJson, "a" -> 2.asJson, "a" -> 3.asJson))
-        res mustEqual json"""{"a": 3}"""
+        val json1 = fromFullPaths(List("a" -> 1.asJson, "a" -> 2.asJson, "a" -> 3.asJson))
+        json1 mustEqual json"""{"a": 3}"""
+
+        val json2 = fromFullPaths(List("a.b.c" -> 1.asJson, "a.b" -> 2.asJson, "a" -> 3.asJson))
+        json2 mustEqual json"""{"a": 3}"""
       }
     }
 
