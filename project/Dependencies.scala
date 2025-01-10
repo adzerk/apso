@@ -4,7 +4,7 @@ object Dependencies {
   object Versions {
     val Akka                    = "2.6.20"
     val AkkaHttp                = "10.2.10"
-    val Pekko                   = "1.1.2"
+    val Pekko                   = "1.1.3"
     val PekkoHttp               = "1.1.0"
     val Aws                     = "1.12.780"
     val BouncyCastle            = "1.79"
