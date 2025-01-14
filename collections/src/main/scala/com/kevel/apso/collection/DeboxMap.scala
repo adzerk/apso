@@ -200,7 +200,8 @@ final class DeboxMap[
       if (status == 3 && keys(j) == key) {
         buckets(j) = 2
         len -= 1
-      } else if (status == 0) {} else {
+      } else if (status == 0) {}
+      else {
         loop((i << 2) + i + perturbation + 1, perturbation >> 5)
       }
     }

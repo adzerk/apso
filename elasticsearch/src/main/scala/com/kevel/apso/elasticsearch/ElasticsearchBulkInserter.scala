@@ -218,8 +218,7 @@ class ElasticsearchBulkInserter(
     super.postStop()
 
     log.info("Stopping Bulk Inserter...")
-    val stop = if (buffer.nonEmpty) flush().andThen { case _ => client.close() }
-    else Future(client.close())
+    val stop = if (buffer.nonEmpty) flush().andThen { case _ => client.close() } else Future(client.close())
 
     Try(Await.result(stop, timeoutOnStop)).failed.foreach { ex =>
       logErrorOrWarning("Failed to cleanly stop Bulk Inserter!", Some(ex))
