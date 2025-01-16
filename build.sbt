@@ -4,8 +4,8 @@ import xerial.sbt.Sonatype.sonatypeCentralHost
 
 ThisBuild / organization := "com.kevel"
 
-ThisBuild / crossScalaVersions := Seq("2.12.20", "2.13.15")
-ThisBuild / scalaVersion       := "2.13.15"
+ThisBuild / crossScalaVersions := Seq("2.12.20", "2.13.16")
+ThisBuild / scalaVersion       := "2.13.16"
 
 val javaVersion = "11"
 
