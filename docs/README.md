@@ -1,6 +1,6 @@
 <p align="center"><img src="https://raw.githubusercontent.com/adzerk/apso/master/apso.png"/></p>
 
-# Apso [![Build Status](https://github.com/adzerk/apso/workflows/CI/badge.svg?branch=master)](https://github.com/adzerk/apso/actions?query=workflow%3ACI+branch%3Amaster) [![Maven Central](https://img.shields.io/maven-central/v/com.kevel/apso_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/com.kevel/apso_2.12)
+# Apso [![Build Status](https://github.com/adzerk/apso/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/adzerk/apso/actions/workflows/ci.yml?query=workflow%3ACI+branch%3Amaster) [![Maven Central](https://img.shields.io/maven-central/v/com.kevel/apso_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/com.kevel/apso_2.12)
 
 Apso is Kevel's collection of Scala utility libraries. It provides a series of useful methods.
 
