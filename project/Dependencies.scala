@@ -16,7 +16,7 @@ object Dependencies {
     val Elasticsearch           = "7.16.3"
     val FastMd5                 = "2.7.1"
     val JUnit                   = "4.13.2"
-    val JodaTime                = "2.13.0"
+    val JodaTime                = "2.13.1"
     val Log4J                   = "2.24.3"
     val NscalaTime              = "3.0.0"
     val ScalaCheck              = "1.18.1"
