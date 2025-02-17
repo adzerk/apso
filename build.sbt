@@ -156,7 +156,7 @@ lazy val commonSettings = Seq(
   scmInfo := Some(
     ScmInfo(
       url("https://github.com/adzerk/apso"),
-      "scm:git@github.com:adzerk/apso.git"
+      "scm:git:ssh://git@github.com/adzerk/apso.git"
     )
   )
   // format: on
