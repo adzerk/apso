@@ -131,7 +131,10 @@ lazy val encryption = module(project, "encryption")
   )
 
 lazy val hashing = module(project, "hashing")
-  .settings(crossScalaVersions := List(Versions.Scala212, Versions.Scala213), libraryDependencies ++= Seq(FastMd5))
+  .settings(
+    crossScalaVersions := List(Versions.Scala212, Versions.Scala213, Versions.Scala3),
+    libraryDependencies ++= Seq(FastMd5)
+  )
 
 lazy val io = module(project, "io")
   .dependsOn(aws, testkit % Test)
