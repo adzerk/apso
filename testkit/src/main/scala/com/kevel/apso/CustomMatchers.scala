@@ -10,7 +10,7 @@ import org.specs2.mutable.SpecificationLike
 trait CustomMatchers extends SpecificationLike {
   def serializationBufSize = 10000
 
-  def beSerializable[T <: AnyRef: ClassTag]: Matcher[T] = { obj: T =>
+  def beSerializable[T <: AnyRef: ClassTag]: Matcher[T] = (obj: T) => {
     val buffer = new ByteArrayOutputStream(serializationBufSize)
 
     val out = new ObjectOutputStream(buffer)

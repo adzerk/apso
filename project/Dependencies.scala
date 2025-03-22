@@ -2,6 +2,10 @@ import sbt._
 
 object Dependencies {
   object Versions {
+    val Scala212 = "2.12.20"
+    val Scala213 = "2.13.16"
+    val Scala3   = "3.3.5"
+
     val Pekko                   = "1.1.3"
     val PekkoHttp               = "1.1.0"
     val Aws                     = "1.12.782"
