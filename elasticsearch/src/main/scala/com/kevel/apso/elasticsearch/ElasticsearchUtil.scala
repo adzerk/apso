@@ -1,4 +1,4 @@
-package com.kevel.apso.elasticsearch.pekko
+package com.kevel.apso.elasticsearch
 
 import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.http.JavaClient

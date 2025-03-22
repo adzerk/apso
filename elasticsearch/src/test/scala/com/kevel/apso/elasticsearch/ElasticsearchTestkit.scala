@@ -1,4 +1,4 @@
-package com.kevel.apso.elasticsearch.pekko
+package com.kevel.apso.elasticsearch
 
 import java.nio.file.Files
 
