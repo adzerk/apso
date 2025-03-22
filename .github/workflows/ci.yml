@@ -37,7 +37,7 @@ jobs:
 
       - name: Compile and check format
         run: >-
-          sbt ++${{ matrix.scala }} scalafmtSbt Test/compile &&
+          sbt "++${{ matrix.scala }} Test/compile" scalafmtSbt &&
           git diff --exit-code
 
       - name: Run tests
