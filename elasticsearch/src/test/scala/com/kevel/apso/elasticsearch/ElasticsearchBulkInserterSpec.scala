@@ -2,13 +2,13 @@ package com.kevel.apso.elasticsearch
 
 import scala.concurrent.duration._
 
-import akka.actor._
-import akka.testkit._
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.RequestSuccess
 import com.sksamuel.elastic4s.requests.searches._
 import io.circe.Json
 import io.circe.syntax._
+import org.apache.pekko.actor._
+import org.apache.pekko.testkit._
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.matcher.Matcher
 import org.specs2.mutable.SpecificationLike

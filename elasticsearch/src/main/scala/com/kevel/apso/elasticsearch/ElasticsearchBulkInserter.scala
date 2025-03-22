@@ -5,13 +5,13 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
-import akka.actor._
-import akka.dispatch.ControlMessage
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.requests.bulk.{BulkResponse, BulkResponseItem}
 import com.sksamuel.elastic4s.requests.indexes.IndexRequest
 import com.sksamuel.elastic4s.{ElasticClient, Indexable}
 import io.circe.Json
+import org.apache.pekko.actor._
+import org.apache.pekko.dispatch.ControlMessage
 
 /** An actor responsible for inserting tracking events into Elasticsearch. This actor buffers requests until either the
   * configured flush timer is triggered or the buffer hits the max size.

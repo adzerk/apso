@@ -36,7 +36,7 @@ Please take into account that the library is still in an experimental stage and 
     - [ProgressBar](#progressbar)
     - [Reflect](#reflect)
     - [Retry](#retry)
-- [Akka HTTP/Pekko HTTP](#akka-http--pekko-http)
+- [Pekko HTTP](#pekko-http)
     - [ClientIPDirectives](#clientipdirectives)
     - [ExtraMiscDirectives](#extramiscdirectives)
     - [ProxySupport](#proxysupport)
@@ -276,16 +276,14 @@ Retry.retry(10)(m())
 // res21: util.Try[Int] = Success(value = 6)
 ```
 
-## Akka HTTP / Pekko HTTP
+## Pekko HTTP
 
-The `akka-http` module provides additional [directives](https://doc.akka.io/docs/akka-http/current/routing-dsl/directives/index.html#directives) to be used in [akka-http](https://doc.akka.io/docs/akka-http/current/index.html).
-
-The same features are provided for Pekko under the `pekko-http` module.
+The `pekko-http` module provides additional [directives](https://pekko.apache.org/docs/pekko-http/current/routing-dsl/directives/) to be used in [pekko-http](https://pekko.apache.org/docs/pekko-http/current/).
 
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.kevel" %% "apso-akka-http" % "0.21.0"
+libraryDependencies += "com.kevel" %% "apso-pekko-http" % "0.21.0"
 ```
 
 ### ClientIPDirectives
@@ -298,7 +296,7 @@ The `ExtraMiscDirectives` trait exposes the directives `cacheControlMaxAge(maxAg
 
 ### ProxySupport
 
-The `ProxySupport` traits adds helper methods to proxy requests to a given uri, either directly (`proxyTo`), or with the unmatched path and query parameters of the current context (`proxyToUnmatchedPath`). In order for the client IP to be correctly propagated in `X-Forward-For` headers, the `ProxySupport` trait requires the `akka.http.server.remote-address-attribute` setting to be `on`.
+The `ProxySupport` traits adds helper methods to proxy requests to a given uri, either directly (`proxyTo`), or with the unmatched path and query parameters of the current context (`proxyToUnmatchedPath`). In order for the client IP to be correctly propagated in `X-Forward-For` headers, the `ProxySupport` trait requires the `pekko.http.server.remote-address-attribute` setting to be `on`.
 
 ## Amazon Web Services
 
