@@ -41,7 +41,7 @@ jobs:
           git diff --exit-code
 
       - name: Run tests
-        run: sbt -Dsbt.color=always ++${{ matrix.scala }} test
+        run: sbt -Dsbt.color=always "++${{ matrix.scala }} test"
 
       - name: Check mdoc for uncommitted changes
         run: sbt -Dsbt.color=always "docs/mdoc --check"
