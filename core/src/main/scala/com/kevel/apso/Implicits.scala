@@ -202,7 +202,7 @@ object Implicits {
       *   element can happen if the weights of the elements do not sum up to the maximum value of `r`.
       */
     @inline def monteCarlo[T](seq: Iterable[(T, Double)], r: Double = rand.nextDouble()): Option[T] =
-      monteCarlo(seq, { p: (T, Double) => p._2 }, r).map(_._1)
+      monteCarlo(seq, (p: (T, Double)) => p._2, r).map(_._1)
 
     /** Chooses a random element of a traversable using the reservoir sampling technique, traversing only once the given
       * sequence.
@@ -279,7 +279,7 @@ object Implicits {
       *   an infinite stream of weighted samples of a sequence.
       */
     @inline def samples[T](seq: Iterable[(T, Double)]): Iterator[T] =
-      samples(seq, { p: (T, Double) => p._2 }).map(_._1)
+      samples(seq, (p: (T, Double)) => p._2).map(_._1)
 
     /** Returns a decreasingly ordered stream of n doubles in [0, 1], according to a uniform distribution. More Info:
       * BENTLEY, SAXE, Generating Sorted Lists of Random Numbers

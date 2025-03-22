@@ -10,7 +10,7 @@ class TypedMap[T] private (val inner: Map[ClassTag[_], T]) {
   def -[A <: T: ClassTag](implicit ct: ClassTag[A]) = new TypedMap(inner - ct)
 
   def apply[A <: T: ClassTag](implicit ct: ClassTag[A]): A = inner(ct).asInstanceOf[A]
-  def get[A <: T: Manifest](implicit ct: ClassTag[A]): Option[A] = inner.get(ct).map(_.asInstanceOf[A])
+  def get[A <: T](implicit ct: ClassTag[A]): Option[A] = inner.get(ct).map(_.asInstanceOf[A])
   def getOrElse[A <: T: ClassTag](default: => A)(implicit ct: ClassTag[A]): A =
     inner.getOrElse(ct, default).asInstanceOf[A]
   def contains[A <: T: ClassTag](implicit ct: ClassTag[A]) = inner.contains(ct)

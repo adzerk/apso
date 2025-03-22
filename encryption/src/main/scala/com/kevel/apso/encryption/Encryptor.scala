@@ -18,17 +18,17 @@ class Encryptor(encryptor: Cipher) extends EncryptionErrorHandling with LazyLogg
 
   def encrypt(data: String, pad: Boolean = true): Option[String] = handle(
     EncryptionUtils.paddedUrlSafebase64(encryptor.doFinal(data.getBytes("UTF-8")), pad),
-    { ex: Throwable => logger.warn(s"Error while trying to encrypt data with padding '$pad': $data", ex) }
+    (ex: Throwable) => logger.warn(s"Error while trying to encrypt data with padding '$pad': $data", ex)
   )
 
   def encryptToSafeString(data: Array[Byte]): Option[String] = handle(
     Base64.encodeBase64URLSafeString(encryptor.doFinal(data)),
-    { ex: Throwable => logger.warn(s"Error while trying to encrypt data: $data", ex) }
+    (ex: Throwable) => logger.warn(s"Error while trying to encrypt data: $data", ex)
   )
 
   def encryptToSafeString(data: String): Option[String] = handle(
     Base64.encodeBase64URLSafeString(encryptor.doFinal(data.getBytes("UTF-8"))),
-    { ex: Throwable => logger.warn(s"Error while trying to encrypt data: $data", ex) }
+    (ex: Throwable) => logger.warn(s"Error while trying to encrypt data: $data", ex)
   )
 }
 
@@ -44,7 +44,7 @@ object Encryptor extends EncryptionUtils with LazyLogging {
       cipher.init(Cipher.ENCRYPT_MODE, key)
       cipher
     },
-    { ex: Throwable =>
+    (ex: Throwable) => {
       logger.warn(s"Cipher Transformation: $transformation")
       logger.warn("Cipher Key: " + key)
       logger.warn(s"Impossible to create Encryption Cipher!", ex)

@@ -38,7 +38,7 @@ object Decryptor extends EncryptionUtils with LazyLogging {
       cipher.init(Cipher.DECRYPT_MODE, key)
       cipher
     },
-    { ex: Throwable =>
+    (ex: Throwable) => {
       logger.warn(s"Cipher Transformation: $transformation")
       logger.warn("Cipher Key: " + key)
       logger.warn(s"Impossible to create Decryption Cipher!", ex)

@@ -2,6 +2,10 @@ import sbt._
 
 object Dependencies {
   object Versions {
+    val Scala212 = "2.12.20"
+    val Scala213 = "2.13.16"
+    val Scala3   = "3.3.5"
+
     val Pekko                   = "1.1.3"
     val PekkoHttp               = "1.1.0"
     val Aws                     = "1.12.782"
@@ -21,7 +25,6 @@ object Dependencies {
     val ScalaLogging            = "3.9.5"
     val ScalaPool               = "0.4.3"
     val ScalaTest               = "3.2.19"
-    val Shapeless               = "2.3.13"
     val SimpleJmx               = "2.2"
     val Specs2                  = "4.21.0"
     val Squants                 = "1.8.3"
@@ -71,7 +74,6 @@ object Dependencies {
   val ScalaLogging               = "com.typesafe.scala-logging"            %% "scala-logging"                % Versions.ScalaLogging
   val ScalaPool                  = "io.github.andrebeat"                   %% "scala-pool"                   % Versions.ScalaPool
   val ScalaTestCore              = "org.scalatest"                         %% "scalatest-core"               % Versions.ScalaTest
-  val Shapeless                  = "com.chuusai"                           %% "shapeless"                    % Versions.Shapeless
   val SimpleJmx                  = "com.j256.simplejmx"                     % "simplejmx"                    % Versions.SimpleJmx
   val Specs2Common               = "org.specs2"                            %% "specs2-common"                % Versions.Specs2
   val Specs2Core                 = "org.specs2"                            %% "specs2-core"                  % Versions.Specs2
