@@ -1,3 +1,4 @@
+import Dependencies._
 import ReleaseTransformations._
 import spray.boilerplate.BoilerplatePlugin
 import xerial.sbt.Sonatype.sonatypeCentralHost
@@ -18,23 +19,205 @@ def module(project: Project, moduleName: String) =
     .settings(name := s"apso-$moduleName")
     .settings(commonSettings: _*)
 
-lazy val akka               = module(project, "akka")
-lazy val akkaHttp           = module(project, "akka-http").dependsOn(core % Test, testkit % Test)
-lazy val aws                = module(project, "aws").dependsOn(core)
-lazy val caching            = module(project, "caching").enablePlugins(BoilerplatePlugin)
-lazy val circe              = module(project, "circe")
-lazy val collections        = module(project, "collections")
-lazy val core               = module(project, "core").dependsOn(testkit % Test)
-lazy val elasticsearch      = module(project, "elasticsearch").dependsOn(testkit % Test)
-lazy val elasticsearchPekko = module(project, "elasticsearch-pekko").dependsOn(testkit % Test)
-lazy val encryption         = module(project, "encryption")
-lazy val hashing            = module(project, "hashing")
-lazy val io                 = module(project, "io").dependsOn(aws, testkit % Test)
-lazy val pekko              = module(project, "pekko")
-lazy val pekkoHttp          = module(project, "pekko-http").dependsOn(core % Test, testkit % Test)
-lazy val profiling          = module(project, "profiling")
-lazy val testkit            = module(project, "testkit")
-lazy val time               = module(project, "time")
+lazy val akka = module(project, "akka").settings(libraryDependencies ++= Seq(AkkaActor % Provided))
+
+lazy val akkaHttp = module(project, "akka-http")
+  .dependsOn(core % Test, testkit % Test)
+  .settings(
+    libraryDependencies ++= Seq(
+      ScalaLogging,
+      AkkaActor             % Provided,
+      AkkaHttp              % Provided,
+      AkkaHttpCore          % Provided,
+      AkkaStream            % Provided,
+      ScalaLogging,
+      TypesafeConfig,
+      AkkaActorTestkitTyped % Test,
+      AkkaHttpTestkit       % Test,
+      Specs2Core            % Test
+    )
+  )
+
+lazy val aws = module(project, "aws")
+  .dependsOn(core)
+  .settings(
+    libraryDependencies ++= Seq(
+      ScalaLogging,
+      AwsJavaSdkS3,
+      AwsJavaSdkCore,
+      ScalaCollectionCompat,
+      ScalaLogging,
+      TypesafeConfig,
+      Specs2Core % Test
+    )
+  )
+
+lazy val caching = module(project, "caching")
+  .enablePlugins(BoilerplatePlugin)
+  .settings(
+    libraryDependencies ++= Seq(
+      "com.github.ben-manes.caffeine" % "caffeine"            % "2.7.0",    // This wasn't updated due to incompatibility with scalacache-caffeine
+      "com.github.cb372"             %% "scalacache-caffeine" % "0.28.0",
+      "com.github.cb372"             %% "scalacache-core"     % "0.28.0",
+      "com.github.cb372"             %% "scalacache-guava"    % "0.28.0",
+      "com.google.guava"              % "guava"               % "28.0-jre", // This wasn't updated due to incompatibility with scalacache-guava
+      ConcurrentLinkedHashMapLru,
+      ScalaCollectionCompat,
+      Specs2Core                      % Test
+    )
+  )
+
+lazy val circe = module(project, "circe").settings(
+  libraryDependencies ++= Seq(
+    CatsCore,
+    CirceCore,
+    CirceGeneric,
+    CirceParser,
+    JodaTime       % Provided,
+    ScalaCollectionCompat,
+    Shapeless,
+    Squants        % Provided,
+    TypesafeConfig % Provided,
+    CirceLiteral   % Test,
+    Specs2Core     % Test,
+    Specs2JUnit    % Test
+  )
+)
+
+lazy val collections = module(project, "collections").settings(
+  libraryDependencies ++= Seq(
+    ScalaCheck            % Test,
+    ScalaCollectionCompat % Test,
+    Specs2Core            % Test,
+    Specs2ScalaCheck      % Test
+  )
+)
+
+lazy val core = module(project, "core")
+  .dependsOn(testkit % Test)
+  .settings(
+    libraryDependencies ++= Seq(
+      CirceCore,
+      ScalaCollectionCompat,
+      ScalaLogging,
+      TypesafeConfig   % Provided,
+      UnirestJava,
+      JUnit            % Test,
+      ScalaCheck       % Test,
+      Specs2Core       % Test,
+      Specs2JUnit      % Test,
+      Specs2ScalaCheck % Test
+    )
+  )
+
+lazy val elasticsearch = module(project, "elasticsearch")
+  .dependsOn(testkit % Test)
+  .settings(
+    libraryDependencies ++= Seq(
+      AkkaActor                    % Provided,
+      ApacheHttpAsyncClient,
+      ApacheHttpClient,
+      ApacheHttpCore,
+      CirceCore,
+      Elastic4sClientEsJava,
+      Elastic4sCore,
+      ElasticsearchRestClient,
+      // This is explicitly included to force the eviction of a dependency exposing the following direct vulnerabilities:
+      // CVE-2022-42004, CVE-2022-42003 and CVE-2020-36518.
+      "com.fasterxml.jackson.core" % "jackson-databind" % "2.13.5",
+      AkkaTestkit                  % Test,
+      AkkaHttpTestkit              % Test,
+      AkkaSlf4J                    % Test,
+      Elastic4sTestkit             % Test,
+      ElasticsearchClusterRunner   % Test,
+      Log4JCore                    % Test,
+      Log4JSlf4j                   % Test,
+      Specs2Core                   % Test
+    )
+  )
+
+lazy val elasticsearchPekko = module(project, "elasticsearch-pekko")
+  .dependsOn(testkit % Test)
+  .settings(
+    libraryDependencies ++= Seq(
+      PekkoActor                   % Provided,
+      ApacheHttpAsyncClient,
+      ApacheHttpClient,
+      ApacheHttpCore,
+      CirceCore,
+      Elastic4sClientEsJava,
+      Elastic4sCore,
+      ElasticsearchRestClient,
+      // This is explicitly included to force the eviction of a dependency exposing the following direct vulnerabilities:
+      // CVE-2022-42004, CVE-2022-42003 and CVE-2020-36518.
+      "com.fasterxml.jackson.core" % "jackson-databind" % "2.13.5",
+      PekkoTestkit                 % Test,
+      PekkoHttpTestkit             % Test,
+      PekkoSlf4J                   % Test,
+      Elastic4sTestkit             % Test,
+      ElasticsearchClusterRunner   % Test,
+      Log4JCore                    % Test,
+      Log4JSlf4j                   % Test,
+      Specs2Core                   % Test
+    )
+  )
+
+lazy val encryption = module(project, "encryption")
+  .settings(libraryDependencies ++= Seq(BouncyCastlePkix % Runtime, BouncyCastleProvider, CommonsCodec, ScalaLogging))
+
+lazy val hashing = module(project, "hashing").settings(libraryDependencies ++= Seq(FastMd5))
+
+lazy val io = module(project, "io")
+  .dependsOn(aws, testkit % Test)
+  .settings(
+    libraryDependencies ++= Seq(
+      AwsJavaSdkCore,
+      AwsJavaSdkS3,
+      // FIX: Explicitly override transient bouncy castle versions from `sshj`: https://security.snyk.io/vuln/SNYK-JAVA-ORGBOUNCYCASTLE-6612984
+      // Remove once com.hierynomus:sshj releases a version with https://github.com/hierynomus/sshj/pull/938
+      BouncyCastlePkix,
+      BouncyCastleProvider,
+      ScalaCollectionCompat,
+      ScalaLogging,
+      ScalaPool,
+      SshJ,
+      TypesafeConfig,
+      Specs2Core % Test
+    )
+  )
+
+lazy val pekko = module(project, "pekko").settings(libraryDependencies ++= Seq(PekkoActor % Provided))
+
+lazy val pekkoHttp = module(project, "pekko-http")
+  .dependsOn(core % Test, testkit % Test)
+  .settings(
+    libraryDependencies ++= Seq(
+      ScalaLogging,
+      PekkoActor             % Provided,
+      PekkoHttp              % Provided,
+      PekkoHttpCore          % Provided,
+      PekkoStream            % Provided,
+      ScalaLogging,
+      TypesafeConfig,
+      PekkoActorTestkitTyped % Test,
+      PekkoHttpTestkit       % Test,
+      Specs2Core             % Test
+    )
+  )
+
+lazy val profiling = module(project, "profiling").settings(libraryDependencies ++= Seq(ScalaLogging, SimpleJmx))
+
+lazy val testkit = module(project, "testkit")
+  .settings(
+    libraryDependencies ++= Seq(
+      ScalaTestCore,
+      Specs2Common  % Provided,
+      Specs2Core    % Provided,
+      Specs2Matcher % Provided
+    )
+  )
+
+lazy val time = module(project, "time").settings(libraryDependencies ++= Seq(JodaTime, NscalaTime, Specs2Core % Test))
 
 lazy val apso = (project in file("."))
   .settings(commonSettings: _*)
