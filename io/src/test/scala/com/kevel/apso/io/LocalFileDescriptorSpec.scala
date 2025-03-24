@@ -250,7 +250,7 @@ class LocalFileDescriptorSpec extends Specification {
 
       fd.listAllFilesWithPrefix("aaa/ggg").toList must haveSize(3)
       fd.listAllFilesWithPrefix("").toList must haveSize(8)
-      dir3.listAllFilesWithPrefix("") must beEmpty
+      dir3.listAllFilesWithPrefix("").toList must beEmpty
     }
 
     "know whether the FD points to a directory" in {

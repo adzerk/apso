@@ -139,7 +139,7 @@ lazy val hashing = module(project, "hashing")
 lazy val io = module(project, "io")
   .dependsOn(aws, testkit % Test)
   .settings(
-    crossScalaVersions := List(Versions.Scala212, Versions.Scala213),
+    crossScalaVersions := List(Versions.Scala212, Versions.Scala213, Versions.Scala3),
     libraryDependencies ++= Seq(
       AwsJavaSdkCore,
       AwsJavaSdkS3,
@@ -149,7 +149,10 @@ lazy val io = module(project, "io")
       BouncyCastleProvider,
       ScalaCollectionCompat,
       ScalaLogging,
-      ScalaPool,
+      // FIXME: scala-pool is not avaiable for Scala 3, but we can use the Scala 2.13 version. This is currently only
+      //        being used to manage pools of SFTP clients for the same connection details. We should eventually
+      //        consider an alternative implementation.
+      ScalaPool.cross(CrossVersion.for3Use2_13),
       SshJ,
       TypesafeConfig,
       Specs2Core % Test

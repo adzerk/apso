@@ -76,7 +76,7 @@ case class SftpFileDescriptor(
     def doConnect(retries: Int): A =
       try {
         sftpClient().use { sftp =>
-          block(sftp)
+          block(sftp.sftpClient)
         }
       } catch {
         case e: SFTPException if e.getStatusCode == Response.StatusCode.NO_SUCH_FILE =>
@@ -185,7 +185,7 @@ case class SftpFileDescriptor(
   def stream(offset: Long = 0L) = new InputStream {
     private[this] lazy val sftpLease = sftpClient()
     private[this] lazy val sftp = sftpLease.get()
-    private[this] lazy val remoteFile = sftp.open(path)
+    private[this] lazy val remoteFile = sftp.sftpClient.open(path)
     private[this] lazy val inner = new remoteFile.RemoteFileInputStream()
     if (offset > 0) inner.skip(offset)
 
@@ -245,8 +245,6 @@ object SftpFileDescriptor {
 
   case class Credentials(host: String, port: String, auth: Either[Identity, String])
 
-  implicit def sftpClientToSFTPClient(c: SftpClient): SFTPClient = c.sftpClient
-
   private[this] def sshClient(
       host: String,
       port: Int,
@@ -299,7 +297,7 @@ object SftpFileDescriptor {
           val pool = Pool(
             maxConnections,
             () => new SftpClient(sshClient(host, port, username, password, identity)),
-            dispose = { c: SftpClient => c.close() },
+            dispose = (c: SftpClient) => c.close(),
             maxIdleTime = maxIdleTime
           )
 
