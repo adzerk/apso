@@ -56,7 +56,6 @@ lazy val circe = module(project, "circe").settings(
     CirceParser,
     JodaTime       % Provided,
     ScalaCollectionCompat,
-    Shapeless,
     Squants        % Provided,
     TypesafeConfig % Provided,
     CirceLiteral   % Test,
