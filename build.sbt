@@ -19,25 +19,6 @@ def module(project: Project, moduleName: String) =
     .settings(name := s"apso-$moduleName")
     .settings(commonSettings: _*)
 
-lazy val akka = module(project, "akka").settings(libraryDependencies ++= Seq(AkkaActor % Provided))
-
-lazy val akkaHttp = module(project, "akka-http")
-  .dependsOn(core % Test, testkit % Test)
-  .settings(
-    libraryDependencies ++= Seq(
-      ScalaLogging,
-      AkkaActor             % Provided,
-      AkkaHttp              % Provided,
-      AkkaHttpCore          % Provided,
-      AkkaStream            % Provided,
-      ScalaLogging,
-      TypesafeConfig,
-      AkkaActorTestkitTyped % Test,
-      AkkaHttpTestkit       % Test,
-      Specs2Core            % Test
-    )
-  )
-
 lazy val aws = module(project, "aws")
   .dependsOn(core)
   .settings(
@@ -106,32 +87,6 @@ lazy val core = module(project, "core")
       Specs2Core       % Test,
       Specs2JUnit      % Test,
       Specs2ScalaCheck % Test
-    )
-  )
-
-lazy val elasticsearch = module(project, "elasticsearch")
-  .dependsOn(testkit % Test)
-  .settings(
-    libraryDependencies ++= Seq(
-      AkkaActor                    % Provided,
-      ApacheHttpAsyncClient,
-      ApacheHttpClient,
-      ApacheHttpCore,
-      CirceCore,
-      Elastic4sClientEsJava,
-      Elastic4sCore,
-      ElasticsearchRestClient,
-      // This is explicitly included to force the eviction of a dependency exposing the following direct vulnerabilities:
-      // CVE-2022-42004, CVE-2022-42003 and CVE-2020-36518.
-      "com.fasterxml.jackson.core" % "jackson-databind" % "2.13.5",
-      AkkaTestkit                  % Test,
-      AkkaHttpTestkit              % Test,
-      AkkaSlf4J                    % Test,
-      Elastic4sTestkit             % Test,
-      ElasticsearchClusterRunner   % Test,
-      Log4JCore                    % Test,
-      Log4JSlf4j                   % Test,
-      Specs2Core                   % Test
     )
   )
 
@@ -222,14 +177,11 @@ lazy val apso = (project in file("."))
   .settings(commonSettings: _*)
   .settings(name := "apso")
   .dependsOn(
-    akka,
-    akkaHttp,
     aws,
     caching,
     circe,
     collections,
     core,
-    elasticsearch,
     elasticsearchPekko,
     encryption,
     hashing,
@@ -240,14 +192,11 @@ lazy val apso = (project in file("."))
     time
   )
   .aggregate(
-    akka,
-    akkaHttp,
     aws,
     caching,
     circe,
     collections,
     core,
-    elasticsearch,
     elasticsearchPekko,
     encryption,
     hashing,

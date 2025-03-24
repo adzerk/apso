@@ -2,8 +2,6 @@ import sbt._
 
 object Dependencies {
   object Versions {
-    val Akka                    = "2.6.20"
-    val AkkaHttp                = "10.2.10"
     val Pekko                   = "1.1.3"
     val PekkoHttp               = "1.1.0"
     val Aws                     = "1.12.782"
@@ -32,16 +30,6 @@ object Dependencies {
   }
 
   // scalafmt: { maxColumn = 200 }
-  val AkkaActor                  = "com.typesafe.akka"                     %% "akka-actor"                   % Versions.Akka
-  val AkkaActorTestkitTyped      = "com.typesafe.akka"                     %% "akka-actor-testkit-typed"     % Versions.Akka
-  val AkkaActorTyped             = "com.typesafe.akka"                     %% "akka-actor-typed"             % Versions.Akka
-  val AkkaHttp                   = "com.typesafe.akka"                     %% "akka-http"                    % Versions.AkkaHttp
-  val AkkaHttpCore               = "com.typesafe.akka"                     %% "akka-http-core"               % Versions.AkkaHttp
-  val AkkaHttpTestkit            = "com.typesafe.akka"                     %% "akka-http-testkit"            % Versions.AkkaHttp
-  val AkkaSlf4J                  = "com.typesafe.akka"                     %% "akka-slf4j"                   % Versions.Akka
-  val AkkaStream                 = "com.typesafe.akka"                     %% "akka-stream"                  % Versions.Akka
-  val AkkaStreamTestkit          = "com.typesafe.akka"                     %% "akka-stream-testkit"          % Versions.Akka
-  val AkkaTestkit                = "com.typesafe.akka"                     %% "akka-testkit"                 % Versions.Akka
   val ApacheHttpAsyncClient      = "org.apache.httpcomponents"              % "httpasyncclient"              % "4.1.5"
   val ApacheHttpClient           = "org.apache.httpcomponents"              % "httpclient"                   % "4.5.14"
   val ApacheHttpCore             = "org.apache.httpcomponents"              % "httpcore"                     % "4.4.16"
