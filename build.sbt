@@ -100,28 +100,36 @@ lazy val core = module(project, "core")
 lazy val elasticsearch = module(project, "elasticsearch")
   .dependsOn(testkit % Test)
   .settings(
-    crossScalaVersions := List(Versions.Scala212, Versions.Scala213),
+    crossScalaVersions := List(Versions.Scala212, Versions.Scala213, Versions.Scala3),
     libraryDependencies ++= Seq(
-      PekkoActor                   % Provided,
+      PekkoActor                                       % Provided,
       ApacheHttpAsyncClient,
       ApacheHttpClient,
       ApacheHttpCore,
       CirceCore,
-      Elastic4sClientEsJava,
-      Elastic4sCore,
+      Elastic4sClientEsJava.cross(CrossVersion.for3Use2_13),
+      Elastic4sCore.cross(CrossVersion.for3Use2_13),
       ElasticsearchRestClient,
       // This is explicitly included to force the eviction of a dependency exposing the following direct vulnerabilities:
       // CVE-2022-42004, CVE-2022-42003 and CVE-2020-36518.
-      "com.fasterxml.jackson.core" % "jackson-databind" % "2.13.5",
-      PekkoTestkit                 % Test,
-      PekkoHttpTestkit             % Test,
-      PekkoSlf4J                   % Test,
-      Elastic4sTestkit             % Test,
-      ElasticsearchClusterRunner   % Test,
-      Log4JCore                    % Test,
-      Log4JSlf4j                   % Test,
-      Specs2Core                   % Test
-    )
+      "com.fasterxml.jackson.core"                     % "jackson-databind" % "2.13.5",
+      PekkoTestkit                                     % Test,
+      PekkoHttpTestkit                                 % Test,
+      PekkoSlf4J                                       % Test,
+      Elastic4sTestkit.cross(CrossVersion.for3Use2_13) % Test,
+      ElasticsearchClusterRunner                       % Test,
+      Log4JCore                                        % Test,
+      Log4JSlf4j                                       % Test,
+      Specs2Core                                       % Test
+    ),
+    excludeDependencies ++= (CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((3, _)) =>
+        // In Scala 3, we're excluding depedencies that are cross-versioned from 2.13 but for which we already have a
+        // 3.x version in place.
+        Seq("org.scala-lang.modules" % "scala-xml_2.13", "org.scalactic" % "scalactic_2.13")
+      case _            =>
+        Seq.empty
+    })
   )
 
 lazy val encryption = module(project, "encryption")

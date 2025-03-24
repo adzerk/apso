@@ -1,5 +1,6 @@
 package com.kevel.apso.elasticsearch
 
+import scala.annotation.nowarn
 import scala.concurrent.duration._
 
 import com.sksamuel.elastic4s.ElasticDsl._
@@ -56,9 +57,10 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv)
   private def searchQuery(msgIndex: String): SearchRequest =
     search(msgIndex)
 
-  private def numberOfHits(index: String) = {
-    esClient.execute(searchQuery(index)).map(_.result.totalHits)
-  }
+  private def numberOfHits(index: String) =
+    esClient.execute(searchQuery(index)).map(_.result.totalHits): @nowarn(
+      "msg=Compiler synthesis of Manifest and OptManifest is deprecated"
+    )
 
   private implicit class ExtraMatchers[T](m: Matcher[T]) {
     def retry(
@@ -106,9 +108,9 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv)
       val bulkInserter = testBulkInserter(maxBufferSize = 2)
 
       // use a mapping that does not allow for extra fields other than the "name" one
-      esClient.execute(
+      (esClient.execute(
         putMapping(msgIndex) rawSource """{"dynamic":"strict","properties":{"name":{"type":"text"}}}"""
-      ) must
+      ): @nowarn("msg=Compiler synthesis of Manifest and OptManifest is deprecated")) must
         beAnInstanceOf[RequestSuccess[_]].awaitFor(5.seconds)
 
       // insert a (valid) document
@@ -123,11 +125,15 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv)
       numberOfHits(msgIndex) must be_==(3L).retry()
 
       // now, change the mapping so that new fields are allowed...
-      esClient.execute(putMapping(msgIndex) rawSource """{"dynamic":true,"properties":{"name":{"type":"text"}}}""") must
+      (esClient.execute(
+        putMapping(msgIndex) rawSource """{"dynamic":true,"properties":{"name":{"type":"text"}}}"""
+      ): @nowarn("msg=Compiler synthesis of Manifest and OptManifest is deprecated")) must
         beAnInstanceOf[RequestSuccess[_]].awaitFor(5.seconds)
       bulkInserter ! Insert(Json.obj("name" := "test5"), msgIndex)
       numberOfHits(msgIndex) must be_==(5L).retry(eventuallyRetries = 30)
-      esClient.execute(search(msgIndex) query matchQuery("other", "dynamic_field_value")).map(_.result.totalHits) must
+      (esClient.execute(search(msgIndex) query matchQuery("other", "dynamic_field_value")): @nowarn(
+        "msg=Compiler synthesis of Manifest and OptManifest is deprecated"
+      )).map(_.result.totalHits) must
         be_==(1L).retry(eventuallyRetries = 30)
     }
 
@@ -138,9 +144,9 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv)
         val bulkInserter = testBulkInserter(maxBufferSize = 2, flushFreq = 1.day)
 
         // use a mapping that does not allow for extra fields other than the "name" one
-        esClient.execute(
+        (esClient.execute(
           putMapping(msgIndex) rawSource """{"dynamic":"strict","properties":{"name":{"type":"text"}}}"""
-        ) must
+        ): @nowarn("msg=Compiler synthesis of Manifest and OptManifest is deprecated")) must
           beAnInstanceOf[RequestSuccess[_]].awaitFor(5.seconds)
 
         // insert valid documents
@@ -181,9 +187,9 @@ class ElasticsearchBulkInserterSpec(implicit ee: ExecutionEnv)
         val bulkInserter = testBulkInserter(maxBufferSize = 2, flushFreq = 500.millis)
 
         // use a mapping that does not allow for extra fields other than the "name" one
-        esClient.execute(
+        (esClient.execute(
           putMapping(msgIndex) rawSource """{"dynamic":"strict","properties":{"name":{"type":"text"}}}"""
-        ) must
+        ): @nowarn("msg=Compiler synthesis of Manifest and OptManifest is deprecated")) must
           beAnInstanceOf[RequestSuccess[_]].awaitFor(5.seconds)
 
         // insert an invalid document that will be retried

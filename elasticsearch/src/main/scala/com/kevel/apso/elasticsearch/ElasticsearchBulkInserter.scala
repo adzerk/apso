@@ -1,5 +1,6 @@
 package com.kevel.apso.elasticsearch
 
+import scala.annotation.nowarn
 import scala.collection.mutable
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -53,9 +54,10 @@ class ElasticsearchBulkInserter(
     }
   }
 
-  private[this] def checkElasticsearch(): Future[Boolean] = {
-    client.execute(clusterHealth()).map(_.result.status != "red")
-  }
+  private[this] def checkElasticsearch(): Future[Boolean] =
+    client.execute(clusterHealth()).map(_.result.status != "red"): @nowarn(
+      "msg=Compiler synthesis of Manifest and OptManifest is deprecated"
+    )
 
   private[this] def becomeElasticsearchUp(): Unit = {
     val periodicFlush = context.system.scheduler.scheduleWithFixedDelay(flushFrequency, flushFrequency, self, Flush)
@@ -123,7 +125,9 @@ class ElasticsearchBulkInserter(
     val sentBuffer = buffer
     buffer = Nil
 
-    Try(client.execute(bulk(sentBuffer.map(_.msg): _*)).map(_.result)) match {
+    (Try(client.execute(bulk(sentBuffer.map(_.msg): _*)).map(_.result)): @nowarn(
+      "msg=Compiler synthesis of Manifest and OptManifest is deprecated"
+    )) match {
       case Success(bulkResponseFut: Future[BulkResponse]) =>
         bulkResponseFut.onComplete {
           case Success(bulkResponse) =>

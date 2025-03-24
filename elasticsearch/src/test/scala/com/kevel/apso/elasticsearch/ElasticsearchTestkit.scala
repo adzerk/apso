@@ -2,6 +2,7 @@ package com.kevel.apso.elasticsearch
 
 import java.nio.file.Files
 
+import scala.annotation.nowarn
 import scala.concurrent.duration._
 import scala.util.Random
 
@@ -64,7 +65,7 @@ trait NoSpecElasticsearchTestKit {
 
   // base templates
 
-  esClient
+  (esClient
     .execute(
       CreateIndexTemplateRequest("default", Seq("*"))
         .settings(Map("number_of_replicas" -> 0, "number_of_shards" -> 1))
@@ -76,7 +77,7 @@ trait NoSpecElasticsearchTestKit {
             )
           )
         )
-    )
+    ): @nowarn("msg=Compiler synthesis of Manifest and OptManifest is deprecated"))
     .await(10.seconds)
 
   runner.ensureYellow()
