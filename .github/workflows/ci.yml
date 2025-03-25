@@ -7,19 +7,13 @@ env:
 
 jobs:
   build:
-    name: Scala ${{ matrix.scala }} (Java ${{ matrix.java }})
+    name: CI (Java ${{ matrix.java }})
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        scala: ['2.12', '2.13']
         java: ['11', '17', '21']
-        include:
-          - scala: '2.12'
-            scala-version: 2.12.20
-          - scala: '2.13'
-            scala-version: 2.13.16
 
     steps:
       - name: Checkout repository
@@ -42,11 +36,11 @@ jobs:
 
       - name: Compile and check format
         run: >-
-          sbt ++${{ matrix.scala-version }} scalafmtSbt Test/compile &&
+          sbt Test/compile &&
           git diff --exit-code
 
       - name: Run tests
-        run: sbt -Dsbt.color=always ++${{ matrix.scala-version }} test
+        run: sbt -Dsbt.color=always test
 
       - name: Check mdoc for uncommitted changes
         run: sbt -Dsbt.color=always "docs/mdoc --check"
