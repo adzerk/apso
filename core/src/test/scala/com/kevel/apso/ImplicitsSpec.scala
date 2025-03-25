@@ -1,6 +1,5 @@
 package com.kevel.apso
 
-import scala.collection.compat._
 import scala.util.Random
 
 import org.specs2.ScalaCheck
@@ -40,7 +39,7 @@ class ImplicitsSpec extends Specification with ScalaCheck with FutureExtraMatche
       rand.setSeed(0)
       val runs = 10000
       val n = 5
-      val elems = immutable.LazyList.iterate(0, 50) { _ + 1 }
+      val elems = LazyList.iterate(0, 50) { _ + 1 }
 
       val tests = (1 to runs).map { _ => rand.chooseN(elems, n) }
 

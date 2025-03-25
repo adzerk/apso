@@ -1,7 +1,5 @@
 package com.kevel.apso.iterator
 
-import scala.collection.compat.immutable.LazyList
-
 import org.specs2.mutable._
 
 import com.kevel.apso.iterator.Implicits._

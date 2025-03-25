@@ -5,7 +5,6 @@ import xerial.sbt.Sonatype.sonatypeCentralHost
 
 ThisBuild / organization := "com.kevel"
 
-ThisBuild / crossScalaVersions := Seq("2.12.20", "2.13.16")
 ThisBuild / scalaVersion       := "2.13.16"
 
 val javaVersion = "11"
@@ -26,7 +25,6 @@ lazy val aws = module(project, "aws")
       ScalaLogging,
       AwsJavaSdkS3,
       AwsJavaSdkCore,
-      ScalaCollectionCompat,
       ScalaLogging,
       TypesafeConfig,
       Specs2Core % Test
@@ -43,7 +41,6 @@ lazy val caching = module(project, "caching")
       "com.github.cb372"             %% "scalacache-guava"    % "0.28.0",
       "com.google.guava"              % "guava"               % "28.0-jre", // This wasn't updated due to incompatibility with scalacache-guava
       ConcurrentLinkedHashMapLru,
-      ScalaCollectionCompat,
       Specs2Core                      % Test
     )
   )
@@ -55,7 +52,6 @@ lazy val circe = module(project, "circe").settings(
     CirceGeneric,
     CirceParser,
     JodaTime       % Provided,
-    ScalaCollectionCompat,
     Squants        % Provided,
     TypesafeConfig % Provided,
     CirceLiteral   % Test,
@@ -67,7 +63,6 @@ lazy val circe = module(project, "circe").settings(
 lazy val collections = module(project, "collections").settings(
   libraryDependencies ++= Seq(
     ScalaCheck            % Test,
-    ScalaCollectionCompat % Test,
     Specs2Core            % Test,
     Specs2ScalaCheck      % Test
   )
@@ -78,7 +73,6 @@ lazy val core = module(project, "core")
   .settings(
     libraryDependencies ++= Seq(
       CirceCore,
-      ScalaCollectionCompat,
       ScalaLogging,
       TypesafeConfig   % Provided,
       UnirestJava,
@@ -131,7 +125,6 @@ lazy val io = module(project, "io")
       // Remove once com.hierynomus:sshj releases a version with https://github.com/hierynomus/sshj/pull/938
       BouncyCastlePkix,
       BouncyCastleProvider,
-      ScalaCollectionCompat,
       ScalaLogging,
       ScalaPool,
       SshJ,
@@ -244,31 +237,18 @@ lazy val commonSettings = Seq(
   semanticdbVersion := scalafixSemanticdb.revision,
   scalafixOnCompile := true,
 
-  scalacOptions ++= {
-    lazy val commonFlags = Seq(
-      "-encoding", "UTF-8",
-      "-language:higherKinds",
-      "-language:implicitConversions",
-      "-feature",
-      "-unchecked",
-      "-deprecation",
-      "-release", javaVersion,
-      "-Xfatal-warnings",
-      "-Ywarn-dead-code")
-
-    def withCommon(flags: String*) =
-      commonFlags ++ flags
-
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, 12)) =>
-        withCommon(
-          "-Ywarn-unused-import")
-
-      case _ =>
-        withCommon(
-          "-Ywarn-unused:imports")
-    }
-  },
+  scalacOptions ++= Seq(
+    "-encoding", "UTF-8",
+    "-language:higherKinds",
+    "-language:implicitConversions",
+    "-feature",
+    "-unchecked",
+    "-deprecation",
+    "-release", javaVersion,
+    "-Xfatal-warnings",
+    "-Ywarn-dead-code",
+    "-Ywarn-unused:imports"
+  ),
 
   javacOptions ++= List(
     "--release", javaVersion

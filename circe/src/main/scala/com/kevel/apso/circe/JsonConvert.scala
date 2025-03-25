@@ -1,6 +1,5 @@
 package com.kevel.apso.circe
 
-import scala.collection.compat._
 import scala.jdk.CollectionConverters._
 
 import io.circe.syntax._
