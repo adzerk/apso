@@ -2,8 +2,6 @@ import sbt._
 
 object Dependencies {
   object Versions {
-    val Akka                    = "2.6.20"
-    val AkkaHttp                = "10.2.10"
     val Pekko                   = "1.1.3"
     val PekkoHttp               = "1.1.0"
     val Aws                     = "1.12.782"
@@ -23,7 +21,6 @@ object Dependencies {
     val ScalaLogging            = "3.9.5"
     val ScalaPool               = "0.4.3"
     val ScalaTest               = "3.2.19"
-    val Shapeless               = "2.3.13"
     val SimpleJmx               = "2.2"
     val Specs2                  = "4.21.0"
     val Squants                 = "1.8.3"
@@ -33,16 +30,6 @@ object Dependencies {
   }
 
   // scalafmt: { maxColumn = 200 }
-  val AkkaActor                  = "com.typesafe.akka"                     %% "akka-actor"                   % Versions.Akka
-  val AkkaActorTestkitTyped      = "com.typesafe.akka"                     %% "akka-actor-testkit-typed"     % Versions.Akka
-  val AkkaActorTyped             = "com.typesafe.akka"                     %% "akka-actor-typed"             % Versions.Akka
-  val AkkaHttp                   = "com.typesafe.akka"                     %% "akka-http"                    % Versions.AkkaHttp
-  val AkkaHttpCore               = "com.typesafe.akka"                     %% "akka-http-core"               % Versions.AkkaHttp
-  val AkkaHttpTestkit            = "com.typesafe.akka"                     %% "akka-http-testkit"            % Versions.AkkaHttp
-  val AkkaSlf4J                  = "com.typesafe.akka"                     %% "akka-slf4j"                   % Versions.Akka
-  val AkkaStream                 = "com.typesafe.akka"                     %% "akka-stream"                  % Versions.Akka
-  val AkkaStreamTestkit          = "com.typesafe.akka"                     %% "akka-stream-testkit"          % Versions.Akka
-  val AkkaTestkit                = "com.typesafe.akka"                     %% "akka-testkit"                 % Versions.Akka
   val ApacheHttpAsyncClient      = "org.apache.httpcomponents"              % "httpasyncclient"              % "4.1.5"
   val ApacheHttpClient           = "org.apache.httpcomponents"              % "httpclient"                   % "4.5.14"
   val ApacheHttpCore             = "org.apache.httpcomponents"              % "httpcore"                     % "4.4.16"
@@ -83,7 +70,6 @@ object Dependencies {
   val ScalaLogging               = "com.typesafe.scala-logging"            %% "scala-logging"                % Versions.ScalaLogging
   val ScalaPool                  = "io.github.andrebeat"                   %% "scala-pool"                   % Versions.ScalaPool
   val ScalaTestCore              = "org.scalatest"                         %% "scalatest-core"               % Versions.ScalaTest
-  val Shapeless                  = "com.chuusai"                           %% "shapeless"                    % Versions.Shapeless
   val SimpleJmx                  = "com.j256.simplejmx"                     % "simplejmx"                    % Versions.SimpleJmx
   val Specs2Common               = "org.specs2"                            %% "specs2-common"                % Versions.Specs2
   val Specs2Core                 = "org.specs2"                            %% "specs2-core"                  % Versions.Specs2
