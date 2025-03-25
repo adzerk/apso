@@ -90,7 +90,7 @@ lazy val core = module(project, "core")
     )
   )
 
-lazy val elasticsearchPekko = module(project, "elasticsearch-pekko")
+lazy val elasticsearch = module(project, "elasticsearch")
   .dependsOn(testkit % Test)
   .settings(
     libraryDependencies ++= Seq(
@@ -182,7 +182,7 @@ lazy val apso = (project in file("."))
     circe,
     collections,
     core,
-    elasticsearchPekko,
+    elasticsearch,
     encryption,
     hashing,
     io,
@@ -197,7 +197,7 @@ lazy val apso = (project in file("."))
     circe,
     collections,
     core,
-    elasticsearchPekko,
+    elasticsearch,
     encryption,
     hashing,
     io,
