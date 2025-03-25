@@ -37,7 +37,7 @@ lazy val caching = module(project, "caching")
   .enablePlugins(BoilerplatePlugin)
   .settings(
     libraryDependencies ++= Seq(
-      "com.github.ben-manes.caffeine" % "caffeine"            % "2.7.0",    // This wasn't updated due to incompatibility with scalacache-caffeine
+      "com.github.ben-manes.caffeine" % "caffeine"            % "2.7.0", // This wasn't updated due to incompatibility with scalacache-caffeine
       "com.github.cb372"             %% "scalacache-caffeine" % "0.28.0",
       "com.github.cb372"             %% "scalacache-core"     % "0.28.0",
       ConcurrentLinkedHashMapLru,
