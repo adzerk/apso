@@ -1,7 +1,7 @@
 package com.kevel.apso
 
 import scala.annotation.tailrec
-import scala.collection.compat._
+import scala.collection.Factory
 import scala.util.{Random, Try, Using}
 
 /** Object containing implicit classes and methods of general purpose.
@@ -289,8 +289,8 @@ object Implicits {
       * @return
       *   ordered stream of doubles
       */
-    def decreasingUniformStream(n: Int): immutable.LazyList[Double] =
-      immutable.LazyList
+    def decreasingUniformStream(n: Int): LazyList[Double] =
+      LazyList
         .iterate((n + 1, 1.0), n + 1) { case (i, currMax) => (i - 1, currMax * math.pow(rand.nextDouble(), 1.0 / i)) }
         .tail
         .map(_._2)
@@ -303,7 +303,7 @@ object Implicits {
       * @return
       *   ordered stream of doubles
       */
-    def increasingUniformStream(n: Int): immutable.LazyList[Double] =
+    def increasingUniformStream(n: Int): LazyList[Double] =
       decreasingUniformStream(n).map(1 - _)
   }
 

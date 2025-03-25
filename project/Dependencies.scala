@@ -2,7 +2,6 @@ import sbt._
 
 object Dependencies {
   object Versions {
-    val Scala212 = "2.12.20"
     val Scala213 = "2.13.16"
     val Scala3   = "3.3.5"
 
@@ -70,7 +69,6 @@ object Dependencies {
   val PekkoStreamTestkit         = "org.apache.pekko"                      %% "pekko-stream-testkit"         % Versions.Pekko
   val PekkoTestkit               = "org.apache.pekko"                      %% "pekko-testkit"                % Versions.Pekko
   val ScalaCheck                 = "org.scalacheck"                        %% "scalacheck"                   % Versions.ScalaCheck
-  val ScalaCollectionCompat      = "org.scala-lang.modules"                %% "scala-collection-compat"      % "2.13.0"
   val ScalaLogging               = "com.typesafe.scala-logging"            %% "scala-logging"                % Versions.ScalaLogging
   val ScalaPool                  = "io.github.andrebeat"                   %% "scala-pool"                   % Versions.ScalaPool
   val ScalaTestCore              = "org.scalatest"                         %% "scalatest-core"               % Versions.ScalaTest
