@@ -1,7 +1,5 @@
 package com.kevel.apso.iterator
 
-import scala.collection.compat.immutable.LazyList
-
 import org.specs2.mutable._
 
 import com.kevel.apso.iterator.Implicits._
@@ -27,7 +25,7 @@ class ImplicitsSpec extends Specification {
       case class Impl1(x: Int) extends Base
       case class Impl2(x: Int) extends Base
 
-      implicit def ord[T <: Base] = new Ordering[T] {
+      implicit def ord[T <: Base]: Ordering[T] = new Ordering[T] {
         override def compare(a: T, b: T): Int = a.x - b.x
       }
 

@@ -5,7 +5,7 @@ import org.specs2.mutable._
 
 class TypedMapSpec extends Specification {
 
-  def beTypedAs[A]: Matcher[A] = { _: A => ok }
+  def beTypedAs[A]: Matcher[A] = (_: A) => ok
 
   class Animal(val name: String)
   case class Dog(n: String) extends Animal(n)

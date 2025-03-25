@@ -5,8 +5,9 @@ import xerial.sbt.Sonatype.sonatypeCentralHost
 
 ThisBuild / organization := "com.kevel"
 
-ThisBuild / crossScalaVersions := Seq("2.12.20", "2.13.16")
-ThisBuild / scalaVersion       := "2.13.16"
+// Setting no cross build for the aggregating root project so that we can have proper per project exclusions.
+ThisBuild / crossScalaVersions := Nil
+ThisBuild / scalaVersion       := Versions.Scala213
 
 val javaVersion = "11"
 
@@ -22,11 +23,11 @@ def module(project: Project, moduleName: String) =
 lazy val aws = module(project, "aws")
   .dependsOn(core)
   .settings(
+    crossScalaVersions := List(Versions.Scala213, Versions.Scala3),
     libraryDependencies ++= Seq(
       ScalaLogging,
       AwsJavaSdkS3,
       AwsJavaSdkCore,
-      ScalaCollectionCompat,
       ScalaLogging,
       TypesafeConfig,
       Specs2Core % Test
@@ -36,49 +37,49 @@ lazy val aws = module(project, "aws")
 lazy val caching = module(project, "caching")
   .enablePlugins(BoilerplatePlugin)
   .settings(
+    crossScalaVersions := List(Versions.Scala213),
     libraryDependencies ++= Seq(
-      "com.github.ben-manes.caffeine" % "caffeine"            % "2.7.0",    // This wasn't updated due to incompatibility with scalacache-caffeine
+      "com.github.ben-manes.caffeine" % "caffeine"            % "2.7.0", // This wasn't updated due to incompatibility with scalacache-caffeine
       "com.github.cb372"             %% "scalacache-caffeine" % "0.28.0",
       "com.github.cb372"             %% "scalacache-core"     % "0.28.0",
-      "com.github.cb372"             %% "scalacache-guava"    % "0.28.0",
-      "com.google.guava"              % "guava"               % "28.0-jre", // This wasn't updated due to incompatibility with scalacache-guava
       ConcurrentLinkedHashMapLru,
-      ScalaCollectionCompat,
       Specs2Core                      % Test
     )
   )
 
-lazy val circe = module(project, "circe").settings(
-  libraryDependencies ++= Seq(
-    CatsCore,
-    CirceCore,
-    CirceGeneric,
-    CirceParser,
-    JodaTime       % Provided,
-    ScalaCollectionCompat,
-    Squants        % Provided,
-    TypesafeConfig % Provided,
-    CirceLiteral   % Test,
-    Specs2Core     % Test,
-    Specs2JUnit    % Test
+lazy val circe = module(project, "circe")
+  .settings(
+    crossScalaVersions := List(Versions.Scala213, Versions.Scala3),
+    libraryDependencies ++= Seq(
+      CatsCore,
+      CirceCore,
+      CirceGeneric,
+      CirceParser,
+      JodaTime       % Provided,
+      Squants        % Provided,
+      TypesafeConfig % Provided,
+      CirceLiteral   % Test,
+      Specs2Core     % Test,
+      Specs2JUnit    % Test
+    )
   )
-)
 
-lazy val collections = module(project, "collections").settings(
-  libraryDependencies ++= Seq(
-    ScalaCheck            % Test,
-    ScalaCollectionCompat % Test,
-    Specs2Core            % Test,
-    Specs2ScalaCheck      % Test
+lazy val collections = module(project, "collections")
+  .settings(
+    crossScalaVersions := List(Versions.Scala213, Versions.Scala3),
+    libraryDependencies ++= Seq(
+      ScalaCheck       % Test,
+      Specs2Core       % Test,
+      Specs2ScalaCheck % Test
+    )
   )
-)
 
 lazy val core = module(project, "core")
   .dependsOn(testkit % Test)
   .settings(
+    crossScalaVersions := List(Versions.Scala213, Versions.Scala3),
     libraryDependencies ++= Seq(
       CirceCore,
-      ScalaCollectionCompat,
       ScalaLogging,
       TypesafeConfig   % Provided,
       UnirestJava,
@@ -91,13 +92,21 @@ lazy val core = module(project, "core")
   )
 
 lazy val encryption = module(project, "encryption")
-  .settings(libraryDependencies ++= Seq(BouncyCastlePkix % Runtime, BouncyCastleProvider, CommonsCodec, ScalaLogging))
+  .settings(
+    crossScalaVersions := List(Versions.Scala213, Versions.Scala3),
+    libraryDependencies ++= Seq(BouncyCastlePkix % Runtime, BouncyCastleProvider, CommonsCodec, ScalaLogging)
+  )
 
-lazy val hashing = module(project, "hashing").settings(libraryDependencies ++= Seq(FastMd5))
+lazy val hashing = module(project, "hashing")
+  .settings(
+    crossScalaVersions := List(Versions.Scala213, Versions.Scala3),
+    libraryDependencies ++= Seq(FastMd5)
+  )
 
 lazy val io = module(project, "io")
   .dependsOn(aws, testkit % Test)
   .settings(
+    crossScalaVersions := List(Versions.Scala213, Versions.Scala3),
     libraryDependencies ++= Seq(
       AwsJavaSdkCore,
       AwsJavaSdkS3,
@@ -105,20 +114,27 @@ lazy val io = module(project, "io")
       // Remove once com.hierynomus:sshj releases a version with https://github.com/hierynomus/sshj/pull/938
       BouncyCastlePkix,
       BouncyCastleProvider,
-      ScalaCollectionCompat,
       ScalaLogging,
-      ScalaPool,
+      // FIXME: scala-pool is not avaiable for Scala 3, but we can use the Scala 2.13 version. This is currently only
+      //        being used to manage pools of SFTP clients for the same connection details. We should eventually
+      //        consider an alternative implementation.
+      ScalaPool.cross(CrossVersion.for3Use2_13),
       SshJ,
       TypesafeConfig,
       Specs2Core % Test
     )
   )
 
-lazy val pekko = module(project, "pekko").settings(libraryDependencies ++= Seq(PekkoActor % Provided))
+lazy val pekko = module(project, "pekko")
+  .settings(
+    crossScalaVersions := List(Versions.Scala213, Versions.Scala3),
+    libraryDependencies ++= Seq(PekkoActor % Provided)
+  )
 
 lazy val pekkoHttp = module(project, "pekko-http")
   .dependsOn(core % Test, testkit % Test)
   .settings(
+    crossScalaVersions := List(Versions.Scala213, Versions.Scala3),
     libraryDependencies ++= Seq(
       ScalaLogging,
       PekkoActor             % Provided,
@@ -133,10 +149,15 @@ lazy val pekkoHttp = module(project, "pekko-http")
     )
   )
 
-lazy val profiling = module(project, "profiling").settings(libraryDependencies ++= Seq(ScalaLogging, SimpleJmx))
+lazy val profiling = module(project, "profiling")
+  .settings(
+    crossScalaVersions := List(Versions.Scala213, Versions.Scala3),
+    libraryDependencies ++= Seq(ScalaLogging, SimpleJmx)
+  )
 
 lazy val testkit = module(project, "testkit")
   .settings(
+    crossScalaVersions := List(Versions.Scala213, Versions.Scala3),
     libraryDependencies ++= Seq(
       ScalaTestCore,
       Specs2Common  % Provided,
@@ -145,11 +166,15 @@ lazy val testkit = module(project, "testkit")
     )
   )
 
-lazy val time = module(project, "time").settings(libraryDependencies ++= Seq(JodaTime, NscalaTime, Specs2Core % Test))
+lazy val time = module(project, "time")
+  .settings(
+    crossScalaVersions := List(Versions.Scala213, Versions.Scala3),
+    libraryDependencies ++= Seq(JodaTime, NscalaTime, Specs2Core % Test)
+  )
 
 lazy val apso = (project in file("."))
   .settings(commonSettings: _*)
-  .settings(name := "apso")
+  .settings(name := "apso", crossScalaVersions := List(Versions.Scala213))
   .dependsOn(
     aws,
     caching,
@@ -223,20 +248,20 @@ lazy val commonSettings = Seq(
       "-unchecked",
       "-deprecation",
       "-release", javaVersion,
-      "-Xfatal-warnings",
-      "-Ywarn-dead-code")
+      "-Xfatal-warnings")
 
     def withCommon(flags: String*) =
       commonFlags ++ flags
 
     CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, 12)) =>
-        withCommon(
-          "-Ywarn-unused-import")
+      case Some((2, _)) =>
+        withCommon("-Ywarn-dead-code", "-Ywarn-unused:imports")
+
+      case Some((3, _)) =>
+        withCommon("-Wunused:imports")
 
       case _ =>
-        withCommon(
-          "-Ywarn-unused:imports")
+        throw new RuntimeException("Unsupported Scala version")
     }
   },
 

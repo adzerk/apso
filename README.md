@@ -1,12 +1,12 @@
 <p align="center"><img src="https://raw.githubusercontent.com/adzerk/apso/master/apso.png"/></p>
 
-# Apso [![Build Status](https://github.com/adzerk/apso/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/adzerk/apso/actions/workflows/ci.yml?query=workflow%3ACI+branch%3Amaster) [![Maven Central](https://img.shields.io/maven-central/v/com.kevel/apso_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/com.kevel/apso_2.12)
+# Apso [![Build Status](https://github.com/adzerk/apso/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/adzerk/apso/actions/workflows/ci.yml?query=workflow%3ACI+branch%3Amaster) [![Maven Central](https://img.shields.io/maven-central/v/com.kevel/apso_2.13.svg)](https://maven-badges.herokuapp.com/maven-central/com.kevel/apso_2.13)
 
 Apso is Kevel's collection of Scala utility libraries. It provides a series of useful methods.
 
 ## Installation
 
-Apso's latest release is built against Scala 2.12 and Scala 2.13.
+Apso's latest release is built against Scala 2.13.
 
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
@@ -14,7 +14,7 @@ To use it in an existing SBT project, add the following dependency to your `buil
 libraryDependencies += "com.kevel" %% "apso" % "0.21.0"
 ```
 
-The project is divided in modules, you can instead install only a specific module.
+The project is divided in modules, you can instead install only a specific module. Some modules are already available for Scala 3. Currently, only apso-elasticsearch and apso-caching are not available for Scala 3.
 
 The TestKit is available under the `apso-testkit` project. You can include it only for the `test` configuration:
 
@@ -355,7 +355,7 @@ To use it in an existing SBT project, add the following dependency to your `buil
 libraryDependencies += "com.kevel" %% "apso-caching" % "0.21.0"
 ```
 
-Apso provides utilities to simplify the caching of method calls, with [ScalaCache](https://cb372.github.io/scalacache/) and using either `Guava` or `Caffeine` as underlying cache implementations.
+Apso provides utilities to simplify the caching of method calls, with [ScalaCache](https://cb372.github.io/scalacache/) and using `Caffeine` as the underlying cache implementation.
 
 These utilities are provided as `cached()` and `cachedF()` extension methods over all `FunctionN[]` types:
 
@@ -390,7 +390,7 @@ val y = new AtomicInteger(0)
 val cachedFutFn = ((i: Int) => Future {
   val value = y.getAndAdd(i)
   value
-}).cachedF(config.Cache.Guava(Some(2), None))
+}).cachedF(config.Cache.Caffeine(Some(2), None))
 // cachedFutFn: MemoizeFn1[Future, Int, Int] = <function1>
 
 Await.result(cachedFutFn(3), Duration.Inf)
