@@ -64,14 +64,15 @@ lazy val circe = module(project, "circe")
     )
   )
 
-lazy val collections = module(project, "collections").settings(
-  crossScalaVersions := List(Versions.Scala213, Versions.Scala3),
-  libraryDependencies ++= Seq(
-    ScalaCheck       % Test,
-    Specs2Core       % Test,
-    Specs2ScalaCheck % Test
+lazy val collections = module(project, "collections")
+  .settings(
+    crossScalaVersions := List(Versions.Scala213, Versions.Scala3),
+    libraryDependencies ++= Seq(
+      ScalaCheck       % Test,
+      Specs2Core       % Test,
+      Specs2ScalaCheck % Test
+    )
   )
-)
 
 lazy val core = module(project, "core")
   .dependsOn(testkit % Test)
