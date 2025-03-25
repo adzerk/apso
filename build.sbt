@@ -90,32 +90,6 @@ lazy val core = module(project, "core")
     )
   )
 
-lazy val elasticsearch = module(project, "elasticsearch")
-  .dependsOn(testkit % Test)
-  .settings(
-    libraryDependencies ++= Seq(
-      PekkoActor                   % Provided,
-      ApacheHttpAsyncClient,
-      ApacheHttpClient,
-      ApacheHttpCore,
-      CirceCore,
-      Elastic4sClientEsJava,
-      Elastic4sCore,
-      ElasticsearchRestClient,
-      // This is explicitly included to force the eviction of a dependency exposing the following direct vulnerabilities:
-      // CVE-2022-42004, CVE-2022-42003 and CVE-2020-36518.
-      "com.fasterxml.jackson.core" % "jackson-databind" % "2.13.5",
-      PekkoTestkit                 % Test,
-      PekkoHttpTestkit             % Test,
-      PekkoSlf4J                   % Test,
-      Elastic4sTestkit             % Test,
-      ElasticsearchClusterRunner   % Test,
-      Log4JCore                    % Test,
-      Log4JSlf4j                   % Test,
-      Specs2Core                   % Test
-    )
-  )
-
 lazy val encryption = module(project, "encryption")
   .settings(libraryDependencies ++= Seq(BouncyCastlePkix % Runtime, BouncyCastleProvider, CommonsCodec, ScalaLogging))
 
@@ -182,7 +156,6 @@ lazy val apso = (project in file("."))
     circe,
     collections,
     core,
-    elasticsearch,
     encryption,
     hashing,
     io,
@@ -197,7 +170,6 @@ lazy val apso = (project in file("."))
     circe,
     collections,
     core,
-    elasticsearch,
     encryption,
     hashing,
     io,
@@ -232,8 +204,6 @@ lazy val commonSettings = Seq(
         Resolver.typesafeRepo("snapshots"),
         "Spray Repository"                  at  "https://repo.spray.io/",
         "Bintray Scalaz Releases"           at  "https://dl.bintray.com/scalaz/releases",
-        // Necessary for org.codelibs:elasticsearch-cluster-runner, which moved to maven.codelibs.org after v7.11.x
-        "Elasticsearch Cluster Repository"  at  "https://maven.codelibs.org/",
         "JCenter Repository"                at  "https://jcenter.bintray.com/"
       ),
 

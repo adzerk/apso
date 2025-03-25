@@ -10,12 +10,9 @@ object Dependencies {
     val Circe                   = "0.14.12"
     val CommonsCodec            = "1.18.0"
     val ConcurrentLinkedHashMap = "1.4.2"
-    val Elastic4s               = "7.16.3"
-    val Elasticsearch           = "7.16.3"
     val FastMd5                 = "2.7.1"
     val JUnit                   = "4.13.2"
     val JodaTime                = "2.13.1"
-    val Log4J                   = "2.24.3"
     val NscalaTime              = "3.0.0"
     val ScalaCheck              = "1.18.1"
     val ScalaLogging            = "3.9.5"
@@ -30,9 +27,6 @@ object Dependencies {
   }
 
   // scalafmt: { maxColumn = 200 }
-  val ApacheHttpAsyncClient      = "org.apache.httpcomponents"              % "httpasyncclient"              % "4.1.5"
-  val ApacheHttpClient           = "org.apache.httpcomponents"              % "httpclient"                   % "4.5.14"
-  val ApacheHttpCore             = "org.apache.httpcomponents"              % "httpcore"                     % "4.4.16"
   val AwsJavaSdkCore             = "com.amazonaws"                          % "aws-java-sdk-core"            % Versions.Aws
   val AwsJavaSdkS3               = "com.amazonaws"                          % "aws-java-sdk-s3"              % Versions.Aws
   val BouncyCastlePkix           = "org.bouncycastle"                       % "bcpkix-jdk18on"               % Versions.BouncyCastle
@@ -44,16 +38,9 @@ object Dependencies {
   val CirceParser                = "io.circe"                              %% "circe-parser"                 % Versions.Circe
   val CommonsCodec               = "commons-codec"                          % "commons-codec"                % Versions.CommonsCodec
   val ConcurrentLinkedHashMapLru = "com.googlecode.concurrentlinkedhashmap" % "concurrentlinkedhashmap-lru"  % Versions.ConcurrentLinkedHashMap
-  val Elastic4sClientEsJava      = "com.sksamuel.elastic4s"                %% "elastic4s-client-esjava"      % Versions.Elastic4s
-  val Elastic4sCore              = "com.sksamuel.elastic4s"                %% "elastic4s-core"               % Versions.Elastic4s
-  val Elastic4sTestkit           = "com.sksamuel.elastic4s"                %% "elastic4s-testkit"            % Versions.Elastic4s
-  val ElasticsearchClusterRunner = "org.codelibs"                           % "elasticsearch-cluster-runner" % "7.16.3.0"
-  val ElasticsearchRestClient    = "org.elasticsearch.client"               % "elasticsearch-rest-client"    % Versions.Elasticsearch
   val FastMd5                    = "com.joyent.util"                        % "fast-md5"                     % Versions.FastMd5
   val JUnit                      = "junit"                                  % "junit"                        % Versions.JUnit
   val JodaTime                   = "joda-time"                              % "joda-time"                    % Versions.JodaTime
-  val Log4JCore                  = "org.apache.logging.log4j"               % "log4j-core"                   % Versions.Log4J
-  val Log4JSlf4j                 = "org.apache.logging.log4j"               % "log4j-slf4j-impl"             % Versions.Log4J
   val NscalaTime                 = "com.github.nscala-time"                %% "nscala-time"                  % Versions.NscalaTime
   val PekkoActor                 = "org.apache.pekko"                      %% "pekko-actor"                  % Versions.Pekko
   val PekkoActorTestkitTyped     = "org.apache.pekko"                      %% "pekko-actor-testkit-typed"    % Versions.Pekko
@@ -61,10 +48,8 @@ object Dependencies {
   val PekkoHttp                  = "org.apache.pekko"                      %% "pekko-http"                   % Versions.PekkoHttp
   val PekkoHttpCore              = "org.apache.pekko"                      %% "pekko-http-core"              % Versions.PekkoHttp
   val PekkoHttpTestkit           = "org.apache.pekko"                      %% "pekko-http-testkit"           % Versions.PekkoHttp
-  val PekkoSlf4J                 = "org.apache.pekko"                      %% "pekko-slf4j"                  % Versions.Pekko
   val PekkoStream                = "org.apache.pekko"                      %% "pekko-stream"                 % Versions.Pekko
   val PekkoStreamTestkit         = "org.apache.pekko"                      %% "pekko-stream-testkit"         % Versions.Pekko
-  val PekkoTestkit               = "org.apache.pekko"                      %% "pekko-testkit"                % Versions.Pekko
   val ScalaCheck                 = "org.scalacheck"                        %% "scalacheck"                   % Versions.ScalaCheck
   val ScalaCollectionCompat      = "org.scala-lang.modules"                %% "scala-collection-compat"      % "2.13.0"
   val ScalaLogging               = "com.typesafe.scala-logging"            %% "scala-logging"                % Versions.ScalaLogging
