@@ -9,13 +9,6 @@ import scala.util.Random
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mutable.Specification
 
-class MemoizeFnWithGuavaSpec(implicit ee: ExecutionEnv) extends BaseMemoizeFnSpec()(ee) {
-  def newConf(size: Option[Long] = None, ttl: Option[FiniteDuration] = None) = {
-    config.Cache.Guava(size, ttl)
-  }
-  lazy val underlyingCacheName = "Guava"
-}
-
 class MemoizeFnWithCaffeineSpec(implicit ee: ExecutionEnv) extends BaseMemoizeFnSpec()(ee) {
   def newConf(size: Option[Long] = None, ttl: Option[FiniteDuration] = None) = {
     config.Cache.Caffeine(size, ttl)

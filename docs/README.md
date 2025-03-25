@@ -338,7 +338,7 @@ To use it in an existing SBT project, add the following dependency to your `buil
 libraryDependencies += "com.kevel" %% "apso-caching" % "@VERSION@"
 ```
 
-Apso provides utilities to simplify the caching of method calls, with [ScalaCache](https://cb372.github.io/scalacache/) and using either `Guava` or `Caffeine` as underlying cache implementations.
+Apso provides utilities to simplify the caching of method calls, with [ScalaCache](https://cb372.github.io/scalacache/) and using `Caffeine` as the underlying cache implementation.
 
 These utilities are provided as `cached()` and `cachedF()` extension methods over all `FunctionN[]` types:
 
@@ -367,7 +367,7 @@ val y = new AtomicInteger(0)
 val cachedFutFn = ((i: Int) => Future {
   val value = y.getAndAdd(i)
   value
-}).cachedF(config.Cache.Guava(Some(2), None))
+}).cachedF(config.Cache.Caffeine(Some(2), None))
 
 Await.result(cachedFutFn(3), Duration.Inf)
 Await.result(cachedFutFn(3), Duration.Inf)
