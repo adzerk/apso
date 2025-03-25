@@ -7,12 +7,13 @@ env:
 
 jobs:
   build:
-    name: CI (Java ${{ matrix.java }})
+    name: Scala ${{ matrix.scala }} (Java ${{ matrix.java }})
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
+        scala: ['2.13', '3.3']
         java: ['11', '17', '21']
 
     steps:
@@ -36,11 +37,11 @@ jobs:
 
       - name: Compile and check format
         run: >-
-          sbt Test/compile &&
+          sbt "++${{ matrix.scala }} Test/compile" scalafmtSbt &&
           git diff --exit-code
 
       - name: Run tests
-        run: sbt -Dsbt.color=always test
+        run: sbt -Dsbt.color=always "++${{ matrix.scala }} test"
 
       - name: Check mdoc for uncommitted changes
         run: sbt -Dsbt.color=always "docs/mdoc --check"

@@ -20,7 +20,7 @@ class ImplicitsSpec extends Specification with ScalaCheck with FutureExtraMatche
 
     def centralMoment(n: Int, xs: Iterable[Double]) = {
       val avg = xs.sum / xs.size
-      val ys = xs map { x: Double => math.pow(x - avg, n.toDouble) }
+      val ys = xs.map((x: Double) => math.pow(x - avg, n.toDouble))
       ys.sum / ys.size
     }
 
@@ -44,7 +44,7 @@ class ImplicitsSpec extends Specification with ScalaCheck with FutureExtraMatche
       val tests = (1 to runs).map { _ => rand.chooseN(elems, n) }
 
       tests.map(_.size).toSet === Set(n)
-      val elementCounts: Map[Int, Int] = tests.flatten.groupBy(identity).view.mapValues(_.size).toMap
+      val elementCounts = tests.flatten.groupBy(identity).view.mapValues(_.size).toMap
 
       elementCounts.keys.size must beCloseTo(elems.size +/- 5)
 
@@ -112,7 +112,7 @@ class ImplicitsSpec extends Specification with ScalaCheck with FutureExtraMatche
       val map = Map("a" -> 0.2, "b" -> 0.3, "c" -> 0.5)
       val runs = 10000
 
-      rand.samples(Map.empty[String, Double]) must beEmpty
+      rand.samples(Map.empty[String, Double]).toList must beEmpty
 
       val sampleDistr = rand.samples(map).take(runs).foldLeft(Map.empty[String, Int]) { case (acc, k) =>
         acc.updated(k, acc.getOrElse(k, 0) + 1)
