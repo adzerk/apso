@@ -41,7 +41,7 @@ override def apply([#i0: I0#]) = memoizeF(cacheConf.ttl)(fn([#i0#]))
   * Provides methods to cache/memoize a given function using ScalaCache.
   *
   * The provided `function` param is memoized using ScalaCache and the client can provide a `config.Cache` object
-  * to configure the underlying cache engine, such as type (caffeine, guava), size and time-to-live.
+  * to configure the underlying cache engine, such as type (caffeine), size and time-to-live.
   *
   * Each method returns a `MemoizeFn*` object, according to the number of arguments of the input function, which
   * provides a corresponding `apply()` method. This method signature follows the signature of the provided function,
