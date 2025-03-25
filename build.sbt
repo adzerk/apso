@@ -5,7 +5,7 @@ import xerial.sbt.Sonatype.sonatypeCentralHost
 
 ThisBuild / organization := "com.kevel"
 
-ThisBuild / scalaVersion       := "2.13.16"
+ThisBuild / scalaVersion := "2.13.16"
 
 val javaVersion = "11"
 
@@ -62,9 +62,9 @@ lazy val circe = module(project, "circe").settings(
 
 lazy val collections = module(project, "collections").settings(
   libraryDependencies ++= Seq(
-    ScalaCheck            % Test,
-    Specs2Core            % Test,
-    Specs2ScalaCheck      % Test
+    ScalaCheck       % Test,
+    Specs2Core       % Test,
+    Specs2ScalaCheck % Test
   )
 )
 
