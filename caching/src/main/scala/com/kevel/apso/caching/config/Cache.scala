@@ -25,21 +25,4 @@ object Cache {
       )
     }
   }
-
-  case class Guava(size: Option[Long], ttl: Option[FiniteDuration]) extends Cache {
-    def implementation[V]: scalacache.Cache[V] = {
-      import com.google.common.cache.CacheBuilder
-      import scalacache._
-      import scalacache.guava._
-
-      val builder = CacheBuilder.newBuilder()
-
-      GuavaCache(
-        size
-          .map(builder.maximumSize)
-          .getOrElse(builder)
-          .build[String, Entry[V]]
-      )
-    }
-  }
 }
