@@ -16,6 +16,9 @@
 
 package com.kevel.apso.caching
 
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+
 import scala.annotation.tailrec
 import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future, Promise}
@@ -60,7 +63,7 @@ final class SimpleLruCache[V](val maxCapacity: Int, val initialCapacity: Int) ex
   require(maxCapacity >= 0, "maxCapacity must not be negative")
   require(initialCapacity <= maxCapacity, "initialCapacity must be <= maxCapacity")
 
-  private[caching] val store = new ConcurrentLinkedHashMap.Builder[Any, Future[V]]
+  private val store = new ConcurrentLinkedHashMap.Builder[Any, Future[V]]
     .initialCapacity(initialCapacity)
     .maximumWeightedCapacity(maxCapacity)
     .build()
@@ -120,7 +123,7 @@ final class ExpiringLruCache[V](maxCapacity: Long, initialCapacity: Int, timeToL
     s"timeToLive($timeToLive) must be greater than timeToIdle($timeToIdle)"
   )
 
-  private[caching] val store = new ConcurrentLinkedHashMap.Builder[Any, Entry[V]]
+  private val store = new ConcurrentLinkedHashMap.Builder[Any, Entry[V]]
     .initialCapacity(initialCapacity)
     .maximumWeightedCapacity(maxCapacity)
     .build()
@@ -187,18 +190,22 @@ final class ExpiringLruCache[V](maxCapacity: Long, initialCapacity: Int, timeToL
 
   def size = store.size
 
-  private def isAlive(entry: Entry[V]) =
-    (entry.created + timeToLive).isFuture &&
-      (entry.lastAccessed + timeToIdle).isFuture
+  private def isAlive(entry: Entry[V]) = {
+    def isFuture(instant: Instant) = instant.isAfter(Instant.now())
+    def sum(instant: Instant, duration: Duration) =
+      if (!duration.isFinite) Instant.MAX else instant.plus(duration.toMillis, ChronoUnit.MILLIS)
+
+    isFuture(sum(entry.created, timeToLive)) && isFuture(sum(entry.lastAccessed, timeToIdle))
+  }
 }
 
-private[caching] class Entry[T](val promise: Promise[T]) {
-  @volatile var created = Timestamp.now
-  @volatile var lastAccessed = Timestamp.now
+private class Entry[T](val promise: Promise[T]) {
+  @volatile var created = Instant.now()
+  @volatile var lastAccessed = Instant.now()
   def future = promise.future
   def refresh(): Unit = {
-    // we dont care whether we overwrite a potentially newer value
-    lastAccessed = Timestamp.now
+    // We don't care whether we overwrite a potentially newer value.
+    lastAccessed = Instant.now()
   }
   override def toString = future.value match {
     case Some(Success(value))     => value.toString
