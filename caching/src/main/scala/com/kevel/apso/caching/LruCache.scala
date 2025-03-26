@@ -63,7 +63,7 @@ final class SimpleLruCache[V](val maxCapacity: Int, val initialCapacity: Int) ex
   require(maxCapacity >= 0, "maxCapacity must not be negative")
   require(initialCapacity <= maxCapacity, "initialCapacity must be <= maxCapacity")
 
-  private val store = new ConcurrentLinkedHashMap.Builder[Any, Future[V]]
+  private[caching] val store = new ConcurrentLinkedHashMap.Builder[Any, Future[V]]
     .initialCapacity(initialCapacity)
     .maximumWeightedCapacity(maxCapacity)
     .build()
@@ -123,7 +123,7 @@ final class ExpiringLruCache[V](maxCapacity: Long, initialCapacity: Int, timeToL
     s"timeToLive($timeToLive) must be greater than timeToIdle($timeToIdle)"
   )
 
-  private val store = new ConcurrentLinkedHashMap.Builder[Any, Entry[V]]
+  private[caching] val store = new ConcurrentLinkedHashMap.Builder[Any, Entry[V]]
     .initialCapacity(initialCapacity)
     .maximumWeightedCapacity(maxCapacity)
     .build()
