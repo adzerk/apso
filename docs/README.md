@@ -14,7 +14,7 @@ To use it in an existing SBT project, add the following dependency to your `buil
 libraryDependencies += "com.kevel" %% "apso" % "@VERSION@"
 ```
 
-The project is divided in modules, you can instead install only a specific module. Some modules are already available for Scala 3. Currently, only apso-elasticsearch and apso-caching are not available for Scala 3.
+The project is divided in modules, you can instead install only a specific module. Some modules are already available for Scala 3. Currently, only apso-caching is not available for Scala 3.
 
 The TestKit is available under the `apso-testkit` project. You can include it only for the `test` configuration:
 
