@@ -15,7 +15,7 @@ object Dependencies {
     val ConcurrentLinkedHashMap = "1.4.2"
     val FastMd5                 = "2.7.1"
     val JUnit                   = "4.13.2"
-    val JodaTime                = "2.13.1"
+    val JodaTime                = "2.14.0"
     val NscalaTime              = "3.0.0"
     val ScalaCheck              = "1.18.1"
     val ScalaLogging            = "3.9.5"
