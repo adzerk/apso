@@ -1,91 +1,99 @@
 package com.kevel.apso.caching
 
-import scalacache._
-import scalacache.memoization._
+import com.github.blemale.scaffeine.Scaffeine
+
+import com.github.blemale.scaffeine.{AsyncLoadingCache, LoadingCache}
+
+import scala.concurrent.Future
+
+import MemoizeFn._
 
 /**
-  * Provides a memoization mechanism for functions with 0 arguments using ScalaCache.
+  * Provides a memoization mechanism for synchronous functions with 0 arguments using Caffeine.
   *
   * Provides a corresponding `apply()` method that follows the signature of the provided `fn` function, but is
-  * memoized using ScalaCache.
+  * memoized using Caffeine.
   */
-sealed trait MemoizeFn0[F[_], V] extends Function0[F[V]] {
-  implicit def mode: Mode[F]
+sealed trait SyncMemoizeFn0[V] extends (() => V) {
+  protected def cacheConfig: config.Cache
+  protected def fn: Unit => V
+  private lazy val cache: LoadingCache[Unit, V] = MemoizeFn.builder(cacheConfig).build(fn)
+  override def apply(): V = cache.get(())
+}
 
-  def cacheConf: config.Cache
-  implicit def underlyingCache: scalacache.Cache[V]
-  def fn: () => F[V]
-
-  override def apply() = memoizeF(cacheConf.ttl)(fn())
+/**
+  * Provides a memoization mechanism for asynchronous functions with 0 arguments using Caffeine.
+  *
+  * Provides a corresponding `apply()` method that follows the signature of the provided `fn` function, but is
+  * memoized using Caffeine.
+  */
+sealed trait AsyncMemoizeFn0[V] extends (() => Future[V]) {
+  protected def cacheConfig: config.Cache
+  protected def fn: Unit => Future[V]
+  private lazy val cache: AsyncLoadingCache[Unit, V] = MemoizeFn.builder(cacheConfig).buildAsyncFuture(fn)
+  override def apply(): Future[V] = cache.get(())
 }
 
 [#
 /**
-  * Provides a memoization mechanism for functions with 1 arguments using ScalaCache.
+  * Provides a memoization mechanism for synchronous functions with 1 arguments using Caffeine.
   *
   * Provides a corresponding `apply()` method that follows the signature of the provided `fn` function, but is
-  * memoized using ScalaCache.
+  * memoized using Caffeine.
   */
-sealed trait MemoizeFn1[F[_], [#-I0#], V] extends Function1[[#I0#], F[V]] {
-implicit def mode: Mode[F]
-
-def cacheConf: config.Cache
-implicit def underlyingCache: scalacache.Cache[V]
-def fn: ([#I0#]) => F[V]
-
-override def apply([#i0: I0#]) = memoizeF(cacheConf.ttl)(fn([#i0#]))
+sealed trait SyncMemoizeFn1[[#I0#], V] extends Function1[[#I0#], V] {
+  def cacheConfig: config.Cache
+  def fn: ([#I0#]) => V
+  private lazy val cache: LoadingCache[([#I0#]), V] = MemoizeFn.builder(cacheConfig).build(fn.tupled)
+  override def apply([#i0: I0#]): V = cache.get(([#i0#]))
 }#
 ]
 
+[#
 /**
-  * Provides methods to cache/memoize a given function using ScalaCache.
+  * Provides a memoization mechanism for synchronous functions with 1 arguments using Caffeine.
   *
-  * The provided `function` param is memoized using ScalaCache and the client can provide a `config.Cache` object
-  * to configure the underlying cache engine, such as type (caffeine), size and time-to-live.
-  *
-  * Each method returns a `MemoizeFn*` object, according to the number of arguments of the input function, which
-  * provides a corresponding `apply()` method. This method signature follows the signature of the provided function,
-  * meaning the returned object can be applied just like the original function.
+  * Provides a corresponding `apply()` method that follows the signature of the provided `fn` function, but is
+  * memoized using Caffeine.
   */
+sealed trait AsyncMemoizeFn1[[#I0#], V] extends Function1[[#I0#], Future[V]] {
+  def cacheConfig: config.Cache
+  def fn: ([#I0#]) => Future[V]
+  private lazy val cache: AsyncLoadingCache[([#I0#]), V] = MemoizeFn.builder(cacheConfig).buildAsyncFuture(fn.tupled)
+  override def apply([#i0: I0#]): Future[V] = cache.get(([#i0#]))
+}#
+]
+
 object MemoizeFn {
-
-  def apply[V](function: () => V, conf: config.Cache)(implicit modeImpl: ModeImpl[Id]): MemoizeFn0[Id, V] = {
-    new MemoizeFn0[Id, V] {
-      implicit lazy val mode: Mode[Id] = modeImpl.mode
-      lazy val cacheConf = conf
-      implicit lazy val underlyingCache: scalacache.Cache[V] = conf.implementation[V]
-      lazy val fn = function
-    }
+  private[caching] def builder(conf: config.Cache): Scaffeine[Any, Any] = {
+    val withSize = conf.maximumSize.fold(Scaffeine())(Scaffeine().maximumSize)
+    val withTimeToLive = conf.timeToLive.fold(withSize)(withSize.expireAfterWrite)
+    withTimeToLive
   }
 
-    [#
-  def apply[[#I0#], V](function: ([#I0#]) => V, conf: config.Cache)(implicit modeImpl: ModeImpl[Id]): MemoizeFn1[Id, [#I0#], V] = {
-    new MemoizeFn1[Id, [#I0#], V] {
-      implicit lazy val mode: Mode[Id] = modeImpl.mode
-      lazy val cacheConf = conf
-      implicit lazy val underlyingCache: scalacache.Cache[V] = conf.implementation[V]
-      lazy val fn = function
-    }
-  }#
-  ]
-
-  def applyF[F[_], V](function: () => F[V], conf: config.Cache)(implicit modeImpl: ModeImpl[F]): MemoizeFn0[F, V] = {
-    new MemoizeFn0[F, V] {
-      implicit lazy val mode: Mode[F] = modeImpl.mode
-      lazy val cacheConf = conf
-      implicit lazy val underlyingCache: scalacache.Cache[V] = conf.implementation[V]
-      lazy val fn = function
-    }
+  private[caching] implicit class Function1Ops[A, B](f: A => B) {
+    def tupled: A => B = f
   }
 
-    [#
-  def applyF[[#I0#], F[_], V](function: ([#I0#]) => F[V], conf: config.Cache)(implicit modeImpl: ModeImpl[F]): MemoizeFn1[F, [#I0#], V] = {
-    new MemoizeFn1[F, [#I0#], V] {
-      implicit lazy val mode: Mode[F] = modeImpl.mode
-      lazy val cacheConf = conf
-      implicit lazy val underlyingCache: scalacache.Cache[V] = conf.implementation[V]
-      lazy val fn = function
-    }
+  def sync[V](function: () => V, conf: config.Cache): SyncMemoizeFn0[V] = new SyncMemoizeFn0[V] {
+    def cacheConfig: config.Cache = conf
+    def fn: Unit => V = _ => function()
+  }
+[#
+  def sync[[#I0#], V](function: ([#I0#]) => V, conf: config.Cache): SyncMemoizeFn1[[#I0#], V] = new SyncMemoizeFn1[[#I0#], V] {
+    def cacheConfig: config.Cache = conf
+    def fn: ([#I0#]) => V = function
   }#
-  ]
+]
+
+  def async[V](function: () => Future[V], conf: config.Cache): AsyncMemoizeFn0[V] = new AsyncMemoizeFn0[V] {
+    def cacheConfig: config.Cache = conf
+    def fn: Unit => Future[V] = _ => function()
+  }
+[#
+  def async[[#I0#], V](function: ([#I0#]) => Future[V], conf: config.Cache): AsyncMemoizeFn1[[#I0#], V] = new AsyncMemoizeFn1[[#I0#], V] {
+    def cacheConfig: config.Cache = conf
+    def fn: ([#I0#]) => Future[V] = function
+  }#
+]
 }
