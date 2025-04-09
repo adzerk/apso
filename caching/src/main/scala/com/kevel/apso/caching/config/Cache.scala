@@ -2,27 +2,13 @@ package com.kevel.apso.caching.config
 
 import scala.concurrent.duration.FiniteDuration
 
-sealed trait Cache {
-  def size: Option[Long]
-  def ttl: Option[FiniteDuration]
-
-  def implementation[V]: scalacache.Cache[V]
-}
-
-object Cache {
-  case class Caffeine(size: Option[Long], ttl: Option[FiniteDuration]) extends Cache {
-    def implementation[V]: scalacache.Cache[V] = {
-      import scalacache._
-      import scalacache.caffeine._
-
-      val builder = com.github.benmanes.caffeine.cache.Caffeine.newBuilder()
-
-      CaffeineCache(
-        size
-          .map(builder.maximumSize)
-          .getOrElse(builder)
-          .build[String, Entry[V]]
-      )
-    }
-  }
-}
+/** A cache configuration for the underlying [[https://github.com/ben-manes/caffeine Caffeine]] cache implementation.
+  *
+  * @param timeToLive
+  *   the maximum time an entry can stay in cache after its last write. If empty, the entry will not be evicted based on
+  *   age.
+  * @param maximumSize
+  *   the maximum number of entries in the cache. Note that this threshold might be temporarily exceeded while the
+  *   underlying cache is evicting old entries.
+  */
+case class Cache(timeToLive: Option[FiniteDuration], maximumSize: Option[Long] = None)
