@@ -7,12 +7,24 @@ import scala.concurrent.Future
   */
 trait CachedFunctionsExtras {
   final implicit class Fn0SyncCachingExtras[V](fn: Function0[V]) {
+    /**
+     * Caches the result of this computation. If this function returns a [[Future]], prefer `cachedAsync`
+     * for automatic failing future eviction.
+     * @param conf the underlying cache settings.
+     * @return a cached thunk.
+     */
     final def cachedSync(conf: config.Cache): SyncMemoizeFn0[V] = {
       MemoizeFn.sync(fn, conf)
     }
   }
   [#
   final implicit class Fn1SyncCachingExtras[[#I0#], V](fn: Function1[[#I0#], V]) {
+    /**
+     * Caches the result of this computation. If this function returns a [[Future]], prefer `cachedAsync`
+     * for automatic failing future eviction.
+     * @param conf the underlying cache settings.
+     * @return a cached thunk.
+     */
     final def cachedSync(conf: config.Cache): SyncMemoizeFn1[[#I0#], V] = {
       MemoizeFn.sync(fn, conf)
     }
@@ -20,12 +32,22 @@ trait CachedFunctionsExtras {
   ]
 
   final implicit class Fn0AsyncCachingFExtras[V](fn: Function0[Future[V]]) {
+    /**
+     * Caches the result of this asynchronous computation. Failing futures will eventually be evicted automatically.
+     * @param conf the underlying cache settings.
+     * @return a cached thunk.
+     */
     final def cachedAsync(conf: config.Cache): AsyncMemoizeFn0[V] = {
       MemoizeFn.async(fn, conf)
     }
   }
   [#
   final implicit class Fn1AsyncCachingExtras[[#I0#], V](fn: Function1[[#I0#], Future[V]]) {
+    /**
+     * Caches the result of this asynchronous computation. Failing futures will eventually be evicted automatically.
+     * @param conf the underlying cache settings.
+     * @return a cached thunk.
+     */
     final def cachedAsync(conf: config.Cache): AsyncMemoizeFn1[[#I0#], V] = {
       MemoizeFn.async(fn, conf)
     }
