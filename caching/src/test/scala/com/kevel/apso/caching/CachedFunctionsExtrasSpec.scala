@@ -75,11 +75,14 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
 
       "evicting failing futures" in {
         val counter = new AtomicInteger(0)
-        val f = () => if (counter.getAndIncrement() == 0) Future.failed(new RuntimeException()) else Future { counter }
+        val f = () => {
+          val current = counter.getAndIncrement()
+          if (current == 0) Future.failed(new RuntimeException()) else Future { current }
+        }
         val cachedF = f.cachedAsync(config.Cache(Some(1.day)))
         Await.result(cachedF(), 10.seconds) must throwA
-        cachedF() must beEqualTo(0)
-        cachedF() must beEqualTo(0)
+        eventually(cachedF() must beEqualTo(1).await)
+        cachedF() must beEqualTo(1).await
       }
     }
   }
