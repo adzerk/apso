@@ -75,23 +75,23 @@ object MemoizeFn {
     def tupled: A => B = f
   }
 
-  def sync[V](function: () => V, conf: config.Cache): SyncMemoizeFn0[V] = new SyncMemoizeFn0[V] {
+  private[caching] def sync[V](function: () => V, conf: config.Cache): SyncMemoizeFn0[V] = new SyncMemoizeFn0[V] {
     def cacheConfig: config.Cache = conf
     def fn: Unit => V = _ => function()
   }
 [#
-  def sync[[#I0#], V](function: ([#I0#]) => V, conf: config.Cache): SyncMemoizeFn1[[#I0#], V] = new SyncMemoizeFn1[[#I0#], V] {
+  private[caching] def sync[[#I0#], V](function: ([#I0#]) => V, conf: config.Cache): SyncMemoizeFn1[[#I0#], V] = new SyncMemoizeFn1[[#I0#], V] {
     def cacheConfig: config.Cache = conf
     def fn: ([#I0#]) => V = function
   }#
 ]
 
-  def async[V](function: () => Future[V], conf: config.Cache): AsyncMemoizeFn0[V] = new AsyncMemoizeFn0[V] {
+  private[caching] def async[V](function: () => Future[V], conf: config.Cache): AsyncMemoizeFn0[V] = new AsyncMemoizeFn0[V] {
     def cacheConfig: config.Cache = conf
     def fn: Unit => Future[V] = _ => function()
   }
 [#
-  def async[[#I0#], V](function: ([#I0#]) => Future[V], conf: config.Cache): AsyncMemoizeFn1[[#I0#], V] = new AsyncMemoizeFn1[[#I0#], V] {
+  private[caching] def async[[#I0#], V](function: ([#I0#]) => Future[V], conf: config.Cache): AsyncMemoizeFn1[[#I0#], V] = new AsyncMemoizeFn1[[#I0#], V] {
     def cacheConfig: config.Cache = conf
     def fn: ([#I0#]) => Future[V] = function
   }#

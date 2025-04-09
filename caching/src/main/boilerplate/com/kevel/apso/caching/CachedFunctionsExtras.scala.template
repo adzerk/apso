@@ -2,14 +2,15 @@ package com.kevel.apso.caching
 
 import scala.concurrent.Future
 
+import com.kevel.apso.caching.SyncEvidence
+
 /**
   * Provides extension methods `.cachedSync()` and `.cachedAsync()` for `FunctionN` types.
   */
 trait CachedFunctionsExtras {
-  final implicit class Fn0SyncCachingExtras[V](fn: Function0[V]) {
+  final implicit class Fn0SyncCachingExtras[V](fn: Function0[V])(implicit ev: SyncEvidence[V]) {
     /**
-     * Caches the result of this computation. If this function returns a [[Future]], prefer `cachedAsync`
-     * for automatic failing future eviction.
+     * Caches the result of this computation.
      * @param conf the underlying cache settings.
      * @return a cached thunk.
      */
@@ -18,10 +19,9 @@ trait CachedFunctionsExtras {
     }
   }
   [#
-  final implicit class Fn1SyncCachingExtras[[#I0#], V](fn: Function1[[#I0#], V]) {
+  final implicit class Fn1SyncCachingExtras[[#I0#], V](fn: Function1[[#I0#], V])(implicit ev: SyncEvidence[V]) {
     /**
-     * Caches the result of this computation. If this function returns a [[Future]], prefer `cachedAsync`
-     * for automatic failing future eviction.
+     * Caches the result of this computation.
      * @param conf the underlying cache settings.
      * @return a cached thunk.
      */
