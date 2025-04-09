@@ -18,6 +18,82 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.21.1] - 2025-04-09
+
+This is a patch release towards 0.22.0, in which we expect to have full support for Scala 3. We have started
+cross-publishing most modules to Scala 3. Currently, only apso-caching is not yet available in Scala 3.
+
+In this release we have dropped the apso-elasticsearch module. It's usefulness was debatable since it was pinned to a
+specific Elasticsearch version.
+
+We have also improved the implementation of the `list` method of `S3FileDescriptor`, making it much faster in
+those scenarios where a bucket contains multiple files.
+
+### Added
+- Start cross-compiling most modules to Scala 3 ([#807](https://github.com/adzerk/apso/pull/807)).
+
+### Changed
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.778 ([#758](https://github.com/adzerk/apso/pull/758)).
+- Update log4j-core, log4j-slf4j-impl to 2.24.2 ([#760](https://github.com/adzerk/apso/pull/760)).
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.779 ([#761](https://github.com/adzerk/apso/pull/761)).
+- Update sbt, scripted-plugin to 1.10.6 ([#762](https://github.com/adzerk/apso/pull/762)).
+- Update sbt-pgp to 2.3.1 ([#763](https://github.com/adzerk/apso/pull/763)).
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.780 ([#764](https://github.com/adzerk/apso/pull/764)).
+- Update log4j-core, log4j-slf4j-impl to 2.24.3 ([#765](https://github.com/adzerk/apso/pull/765)).
+- Update sbt-mdoc to 2.6.2 ([#766](https://github.com/adzerk/apso/pull/766)).
+- Update sbt, scripted-plugin to 1.10.7 ([#767](https://github.com/adzerk/apso/pull/767)).
+- Install sbt in GitHub actions ([#768](https://github.com/adzerk/apso/pull/768)).
+- Update commons-codec to 1.17.2 ([#769](https://github.com/adzerk/apso/pull/769)).
+- Update pekko-actor, ... to 1.1.3 ([#770](https://github.com/adzerk/apso/pull/770)).
+- Update nscala-time to 3.0.0 ([#771](https://github.com/adzerk/apso/pull/771)).
+- Update sbt-scalafmt to 2.5.3 ([#772](https://github.com/adzerk/apso/pull/772)).
+- Update scalafmt-core to 3.8.4 ([#773](https://github.com/adzerk/apso/pull/773)).
+- Update sbt-scalafix to 0.14.0 ([#774](https://github.com/adzerk/apso/pull/774)).
+- Update bcpkix-jdk18on, bcprov-jdk18on to 1.80 ([#775](https://github.com/adzerk/apso/pull/775)).
+- Update scala-library to 2.13.16 ([#776](https://github.com/adzerk/apso/pull/776)).
+- Update sbt-scalafmt to 2.5.4 ([#777](https://github.com/adzerk/apso/pull/777)).
+- Update scalafmt-core to 3.8.5 ([#778](https://github.com/adzerk/apso/pull/778)).
+- Update cats-core to 2.13.0 ([#779](https://github.com/adzerk/apso/pull/779)).
+- Update scalafmt-core to 3.8.6 ([#780](https://github.com/adzerk/apso/pull/780)).
+- Update commons-codec to 1.18.0 ([#782](https://github.com/adzerk/apso/pull/782)).
+- Update joda-time to 2.13.1 ([#783](https://github.com/adzerk/apso/pull/783)).
+- Update scala-collection-compat to 2.13.0 ([#784](https://github.com/adzerk/apso/pull/784)).
+- Update sbt-mdoc to 2.6.3 ([#785](https://github.com/adzerk/apso/pull/785)).
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.781 ([#786](https://github.com/adzerk/apso/pull/786)).
+- Update sbt-mdoc to 2.6.4 ([#787](https://github.com/adzerk/apso/pull/787)).
+- Update scalafmt-core to 3.9.0 ([#788](https://github.com/adzerk/apso/pull/788)).
+- Update SCM connection string ([#789](https://github.com/adzerk/apso/pull/789)).
+- Update sbt-scalafix to 0.14.2 ([#790](https://github.com/adzerk/apso/pull/790)).
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.782 ([#791](https://github.com/adzerk/apso/pull/791)).
+- Update scalafmt-core to 3.9.1 ([#792](https://github.com/adzerk/apso/pull/792)).
+- Update scalafmt-core to 3.9.2 ([#793](https://github.com/adzerk/apso/pull/793)).
+- Update shapeless to 2.3.13 ([#794](https://github.com/adzerk/apso/pull/794)).
+- Update sbt, scripted-plugin to 1.10.8 ([#795](https://github.com/adzerk/apso/pull/795)).
+- Update sbt, scripted-plugin to 1.10.10 ([#796](https://github.com/adzerk/apso/pull/796)).
+- Update scalafmt-core to 3.9.3 ([#797](https://github.com/adzerk/apso/pull/797)).
+- Update scalafmt-core to 3.9.4 ([#798](https://github.com/adzerk/apso/pull/798)).
+- Update circe-core, circe-generic, ... to 0.14.12 ([#799](https://github.com/adzerk/apso/pull/799)).
+- Update sbt, scripted-plugin to 1.10.11 ([#800](https://github.com/adzerk/apso/pull/800)).
+- Update sbt-mdoc to 2.6.5 ([#801](https://github.com/adzerk/apso/pull/801)).
+- Update specs2-common, specs2-core, ... to 4.21.0 ([#802](https://github.com/adzerk/apso/pull/802)).
+- Have a single build.sbt file ([#803](https://github.com/adzerk/apso/pull/803)).
+- Move elasticsearch-pekko to elasticsearch ([#806](https://github.com/adzerk/apso/pull/806)).
+- Update joda-time to 2.14.0 ([#817](https://github.com/adzerk/apso/pull/817)).
+
+### Removed
+- Remove Guava option from apso-caching ([#810](https://github.com/adzerk/apso/pull/810)).
+- Remove apso-elasticsearch ([#811](https://github.com/adzerk/apso/pull/811)).
+- Drop support for Scala 2.12 ([#813](https://github.com/adzerk/apso/pull/813)).
+- Remove custom `Timestamp` implementation from `caching` ([#814](https://github.com/adzerk/apso/pull/814)).
+
+### Fixed
+- Make fromFullPaths tail recursive ([#759](https://github.com/adzerk/apso/pull/759)).
+- Fix CI badge ([#781](https://github.com/adzerk/apso/pull/781)).
+- Remove Scala Steward pins related to Elasticsearch dependencies ([#816](https://github.com/adzerk/apso/pull/816)).
+- Avoid fetching all prefixes when listing S3 files under a directory ([#819](https://github.com/adzerk/apso/pull/819)).
+
+[0.21.1]: https://github.com/adzerk/apso/compare/v0.21.0...v0.21.1
+
 ## [0.21.0] - 2024-11-06
 
 In this release we have added a `uri` method to the `FileDescriptor` data type. The `uri` method can be used to produce

@@ -11,7 +11,7 @@ Apso's latest release is built against Scala 2.13.
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.kevel" %% "apso" % "0.21.0"
+libraryDependencies += "com.kevel" %% "apso" % "0.21.1"
 ```
 
 The project is divided in modules, you can instead install only a specific module. Some modules are already available for Scala 3. Currently, only apso-caching is not available for Scala 3.
@@ -19,7 +19,7 @@ The project is divided in modules, you can instead install only a specific modul
 The TestKit is available under the `apso-testkit` project. You can include it only for the `test` configuration:
 
 ```scala
-libraryDependencies += "com.kevel" %% "apso-testkit" % "0.21.0" % "test"
+libraryDependencies += "com.kevel" %% "apso-testkit" % "0.21.1" % "test"
 ```
 
 Please take into account that the library is still in an experimental stage and the interfaces might change for subsequent releases.
@@ -69,7 +69,7 @@ Please take into account that the library is still in an experimental stage and 
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.kevel" %% "apso-core" % "0.21.0"
+libraryDependencies += "com.kevel" %% "apso-core" % "0.21.1"
 ```
 
 ### Config
@@ -283,7 +283,7 @@ The `pekko-http` module provides additional [directives](https://pekko.apache.or
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.kevel" %% "apso-pekko-http" % "0.21.0"
+libraryDependencies += "com.kevel" %% "apso-pekko-http" % "0.21.1"
 ```
 
 ### ClientIPDirectives
@@ -305,7 +305,7 @@ Apso provides a group of classes to ease the interaction with the Amazon Web Ser
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.kevel" %% "apso-aws" % "0.21.0"
+libraryDependencies += "com.kevel" %% "apso-aws" % "0.21.1"
 ```
 
 ### ConfigCredentialsProvider
@@ -352,7 +352,7 @@ The `apso-caching` module provides provides utilities for caching.
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.kevel" %% "apso-caching" % "0.21.0"
+libraryDependencies += "com.kevel" %% "apso-caching" % "0.21.1"
 ```
 
 Apso provides utilities to simplify the caching of method calls, with [ScalaCache](https://cb372.github.io/scalacache/) and using `Caffeine` as the underlying cache implementation.
@@ -406,7 +406,7 @@ y
 The `apso-collections` module provides some helpful collections. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.kevel" %% "apso-collections" % "0.21.0"
+libraryDependencies += "com.kevel" %% "apso-collections" % "0.21.1"
 ```
 
 ### Trie
@@ -607,7 +607,7 @@ creation of the underlying Cyphers.
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.kevel" %% "apso-encryption" % "0.21.0"
+libraryDependencies += "com.kevel" %% "apso-encryption" % "0.21.1"
 ```
 
 The following shows the creation of `Encryptor` and `Decryptor` objects,
@@ -632,7 +632,7 @@ decryptor.get.decryptToString(encryptor.get.encryptToSafeString(secretData).get)
 Apso provides utilities for various hashing functions. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.kevel" %% "apso-hashing" % "0.21.0"
+libraryDependencies += "com.kevel" %% "apso-hashing" % "0.21.1"
 ```
 
 ```scala
@@ -652,7 +652,7 @@ Apso provides methods to deal with IO-related features in the `io` module.
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.kevel" %% "apso-io" % "0.21.0"
+libraryDependencies += "com.kevel" %% "apso-io" % "0.21.1"
 ```
 
 ### FileDescriptor
@@ -695,7 +695,7 @@ ResourceUtil.getResourceAsString("reference.conf")
 Apso includes a bunch of utilities to work with JSON serialization and deserialization, specifically with the [circe](https://circe.github.io/circe/) library. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.kevel" %% "apso-circe" % "0.21.0"
+libraryDependencies += "com.kevel" %% "apso-circe" % "0.21.1"
 ```
 
 ### ExtraJsonProtocol
@@ -807,7 +807,7 @@ The `profiling` module of apso provides utilities to help with profiling the run
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.kevel" %% "apso-profiling" % "0.21.0"
+libraryDependencies += "com.kevel" %% "apso-profiling" % "0.21.1"
 ```
 
 ### CpuSampler
@@ -825,7 +825,7 @@ The `apso-time` module provides utilities to work with `DateTime` and `LocalDate
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.kevel" %% "apso-time" % "0.21.0"
+libraryDependencies += "com.kevel" %% "apso-time" % "0.21.1"
 ```
 
 See the following sample usages:
