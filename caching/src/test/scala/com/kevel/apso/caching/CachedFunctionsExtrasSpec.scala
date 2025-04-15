@@ -58,6 +58,51 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
         quickly(cachedF() must beEqualTo(1))
         quickly(cachedF() must beEqualTo(2))
       }
+
+      "that resorts to the `hashCode` method of the key" in {
+        val hashCodeCallCounter = new AtomicInteger(0)
+        val toStringCallCounter = new AtomicInteger(0)
+        case class Dummy(str: String, int: Int) {
+          override def hashCode(): Int = {
+            hashCodeCallCounter.incrementAndGet()
+            super.hashCode()
+          }
+
+          override def toString: String = {
+            toStringCallCounter.incrementAndGet()
+            super.toString
+          }
+        }
+
+        val f = (dum: Dummy) => ()
+        val cachedF = f.cachedSync(config.Cache(None))
+        val dummy1 = Dummy("str", 0)
+        hashCodeCallCounter.get() must beEqualTo(0)
+        toStringCallCounter.get() must beEqualTo(0)
+
+        // The first get will trigger a put, hence the two expected `hashCode` calls.
+        // We want to make sure Caffeine does not resort to `toString` behind our backs.
+        cachedF(dummy1) must beEqualTo(())
+        hashCodeCallCounter.get() must beEqualTo(2)
+        cachedF(dummy1) must beEqualTo(())
+        hashCodeCallCounter.get() must beEqualTo(3)
+        cachedF(dummy1) must beEqualTo(())
+        hashCodeCallCounter.get() must beEqualTo(4)
+        toStringCallCounter.get() must beEqualTo(0)
+
+        // We tuple the arguments to make a build key instance,
+        // and need to ensure that `hashCode` is called recursively.
+        val f2 = (dum1: Dummy, dum2: Dummy) => ()
+        val cachedF2 = f2.cachedSync(config.Cache(None))
+        val dummy2 = Dummy("str2", 0)
+        val dummy3 = Dummy("str3", 0)
+        hashCodeCallCounter.get() must beEqualTo(4)
+        cachedF2(dummy2, dummy3) must beEqualTo(())
+        hashCodeCallCounter.get() must beEqualTo(8)
+        cachedF2(dummy2, dummy3) must beEqualTo(())
+        hashCodeCallCounter.get() must beEqualTo(10)
+        toStringCallCounter.get() must beEqualTo(0)
+      }
     }
 
     "provide asynchronous variants" in {
