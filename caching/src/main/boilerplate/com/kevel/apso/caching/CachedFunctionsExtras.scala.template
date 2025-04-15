@@ -12,7 +12,7 @@ trait CachedFunctionsExtras {
     /**
      * Caches the result of this computation.
      * @param conf the underlying cache settings.
-     * @return a cached thunk.
+     * @return a cached function.
      */
     final def cachedSync(conf: config.Cache): SyncMemoizeFn0[V] = {
       MemoizeFn.sync(fn, conf)
@@ -23,7 +23,7 @@ trait CachedFunctionsExtras {
     /**
      * Caches the result of this computation.
      * @param conf the underlying cache settings.
-     * @return a cached thunk.
+     * @return a cached function.
      */
     final def cachedSync(conf: config.Cache): SyncMemoizeFn1[[#I0#], V] = {
       MemoizeFn.sync(fn, conf)
@@ -35,7 +35,7 @@ trait CachedFunctionsExtras {
     /**
      * Caches the result of this asynchronous computation. Failing futures will eventually be evicted automatically.
      * @param conf the underlying cache settings.
-     * @return a cached thunk.
+     * @return a cached function.
      */
     final def cachedAsync(conf: config.Cache): AsyncMemoizeFn0[V] = {
       MemoizeFn.async(fn, conf)
@@ -46,7 +46,7 @@ trait CachedFunctionsExtras {
     /**
      * Caches the result of this asynchronous computation. Failing futures will eventually be evicted automatically.
      * @param conf the underlying cache settings.
-     * @return a cached thunk.
+     * @return a cached function.
      */
     final def cachedAsync(conf: config.Cache): AsyncMemoizeFn1[[#I0#], V] = {
       MemoizeFn.async(fn, conf)
