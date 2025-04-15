@@ -148,6 +148,38 @@ class S3Bucket(
     if (includeDirectories) objects else objects.filterNot(_.getKey.endsWith("/"))
   }
 
+  /** Assuming prefix points to a folder, returns all filenames and optional object summaries immediately below that
+    * folder. Only actual files will have an S3ObjectSummary, folders won't.
+    *
+    * @param prefix
+    *   the prefix in which to list files
+    * @return
+    *   a list of filenames and optional object summaries in a bucket directly "below" the provided prefix.
+    */
+  def getFilesInFolder(prefix: String): Iterator[(String, Option[S3ObjectSummary])] = {
+    logger.info(s"Finding files in folder '$prefix'...")
+
+    val sanitizedPrefix = if (prefix.nonEmpty) s"${sanitizeKey(prefix)}/" else ""
+
+    val listings = Iterator.iterate(
+      s3.listObjects(
+        new ListObjectsRequest().withBucketName(bucketName).withPrefix(sanitizedPrefix).withDelimiter("/")
+      )
+    )(listing => {
+      if (listing.isTruncated) {
+        logger.debug("Asking for another batch of objects...")
+        s3.listNextBatchOfObjects(listing)
+      } else null
+    })
+
+    listings
+      .takeWhile(_ != null)
+      .flatMap(listing =>
+        listing.getObjectSummaries.asScala
+          .map(summary => (summary.getKey(), Some(summary))) ++ listing.getCommonPrefixes.asScala.map((_, None))
+      )
+  }
+
   /** Returns a list of filenames and directories in a bucket matching a given prefix.
     *
     * @param prefix

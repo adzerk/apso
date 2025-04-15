@@ -40,7 +40,6 @@ lazy val caching = module(project, "caching")
     crossScalaVersions := List(Versions.Scala213),
     libraryDependencies ++= Seq(
       Scaffeine,
-      ConcurrentLinkedHashMapLru,
       Specs2Core % Test
     )
   )
@@ -211,7 +210,7 @@ lazy val docs = (project in file("apso-docs"))
     mdocOut := (ThisBuild / baseDirectory).value,
 
     mdocVariables := Map(
-      "VERSION" -> "0.21.0" // This version should be set to the currently released version.
+      "VERSION" -> "0.21.1" // This version should be set to the currently released version.
     ),
 
     publish / skip := true
