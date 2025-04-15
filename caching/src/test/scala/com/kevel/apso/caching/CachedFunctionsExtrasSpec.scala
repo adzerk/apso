@@ -90,7 +90,7 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
         hashCodeCallCounter.get() must beEqualTo(4)
         toStringCallCounter.get() must beEqualTo(0)
 
-        // We tuple the arguments to make a build key instance,
+        // We tuple the arguments to build a key instance,
         // and need to ensure that `hashCode` is called recursively.
         val f2 = (dum1: Dummy, dum2: Dummy) => ()
         val cachedF2 = f2.cachedSync(config.Cache(None))
