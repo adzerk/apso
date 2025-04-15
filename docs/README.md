@@ -338,9 +338,9 @@ To use it in an existing SBT project, add the following dependency to your `buil
 libraryDependencies += "com.kevel" %% "apso-caching" % "@VERSION@"
 ```
 
-Apso provides utilities to simplify the caching of method calls, with [ScalaCache](https://cb372.github.io/scalacache/) and using `Caffeine` as the underlying cache implementation.
+Apso provides utilities to simplify the caching of method calls, using `Caffeine` as the underlying implementation.
 
-These utilities are provided as `cached()` and `cachedF()` extension methods over all `FunctionN[]` types:
+These utilities are provided as `cachedSync()` and `cachedAsync()` extension methods over all `FunctionN[]` types:
 
 ```scala mdoc:reset
 import scala.concurrent._
@@ -356,7 +356,7 @@ val x = new AtomicInteger(0)
 val cachedFn = ((i: Int) => {
   val value = x.getAndAdd(i)
   value
-}).cached(config.Cache.Caffeine(Some(3), None))
+}).cachedSync(config.Cache(Some(5.seconds)))
 
 cachedFn(2)
 cachedFn(2)
@@ -367,7 +367,7 @@ val y = new AtomicInteger(0)
 val cachedFutFn = ((i: Int) => Future {
   val value = y.getAndAdd(i)
   value
-}).cachedF(config.Cache.Caffeine(Some(2), None))
+}).cachedAsync(config.Cache(Some(5.seconds)))
 
 Await.result(cachedFutFn(3), Duration.Inf)
 Await.result(cachedFutFn(3), Duration.Inf)
