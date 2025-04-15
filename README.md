@@ -355,9 +355,9 @@ To use it in an existing SBT project, add the following dependency to your `buil
 libraryDependencies += "com.kevel" %% "apso-caching" % "0.21.1"
 ```
 
-Apso provides utilities to simplify the caching of method calls, with [ScalaCache](https://cb372.github.io/scalacache/) and using `Caffeine` as the underlying cache implementation.
+Apso provides utilities to simplify the caching of method calls, using `Caffeine` as the underlying implementation.
 
-These utilities are provided as `cached()` and `cachedF()` extension methods over all `FunctionN[]` types:
+These utilities are provided as `cachedSync()` and `cachedAsync()` extension methods over all `FunctionN[]` types:
 
 ```scala
 import scala.concurrent._
@@ -374,13 +374,13 @@ val x = new AtomicInteger(0)
 val cachedFn = ((i: Int) => {
   val value = x.getAndAdd(i)
   value
-}).cached(config.Cache.Caffeine(Some(3), None))
-// cachedFn: MemoizeFn1[scalacache.package.Id, Int, Int] = <function1>
+}).cachedSync(config.Cache(Some(5.seconds)))
+// cachedFn: SyncMemoizeFn1[Int, Int] = <function1>
 
 cachedFn(2)
-// res25: scalacache.package.Id[Int] = 0
+// res25: Int = 0
 cachedFn(2)
-// res26: scalacache.package.Id[Int] = 0
+// res26: Int = 0
 x
 // res27: AtomicInteger = 2
 
@@ -390,8 +390,8 @@ val y = new AtomicInteger(0)
 val cachedFutFn = ((i: Int) => Future {
   val value = y.getAndAdd(i)
   value
-}).cachedF(config.Cache.Caffeine(Some(2), None))
-// cachedFutFn: MemoizeFn1[Future, Int, Int] = <function1>
+}).cachedAsync(config.Cache(Some(5.seconds)))
+// cachedFutFn: AsyncMemoizeFn1[Int, Int] = <function1>
 
 Await.result(cachedFutFn(3), Duration.Inf)
 // res28: Int = 0
