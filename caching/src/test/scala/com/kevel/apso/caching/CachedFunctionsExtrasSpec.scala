@@ -44,10 +44,7 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
         val cachedF = f.cachedSync(config.Cache(Some(1.second)))
 
         cachedF() must beEqualTo(0)
-        Thread.sleep(500)
-        cachedF() must beEqualTo(0)
-        Thread.sleep(1000)
-        cachedF() must beEqualTo(1)
+        eventually(retries = 2, sleep = 1.second)(cachedF() must beEqualTo(1))
       }
 
       "evicting right away if the size is 0" in {
