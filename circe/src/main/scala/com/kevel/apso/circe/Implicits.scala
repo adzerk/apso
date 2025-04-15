@@ -18,7 +18,7 @@ object Implicits {
       case None => Vector.empty
       case Some(jo) =>
         val builder = Vector.newBuilder[(String, Json)]
-        jo.toMap.foreach {
+        jo.toIterable.foreach {
           case (k, v) if v.isObject =>
             flattenedKeyValueSetAux(v, separator).foreach { case (kk, vv) =>
               val path = new StringBuilder(k.length + separator.length + kk.length)
