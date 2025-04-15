@@ -14,8 +14,7 @@ To use it in an existing SBT project, add the following dependency to your `buil
 libraryDependencies += "com.kevel" %% "apso" % "0.21.1"
 ```
 
-The project is divided in modules, you can instead install only a specific module. Some modules are already available
-for Scala 3. Currently, only apso-caching is not available for Scala 3.
+The project is divided in modules, you can instead install only a specific module. Some modules are already available for Scala 3. Currently, only apso-caching is not available for Scala 3.
 
 The TestKit is available under the `apso-testkit` project. You can include it only for the `test` configuration:
 
@@ -23,8 +22,7 @@ The TestKit is available under the `apso-testkit` project. You can include it on
 libraryDependencies += "com.kevel" %% "apso-testkit" % "0.21.1" % "test"
 ```
 
-Please take into account that the library is still in an experimental stage and the interfaces might change for
-subsequent releases.
+Please take into account that the library is still in an experimental stage and the interfaces might change for subsequent releases.
 
 ## Table of Contents
 
@@ -80,17 +78,11 @@ Apso provides methods to ease working with Typesafe's [config](https://github.co
 
 #### LazyConfigFactory
 
-The `LazyConfigFactory` object provides static methods for creating `Config` instances in a lazy way. The lazy way
-refers to the variable loading process. The usual process loads variables in config files eagerly (i.e. the path needs
-to be defined in the same file it is refered to). The loading process provided by `LazyConfigFactory` loads and merges
-all configuration files and only then resolves variables. This loading process introduces a third file (beyond the
-default ones - `application.conf` and `reference.conf`): `overrides.conf`. This file has priority over the
-`application.conf` file and can be used to specify keys that should always be overriden, e.g. by environment variables.
+The `LazyConfigFactory` object provides static methods for creating `Config` instances in a lazy way. The lazy way refers to the variable loading process. The usual process loads variables in config files eagerly (i.e. the path needs to be defined in the same file it is refered to). The loading process provided by `LazyConfigFactory` loads and merges all configuration files and only then resolves variables. This loading process introduces a third file (beyond the default ones - `application.conf` and `reference.conf`): `overrides.conf`. This file has priority over the `application.conf` file and can be used to specify keys that should always be overriden, e.g. by environment variables.
 
 ### HTTP
 
-Apso provides a tiny wrapper for [Dispatch](http://dispatch.databinder.net/) with synchronous operations. It's called
-`W`, and the following shows some sample usage:
+Apso provides a tiny wrapper for [Dispatch](http://dispatch.databinder.net/) with synchronous operations. It's called `W`, and the following shows some sample usage:
 
 ```scala
 import com.kevel.apso.http.W
@@ -111,14 +103,11 @@ W.head("http://www.google.com/").getStatus
 // res4: Int = 302
 ```
 
-The POST and PUT methods can also receive the body as `JSON` (of [circe](https://github.com/circe/circe)), which adds
-the `Content-type` header accordingly.
+The POST and PUT methods can also receive the body as `JSON` (of [circe](https://github.com/circe/circe)), which adds the `Content-type` header accordingly.
 
 ### Geo
 
-The `Geo` object provides methods to compute distances in kilometers between two points on the planet Earth, calculated
-using the spherical [law of cosines](https://en.wikipedia.org/wiki/Great-circle_distance#Formulas). Coordinates are
-represented by a pair of `Double` for latitude and longitude.
+The `Geo` object provides methods to compute distances in kilometers between two points on the planet Earth, calculated using the spherical [law of cosines](https://en.wikipedia.org/wiki/Great-circle_distance#Formulas). Coordinates are represented by a pair of `Double` for latitude and longitude.
 
 ```scala
 import com.kevel.apso.Geo
@@ -132,7 +121,6 @@ You can also have the distance function curried if you are computing distances f
 ```scala
 val distFromOffice = Geo.distanceFrom((41.1617609, -8.6024716))
 ```
-
 ```scala
 distFromOffice((41.1763745, -8.5964861))
 // res3: Double = 1.7004440788845807
@@ -143,8 +131,7 @@ distFromOffice((38.7223032, -9.1414664))
 
 ### Implicits
 
-Apso provides implicit conversions from `String`, `Seq[_]`, `Map[_, _]`, `Seq[Map[_, _]]` and `AutoCloseable` to
-extended types that come packed with extended features.
+Apso provides implicit conversions from `String`, `Seq[_]`, `Map[_, _]`, `Seq[Map[_, _]]` and `AutoCloseable` to extended types that come packed with extended features.
 
 ```scala
 import com.kevel.apso.Implicits._
@@ -164,11 +151,9 @@ Map(1 -> 2, 2 -> 4, 3 -> 6).twoWayMerge(Map(2 -> 2, 3 -> 5)) { (a, b) => b }
 Map(1 -> 2, 2 -> 3).mapKeys(_ + 1)
 // res10: Map[Int, Int] = Map(2 -> 2, 3 -> 3)
 ```
-
 ```scala
 val rand = new scala.util.Random(1)
 ```
-
 ```scala
 rand.choose((0 to 15).toSeq)
 // res11: Option[Int] = Some(value = 11)
@@ -191,8 +176,7 @@ rand.chooseN((0 to 15).toSeq, 4)
 
 ### JreVersionHelper
 
-The JreVersionHelper object provides helper methods to check the two most significant parts of the JRE version at
-runtime:
+The JreVersionHelper object provides helper methods to check the two most significant parts of the JRE version at runtime:
 
 ```scala
 import com.kevel.apso.JreVersionHelper
@@ -231,33 +215,25 @@ progress.tick(30)
 
 ### Reflect
 
-The `Reflect` object contains helpers for reflection-related tasks, namely to create an instance of a given class given
-its fully qualified name and also to access singleton objects:
+The `Reflect` object contains helpers for reflection-related tasks, namely to create an instance of a given class given its fully qualified name and also to access singleton objects:
 
 ```scala
-scala >
-
-import com.kevel.apso.Reflect
+scala> import com.kevel.apso.Reflect
 import com.kevel.apso.Reflect
 
-scala >
-import com.kevel.apso.collection._
+scala> import com.kevel.apso.collection._
 import com.kevel.apso.collection._
 
-scala > Reflect.newInstance[HMap[Nothing]]("com.kevel.apso.collection.HMap")
-res0: com.kevel.apso.collection.HMap[Nothing]
-= HMap()
+scala> Reflect.newInstance[HMap[Nothing]]("com.kevel.apso.collection.HMap")
+res0: com.kevel.apso.collection.HMap[Nothing] = HMap()
 
-scala > Reflect.companion[Reflect.type]("com.kevel.apso.Reflect")
-res1: com.kevel.apso.Reflect.type
-= com.kevel.apso.Reflect$
-@3 b1dbca
+scala> Reflect.companion[Reflect.type]("com.kevel.apso.Reflect")
+res1: com.kevel.apso.Reflect.type = com.kevel.apso.Reflect$@3b1dbca
 ```
 
 ### Retry
 
-The `Retry` object provides a method to retry methods or `Future`s a given number of times until they succeed or the
-specified maximum number of retries is reached:
+The `Retry` object provides a method to retry methods or `Future`s a given number of times until they succeed or the specified maximum number of retries is reached:
 
 ```scala
 import scala.concurrent._
@@ -302,9 +278,7 @@ Retry.retry(10)(m())
 
 ## Pekko HTTP
 
-The `pekko-http` module provides
-additional [directives](https://pekko.apache.org/docs/pekko-http/current/routing-dsl/directives/) to be used
-in [pekko-http](https://pekko.apache.org/docs/pekko-http/current/).
+The `pekko-http` module provides additional [directives](https://pekko.apache.org/docs/pekko-http/current/routing-dsl/directives/) to be used in [pekko-http](https://pekko.apache.org/docs/pekko-http/current/).
 
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
@@ -314,22 +288,15 @@ libraryDependencies += "com.kevel" %% "apso-pekko-http" % "0.21.1"
 
 ### ClientIPDirectives
 
-The `ClientIPDirectives` trait exposes an `optionalRawClientIP` directive that extracts the raw IP of the client from
-either the `X-Forwarded-For`, `Remote-Address` or `X-Real-IP` header, in that order of priority.
+The `ClientIPDirectives` trait exposes an `optionalRawClientIP` directive that extracts the raw IP of the client from either the `X-Forwarded-For`, `Remote-Address` or `X-Real-IP` header, in that order of priority.
 
 ### ExtraMiscDirectives
 
-The `ExtraMiscDirectives` trait exposes the directives `cacheControlMaxAge(maxAgeDuration)` and `optionalRefererHost` to
-set the cache-control header to the supplied finite duration (the minimum resolution is 1 second) to extract the referer
-from the HTTP request header, respectively. The `ExtraMiscDirectives` companion object exposes a `cacheControlNoCache`
-directive to reply with the `no-cache` option in the `Cache-Control` header.
+The `ExtraMiscDirectives` trait exposes the directives `cacheControlMaxAge(maxAgeDuration)` and `optionalRefererHost` to set the cache-control header to the supplied finite duration (the minimum resolution is 1 second) to extract the referer from the HTTP request header, respectively. The `ExtraMiscDirectives` companion object exposes a `cacheControlNoCache` directive to reply with the `no-cache` option in the `Cache-Control` header.
 
 ### ProxySupport
 
-The `ProxySupport` traits adds helper methods to proxy requests to a given uri, either directly (`proxyTo`), or with the
-unmatched path and query parameters of the current context (`proxyToUnmatchedPath`). In order for the client IP to be
-correctly propagated in `X-Forward-For` headers, the `ProxySupport` trait requires the
-`pekko.http.server.remote-address-attribute` setting to be `on`.
+The `ProxySupport` traits adds helper methods to proxy requests to a given uri, either directly (`proxyTo`), or with the unmatched path and query parameters of the current context (`proxyToUnmatchedPath`). In order for the client IP to be correctly propagated in `X-Forward-For` headers, the `ProxySupport` trait requires the `pekko.http.server.remote-address-attribute` setting to be `on`.
 
 ## Amazon Web Services
 
@@ -343,8 +310,7 @@ libraryDependencies += "com.kevel" %% "apso-aws" % "0.21.1"
 
 ### ConfigCredentialsProvider
 
-The `ConfigCredentialsProvider` is an `AWSCredentialsProvider` (from AWS SDK for Java) that retrieves credentials from a
-typesafe configuration, allowing customization of its `Config` object, as well as the access key and secret key paths:
+The `ConfigCredentialsProvider` is an `AWSCredentialsProvider` (from AWS SDK for Java) that retrieves credentials from a typesafe configuration, allowing customization of its `Config` object, as well as the access key and secret key paths:
 
 ```scala
 import com.kevel.apso.aws._
@@ -352,8 +318,7 @@ import com.kevel.apso.aws._
 import com.typesafe.config._
 
 val confProvider = ConfigCredentialsProvider(
-  config = ConfigFactory.parseString(
-    """{
+  config = ConfigFactory.parseString("""{
     aws {
       access-key = "<access-key>"
       secret-key = "<secret-key>"
@@ -371,22 +336,17 @@ credentials.getAWSSecretKey
 
 ### CredentialStore
 
-The `CredentialStore` object serves as an endpoint for the retrieval of AWS credentials from available configurations.
-It extends the chain in the `DefaultAWSCredentialsProviderChain` (from AWS SDK for Java) with the retrieval of AWS
-credentials through the default typesafe configuration file (typically `application.conf`).
+The `CredentialStore` object serves as an endpoint for the retrieval of AWS credentials from available configurations. It extends the chain in the `DefaultAWSCredentialsProviderChain` (from AWS SDK for Java) with the retrieval of AWS credentials through the default typesafe configuration file (typically `application.conf`).
 
 ### S3Bucket
 
-The `S3Bucket` class wraps an instance of `AmazonS3Client` (from AWS SDK for Java) and exposes a higher level interface
-for pushing and pulling files to and from a bucket.
+The `S3Bucket` class wraps an instance of `AmazonS3Client` (from AWS SDK for Java) and exposes a higher level interface for pushing and pulling files to and from a bucket.
 
 ### SerializableAWSCredentials
 
-The `SerializableAWSCredentials` class provides a serializable container for AWS credentials, extending the
-`AWSCredentials` class (from AWS SDK for Java).
+The `SerializableAWSCredentials` class provides a serializable container for AWS credentials, extending the `AWSCredentials` class (from AWS SDK for Java).
 
 ## Caching
-
 The `apso-caching` module provides provides utilities for caching.
 
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
@@ -395,8 +355,7 @@ To use it in an existing SBT project, add the following dependency to your `buil
 libraryDependencies += "com.kevel" %% "apso-caching" % "0.21.1"
 ```
 
-Apso provides utilities to simplify the caching of method calls, with [ScalaCache](https://cb372.github.io/scalacache/)
-and using `Caffeine` as the underlying cache implementation.
+Apso provides utilities to simplify the caching of method calls, with [ScalaCache](https://cb372.github.io/scalacache/) and using `Caffeine` as the underlying cache implementation.
 
 These utilities are provided as `cached()` and `cachedF()` extension methods over all `FunctionN[]` types:
 
@@ -415,13 +374,13 @@ val x = new AtomicInteger(0)
 val cachedFn = ((i: Int) => {
   val value = x.getAndAdd(i)
   value
-}).cachedSync(config.Cache(Some(5.seconds)))
-// cachedFn: SyncMemoizeFn1[Int, Int] = <function1>
+}).cached(config.Cache.Caffeine(Some(3), None))
+// cachedFn: MemoizeFn1[scalacache.package.Id, Int, Int] = <function1>
 
 cachedFn(2)
-// res25: Int = 0
+// res25: scalacache.package.Id[Int] = 0
 cachedFn(2)
-// res26: Int = 0
+// res26: scalacache.package.Id[Int] = 0
 x
 // res27: AtomicInteger = 2
 
@@ -431,8 +390,8 @@ val y = new AtomicInteger(0)
 val cachedFutFn = ((i: Int) => Future {
   val value = y.getAndAdd(i)
   value
-}).cachedAsync(config.Cache(Some(5.seconds)))
-// cachedFutFn: AsyncMemoizeFn1[Int, Int] = <function1>
+}).cachedF(config.Cache.Caffeine(Some(2), None))
+// cachedFutFn: MemoizeFn1[Future, Int, Int] = <function1>
 
 Await.result(cachedFutFn(3), Duration.Inf)
 // res28: Int = 0
@@ -444,8 +403,7 @@ y
 
 ## Collections
 
-The `apso-collections` module provides some helpful collections. To use it in an existing SBT project, add the following
-dependency to your `build.sbt`:
+The `apso-collections` module provides some helpful collections. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
 libraryDependencies += "com.kevel" %% "apso-collections" % "0.21.1"
@@ -561,8 +519,7 @@ Apso provides some utility iterators.
 
 #### CircularIterator
 
-The `CircularIterator` is an iterator that iterates over its elements in a circular way. See the following for sample
-usage:
+The `CircularIterator` is an iterator that iterates over its elements in a circular way. See the following for sample usage:
 
 ```scala
 import com.kevel.apso.iterator.CircularIterator
@@ -576,18 +533,16 @@ circularIterator.take(10).toList
 
 #### MergedBufferedIterator
 
-The `MergedBufferedIterator` is a collection of sorted `BufferedIterators` that allows traversing them in order, while
-also providing a `mergeSorted` method to merge with another sorted `BufferedIterator`. See the following for sample
-usage:
+The `MergedBufferedIterator` is a collection of sorted `BufferedIterators` that allows traversing them in order, while also providing a `mergeSorted` method to merge with another sorted `BufferedIterator`. See the following for sample usage:
 
 ```scala
 import com.kevel.apso.iterator.MergedBufferedIterator
 
 val it1 = MergedBufferedIterator(List(
-  (0 to 3).iterator.buffered,
-  (0 to 8).iterator.buffered,
-  (0 to 15).iterator.buffered,
-  (0 to 11).iterator.buffered))
+         (0 to 3).iterator.buffered,
+         (0 to 8).iterator.buffered,
+         (0 to 15).iterator.buffered,
+         (0 to 11).iterator.buffered))
 // it1: MergedBufferedIterator[Int] = empty iterator
 
 it1.toList
@@ -636,8 +591,8 @@ it1.toList
 // )
 
 val it2 = MergedBufferedIterator(List(
-  Iterator(1, 3, 5).buffered,
-  Iterator(2).buffered))
+         Iterator(1, 3, 5).buffered,
+         Iterator(2).buffered))
 // it2: MergedBufferedIterator[Int] = non-empty iterator
 
 it2.mergeSorted(Iterator(4, 6).buffered).toList
@@ -674,8 +629,7 @@ decryptor.get.decryptToString(encryptor.get.encryptToSafeString(secretData).get)
 
 ## Hashing
 
-Apso provides utilities for various hashing functions. To use it in an existing SBT project, add the following
-dependency to your `build.sbt`:
+Apso provides utilities for various hashing functions. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
 libraryDependencies += "com.kevel" %% "apso-hashing" % "0.21.1"
@@ -703,9 +657,7 @@ libraryDependencies += "com.kevel" %% "apso-io" % "0.21.1"
 
 ### FileDescriptor
 
-Apso introduces the concept of a `FileDescriptor`: a representation of a file stored in an arbitrary location. A
-descriptor includes logic to copy files to and from a local filesystem, as well as filesystem navigation logic. The
-following implementations of `FileDescriptor` are available:
+Apso introduces the concept of a `FileDescriptor`: a representation of a file stored in an arbitrary location. A descriptor includes logic to copy files to and from a local filesystem, as well as filesystem navigation logic. The following implementations of `FileDescriptor` are available:
 
 * LocalFileDescriptor (for files in the local filesystem);
 * S3FileDescriptor (for files in S3);
@@ -740,9 +692,7 @@ ResourceUtil.getResourceAsString("reference.conf")
 
 ## JSON
 
-Apso includes a bunch of utilities to work with JSON serialization and deserialization, specifically with
-the [circe](https://circe.github.io/circe/) library. To use it in an existing SBT project, add the following dependency
-to your `build.sbt`:
+Apso includes a bunch of utilities to work with JSON serialization and deserialization, specifically with the [circe](https://circe.github.io/circe/) library. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
 ```scala
 libraryDependencies += "com.kevel" %% "apso-circe" % "0.21.1"
@@ -750,21 +700,14 @@ libraryDependencies += "com.kevel" %% "apso-circe" % "0.21.1"
 
 ### ExtraJsonProtocol
 
-The `ExtraJsonProtocol` object combines three traits that provide extra `Encoders` and `Decoders` (
-of [circe](https://circe.github.io/circe/)) for some relevant types. The `Encoders` and `Decoders` are provided on each
-trait for the following types:
+The `ExtraJsonProtocol` object combines three traits that provide extra `Encoders` and `Decoders` (of [circe](https://circe.github.io/circe/)) for some relevant types. The `Encoders` and `Decoders` are provided on each trait for the following types:
 
 * ExtraTimeJsonProtocol: `FiniteDuration`, `Interval` and `Period`;
 * ExtraHttpJsonProtocol: `URI`;
-* ExtraMiscJsonProtocol: `Config`, `DateTime`, `LocalDate` and `Currency`. It also includes the non-implicit methods
-  `mapJsonArrayEncoder[K, V]` and `mapJsonArrayDecoder[K, V]` which serialize and deserialize a map as an array of
-  key-value objects.
+* ExtraMiscJsonProtocol: `Config`, `DateTime`, `LocalDate` and `Currency`. It also includes the non-implicit methods `mapJsonArrayEncoder[K, V]` and `mapJsonArrayDecoder[K, V]` which serialize and deserialize a map as an array of key-value objects.
 
 ### JSON
-
-The `json` package provides some implicits around [circe](https://circe.github.io/circe/)'s `Json` to unwrap JSON
-values, merge two `Json` and create `Json` from a sequence of dot-separated paths with the corresponding leaf values. It
-also provides methods to access and delete fields on the `Json` object. See the following for sample usage:
+The `json` package provides some implicits around [circe](https://circe.github.io/circe/)'s `Json` to unwrap JSON values, merge two `Json` and create `Json` from a sequence of dot-separated paths with the corresponding leaf values. It also provides methods to access and delete fields on the `Json` object. See the following for sample usage:
 
 ```scala
 import com.kevel.apso.circe.Implicits._
@@ -779,10 +722,9 @@ val js1 = Json.obj(
   "d" := Json.obj("f" := 6))
 
 val js2 = Json.obj(
-  "c" := 4,
-  "d" := Json.obj("e" := 5))
+            "c" := 4,
+            "d" := Json.obj("e" := 5))
 ```
-
 ```scala
 js1.deepMerge(js2).spaces2
 // res56: String = """{
@@ -796,11 +738,11 @@ js1.deepMerge(js2).spaces2
 // }"""
 
 fromFullPaths(Seq(
-  "a" -> 1.asJson,
-  "b.c" -> 2.asJson,
-  "b.d" -> 3.asJson,
-  "e" -> "xpto".asJson,
-  "f.g.h" -> 5.asJson)).spaces2
+   "a" -> 1.asJson,
+   "b.c" -> 2.asJson,
+   "b.d" -> 3.asJson,
+   "e" -> "xpto".asJson,
+   "f.g.h" -> 5.asJson)).spaces2
 // res57: String = """{
 //   "f" : {
 //     "g" : {
@@ -843,9 +785,7 @@ js1.deleteField("x")
 ```
 
 ### JsonConvert
-
-The `JsonConvert` object contains helpers for converting between JSON values and other structures. See the following for
-sample usage:
+The `JsonConvert` object contains helpers for converting between JSON values and other structures. See the following for sample usage:
 
 ```scala
 import com.kevel.apso.circe._
@@ -872,23 +812,15 @@ libraryDependencies += "com.kevel" %% "apso-profiling" % "0.21.1"
 
 ### CpuSampler
 
-The `CpuSampler` is a lightweight configurable CPU profiler based on call stack sampling. When run as a thread, it
-periodically captures the call stacks of all live threads and maintains counters for each leaf method. The counters are
-then dumped to a logger with a given periodicity (most probably greater than the sampling period). Each data row written
-to the logger contains a timestamp, the method profiled, its location in the source code and the associated absolute
-counters and relative weight.
+The `CpuSampler` is a lightweight configurable CPU profiler based on call stack sampling. When run as a thread, it periodically captures the call stacks of all live threads and maintains counters for each leaf method. The counters are then dumped to a logger with a given periodicity (most probably greater than the sampling period). Each data row written to the logger contains a timestamp, the method profiled, its location in the source code and the associated absolute counters and relative weight.
 
 ### SimpleJmx
 
-The `SimpleJmx` trait allows mixing in a simple JMX server. The JMX server is configured through a `Config` object,
-where the parameters `host` and `port` can be set. When behind a firewall, both the `port` defined (the RMI registry
-port) and the `port + 1` port (the RMI server port) need to be open. In the event of a binding failure to the defined
-port, a retry is performed with a random port.
+The `SimpleJmx` trait allows mixing in a simple JMX server. The JMX server is configured through a `Config` object, where the parameters `host` and `port` can be set. When behind a firewall, both the `port` defined (the RMI registry port) and the `port + 1` port (the RMI server port) need to be open. In the event of a binding failure to the defined port, a retry is performed with a random port.
 
 ## Time
 
-The `apso-time` module provides utilities to work with `DateTime` and `LocalDate`. It mainly adds support for better
-working with intervals.
+The `apso-time` module provides utilities to work with `DateTime` and `LocalDate`. It mainly adds support for better working with intervals.
 
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
@@ -996,8 +928,7 @@ import com.kevel.apso.time.Implicits._
 
 ## TestKit
 
-Apso comes with a TestKit with extra useful matchers for [specs2](https://etorreborre.github.io/specs2/). The following
-traits with extra matchers are available:
+Apso comes with a TestKit with extra useful matchers for [specs2](https://etorreborre.github.io/specs2/). The following traits with extra matchers are available:
 
 * `CustomMatchers`: provides a matcher to check if an object is serializable and one to check if a file exists;
 * `FutureExtraMatchers`: provides extra matchers for futures and implicit conversions for awaitables;
