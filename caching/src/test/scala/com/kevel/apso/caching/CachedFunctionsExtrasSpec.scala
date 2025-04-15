@@ -16,10 +16,13 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
         val f = () => 1
         val f2 = (_: Int) => 2
         val f3 = (_: Int, _: Int) => "hello"
-        type D = Int
-        val f4: (D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D) => String =
+
+        // format: off
+        val f4: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int) => String =
           (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20, a21, a22) =>
             "dummy"
+        // format: on
+
         f.cachedSync(config.Cache(None))() must beEqualTo(1)
         f2.cachedSync(config.Cache(None))(0) must beEqualTo(2)
         f3.cachedSync(config.Cache(None))(0, 1) must beEqualTo("hello")
@@ -62,10 +65,13 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
         val f = () => Future.successful(1)
         val f2 = (_: Int) => Future.successful(2)
         val f3 = (_: Int, _: Int) => Future.successful("hello")
-        type D = Int
-        val f4: (D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D) => Future[String] =
+
+        // format: off
+        val f4: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int) => Future[String] =
           (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20, a21, a22) =>
             Future.successful("dummy")
+        // format: on
+
         f.cachedAsync(config.Cache(None))() must beEqualTo(1).await
         f2.cachedAsync(config.Cache(None))(0) must beEqualTo(2).await
         f3.cachedAsync(config.Cache(None))(0, 1) must beEqualTo("hello").await
