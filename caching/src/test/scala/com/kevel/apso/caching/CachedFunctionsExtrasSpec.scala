@@ -63,9 +63,9 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
         val hashCodeCallCounter = new AtomicInteger(0)
         val toStringCallCounter = new AtomicInteger(0)
         case class Dummy(str: String, int: Int) {
-          override def hashCode(): Int = {
+          override def hashCode: Int = {
             hashCodeCallCounter.incrementAndGet()
-            super.hashCode()
+            super.hashCode
           }
 
           override def toString: String = {
