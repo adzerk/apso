@@ -132,6 +132,7 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
         }
         val cachedF = f.cachedAsync(config.Cache(Some(1.day)))
 
+        // We are simulating a cache load failure here, so silence the expected exception log.
         val logger = Logger.getLogger("com.github.benmanes.caffeine.cache.LocalAsyncCache")
         logger.setLevel(Level.OFF)
 
