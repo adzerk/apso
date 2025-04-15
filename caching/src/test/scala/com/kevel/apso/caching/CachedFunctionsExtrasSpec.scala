@@ -1,11 +1,13 @@
 package com.kevel.apso.caching
 
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.logging.{Level, Logger}
 
+import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, Future}
 
 import org.specs2.concurrent.ExecutionEnv
+import org.specs2.execute.AsResult
 import org.specs2.mutable.Specification
 
 class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification {
@@ -47,13 +49,14 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
         eventually(retries = 2, sleep = 1.second)(cachedF() must beEqualTo(1))
       }
 
-      "evicting right away if the size is 0" in {
+      "evicting quickly if the size is 0" in {
+        def quickly[T: AsResult](result: => T): T = eventually(10, _ => 20.millis)(result)
         val counter = new AtomicInteger(0)
         val f = () => counter.getAndIncrement()
         val cachedF = f.cachedSync(config.Cache(Some(1.day), Some(0)))
         cachedF() must beEqualTo(0)
-        eventually(cachedF() must beEqualTo(1))
-        eventually(cachedF() must beEqualTo(2))
+        quickly(cachedF() must beEqualTo(1))
+        quickly(cachedF() must beEqualTo(2))
       }
     }
 
@@ -83,8 +86,12 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
           if (current == 0) Future.failed(new RuntimeException()) else Future { current }
         }
         val cachedF = f.cachedAsync(config.Cache(Some(1.day)))
-        Await.result(cachedF(), 10.seconds) must throwA
-        eventually(cachedF() must beEqualTo(1).await)
+
+        val logger = Logger.getLogger("com.github.benmanes.caffeine.cache.LocalAsyncCache")
+        logger.setLevel(Level.OFF)
+
+        cachedF() must throwA[RuntimeException].await
+        cachedF() must beEqualTo(1).await
         cachedF() must beEqualTo(1).await
       }
     }
