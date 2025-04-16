@@ -15,20 +15,20 @@ object Implicits {
   }
 
   private def flattenedKeySetAux(json: Json, separator: String, ignoreNull: Boolean): Vector[String] = {
-    val jsonsAndPrefixes = mutable.Queue.empty[(String, Json)]
+    val prefixesAndJsons = mutable.Queue.empty[(String, Json)]
     val builder = Vector.newBuilder[String]
 
-    jsonsAndPrefixes.enqueue(("", json))
+    prefixesAndJsons.enqueue(("", json))
 
-    while (jsonsAndPrefixes.nonEmpty) {
-      val (prefix, nextJson) = jsonsAndPrefixes.dequeue()
+    while (prefixesAndJsons.nonEmpty) {
+      val (prefix, nextJson) = prefixesAndJsons.dequeue()
 
       nextJson.asObject.foreach(jsonObject =>
         jsonObject.toIterable.foreach({ case (k, v) =>
           if (!(ignoreNull && v.isNull)) {
             val kk = if (prefix.nonEmpty) s"$prefix$separator$k" else k
             if (v.isObject) {
-              jsonsAndPrefixes.enqueue((kk, v))
+              prefixesAndJsons.enqueue((kk, v))
             } else {
               builder += kk
             }
@@ -41,20 +41,20 @@ object Implicits {
   }
 
   private def flattenedKeyValueSetAux(json: Json, separator: String, ignoreNull: Boolean): Vector[(String, Json)] = {
-    val jsonsAndPrefixes = mutable.Queue.empty[(String, Json)]
+    val prefixesAndJsons = mutable.Queue.empty[(String, Json)]
     val builder = Vector.newBuilder[(String, Json)]
 
-    jsonsAndPrefixes.enqueue(("", json))
+    prefixesAndJsons.enqueue(("", json))
 
-    while (jsonsAndPrefixes.nonEmpty) {
-      val (prefix, nextJson) = jsonsAndPrefixes.dequeue()
+    while (prefixesAndJsons.nonEmpty) {
+      val (prefix, nextJson) = prefixesAndJsons.dequeue()
 
       nextJson.asObject.foreach(jsonObject =>
         jsonObject.toIterable.foreach({ case (k, v) =>
           if (!(ignoreNull && v.isNull)) {
             val kk = if (prefix.nonEmpty) s"$prefix$separator$k" else k
             if (v.isObject) {
-              jsonsAndPrefixes.enqueue((kk, v))
+              prefixesAndJsons.enqueue((kk, v))
             } else {
               builder += ((kk, v))
             }
