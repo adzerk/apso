@@ -14,9 +14,14 @@ object Implicits {
     def unapply(str: String) = Try(str.toInt).toOption
   }
 
-  private def flattenedKeySetAux(json: Json, separator: String, ignoreNull: Boolean): Vector[String] = {
+  private def flattenJson[V](
+      json: Json,
+      separator: String,
+      ignoreNull: Boolean,
+      onLeaf: (String, Json) => V
+  ): Vector[V] = {
     val prefixesAndJsons = mutable.Queue.empty[(String, Json)]
-    val builder = Vector.newBuilder[String]
+    val builder = Vector.newBuilder[V]
 
     prefixesAndJsons.enqueue(("", json))
 
@@ -30,39 +35,12 @@ object Implicits {
             if (v.isObject) {
               prefixesAndJsons.enqueue((kk, v))
             } else {
-              builder += kk
+              builder += onLeaf(kk, v)
             }
           }
         })
       )
     }
-
-    builder.result()
-  }
-
-  private def flattenedKeyValueSetAux(json: Json, separator: String, ignoreNull: Boolean): Vector[(String, Json)] = {
-    val prefixesAndJsons = mutable.Queue.empty[(String, Json)]
-    val builder = Vector.newBuilder[(String, Json)]
-
-    prefixesAndJsons.enqueue(("", json))
-
-    while (prefixesAndJsons.nonEmpty) {
-      val (prefix, nextJson) = prefixesAndJsons.dequeue()
-
-      nextJson.asObject.foreach(jsonObject =>
-        jsonObject.toIterable.foreach({ case (k, v) =>
-          if (!(ignoreNull && v.isNull)) {
-            val kk = if (prefix.nonEmpty) s"$prefix$separator$k" else k
-            if (v.isObject) {
-              prefixesAndJsons.enqueue((kk, v))
-            } else {
-              builder += ((kk, v))
-            }
-          }
-        })
-      )
-    }
-
     builder.result()
   }
 
@@ -78,7 +56,7 @@ object Implicits {
       *   flattened key set
       */
     def flattenedKeyValueSet(separator: String = "."): Set[(String, Json)] = {
-      flattenedKeyValueSetAux(json, separator, ignoreNull = false).toSet
+      flattenJson(json, separator, ignoreNull = false, onLeaf = (k, v) => (k, v)).toSet
     }
 
     /** Returns a set of keys of this object where nested keys are separated by a separator character.
@@ -93,7 +71,7 @@ object Implicits {
       *   flattened key set
       */
     def flattenedKeySet(separator: String = ".", ignoreNull: Boolean = true): Set[String] =
-      flattenedKeySetAux(json, separator, ignoreNull).toSet
+      flattenJson(json, separator, ignoreNull, onLeaf = (k, _) => k).toSet
 
     /** Returns the value of the field on the end of the tree, separated by the separator character.
       *
