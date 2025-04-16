@@ -1,5 +1,6 @@
 package com.kevel.apso.circe
 
+import io.circe.Json
 import io.circe.generic.semiauto._
 import io.circe.literal._
 import io.circe.syntax._
@@ -47,7 +48,17 @@ class ImplicitsSpec extends Specification {
       obj.flattenedKeySet(".", ignoreNull = true) === Set("a", "b.c")
       obj.flattenedKeySet(".", ignoreNull = false) === Set("a", "b.c", "d")
       obj.flattenedKeySet("/", ignoreNull = true) === Set("a", "b/c")
+
       1.asJson.flattenedKeySet() === Set.empty
+    }
+
+    "provide a method to get the key-value set of a JSON Object" in {
+      val obj = json"""{"a":1,"b":{"c":2},"d":null}"""
+
+      obj.flattenedKeyValueSet(".") === Set(("a", Json.fromInt(1)), ("b.c", Json.fromInt(2)), ("d", Json.Null))
+      obj.flattenedKeyValueSet("/") === Set(("a", Json.fromInt(1)), ("b/c", Json.fromInt(2)), ("d", Json.Null))
+
+      1.asJson.flattenedKeyValueSet() === Set.empty
     }
 
     "provide a method to get a field from a JSON object" in {

@@ -14,6 +14,32 @@ object Implicits {
     def unapply(str: String) = Try(str.toInt).toOption
   }
 
+  private def flattenedKeySetAux(json: Json, separator: String, ignoreNull: Boolean): Vector[String] = {
+    val jsonsAndPrefixes = mutable.Queue.empty[(String, Json)]
+    val builder = Vector.newBuilder[String]
+
+    jsonsAndPrefixes.enqueue(("", json))
+
+    while (jsonsAndPrefixes.nonEmpty) {
+      val (prefix, nextJson) = jsonsAndPrefixes.dequeue()
+
+      nextJson.asObject.foreach(jsonObject =>
+        jsonObject.toIterable.foreach({ case (k, v) =>
+          if (!(ignoreNull && v.isNull)) {
+            val kk = if (prefix.nonEmpty) s"$prefix$separator$k" else k
+            if (v.isObject) {
+              jsonsAndPrefixes.enqueue((kk, v))
+            } else {
+              builder += kk
+            }
+          }
+        })
+      )
+    }
+
+    builder.result()
+  }
+
   private def flattenedKeyValueSetAux(json: Json, separator: String, ignoreNull: Boolean): Vector[(String, Json)] = {
     val jsonsAndPrefixes = mutable.Queue.empty[(String, Json)]
     val builder = Vector.newBuilder[(String, Json)]
@@ -21,10 +47,10 @@ object Implicits {
     jsonsAndPrefixes.enqueue(("", json))
 
     while (jsonsAndPrefixes.nonEmpty) {
-      val (prefix, json) = jsonsAndPrefixes.dequeue()
+      val (prefix, nextJson) = jsonsAndPrefixes.dequeue()
 
-      json.asObject.foreach(jo =>
-        jo.toIterable.foreach({ case (k, v) =>
+      nextJson.asObject.foreach(jsonObject =>
+        jsonObject.toIterable.foreach({ case (k, v) =>
           if (!(ignoreNull && v.isNull)) {
             val kk = if (prefix.nonEmpty) s"$prefix$separator$k" else k
             if (v.isObject) {
@@ -67,7 +93,7 @@ object Implicits {
       *   flattened key set
       */
     def flattenedKeySet(separator: String = ".", ignoreNull: Boolean = true): Set[String] =
-      flattenedKeyValueSetAux(json, separator, ignoreNull).map(_._1).toSet
+      flattenedKeySetAux(json, separator, ignoreNull).toSet
 
     /** Returns the value of the field on the end of the tree, separated by the separator character.
       *
