@@ -19,9 +19,9 @@ object Implicits {
       separator: String,
       ignoreNull: Boolean,
       onLeaf: (String, Json) => V
-  ): Vector[V] = {
+  ): Set[V] = {
     val prefixesAndJsons = mutable.Queue.empty[(String, Json)]
-    val builder = Vector.newBuilder[V]
+    val builder = Set.newBuilder[V]
 
     prefixesAndJsons.enqueue(("", json))
 
@@ -56,7 +56,7 @@ object Implicits {
       *   flattened key set
       */
     def flattenedKeyValueSet(separator: String = "."): Set[(String, Json)] = {
-      flattenJson(json, separator, ignoreNull = false, onLeaf = (k, v) => (k, v)).toSet
+      flattenJson(json, separator, ignoreNull = false, onLeaf = (k, v) => (k, v))
     }
 
     /** Returns a set of keys of this object where nested keys are separated by a separator character.
@@ -71,7 +71,7 @@ object Implicits {
       *   flattened key set
       */
     def flattenedKeySet(separator: String = ".", ignoreNull: Boolean = true): Set[String] =
-      flattenJson(json, separator, ignoreNull, onLeaf = (k, _) => k).toSet
+      flattenJson(json, separator, ignoreNull, onLeaf = (k, _) => k)
 
     /** Returns the value of the field on the end of the tree, separated by the separator character.
       *
