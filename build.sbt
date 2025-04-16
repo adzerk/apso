@@ -171,7 +171,7 @@ lazy val time = module(project, "time")
 
 lazy val apso = (project in file("."))
   .settings(commonSettings: _*)
-  .settings(name := "apso", crossScalaVersions := List(Versions.Scala213))
+  .settings(name := "apso", crossScalaVersions := List(Versions.Scala213, Versions.Scala3))
   .dependsOn(
     aws,
     caching,
