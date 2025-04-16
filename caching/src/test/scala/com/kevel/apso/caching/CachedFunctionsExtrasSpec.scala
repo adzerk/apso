@@ -25,16 +25,16 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
             "dummy"
         // format: on
 
-        f.cachedSync(config.Cache(None))() must beEqualTo(1)
-        f2.cachedSync(config.Cache(None))(0) must beEqualTo(2)
-        f3.cachedSync(config.Cache(None))(0, 1) must beEqualTo("hello")
-        f4.cachedSync(config.Cache(None))(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-          22) must beEqualTo("dummy")
+        f.cachedSync(config.Cache(None, None))() must beEqualTo(1)
+        f2.cachedSync(config.Cache(None, None))(0) must beEqualTo(2)
+        f3.cachedSync(config.Cache(None, None))(0, 1) must beEqualTo("hello")
+        f4.cachedSync(config.Cache(None, None))(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+          21, 22) must beEqualTo("dummy")
       }
 
       "respecting key-value semantics" in {
         val f: Int => Int = identity
-        val cachedF = f.cachedSync(config.Cache(None))
+        val cachedF = f.cachedSync(config.Cache(None, None))
         cachedF(1) must beEqualTo(1)
         cachedF(2) must beEqualTo(2)
         cachedF(2) must beEqualTo(2)
@@ -43,7 +43,7 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
       "respecting the time to live" in {
         val counter = new AtomicInteger(0)
         val f = () => counter.getAndIncrement()
-        val cachedF = f.cachedSync(config.Cache(Some(1.second)))
+        val cachedF = f.cachedSync(config.Cache(Some(1.second), None))
 
         cachedF() must beEqualTo(0)
         eventually(retries = 2, sleep = 1.second)(cachedF() must beEqualTo(1))
@@ -75,7 +75,7 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
         }
 
         val f = (dum: Dummy) => ()
-        val cachedF = f.cachedSync(config.Cache(None))
+        val cachedF = f.cachedSync(config.Cache(None, None))
         val dummy1 = Dummy("str", 0)
         hashCodeCallCounter.get() must beEqualTo(0)
         toStringCallCounter.get() must beEqualTo(0)
@@ -93,7 +93,7 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
         // We tuple the arguments to build a key instance,
         // and need to ensure that `hashCode` is called recursively.
         val f2 = (dum1: Dummy, dum2: Dummy) => ()
-        val cachedF2 = f2.cachedSync(config.Cache(None))
+        val cachedF2 = f2.cachedSync(config.Cache(None, None))
         val dummy2 = Dummy("str2", 0)
         val dummy3 = Dummy("str3", 0)
         hashCodeCallCounter.get() must beEqualTo(4)
@@ -117,11 +117,11 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
             Future.successful("dummy")
         // format: on
 
-        f.cachedAsync(config.Cache(None))() must beEqualTo(1).await
-        f2.cachedAsync(config.Cache(None))(0) must beEqualTo(2).await
-        f3.cachedAsync(config.Cache(None))(0, 1) must beEqualTo("hello").await
-        f4.cachedAsync(config.Cache(None))(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-          22) must beEqualTo("dummy").await
+        f.cachedAsync(config.Cache(None, None))() must beEqualTo(1).await
+        f2.cachedAsync(config.Cache(None, None))(0) must beEqualTo(2).await
+        f3.cachedAsync(config.Cache(None, None))(0, 1) must beEqualTo("hello").await
+        f4.cachedAsync(config.Cache(None, None))(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+          21, 22) must beEqualTo("dummy").await
       }
 
       "evicting failing futures" in {
@@ -130,7 +130,7 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
           val current = counter.getAndIncrement()
           if (current == 0) Future.failed(new RuntimeException()) else Future { current }
         }
-        val cachedF = f.cachedAsync(config.Cache(Some(1.day)))
+        val cachedF = f.cachedAsync(config.Cache(Some(1.day), None))
 
         // We are simulating a cache load failure here, so silence the expected exception log.
         val logger = Logger.getLogger("com.github.benmanes.caffeine.cache.LocalAsyncCache")

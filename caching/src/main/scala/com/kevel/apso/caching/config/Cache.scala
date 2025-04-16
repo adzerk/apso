@@ -11,4 +11,4 @@ import scala.concurrent.duration.FiniteDuration
   *   the maximum number of entries in the cache. Note that this threshold might be temporarily exceeded while the
   *   underlying cache is evicting old entries.
   */
-case class Cache(timeToLive: Option[FiniteDuration], maximumSize: Option[Long] = None)
+case class Cache(timeToLive: Option[FiniteDuration], maximumSize: Option[Long])
