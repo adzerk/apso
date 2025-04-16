@@ -1,6 +1,7 @@
 package com.kevel.apso.circe
 
 import scala.annotation.tailrec
+import scala.collection.mutable
 import scala.util.Try
 
 import io.circe._
@@ -13,26 +14,34 @@ object Implicits {
     def unapply(str: String) = Try(str.toInt).toOption
   }
 
-  private def flattenedKeyValueSetAux(json: Json, separator: String = "."): Vector[(String, Json)] = {
-    json.asObject match {
-      case None => Vector.empty
-      case Some(jo) =>
-        val builder = Vector.newBuilder[(String, Json)]
-        jo.toIterable.foreach {
-          case (k, v) if v.isObject =>
-            flattenedKeyValueSetAux(v, separator).foreach { case (kk, vv) =>
-              val path = new StringBuilder(k.length + separator.length + kk.length)
-                .append(k)
-                .append(separator)
-                .append(kk)
-                .toString
-              builder += ((path, vv))
+  private def flattenedKeyValueSetAux(json: Json, separator: String, ignoreNull: Boolean): Vector[(String, Json)] = {
+    val jsons = mutable.Queue.empty[Json]
+    val prefixes = mutable.Queue.empty[String]
+    val builder = Vector.newBuilder[(String, Json)]
+
+    jsons.enqueue(json)
+    prefixes.enqueue("")
+
+    while (jsons.nonEmpty) {
+      val j = jsons.dequeue()
+      val p = prefixes.dequeue()
+
+      j.asObject.foreach(jo =>
+        jo.toIterable.foreach({ case (k, v) =>
+          if (!(ignoreNull && v.isNull)) {
+            val kk = if (p.nonEmpty) s"$p$separator$k" else k
+            if (v.isObject) {
+              jsons.enqueue(v)
+              prefixes.enqueue(kk)
+            } else {
+              builder += ((kk, v))
             }
-          case (k, v) =>
-            builder += ((k, v))
-        }
-        builder.result()
+          }
+        })
+      )
     }
+
+    builder.result()
   }
 
   final implicit class ApsoJsonObject(val json: Json) extends AnyVal {
@@ -47,7 +56,7 @@ object Implicits {
       *   flattened key set
       */
     def flattenedKeyValueSet(separator: String = "."): Set[(String, Json)] = {
-      flattenedKeyValueSetAux(json, separator).toSet
+      flattenedKeyValueSetAux(json, separator, ignoreNull = false).toSet
     }
 
     /** Returns a set of keys of this object where nested keys are separated by a separator character.
@@ -62,12 +71,7 @@ object Implicits {
       *   flattened key set
       */
     def flattenedKeySet(separator: String = ".", ignoreNull: Boolean = true): Set[String] =
-      flattenedKeyValueSetAux(json, separator)
-        .filter { case (_, v) =>
-          !ignoreNull || !v.isNull
-        }
-        .map(_._1)
-        .toSet
+      flattenedKeyValueSetAux(json, separator, ignoreNull).map(_._1).toSet
 
     /** Returns the value of the field on the end of the tree, separated by the separator character.
       *
