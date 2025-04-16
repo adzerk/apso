@@ -356,7 +356,7 @@ val x = new AtomicInteger(0)
 val cachedFn = ((i: Int) => {
   val value = x.getAndAdd(i)
   value
-}).cachedSync(config.Cache(Some(5.seconds)))
+}).cachedSync(config.Cache(Some(5.seconds), None))
 
 cachedFn(2)
 cachedFn(2)
@@ -367,7 +367,7 @@ val y = new AtomicInteger(0)
 val cachedFutFn = ((i: Int) => Future {
   val value = y.getAndAdd(i)
   value
-}).cachedAsync(config.Cache(Some(5.seconds)))
+}).cachedAsync(config.Cache(Some(5.seconds), None))
 
 Await.result(cachedFutFn(3), Duration.Inf)
 Await.result(cachedFutFn(3), Duration.Inf)
