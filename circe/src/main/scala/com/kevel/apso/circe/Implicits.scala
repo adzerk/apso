@@ -15,24 +15,20 @@ object Implicits {
   }
 
   private def flattenedKeyValueSetAux(json: Json, separator: String, ignoreNull: Boolean): Vector[(String, Json)] = {
-    val jsons = mutable.Queue.empty[Json]
-    val prefixes = mutable.Queue.empty[String]
+    val jsonsAndPrefixes = mutable.Queue.empty[(String, Json)]
     val builder = Vector.newBuilder[(String, Json)]
 
-    jsons.enqueue(json)
-    prefixes.enqueue("")
+    jsonsAndPrefixes.enqueue(("", json))
 
-    while (jsons.nonEmpty) {
-      val j = jsons.dequeue()
-      val p = prefixes.dequeue()
+    while (jsonsAndPrefixes.nonEmpty) {
+      val (prefix, json) = jsonsAndPrefixes.dequeue()
 
-      j.asObject.foreach(jo =>
+      json.asObject.foreach(jo =>
         jo.toIterable.foreach({ case (k, v) =>
           if (!(ignoreNull && v.isNull)) {
-            val kk = if (p.nonEmpty) s"$p$separator$k" else k
+            val kk = if (prefix.nonEmpty) s"$prefix$separator$k" else k
             if (v.isObject) {
-              jsons.enqueue(v)
-              prefixes.enqueue(kk)
+              jsonsAndPrefixes.enqueue((kk, v))
             } else {
               builder += ((kk, v))
             }
