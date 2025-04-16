@@ -37,7 +37,7 @@ lazy val aws = module(project, "aws")
 lazy val caching = module(project, "caching")
   .enablePlugins(BoilerplatePlugin)
   .settings(
-    crossScalaVersions := List(Versions.Scala213),
+    crossScalaVersions := List(Versions.Scala213, Versions.Scala3),
     libraryDependencies ++= Seq(
       Scaffeine,
       Specs2Core % Test
