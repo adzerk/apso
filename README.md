@@ -6,7 +6,7 @@ Apso is Kevel's collection of Scala utility libraries. It provides a series of u
 
 ## Installation
 
-Apso's latest release is built against Scala 2.13.
+Apso's latest release is built against Scala 2.13 and Scala 3.
 
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
@@ -14,7 +14,7 @@ To use it in an existing SBT project, add the following dependency to your `buil
 libraryDependencies += "com.kevel" %% "apso" % "0.21.1"
 ```
 
-The project is divided in modules, you can instead install only a specific module. Some modules are already available for Scala 3. Currently, only apso-caching is not available for Scala 3.
+The project is divided in modules, you can instead install only a specific module.
 
 The TestKit is available under the `apso-testkit` project. You can include it only for the `test` configuration:
 

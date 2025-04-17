@@ -2,8 +2,6 @@ package com.kevel.apso.caching
 
 import scala.concurrent.Future
 
-import com.kevel.apso.caching.SyncEvidence
-
 /**
   * Provides extension methods `.cachedSync()` and `.cachedAsync()` for `FunctionN` types.
   */
