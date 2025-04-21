@@ -1,6 +1,7 @@
 package com.kevel.apso.circe
 
 import scala.annotation.tailrec
+import scala.collection.mutable
 import scala.util.Try
 
 import io.circe._
@@ -11,6 +12,36 @@ object Implicits {
 
   object ToInt {
     def unapply(str: String) = Try(str.toInt).toOption
+  }
+
+  private def flattenJson[V](
+      json: Json,
+      separator: String,
+      ignoreNull: Boolean,
+      onLeaf: (String, Json) => V
+  ): Set[V] = {
+    val prefixesAndJsons = mutable.Queue.empty[(String, Json)]
+    val builder = Set.newBuilder[V]
+
+    prefixesAndJsons.enqueue(("", json))
+
+    while (prefixesAndJsons.nonEmpty) {
+      val (prefix, nextJson) = prefixesAndJsons.dequeue()
+
+      nextJson.asObject.foreach(jsonObject =>
+        jsonObject.toIterable.foreach({ case (k, v) =>
+          if (!(ignoreNull && v.isNull)) {
+            val kk = if (prefix.nonEmpty) s"$prefix$separator$k" else k
+            if (v.isObject) {
+              prefixesAndJsons.enqueue((kk, v))
+            } else {
+              builder += onLeaf(kk, v)
+            }
+          }
+        })
+      )
+    }
+    builder.result()
   }
 
   final implicit class ApsoJsonObject(val json: Json) extends AnyVal {
@@ -25,16 +56,7 @@ object Implicits {
       *   flattened key set
       */
     def flattenedKeyValueSet(separator: String = "."): Set[(String, Json)] = {
-      json.asObject match {
-        case None => Set.empty
-        case Some(jo) =>
-          val fields = jo.toMap.toSet
-          fields.flatMap {
-            case (k, v) if v.isObject =>
-              v.flattenedKeyValueSet(separator).map { case (kk, vv) => (k + separator + kk) -> vv }
-            case (k, v) => Set(k -> v)
-          }
-      }
+      flattenJson(json, separator, ignoreNull = false, onLeaf = (k, v) => (k, v))
     }
 
     /** Returns a set of keys of this object where nested keys are separated by a separator character.
@@ -49,11 +71,7 @@ object Implicits {
       *   flattened key set
       */
     def flattenedKeySet(separator: String = ".", ignoreNull: Boolean = true): Set[String] =
-      flattenedKeyValueSet(separator)
-        .filter { case (_, v) =>
-          !ignoreNull || !v.isNull
-        }
-        .map(_._1)
+      flattenJson(json, separator, ignoreNull, onLeaf = (k, _) => k)
 
     /** Returns the value of the field on the end of the tree, separated by the separator character.
       *
