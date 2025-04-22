@@ -10,7 +10,7 @@ object Dependencies {
     val Aws            = "1.12.782"
     val BouncyCastle   = "1.80"
     val Cats           = "2.13.0"
-    val Circe          = "0.14.12"
+    val Circe          = "0.14.13"
     val CommonsCodec   = "1.18.0"
     val FastMd5        = "2.7.1"
     val JUnit          = "4.13.2"
