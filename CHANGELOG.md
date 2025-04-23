@@ -18,7 +18,7 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
-## [0.22.0] - 2025-04-09
+## [0.22.0] - 2025-04-23
 
 This release includes full support for Scala 3, now that `apso-caching` is ported. `apso-caching`'s API has breaking
 changes; check the (README)[/README.md] for the updated documentation.
