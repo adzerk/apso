@@ -18,6 +18,33 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.22.0] - 2025-04-09
+
+This release includes full support for Scala 3, now that `apso-caching` is ported. `apso-caching`'s API has breaking
+changes; check the (README)[/README.md] for the updated documentation.
+
+In addition, the performance of the `flattenedKeyValueSet` in `apso-circe` was improved.
+
+### Added
+
+- Port `apso-caching` to Scaffeine ([#821](https://github.com/adzerk/apso/pull/821)).
+- Start cross-compiling apso-caching to Scala 3 ([#827](https://github.com/adzerk/apso/pull/827)).
+
+### Changed
+
+- Remove LruCache ([#818](https://github.com/adzerk/apso/pull/818)).
+- Update sbt-mdoc to 2.7.0 ([#822](https://github.com/adzerk/apso/pull/822)).
+- Use builders and avoid Sets in flattenedKeyValueSet ([#825](https://github.com/adzerk/apso/pull/825)).
+- Avoid specifying a default value for the maximum cache size ([#826](https://github.com/adzerk/apso/pull/826)).
+- Update sbt-mdoc to 2.7.1 ([#828](https://github.com/adzerk/apso/pull/828)).
+- Update unirest-java-core to 4.4.6 ([#829](https://github.com/adzerk/apso/pull/829)).
+- Update circe-core, circe-generic, ... to 0.14.13 ([#830](https://github.com/adzerk/apso/pull/830)).
+
+### Removed
+
+- Remove LruCache ([#818](https://github.com/adzerk/apso/pull/818)).
+- Remove `scala-collection-compat` dependency listing ([#824](https://github.com/adzerk/apso/pull/824)).
+
 ## [0.21.1] - 2025-04-09
 
 This is a patch release towards 0.22.0, in which we expect to have full support for Scala 3. We have started
