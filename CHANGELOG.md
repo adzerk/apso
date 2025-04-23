@@ -45,6 +45,8 @@ In addition, the performance of the `flattenedKeyValueSet` in `apso-circe` was i
 - Remove LruCache ([#818](https://github.com/adzerk/apso/pull/818)).
 - Remove `scala-collection-compat` dependency listing ([#824](https://github.com/adzerk/apso/pull/824)).
 
+[0.21.1]: https://github.com/adzerk/apso/compare/v0.21.1...v0.22.0
+
 ## [0.21.1] - 2025-04-09
 
 This is a patch release towards 0.22.0, in which we expect to have full support for Scala 3. We have started
