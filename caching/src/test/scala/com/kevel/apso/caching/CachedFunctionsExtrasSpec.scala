@@ -138,7 +138,7 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
         logger.setLevel(Level.OFF)
 
         cachedF() must throwA[RuntimeException].await
-        quickly(cachedF() must not(throwA).await)
+        quickly(cachedF() must not(throwA[RuntimeException]).await)
         cachedF() must beEqualTo(1).await
         cachedF() must beEqualTo(1).await
       }
