@@ -13,6 +13,8 @@ import org.specs2.mutable.Specification
 class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification {
   "Cached extension methods in FunctionN types" should {
 
+    def quickly[T: AsResult](result: => T): T = eventually(10, _ => 20.millis)(result)
+
     "provide synchronous variants" in {
       "for multiple number of arguments" in {
         val f = () => 1
@@ -50,7 +52,6 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
       }
 
       "evicting quickly if the size is 0" in {
-        def quickly[T: AsResult](result: => T): T = eventually(10, _ => 20.millis)(result)
         val counter = new AtomicInteger(0)
         val f = () => counter.getAndIncrement()
         val cachedF = f.cachedSync(config.Cache(Some(1.day), Some(0)))
@@ -124,7 +125,7 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
           21, 22) must beEqualTo("dummy").await
       }
 
-      "evicting failing futures" in {
+      "quickly evicting failing futures" in {
         val counter = new AtomicInteger(0)
         val f = () => {
           val current = counter.getAndIncrement()
@@ -137,6 +138,7 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
         logger.setLevel(Level.OFF)
 
         cachedF() must throwA[RuntimeException].await
+        quickly(cachedF() must not(throwA).await)
         cachedF() must beEqualTo(1).await
         cachedF() must beEqualTo(1).await
       }
