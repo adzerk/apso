@@ -187,6 +187,7 @@ lazy val docs = (project in file("apso-docs"))
     mdocOut := (ThisBuild / baseDirectory).value,
 
     mdocVariables := Map(
+      // TODO: Update this to the latest version.
       "VERSION" -> "0.21.1" // This version should be set to the currently released version.
     ),
 
