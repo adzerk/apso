@@ -346,8 +346,7 @@ import scala.concurrent.duration._
 
 import com.kevel.apso.caching._
 
-val conf = config.Cache(Some(5.seconds), None)
-val cache = conf.implementation[String, Int]
+val cache = config.Cache(Some(5.seconds), None).implementation[String, Int]
 
 val x1 = cache.getIfPresent("requests")
 

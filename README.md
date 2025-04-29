@@ -363,13 +363,8 @@ import scala.concurrent.duration._
 
 import com.kevel.apso.caching._
 
-val conf = config.Cache(Some(5.seconds), None)
-// conf: config.Cache = Cache(
-//   timeToLive = Some(value = 5 seconds),
-//   maximumSize = None
-// )
-val cache = conf.implementation[String, Int]
-// cache: com.github.blemale.scaffeine.Cache[String, Int] = Cache(com.github.benmanes.caffeine.cache.BoundedLocalCache$BoundedLocalManualCache@10f2706a)
+val cache = config.Cache(Some(5.seconds), None).implementation[String, Int]
+// cache: com.github.blemale.scaffeine.Cache[String, Int] = Cache(com.github.benmanes.caffeine.cache.BoundedLocalCache$BoundedLocalManualCache@7f262c77)
 
 val x1 = cache.getIfPresent("requests")
 // x1: Option[Int] = None
