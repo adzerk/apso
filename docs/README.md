@@ -331,7 +331,7 @@ The `SerializableAWSCredentials` class provides a serializable container for AWS
 
 ## Caching
 
-The `apso-caching` module provides provides utilities for caching, using `Caffeine` as the underlying implementation.
+The `apso-caching` module provides utilities for caching, using `Caffeine` as the underlying implementation.
 
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 

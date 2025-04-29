@@ -348,7 +348,7 @@ The `SerializableAWSCredentials` class provides a serializable container for AWS
 
 ## Caching
 
-The `apso-caching` module provides provides utilities for caching, using `Caffeine` as the underlying implementation.
+The `apso-caching` module provides utilities for caching, using `Caffeine` as the underlying implementation.
 
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
@@ -369,7 +369,7 @@ val conf = config.Cache(Some(5.seconds), None)
 //   maximumSize = None
 // )
 val cache = conf.implementation[String, Int]
-// cache: com.github.blemale.scaffeine.Cache[String, Int] = Cache(com.github.benmanes.caffeine.cache.BoundedLocalCache$BoundedLocalManualCache@3260516c)
+// cache: com.github.blemale.scaffeine.Cache[String, Int] = Cache(com.github.benmanes.caffeine.cache.BoundedLocalCache$BoundedLocalManualCache@10f2706a)
 
 val x1 = cache.getIfPresent("requests")
 // x1: Option[Int] = None
