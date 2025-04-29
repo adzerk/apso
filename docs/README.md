@@ -330,7 +330,8 @@ The `S3Bucket` class wraps an instance of `AmazonS3Client` (from AWS SDK for Jav
 The `SerializableAWSCredentials` class provides a serializable container for AWS credentials, extending the `AWSCredentials` class (from AWS SDK for Java).
 
 ## Caching
-The `apso-caching` module provides provides utilities for caching.
+
+The `apso-caching` module provides provides utilities for caching, using `Caffeine` as the underlying implementation.
 
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
@@ -338,9 +339,25 @@ To use it in an existing SBT project, add the following dependency to your `buil
 libraryDependencies += "com.kevel" %% "apso-caching" % "@VERSION@"
 ```
 
-Apso provides utilities to simplify the caching of method calls, using `Caffeine` as the underlying implementation.
+The simplest use case is bootstrapping a cache implementation based on a configuration object:
 
-These utilities are provided as `cachedSync()` and `cachedAsync()` extension methods over all `FunctionN[]` types:
+```scala mdoc:reset
+import scala.concurrent.duration._
+
+import com.kevel.apso.caching._
+
+val conf = config.Cache(Some(5.seconds), None)
+val cache = conf.implementation[String, Int]
+
+val x1 = cache.getIfPresent("requests")
+
+cache.put("requests", 1)
+
+val x2 = cache.getIfPresent("requests")
+```
+
+Apso also provides utilities to simplify the caching of method calls. These utilities are provided as `cachedSync()` and
+`cachedAsync()` extension methods over all `FunctionN[]` types:
 
 ```scala mdoc:reset
 import scala.concurrent._
