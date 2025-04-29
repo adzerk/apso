@@ -341,18 +341,21 @@ libraryDependencies += "com.kevel" %% "apso-caching" % "@VERSION@"
 
 The simplest use case is bootstrapping a cache implementation based on a configuration object:
 
-```scala mdoc:reset
+```scala mdoc:compile-only
 import scala.concurrent.duration._
 
 import com.kevel.apso.caching._
 
 val cache = config.Cache(Some(5.seconds), None).implementation[String, Int]
+// cache: com.github.blemale.scaffeine.Cache[String, Int]
 
 val x1 = cache.getIfPresent("requests")
+// x1: Option[Int] = None
 
 cache.put("requests", 1)
 
 val x2 = cache.getIfPresent("requests")
+// x2: Option[Int] = Some(value = 1)
 ```
 
 Apso also provides utilities to simplify the caching of method calls. These utilities are provided as `cachedSync()` and
