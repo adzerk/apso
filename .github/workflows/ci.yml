@@ -46,6 +46,9 @@ jobs:
       - name: Check mdoc for uncommitted changes
         run: sbt -Dsbt.color=always "docs/mdoc --check"
 
+      - name: Compile API documentation
+        run: sbt -Dsbt.color=always "++${{ matrix.scala }} doc"
+
   validate-changelog:
     timeout-minutes: 5
     runs-on: ubuntu-latest
