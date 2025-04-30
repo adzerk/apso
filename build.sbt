@@ -5,9 +5,8 @@ import xerial.sbt.Sonatype.sonatypeCentralHost
 
 ThisBuild / organization := "com.kevel"
 
-// Setting no cross build for the aggregating root project so that we can have proper per project exclusions.
-ThisBuild / crossScalaVersions := Nil
 ThisBuild / scalaVersion       := Versions.Scala213
+ThisBuild / crossScalaVersions := List(Versions.Scala213, Versions.Scala3)
 
 val javaVersion = "11"
 
@@ -40,6 +39,7 @@ lazy val caching = module(project, "caching")
       Scaffeine,
       Specs2Core % Test
     ),
+    // NOTICE: This may not be needed anymore if https://github.com/blemale/scaffeine/pull/441 is merged.
     apiMappings ++= {
       val scaffeineJar     = (Compile / dependencyClasspath).value.map(_.data).find(_.getName.contains("scaffeine")).get
       val scaffeineModule  = libraryDependencies.value.find(_.name == "scaffeine").get
@@ -223,8 +223,6 @@ lazy val commonSettings = Seq(
   semanticdbEnabled := true,
   semanticdbVersion := scalafixSemanticdb.revision,
   scalafixOnCompile := true,
-
-  crossScalaVersions := List(Versions.Scala213, Versions.Scala3),
 
   scalacOptions ++= {
     lazy val commonFlags = Seq(
