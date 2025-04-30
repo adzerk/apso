@@ -26,8 +26,14 @@ and value and returning a `Scaffeine` instance. This should make lower-level cac
 ### Added
 - Add `implementation` method to `apso-caching` config class ([#833](https://github.com/adzerk/apso/pull/833)).
 
+### Changed
+- Add `Scaffeine` api mappings ([#835](https://github.com/adzerk/apso/pull/835)).
+- Compile API documentation in CI ([#836](https://github.com/adzerk/apso/pull/836)).
+- Update scalafmt-core to 3.9.5 ([#838](https://github.com/adzerk/apso/pull/838)).
+
 ### Fixed
 - Fix non-determinism in CachedFunctionExtrasSpec failure eviction ([#832](https://github.com/adzerk/apso/pull/832)).
+- Remove nil crossScalaVersions for root project ([#837](https://github.com/adzerk/apso/pull/837)).
 
 [0.22.1]: https://github.com/adzerk/apso/compare/v0.22.0...v0.22.1
 
