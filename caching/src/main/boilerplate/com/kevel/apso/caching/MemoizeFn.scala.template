@@ -1,7 +1,5 @@
 package com.kevel.apso.caching
 
-import com.github.blemale.scaffeine.Scaffeine
-
 import com.github.blemale.scaffeine.{AsyncLoadingCache, LoadingCache}
 
 import scala.concurrent.Future
@@ -17,7 +15,7 @@ import MemoizeFn._
 sealed trait SyncMemoizeFn0[V] extends (() => V) {
   protected def cacheConfig: config.Cache
   protected def fn: Unit => V
-  private lazy val cache: LoadingCache[Unit, V] = MemoizeFn.builder(cacheConfig).build(fn)
+  private lazy val cache: LoadingCache[Unit, V] = cacheConfig.build.build(fn)
   override def apply(): V = cache.get(())
 }
 
@@ -30,7 +28,7 @@ sealed trait SyncMemoizeFn0[V] extends (() => V) {
 sealed trait AsyncMemoizeFn0[V] extends (() => Future[V]) {
   protected def cacheConfig: config.Cache
   protected def fn: Unit => Future[V]
-  private lazy val cache: AsyncLoadingCache[Unit, V] = MemoizeFn.builder(cacheConfig).buildAsyncFuture(fn)
+  private lazy val cache: AsyncLoadingCache[Unit, V] = cacheConfig.build.buildAsyncFuture(fn)
   override def apply(): Future[V] = cache.get(())
 }
 
@@ -44,7 +42,7 @@ sealed trait AsyncMemoizeFn0[V] extends (() => Future[V]) {
 sealed trait SyncMemoizeFn1[[#I0#], V] extends Function1[[#I0#], V] {
   def cacheConfig: config.Cache
   def fn: ([#I0#]) => V
-  private lazy val cache: LoadingCache[([#I0#]), V] = MemoizeFn.builder(cacheConfig).build(fn.tupled)
+  private lazy val cache: LoadingCache[([#I0#]), V] = cacheConfig.build.build(fn.tupled)
   override def apply([#i0: I0#]): V = cache.get(([#i0#]))
 }#
 ]
@@ -59,18 +57,12 @@ sealed trait SyncMemoizeFn1[[#I0#], V] extends Function1[[#I0#], V] {
 sealed trait AsyncMemoizeFn1[[#I0#], V] extends Function1[[#I0#], Future[V]] {
   def cacheConfig: config.Cache
   def fn: ([#I0#]) => Future[V]
-  private lazy val cache: AsyncLoadingCache[([#I0#]), V] = MemoizeFn.builder(cacheConfig).buildAsyncFuture(fn.tupled)
+  private lazy val cache: AsyncLoadingCache[([#I0#]), V] = cacheConfig.build.buildAsyncFuture(fn.tupled)
   override def apply([#i0: I0#]): Future[V] = cache.get(([#i0#]))
 }#
 ]
 
 object MemoizeFn {
-  private[caching] def builder(conf: config.Cache): Scaffeine[Any, Any] = {
-    val withSize = conf.maximumSize.fold(Scaffeine())(Scaffeine().maximumSize)
-    val withTimeToLive = conf.timeToLive.fold(withSize)(withSize.expireAfterWrite)
-    withTimeToLive
-  }
-
   private[caching] implicit class Function1Ops[A, B](f: A => B) {
     def tupled: A => B = f
   }

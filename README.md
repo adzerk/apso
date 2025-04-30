@@ -347,7 +347,8 @@ The `S3Bucket` class wraps an instance of `AmazonS3Client` (from AWS SDK for Jav
 The `SerializableAWSCredentials` class provides a serializable container for AWS credentials, extending the `AWSCredentials` class (from AWS SDK for Java).
 
 ## Caching
-The `apso-caching` module provides provides utilities for caching.
+
+The `apso-caching` module provides utilities for caching, using `Caffeine` as the underlying implementation.
 
 To use it in an existing SBT project, add the following dependency to your `build.sbt`:
 
@@ -355,9 +356,27 @@ To use it in an existing SBT project, add the following dependency to your `buil
 libraryDependencies += "com.kevel" %% "apso-caching" % "0.21.1"
 ```
 
-Apso provides utilities to simplify the caching of method calls, using `Caffeine` as the underlying implementation.
+The simplest use case is bootstrapping a cache implementation based on a configuration object:
 
-These utilities are provided as `cachedSync()` and `cachedAsync()` extension methods over all `FunctionN[]` types:
+```scala
+import scala.concurrent.duration._
+
+import com.kevel.apso.caching._
+
+val cache = config.Cache(Some(5.seconds), None).implementation[String, Int]
+// cache: com.github.blemale.scaffeine.Cache[String, Int]
+
+val x1 = cache.getIfPresent("requests")
+// x1: Option[Int] = None
+
+cache.put("requests", 1)
+
+val x2 = cache.getIfPresent("requests")
+// x2: Option[Int] = Some(value = 1)
+```
+
+Apso also provides utilities to simplify the caching of method calls. These utilities are provided as `cachedSync()` and
+`cachedAsync()` extension methods over all `FunctionN[]` types:
 
 ```scala
 import scala.concurrent._
@@ -378,11 +397,11 @@ val cachedFn = ((i: Int) => {
 // cachedFn: SyncMemoizeFn1[Int, Int] = <function1>
 
 cachedFn(2)
-// res25: Int = 0
-cachedFn(2)
 // res26: Int = 0
+cachedFn(2)
+// res27: Int = 0
 x
-// res27: AtomicInteger = 2
+// res28: AtomicInteger = 2
 
 val y = new AtomicInteger(0)
 // y: AtomicInteger = 3
@@ -394,11 +413,11 @@ val cachedFutFn = ((i: Int) => Future {
 // cachedFutFn: AsyncMemoizeFn1[Int, Int] = <function1>
 
 Await.result(cachedFutFn(3), Duration.Inf)
-// res28: Int = 0
-Await.result(cachedFutFn(3), Duration.Inf)
 // res29: Int = 0
+Await.result(cachedFutFn(3), Duration.Inf)
+// res30: Int = 0
 y
-// res30: AtomicInteger = 3
+// res31: AtomicInteger = 3
 ```
 
 ## Collections
@@ -472,13 +491,13 @@ val nt = t.set("one", 1).set("two", 2).set("three", 3).set("four", 4)
 // ...
 
 nt.get("one")
-// res32: Option[Int] = Some(value = 1)
+// res33: Option[Int] = Some(value = 1)
 
 nt.get("two")
-// res33: Option[Int] = Some(value = 2)
+// res34: Option[Int] = Some(value = 2)
 
 nt.get("five")
-// res34: Option[Int] = None
+// res35: Option[Int] = None
 ```
 
 ### TypedMap
@@ -492,25 +511,25 @@ val m = TypedMap("one", 2, 3L)
 // m: TypedMap[Any] = Map(java.lang.String -> one, Int -> 2, Long -> 3)
 
 m[String]
-// res36: String = "one"
+// res37: String = "one"
 
 m[Int]
-// res37: Int = 2
+// res38: Int = 2
 
 m[Long]
-// res38: Long = 3L
+// res39: Long = 3L
 
 m.get[String]
-// res39: Option[String] = Some(value = "one")
+// res40: Option[String] = Some(value = "one")
 
 m.get[Int]
-// res40: Option[Int] = Some(value = 2)
+// res41: Option[Int] = Some(value = 2)
 
 m.get[Long]
-// res41: Option[Long] = Some(value = 3L)
+// res42: Option[Long] = Some(value = 3L)
 
 m.get[Char]
-// res42: Option[Char] = None
+// res43: Option[Char] = None
 ```
 
 ### Iterators
@@ -528,7 +547,7 @@ val circularIterator = CircularIterator(List(1, 2, 3).iterator)
 // circularIterator: CircularIterator[Int] = non-empty iterator
 
 circularIterator.take(10).toList
-// res44: List[Int] = List(1, 2, 3, 1, 2, 3, 1, 2, 3, 1)
+// res45: List[Int] = List(1, 2, 3, 1, 2, 3, 1, 2, 3, 1)
 ```
 
 #### MergedBufferedIterator
@@ -546,7 +565,7 @@ val it1 = MergedBufferedIterator(List(
 // it1: MergedBufferedIterator[Int] = empty iterator
 
 it1.toList
-// res46: List[Int] = List(
+// res47: List[Int] = List(
 //   0,
 //   0,
 //   0,
@@ -596,7 +615,7 @@ val it2 = MergedBufferedIterator(List(
 // it2: MergedBufferedIterator[Int] = non-empty iterator
 
 it2.mergeSorted(Iterator(4, 6).buffered).toList
-// res47: List[Int] = List(1, 2, 3, 4, 5, 6)
+// res48: List[Int] = List(1, 2, 3, 4, 5, 6)
 ```
 
 ## Encryption
@@ -639,10 +658,10 @@ libraryDependencies += "com.kevel" %% "apso-hashing" % "0.21.1"
 import com.kevel.apso.hashing.Implicits._
 
 "abcd".md5
-// res50: String = "e2fc714c4727ee9395f324cd2e7f331f"
+// res51: String = "e2fc714c4727ee9395f324cd2e7f331f"
 
 "abcd".murmurHash
-// res51: Long = 7785666560123423118L
+// res52: Long = 7785666560123423118L
 ```
 
 ## IO
@@ -727,7 +746,7 @@ val js2 = Json.obj(
 ```
 ```scala
 js1.deepMerge(js2).spaces2
-// res56: String = """{
+// res57: String = """{
 //   "c" : 4,
 //   "d" : {
 //     "e" : 5,
@@ -743,7 +762,7 @@ fromFullPaths(Seq(
    "b.d" -> 3.asJson,
    "e" -> "xpto".asJson,
    "f.g.h" -> 5.asJson)).spaces2
-// res57: String = """{
+// res58: String = """{
 //   "f" : {
 //     "g" : {
 //       "h" : 5
@@ -758,26 +777,26 @@ fromFullPaths(Seq(
 // }"""
 
 js1.getField[Int]("a")
-// res58: Option[Int] = Some(value = 2)
+// res59: Option[Int] = Some(value = 2)
 js1.getField[Int]("d.f")
-// res59: Option[Int] = Some(value = 6)
+// res60: Option[Int] = Some(value = 6)
 js1.getField[Int]("x")
-// res60: Option[Int] = None
+// res61: Option[Int] = None
 
 js1.deleteField("a")
-// res61: Json = JObject(
+// res62: Json = JObject(
 //   value = object[b -> 3,d -> {
 //   "f" : 6
 // }]
 // )
 js1.deleteField("d.f")
-// res62: Json = JObject(
+// res63: Json = JObject(
 //   value = object[a -> 2,b -> 3,d -> {
 //   
 // }]
 // )
 js1.deleteField("x")
-// res63: Json = JObject(
+// res64: Json = JObject(
 //   value = object[a -> 2,b -> 3,d -> {
 //   "f" : 6
 // }]
@@ -791,13 +810,13 @@ The `JsonConvert` object contains helpers for converting between JSON values and
 import com.kevel.apso.circe._
 
 JsonConvert.toJson("abcd")
-// res65: io.circe.Json = JString(value = "abcd")
+// res66: io.circe.Json = JString(value = "abcd")
 
 JsonConvert.toJson(1)
-// res66: io.circe.Json = JNumber(value = JsonLong(value = 1L))
+// res67: io.circe.Json = JNumber(value = JsonLong(value = 1L))
 
 JsonConvert.toJson(Map(1 -> 2, 3 -> 4))
-// res67: io.circe.Json = JObject(value = object[1 -> 2,3 -> 4])
+// res68: io.circe.Json = JObject(value = object[1 -> 2,3 -> 4])
 ```
 
 ## Profiling
@@ -838,10 +857,10 @@ import com.kevel.apso.time._
 import com.kevel.apso.time.Implicits._
 
 (new DateTime("2012-01-01") to new DateTime("2012-01-01")).toList
-// res69: List[DateTime] = List(2012-01-01T00:00:00.000Z)
+// res70: List[DateTime] = List(2012-01-01T00:00:00.000Z)
 
 (new DateTime("2012-02-01") until new DateTime("2012-03-01") by 1.day)
-// res70: IterableInterval = IndexedSeq(
+// res71: IterableInterval = IndexedSeq(
 //   2012-02-01T00:00:00.000Z,
 //   2012-02-02T00:00:00.000Z,
 //   2012-02-03T00:00:00.000Z,
@@ -874,7 +893,7 @@ import com.kevel.apso.time.Implicits._
 // )
 
 (new DateTime("2012-01-01") until new DateTime("2012-02-01") by 2.minutes)
-// res71: IterableInterval = IndexedSeq(
+// res72: IterableInterval = IndexedSeq(
 //   2012-01-01T00:00:00.000Z,
 //   2012-01-01T00:02:00.000Z,
 //   2012-01-01T00:04:00.000Z,
