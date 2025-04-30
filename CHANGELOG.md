@@ -43,7 +43,6 @@ In addition, the performance of the `flattenedKeyValueSet` in `apso-circe` was i
 - Start cross-compiling apso-caching to Scala 3 ([#827](https://github.com/adzerk/apso/pull/827)).
 
 ### Changed
-- Remove LruCache ([#818](https://github.com/adzerk/apso/pull/818)).
 - Update sbt-mdoc to 2.7.0 ([#822](https://github.com/adzerk/apso/pull/822)).
 - Use builders and avoid Sets in flattenedKeyValueSet ([#825](https://github.com/adzerk/apso/pull/825)).
 - Avoid specifying a default value for the maximum cache size ([#826](https://github.com/adzerk/apso/pull/826)).
