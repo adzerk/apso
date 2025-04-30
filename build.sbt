@@ -41,12 +41,15 @@ lazy val caching = module(project, "caching")
       Specs2Core % Test
     ),
     apiMappings ++= {
-      val scaffeineJar = (Compile / dependencyClasspath).value.map(_.data).find(_.getName.contains("scaffeine")).get
-      Map(
-        scaffeineJar -> url(
-          "https://www.javadoc.io/doc/com.github.blemale/scaffeine_3/latest/com/github/blemale/scaffeine.html"
-        )
-      )
+      val scaffeineJar     = (Compile / dependencyClasspath).value.map(_.data).find(_.getName.contains("scaffeine")).get
+      val scaffeineModule  = libraryDependencies.value.find(_.name == "scaffeine").get
+      val path             = CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, 13)) => "scaffeine_2.13"
+        case Some((3, _))  => "scaffeine_3"
+        case _             => throw new RuntimeException("Unsupported Scala version")
+      }
+      val scaffeineVersion = scaffeineModule.revision
+      Map(scaffeineJar -> url(s"https://www.javadoc.io/doc/com.github.blemale/$path/$scaffeineVersion/"))
     }
   )
 
