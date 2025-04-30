@@ -39,6 +39,7 @@ lazy val caching = module(project, "caching")
       Scaffeine,
       Specs2Core % Test
     ),
+    // NOTICE: This may not be needed anymore if https://github.com/blemale/scaffeine/pull/441 is merged.
     apiMappings ++= {
       val scaffeineJar     = (Compile / dependencyClasspath).value.map(_.data).find(_.getName.contains("scaffeine")).get
       val scaffeineModule  = libraryDependencies.value.find(_.name == "scaffeine").get
