@@ -43,7 +43,9 @@ lazy val caching = module(project, "caching")
     apiMappings ++= {
       val scaffeineJar = (Compile / dependencyClasspath).value.map(_.data).find(_.getName.contains("scaffeine")).get
       Map(
-        scaffeineJar -> url("https://www.javadoc.io/doc/com.github.blemale/scaffeine_3/latest/com/github/blemale/scaffeine.html")
+        scaffeineJar -> url(
+          "https://www.javadoc.io/doc/com.github.blemale/scaffeine_3/latest/com/github/blemale/scaffeine.html"
+        )
       )
     }
   )
