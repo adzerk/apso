@@ -5,7 +5,8 @@ import xerial.sbt.Sonatype.sonatypeCentralHost
 
 ThisBuild / organization := "com.kevel"
 
-ThisBuild / scalaVersion := Versions.Scala213
+ThisBuild / scalaVersion       := Versions.Scala213
+ThisBuild / crossScalaVersions := List(Versions.Scala213, Versions.Scala3)
 
 val javaVersion = "11"
 
@@ -210,8 +211,6 @@ lazy val commonSettings = Seq(
   semanticdbEnabled := true,
   semanticdbVersion := scalafixSemanticdb.revision,
   scalafixOnCompile := true,
-
-  crossScalaVersions := List(Versions.Scala213, Versions.Scala3),
 
   scalacOptions ++= {
     lazy val commonFlags = Seq(
