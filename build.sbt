@@ -5,9 +5,7 @@ import xerial.sbt.Sonatype.sonatypeCentralHost
 
 ThisBuild / organization := "com.kevel"
 
-// Setting no cross build for the aggregating root project so that we can have proper per project exclusions.
-ThisBuild / crossScalaVersions := Nil
-ThisBuild / scalaVersion       := Versions.Scala213
+ThisBuild / scalaVersion := Versions.Scala213
 
 val javaVersion = "11"
 
