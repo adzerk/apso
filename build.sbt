@@ -1,7 +1,6 @@
 import Dependencies._
 import ReleaseTransformations._
 import spray.boilerplate.BoilerplatePlugin
-import xerial.sbt.Sonatype.sonatypeCentralHost
 
 ThisBuild / organization := "com.kevel"
 
@@ -256,7 +255,11 @@ lazy val commonSettings = Seq(
 
   autoAPIMappings := true,
 
-  publishTo := sonatypePublishToBundle.value,
+  publishTo := {
+    val centralSnapshots = "https://central.sonatype.com/repository/maven-snapshots/"
+    if (isSnapshot.value) Some("central-snapshots" at centralSnapshots)
+    else localStaging.value
+  },
 
   publishMavenStyle := true,
   Test / publishArtifact := false,
@@ -273,8 +276,6 @@ lazy val commonSettings = Seq(
   // format: on
 )
 
-ThisBuild / sonatypeCredentialHost := sonatypeCentralHost
-
 releaseCrossBuild    := true
 releaseTagComment    := s"Release ${(ThisBuild / version).value}"
 releaseCommitMessage := s"Set version to ${(ThisBuild / version).value}"
@@ -288,7 +289,7 @@ releaseProcess := Seq[ReleaseStep](
   commitReleaseVersion,
   tagRelease,
   releaseStepCommandAndRemaining("+publishSigned"),
-  releaseStepCommand("sonatypeBundleRelease"),
+  releaseStepCommand("sonaRelease"),
   setNextVersion,
   commitNextVersion,
   pushChanges
