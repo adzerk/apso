@@ -18,6 +18,21 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+- Dependency on `nscala-time`, using only `joda.time` methods instead ([#849](https://github.com/adzerk/apso/pull/849)).
+
+### Fixed
+
+### Security
+
 ## [0.22.1] - 2025-04-30
 
 This release reintroduces the `config.Cache.implementation` method in `apso-caching`, now typed in both the cache key
