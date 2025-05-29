@@ -1,7 +1,6 @@
 package com.kevel.apso.time
 
-import com.github.nscala_time.time.Imports._
-import org.joda.time.ReadableInterval
+import org.joda.time.{DateTime, DateTimeZone, Interval, LocalDate, LocalDateTime, LocalTime, Period, ReadableInterval}
 
 /** Object containing implicit classes and methods related to datetime libraries.
   */
@@ -24,7 +23,7 @@ object Implicits {
       *   a `DateTime` corresponding to this `LocalDate` at the latest valid time for the date.
       */
     def toDateTimeAtEndOfDay =
-      (d1 + 1.day).toDateTimeAtStartOfDay - 1.millis
+      d1.plusDays(1).toDateTimeAtStartOfDay.minusMillis(1)
 
     /** Returns a `DateTime` corresponding to this `LocalDate` at the latest valid time for the date on the given
       * `DateTimeZone`.
@@ -35,7 +34,7 @@ object Implicits {
       *   `DateTimeZone`.
       */
     def toDateTimeAtEndOfDay(tz: DateTimeZone) =
-      (d1 + 1.day).toDateTimeAtStartOfDay(tz) - 1.millis
+      d1.plusDays(1).toDateTimeAtStartOfDay(tz).minusMillis(1)
 
     /** Returns an iterable interval starting at this `LocalDate` (inclusive) and ending at the given `LocalDate`
       * (inclusive), with a 1 day step.
@@ -46,7 +45,9 @@ object Implicits {
       *   with a 1 day step.
       */
     def to(d2: LocalDate) =
-      LocalDateInterval(IterableInterval(d1.toDateTimeAtStartOfDay to d2.toDateTimeAtStartOfDay, 1.day, true))
+      LocalDateInterval(
+        IterableInterval(new Interval(d1.toDateTimeAtStartOfDay, d2.toDateTimeAtStartOfDay), Period.days(1), true)
+      )
 
     /** Returns an iterable interval starting at this `LocalDate` (inclusive) and ending at the given `LocalDate`
       * (exclusive), with a 1 day step.
@@ -57,7 +58,9 @@ object Implicits {
       *   with a 1 day step.
       */
     def until(d2: LocalDate) =
-      LocalDateInterval(IterableInterval(d1.toDateTimeAtStartOfDay to d2.toDateTimeAtStartOfDay, 1.day, false))
+      LocalDateInterval(
+        IterableInterval(new Interval(d1.toDateTimeAtStartOfDay, d2.toDateTimeAtStartOfDay), Period.days(1), false)
+      )
   }
 
   /** Implicit class that provides new methods for `DateTimes`.
@@ -94,7 +97,18 @@ object Implicits {
       * @return
       *   `true` if this `DateTime` is in the range between the two given `DateTimes`, `false` otherwise.
       */
-    def between(dStart: DateTime, dEnd: DateTime) = dStart < d1 && d1 < dEnd
+    def between(dStart: DateTime, dEnd: DateTime) = dStart.isBefore(d1) && d1.isBefore(dEnd)
+
+    /** Returns an iterable interval starting at this `DateTime` (inclusive) and ending at the given `DateTime`
+      * (inclusive), with a 1 day step.
+      * @param d2
+      *   the ending `DateTime`
+      * @return
+      *   an iterable interval starting at this `DateTime` (inclusive) and ending at the given `DateTime` (inclusive),
+      *   with a 1 day step.
+      */
+    def to(d2: DateTime): IterableInterval =
+      IterableInterval(new Interval(d1, d2), Period.days(1), true)
 
     /** Returns an iterable interval starting at this `DateTime` (inclusive) and ending at the given `DateTime`
       * (exclusive), with a 1 day step.
@@ -104,7 +118,7 @@ object Implicits {
       *   an iterable interval starting at this `DateTime` (inclusive) and ending at the given `DateTime` (exclusive),
       *   with a 1 day step.
       */
-    def until(d2: DateTime) = IterableInterval(d1 to d2, 1.day, false)
+    def until(d2: DateTime): IterableInterval = IterableInterval(new Interval(d1, d2), Period.days(1), false)
   }
 
   /** Implicit class that provides new methods for `ReadableIntervals`.
@@ -123,8 +137,10 @@ object Implicits {
       require(n >= 0, "n must not be negative")
       if (n == 0) Seq.empty
       else {
-        val q = (interval.millis / n).toInt
-        (0 until n).map { i => (interval.getStart + q * i + i) to (interval.getStart + q * (i + 1) + i) }
+        val q = (interval.toDuration.getMillis / n).toInt
+        (0 until n).map { i =>
+          new Interval(interval.getStart.plus(q * i + i), (interval.getStart.plus(q * (i + 1)).plus(i)))
+        }
       }
     }
   }
@@ -136,5 +152,6 @@ object Implicits {
     * @return
     *   an iterable time interval.
     */
-  implicit def intervalToStepped(interval: ReadableInterval): IterableInterval = IterableInterval(interval, 1.day)
+  implicit def intervalToStepped(interval: ReadableInterval): IterableInterval =
+    IterableInterval(interval, Period.days(1))
 }

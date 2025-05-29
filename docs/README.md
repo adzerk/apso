@@ -669,7 +669,7 @@ libraryDependencies += "com.kevel" %% "apso-time" % "@VERSION@"
 See the following sample usages:
 
 ```scala mdoc:reset
-import com.github.nscala_time.time.Imports._
+import org.joda.time.{DateTime, Period}
 
 import com.kevel.apso.time._
 
@@ -677,9 +677,9 @@ import com.kevel.apso.time.Implicits._
 
 (new DateTime("2012-01-01") to new DateTime("2012-01-01")).toList
 
-(new DateTime("2012-02-01") until new DateTime("2012-03-01") by 1.day)
+(new DateTime("2012-02-01") until new DateTime("2012-03-01") by Period.days(1))
 
-(new DateTime("2012-01-01") until new DateTime("2012-02-01") by 2.minutes)
+(new DateTime("2012-01-01") until new DateTime("2012-02-01") by Period.minutes(2))
 ```
 
 ## TestKit
