@@ -15,7 +15,6 @@ object Dependencies {
     val FastMd5        = "2.7.1"
     val JUnit          = "4.13.2"
     val JodaTime       = "2.14.0"
-    val NscalaTime     = "3.0.0"
     val ScalaCheck     = "1.18.1"
     val ScalaLogging   = "3.9.5"
     val ScalaPool      = "0.4.3"
@@ -42,7 +41,6 @@ object Dependencies {
   val FastMd5                = "com.joyent.util"             % "fast-md5"                  % Versions.FastMd5
   val JUnit                  = "junit"                       % "junit"                     % Versions.JUnit
   val JodaTime               = "joda-time"                   % "joda-time"                 % Versions.JodaTime
-  val NscalaTime             = "com.github.nscala-time"     %% "nscala-time"               % Versions.NscalaTime
   val PekkoActor             = "org.apache.pekko"           %% "pekko-actor"               % Versions.Pekko
   val PekkoActorTestkitTyped = "org.apache.pekko"           %% "pekko-actor-testkit-typed" % Versions.Pekko
   val PekkoActorTyped        = "org.apache.pekko"           %% "pekko-actor-typed"         % Versions.Pekko

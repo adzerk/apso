@@ -850,7 +850,7 @@ libraryDependencies += "com.kevel" %% "apso-time" % "0.22.1"
 See the following sample usages:
 
 ```scala
-import com.github.nscala_time.time.Imports._
+import org.joda.time.{DateTime, Period}
 
 import com.kevel.apso.time._
 
@@ -859,7 +859,7 @@ import com.kevel.apso.time.Implicits._
 (new DateTime("2012-01-01") to new DateTime("2012-01-01")).toList
 // res70: List[DateTime] = List(2012-01-01T00:00:00.000Z)
 
-(new DateTime("2012-02-01") until new DateTime("2012-03-01") by 1.day)
+(new DateTime("2012-02-01") until new DateTime("2012-03-01") by Period.days(1))
 // res71: IterableInterval = IndexedSeq(
 //   2012-02-01T00:00:00.000Z,
 //   2012-02-02T00:00:00.000Z,
@@ -892,7 +892,7 @@ import com.kevel.apso.time.Implicits._
 //   2012-02-29T00:00:00.000Z
 // )
 
-(new DateTime("2012-01-01") until new DateTime("2012-02-01") by 2.minutes)
+(new DateTime("2012-01-01") until new DateTime("2012-02-01") by Period.minutes(2))
 // res72: IterableInterval = IndexedSeq(
 //   2012-01-01T00:00:00.000Z,
 //   2012-01-01T00:02:00.000Z,

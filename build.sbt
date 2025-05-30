@@ -154,7 +154,7 @@ lazy val testkit = module(project, "testkit")
   )
 
 lazy val time = module(project, "time")
-  .settings(libraryDependencies ++= Seq(JodaTime, NscalaTime, Specs2Core % Test))
+  .settings(libraryDependencies ++= Seq(JodaTime, Specs2Core % Test))
 
 lazy val apso = (project in file("."))
   .settings(commonSettings: _*)

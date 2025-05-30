@@ -1,7 +1,6 @@
 package com.kevel.apso.time
 
-import com.github.nscala_time.time.Imports._
-import org.joda.time.ReadableInterval
+import org.joda.time.{DateTime, Interval, LocalDate, Period, ReadableInstant, ReadableInterval}
 
 /** A view of a time interval as an indexed sequence of `DateTimes`.
   */
@@ -29,17 +28,17 @@ trait IterableInterval extends IndexedSeq[DateTime] {
 case class SteppedInterval(interval: ReadableInterval, step: Period) extends IterableInterval {
 
   lazy val length: Int = {
-    var i = (interval.toDurationMillis / step.toDurationFrom(interval.getStart).millis).toInt
-    if (apply(i) < interval.getEnd) {
-      while (apply(i) <= interval.getEnd) { i += 1 }
+    var i = (interval.toDurationMillis / step.toDurationFrom(interval.getStart).getMillis).toInt
+    if (apply(i).isBefore(interval.getEnd)) {
+      while (apply(i).isBefore(interval.getEnd)) { i += 1 }
       i
     } else {
-      while (apply(i) > interval.getEnd) { i -= 1 }
+      while (!apply(i).isBefore(interval.getEnd)) { i -= 1 }
       i + 1
     } // FIXME more intelligent code for this?
   }
 
-  def apply(idx: Int) = interval.getStart + step.multipliedBy(idx)
+  def apply(idx: Int) = interval.getStart.plus(step.multipliedBy(idx))
 
   def by(newStep: Period) = new SteppedInterval(interval, newStep)
 }
@@ -64,15 +63,25 @@ object IterableInterval {
     *   the `ReadableInterval` to view as an indexed sequence
     * @param step
     *   the period of time between consecutive `DateTimes`
-    * @param lastInclusive
-    *   `true` if the upper bound of the interval is to be included in the sequence
     * @return
     *   an iterable time interval with the given step.
     */
-  def apply(interval: ReadableInterval, step: Period, lastInclusive: Boolean = true): IterableInterval =
-    if (lastInclusive) SteppedInterval(interval, step)
-    else if (interval.millis == 0) EmptySteppedInterval(step)
-    else SteppedInterval(interval.getStart to interval.getEnd - 1.millis, step)
+  def apply(interval: ReadableInterval, step: Period): IterableInterval =
+    if (interval.toDuration.getMillis == 0) EmptySteppedInterval(step)
+    else SteppedInterval(interval, step)
+
+  /** Creates a new iterable time interval from `start` (inclusive) to `end` (exclusive).
+    * @param start
+    *   the first `ReadableInstant` of the interval, the first element of the indexed sequence
+    * @param end
+    *   the last exclusive `ReadableInstant` of the interval, the first element not in the sequence
+    * @param step
+    *   the period of time between consecutive `DateTimes`
+    * @return
+    *   an iterable time interval with the given step.
+    */
+  def apply(start: ReadableInstant, end: ReadableInstant, step: Period): IterableInterval =
+    IterableInterval(new Interval(start, end), step)
 }
 
 /** A view of a time interval as an indexed sequence of `LocalDate`.
