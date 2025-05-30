@@ -1,6 +1,6 @@
 package com.kevel.apso.time
 
-import org.joda.time.{DateTime, LocalDate, Period, ReadableInterval}
+import org.joda.time.{DateTime, Interval, LocalDate, Period, ReadableInstant, ReadableInterval}
 
 /** A view of a time interval as an indexed sequence of `DateTimes`.
   */
@@ -69,6 +69,19 @@ object IterableInterval {
   def apply(interval: ReadableInterval, step: Period): IterableInterval =
     if (interval.toDuration.getMillis == 0) EmptySteppedInterval(step)
     else SteppedInterval(interval, step)
+
+  /** Creates a new iterable time interval from `start` (inclusive) to `end` (exclusive).
+    * @param start
+    *   the first `ReadableInstant` of the interval, the first element of the indexed sequence
+    * @param end
+    *   the last exclusive `ReadableInstant` of the interval, the first element not in the sequence
+    * @param step
+    *   the period of time between consecutive `DateTimes`
+    * @return
+    *   an iterable time interval with the given step.
+    */
+  def apply(start: ReadableInstant, end: ReadableInstant, step: Period): IterableInterval =
+    IterableInterval(new Interval(start, end), step)
 }
 
 /** A view of a time interval as an indexed sequence of `LocalDate`.

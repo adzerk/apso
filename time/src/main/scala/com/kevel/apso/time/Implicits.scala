@@ -47,7 +47,8 @@ object Implicits {
     def to(d2: LocalDate) =
       LocalDateInterval(
         IterableInterval(
-          new Interval(d1.toDateTimeAtStartOfDay, d2.toDateTimeAtStartOfDay.plusMillis(1)),
+          d1.toDateTimeAtStartOfDay,
+          d2.toDateTimeAtStartOfDay.plusMillis(1),
           Period.days(1)
         )
       )
@@ -63,7 +64,8 @@ object Implicits {
     def until(d2: LocalDate) =
       LocalDateInterval(
         IterableInterval(
-          new Interval(d1.toDateTimeAtStartOfDay, d2.toDateTimeAtStartOfDay),
+          d1.toDateTimeAtStartOfDay,
+          d2.toDateTimeAtStartOfDay,
           Period.days(1)
         )
       )
@@ -114,7 +116,7 @@ object Implicits {
       *   with a 1 day step.
       */
     def to(d2: DateTime): IterableInterval =
-      IterableInterval(new Interval(d1, d2.plusMillis(1)), Period.days(1))
+      IterableInterval(d1, d2.plusMillis(1), Period.days(1))
 
     /** Returns an iterable interval starting at this `DateTime` (inclusive) and ending at the given `DateTime`
       * (exclusive), with a 1 day step.
@@ -124,7 +126,7 @@ object Implicits {
       *   an iterable interval starting at this `DateTime` (inclusive) and ending at the given `DateTime` (exclusive),
       *   with a 1 day step.
       */
-    def until(d2: DateTime): IterableInterval = IterableInterval(new Interval(d1, d2), Period.days(1))
+    def until(d2: DateTime): IterableInterval = IterableInterval(d1, d2, Period.days(1))
   }
 
   /** Implicit class that provides new methods for `ReadableIntervals`.
