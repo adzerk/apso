@@ -1,6 +1,6 @@
 package com.kevel.apso.time
 
-import org.joda.time.{DateTime, Interval, LocalDate, Period, ReadableInterval}
+import org.joda.time.{DateTime, LocalDate, Period, ReadableInterval}
 
 /** A view of a time interval as an indexed sequence of `DateTimes`.
   */
@@ -30,10 +30,10 @@ case class SteppedInterval(interval: ReadableInterval, step: Period) extends Ite
   lazy val length: Int = {
     var i = (interval.toDurationMillis / step.toDurationFrom(interval.getStart).getMillis).toInt
     if (apply(i).isBefore(interval.getEnd)) {
-      while (!apply(i).isAfter(interval.getEnd)) { i += 1 }
+      while (apply(i).isBefore(interval.getEnd)) { i += 1 }
       i
     } else {
-      while (apply(i).isAfter(interval.getEnd)) { i -= 1 }
+      while (!apply(i).isBefore(interval.getEnd)) { i -= 1 }
       i + 1
     } // FIXME more intelligent code for this?
   }
@@ -63,15 +63,12 @@ object IterableInterval {
     *   the `ReadableInterval` to view as an indexed sequence
     * @param step
     *   the period of time between consecutive `DateTimes`
-    * @param lastInclusive
-    *   `true` if the upper bound of the interval is to be included in the sequence
     * @return
     *   an iterable time interval with the given step.
     */
-  def apply(interval: ReadableInterval, step: Period, lastInclusive: Boolean = true): IterableInterval =
-    if (lastInclusive) SteppedInterval(interval, step)
-    else if (interval.toDuration.getMillis == 0) EmptySteppedInterval(step)
-    else SteppedInterval(new Interval(interval.getStart, interval.getEnd.minusMillis(1)), step)
+  def apply(interval: ReadableInterval, step: Period): IterableInterval =
+    if (interval.toDuration.getMillis == 0) EmptySteppedInterval(step)
+    else SteppedInterval(interval, step)
 }
 
 /** A view of a time interval as an indexed sequence of `LocalDate`.

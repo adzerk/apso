@@ -101,11 +101,11 @@ class ImplicitsSpec extends Specification {
 
   "An ApsoTimeInterval" should {
     "split itself into subsequences" in {
-      val interval = new Interval(0, 99)
+      val interval = new Interval(0, 100)
       interval.split(0) === Seq.empty
       interval.split(-1) must throwAn[IllegalArgumentException]
       interval.split(5).size === 5
-      interval.split(4) === Seq(new Interval(0, 24), new Interval(25, 49), new Interval(50, 74), new Interval(75, 99))
+      interval.split(4) === Seq(new Interval(0, 25), new Interval(25, 50), new Interval(50, 75), new Interval(75, 100))
     }
   }
 }
