@@ -16,12 +16,12 @@ object JsonConvert {
     *   the given object converted to a [[io.circe.Json]] value.
     */
   def toJson(obj: Any): Json = obj match {
-    case null        => Json.Null
-    case n: Int      => n.asJson
-    case n: Long     => n.asJson
-    case n: Double   => n.asJson
-    case b: Boolean  => b.asJson
-    case str: String => str.asJson
+    case null           => Json.Null
+    case n: Int         => n.asJson
+    case n: Long        => n.asJson
+    case n: Double      => n.asJson
+    case b: Boolean     => b.asJson
+    case str: String    => str.asJson
     case map: Map[_, _] =>
       Json.fromJsonObject(
         JsonObject.fromIterable(map.iterator.map { case (k, v) => (k.toString, toJson(v)) }.to(Iterable))

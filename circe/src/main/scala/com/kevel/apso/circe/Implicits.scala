@@ -143,7 +143,7 @@ object Implicits {
     @tailrec
     def fromFullPathsRec(paths: Seq[(String, Json)], acc: Json): Json = {
       paths match {
-        case Nil => acc
+        case Nil                  => acc
         case (path, value) :: rem =>
           val newAcc = acc.deepMerge(createJson(path.split(separatorRegex).toList, value))
           fromFullPathsRec(rem, newAcc)

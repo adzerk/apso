@@ -70,7 +70,7 @@ trait ProxySupport extends ClientIPDirectives {
           val req = reqBuilder(ip, ctx)
           import system.dispatcher
           strictTimeout match {
-            case None => Http(system).singleRequest(req).map(Complete.apply)
+            case None    => Http(system).singleRequest(req).map(Complete.apply)
             case Some(t) =>
               Http(system)
                 .singleRequest(req)
@@ -167,7 +167,7 @@ trait ProxySupport extends ClientIPDirectives {
       Source.queue[(HttpRequest, Promise[RouteResult])](reqQueueSize)
 
     private[this] lazy val flow = strictTimeout match {
-      case None => Http().cachedHostConnectionPool[Promise[RouteResult]](host, port)
+      case None    => Http().cachedHostConnectionPool[Promise[RouteResult]](host, port)
       case Some(t) =>
         Http()
           .cachedHostConnectionPool[Promise[RouteResult]](host, port)
@@ -205,7 +205,7 @@ trait ProxySupport extends ClientIPDirectives {
         case Enqueued         => promise.future
         case OfferFailure(ex) => Future.failed(new RuntimeException("Queue offering failed", ex))
         case QueueClosed      => Future.failed(new RuntimeException("Queue is completed before call!?"))
-        case Dropped =>
+        case Dropped          =>
           logger.warn(s"Request queue for $host:$port is full")
           if (failOnDrop) Future.failed(new RuntimeException("Dropping request (Queue is full)"))
           else Future.successful(Complete(HttpResponse(StatusCodes.ServiceUnavailable)))

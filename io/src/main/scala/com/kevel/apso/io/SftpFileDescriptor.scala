@@ -96,7 +96,7 @@ case class SftpFileDescriptor(
 
   protected def withFileAttributes[A](f: FileAttributes => A): A = fileAttributes match {
     case Some(fa) => f(fa)
-    case None =>
+    case None     =>
       _fileAttributes = Some(sftp(_.stat(path)))
       withFileAttributes(f)
   }
