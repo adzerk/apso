@@ -386,7 +386,7 @@ class S3Bucket(
     if (tries == 0) { logger.error("Max retries reached. Aborting S3 operation"); None }
     else
       Try(f) match {
-        case Success(res) => Some(res)
+        case Success(res)              => Some(res)
         case Failure(e) if !handler(e) =>
           if (tries > 1) {
             logger.warn(s"Error during S3 operation. Retrying in ${sleepTime}ms (${tries - 1} more times)")
