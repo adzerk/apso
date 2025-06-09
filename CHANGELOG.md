@@ -19,7 +19,7 @@ Use the following schema when setting up the Changelog for a new release. Remove
 -->
 
 ## [0.23.0] - 2025-06-09
-This release removes the dependency on `nscala-time`, relying solely on `org.joda.time`'s API. This avoids pulling this dependency to any downstream users.
+This release removes the dependency on `nscala-time` from apso-time, relying solely on `org.joda.time`'s API. This avoids introducing this dependency to any downstream users.
 
 ### Changed
 - Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.783 ([#840](https://github.com/adzerk/apso/pull/840)).
