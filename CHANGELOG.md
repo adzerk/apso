@@ -35,6 +35,7 @@ This release removes the dependency on `nscala-time`, relying solely on `org.jod
 - Update sbt, scripted-plugin to 1.11.1 ([#852](https://github.com/adzerk/apso/pull/852)).
 - Update aws-java-sdk-s3 to 1.12.785 ([#853](https://github.com/adzerk/apso/pull/853)).
 - Update bcpkix-jdk18on, bcprov-jdk18on to 1.81 ([#854](https://github.com/adzerk/apso/pull/854)).
+- Update sbt, scripted-plugin to 1.11.2 ([#855](https://github.com/adzerk/apso/pull/855)).
 
 ### Removed
 - Remove `nscala-time` dependency ([#849](https://github.com/adzerk/apso/pull/849)).
