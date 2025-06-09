@@ -18,6 +18,27 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.23.0] - 2025-06-09
+This release removes the dependency on `nscala-time`, relying solely on `org.joda.time`'s API. This avoids pulling this dependency to any downstream users.
+
+### Changed
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.783 ([#840](https://github.com/adzerk/apso/pull/840)).
+- Update scalafmt-core to 3.9.6 ([#841](https://github.com/adzerk/apso/pull/841)).
+- Update sbt-scalafix to 0.14.3 ([#842](https://github.com/adzerk/apso/pull/842)).
+- Update scala3-library to 3.3.6 ([#843](https://github.com/adzerk/apso/pull/843)).
+- Update unirest-java-core to 4.4.7 ([#844](https://github.com/adzerk/apso/pull/844)).
+- Update sshj to 0.40.0 ([#845](https://github.com/adzerk/apso/pull/845)).
+- Update pekko-http, pekko-http-core, ... to 1.2.0 ([#846](https://github.com/adzerk/apso/pull/846)).
+- Update sbt to 1.11.0 and remove dependency on sbt-sonatype ([#847](https://github.com/adzerk/apso/pull/847)).
+- Update scalafmt-core to 3.9.7 ([#850](https://github.com/adzerk/apso/pull/850)).
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.784 ([#851](https://github.com/adzerk/apso/pull/851)).
+- Update sbt, scripted-plugin to 1.11.1 ([#852](https://github.com/adzerk/apso/pull/852)).
+- Update aws-java-sdk-s3 to 1.12.785 ([#853](https://github.com/adzerk/apso/pull/853)).
+- Update bcpkix-jdk18on, bcprov-jdk18on to 1.81 ([#854](https://github.com/adzerk/apso/pull/854)).
+
+### Removed
+- Remove `nscala-time` dependency ([#849](https://github.com/adzerk/apso/pull/849)).
+
 ## [0.22.1] - 2025-04-30
 
 This release reintroduces the `config.Cache.implementation` method in `apso-caching`, now typed in both the cache key
