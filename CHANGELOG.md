@@ -40,6 +40,8 @@ This release removes the dependency on `nscala-time`, relying solely on `org.jod
 ### Removed
 - Remove `nscala-time` dependency ([#849](https://github.com/adzerk/apso/pull/849)).
 
+[0.23.0]: https://github.com/adzerk/apso/compare/v0.22.1...v0.23.0
+
 ## [0.22.1] - 2025-04-30
 
 This release reintroduces the `config.Cache.implementation` method in `apso-caching`, now typed in both the cache key
