@@ -157,7 +157,6 @@ lazy val testkitSpecs2_5 = module(project, "testkit-specs2-5")
     scalaVersion       := Versions.Scala3,
     crossScalaVersions := List(Versions.Scala3),
     libraryDependencies ++= Seq(
-      ScalaTestCore,
       Specs2Common_5  % Provided,
       Specs2Core_5    % Provided,
       Specs2Matcher_5 % Provided
