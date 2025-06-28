@@ -951,4 +951,16 @@ Apso comes with a TestKit with extra useful matchers for [specs2](https://etorre
 
 * `CustomMatchers`: provides a matcher to check if an object is serializable and one to check if a file exists;
 * `FutureExtraMatchers`: provides extra matchers for futures and implicit conversions for awaitables;
-* `JreVersionTestHelper`: provides a wrapper for `AsResult` to only run a spec if a specific JRE version is satisfied;
+* `JreVersionTestHelper`: provides a wrapper for `AsResult` to only run a spec if a specific JRE version is satisfied.
+
+To use the version for version 4 of `specs2`, add the following dependency to your `build.sbt`:
+
+```scala
+libraryDependencies += "com.kevel" %% "apso-testkit" % "0.23.0"
+```
+
+To use the version for version 5 of `specs2` (only available for Scala 3), add the following dependency to your `build.sbt`:
+
+```scala
+libraryDependencies += "com.kevel" %% "apso-testkit-specs2-5" % "0.23.0"
+```

@@ -21,6 +21,7 @@ object Dependencies {
     val ScalaTest      = "3.2.19"
     val SimpleJmx      = "2.2"
     val Specs2         = "4.21.0"
+    val Specs2_5       = "5.6.3"
     val Squants        = "1.8.3"
     val SshJ           = "0.40.0"
     val TypesafeConfig = "1.4.3"
@@ -56,9 +57,12 @@ object Dependencies {
   val ScalaTestCore          = "org.scalatest"              %% "scalatest-core"            % Versions.ScalaTest
   val SimpleJmx              = "com.j256.simplejmx"          % "simplejmx"                 % Versions.SimpleJmx
   val Specs2Common           = "org.specs2"                 %% "specs2-common"             % Versions.Specs2
+  val Specs2Common_5         = "org.specs2"                 %% "specs2-common"             % Versions.Specs2_5
   val Specs2Core             = "org.specs2"                 %% "specs2-core"               % Versions.Specs2
+  val Specs2Core_5           = "org.specs2"                 %% "specs2-core"               % Versions.Specs2_5
   val Specs2JUnit            = "org.specs2"                 %% "specs2-junit"              % Versions.Specs2
   val Specs2Matcher          = "org.specs2"                 %% "specs2-matcher"            % Versions.Specs2
+  val Specs2Matcher_5        = "org.specs2"                 %% "specs2-matcher"            % Versions.Specs2_5
   val Specs2ScalaCheck       = "org.specs2"                 %% "specs2-scalacheck"         % Versions.Specs2
   val Squants                = "org.typelevel"              %% "squants"                   % Versions.Squants
   val SshJ                   = "com.hierynomus"              % "sshj"                      % Versions.SshJ

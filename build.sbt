@@ -26,8 +26,7 @@ lazy val aws = module(project, "aws")
       AwsJavaSdkS3,
       AwsJavaSdkCore,
       ScalaLogging,
-      TypesafeConfig,
-      Specs2Core % Test
+      TypesafeConfig
     )
   )
 
@@ -153,6 +152,18 @@ lazy val testkit = module(project, "testkit")
     )
   )
 
+lazy val testkitSpecs2_5 = module(project, "testkit-specs2-5")
+  .settings(
+    scalaVersion       := Versions.Scala3,
+    crossScalaVersions := List(Versions.Scala3),
+    libraryDependencies ++= Seq(
+      ScalaTestCore,
+      Specs2Common_5  % Provided,
+      Specs2Core_5    % Provided,
+      Specs2Matcher_5 % Provided
+    )
+  )
+
 lazy val time = module(project, "time")
   .settings(libraryDependencies ++= Seq(JodaTime, Specs2Core % Test))
 
@@ -186,6 +197,7 @@ lazy val apso = (project in file("."))
     pekkoHttp,
     profiling,
     testkit,
+    testkitSpecs2_5,
     time
   )
 
