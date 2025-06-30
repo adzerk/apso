@@ -9,12 +9,12 @@ import org.specs2.mutable.SpecificationLike
 
 trait FutureExtraMatchers { this: SpecificationLike =>
 
-  implicit class RichAwaitable[T](val awaitable: Awaitable[T]) {
+  extension [T](awaitable: Awaitable[T]) {
     def get = Await.result(awaitable, 1.second)
     def await(timeout: Duration) = Await.result(awaitable, timeout)
   }
 
-  implicit class RichFutureExtraMatcher[T: AsResult](m: => T) {
+  extension [T: AsResult](m: => T) {
 
     /** @return
       *   a matcher that needs to eventually match, after a given number of retries.
