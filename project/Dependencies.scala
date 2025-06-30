@@ -21,7 +21,7 @@ object Dependencies {
     val ScalaTest      = "3.2.19"
     val SimpleJmx      = "2.2"
     val Specs2         = "4.21.0"
-    val Specs2_5       = "5.6.3"
+    val Specs2_5       = "5.6.4"
     val Squants        = "1.8.3"
     val SshJ           = "0.40.0"
     val TypesafeConfig = "1.4.3"
