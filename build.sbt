@@ -35,7 +35,7 @@ lazy val caching = module(project, "caching")
   .settings(
     libraryDependencies ++= Seq(
       Scaffeine,
-      Specs2Core_4 % Test
+      Specs2_4Core % Test
     ),
     // NOTICE: This may not be needed anymore if https://github.com/blemale/scaffeine/pull/441 is merged.
     apiMappings ++= {
@@ -62,8 +62,8 @@ lazy val circe = module(project, "circe")
       Squants        % Provided,
       TypesafeConfig % Provided,
       CirceLiteral   % Test,
-      Specs2Core_4   % Test,
-      Specs2JUnit_4  % Test
+      Specs2_4Core   % Test,
+      Specs2_4JUnit  % Test
     )
   )
 
@@ -71,8 +71,8 @@ lazy val collections = module(project, "collections")
   .settings(
     libraryDependencies ++= Seq(
       ScalaCheck         % Test,
-      Specs2Core_4       % Test,
-      Specs2ScalaCheck_4 % Test
+      Specs2_4Core       % Test,
+      Specs2_4ScalaCheck % Test
     )
   )
 
@@ -86,9 +86,9 @@ lazy val core = module(project, "core")
       UnirestJava,
       JUnit              % Test,
       ScalaCheck         % Test,
-      Specs2Core_4       % Test,
-      Specs2JUnit_4      % Test,
-      Specs2ScalaCheck_4 % Test
+      Specs2_4Core       % Test,
+      Specs2_4JUnit      % Test,
+      Specs2_4ScalaCheck % Test
     )
   )
 
@@ -115,7 +115,7 @@ lazy val io = module(project, "io")
       ScalaPool.cross(CrossVersion.for3Use2_13),
       SshJ,
       TypesafeConfig,
-      Specs2Core_4 % Test
+      Specs2_4Core % Test
     )
   )
 
@@ -135,7 +135,7 @@ lazy val pekkoHttp = module(project, "pekko-http")
       TypesafeConfig,
       PekkoActorTestkitTyped % Test,
       PekkoHttpTestkit       % Test,
-      Specs2Core_4           % Test
+      Specs2_4Core           % Test
     )
   )
 
@@ -146,9 +146,9 @@ lazy val specs2_4 = module(project, "specs2_4")
   .settings(
     libraryDependencies ++= Seq(
       ScalaTestCore,
-      Specs2Common_4  % Provided,
-      Specs2Core_4    % Provided,
-      Specs2Matcher_4 % Provided
+      Specs2_4Common  % Provided,
+      Specs2_4Core    % Provided,
+      Specs2_4Matcher % Provided
     )
   )
 
@@ -157,14 +157,14 @@ lazy val specs2_5 = module(project, "specs2_5")
     scalaVersion       := Versions.Scala3,
     crossScalaVersions := List(Versions.Scala3),
     libraryDependencies ++= Seq(
-      Specs2Common_5  % Provided,
-      Specs2Core_5    % Provided,
-      Specs2Matcher_5 % Provided
+      Specs2_5Common  % Provided,
+      Specs2_5Core    % Provided,
+      Specs2_5Matcher % Provided
     )
   )
 
 lazy val time = module(project, "time")
-  .settings(libraryDependencies ++= Seq(JodaTime, Specs2Core_4 % Test))
+  .settings(libraryDependencies ++= Seq(JodaTime, Specs2_4Core % Test))
 
 lazy val apso = (project in file("."))
   .settings(commonSettings: _*)
