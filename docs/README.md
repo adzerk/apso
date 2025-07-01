@@ -684,7 +684,7 @@ import com.kevel.apso.time.Implicits._
 
 ## TestKit
 
-Apso comes with a TestKit with extra useful matchers for [specs2](https://etorreborre.github.io/specs2/). The following traits with extra matchers are available:
+Apso comes with TestKits with extra useful matchers for [specs2](https://etorreborre.github.io/specs2/). The following traits with extra matchers are available:
 
 * `CustomMatchers`: provides a matcher to check if an object is serializable and one to check if a file exists;
 * `FutureExtraMatchers`: provides extra matchers for futures and implicit conversions for awaitables;
@@ -693,11 +693,11 @@ Apso comes with a TestKit with extra useful matchers for [specs2](https://etorre
 To use the version for version 4 of `specs2`, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.kevel" %% "apso-testkit" % "@VERSION@"
+libraryDependencies += "com.kevel" %% "apso-specs2_4" % "@VERSION@"
 ```
 
 To use the version for version 5 of `specs2` (only available for Scala 3), add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "com.kevel" %% "apso-testkit-specs2-5" % "@VERSION@"
+libraryDependencies += "com.kevel" %% "apso-specs2_5" % "@VERSION@"
 ```
