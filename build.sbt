@@ -26,8 +26,7 @@ lazy val aws = module(project, "aws")
       AwsJavaSdkS3,
       AwsJavaSdkCore,
       ScalaLogging,
-      TypesafeConfig,
-      Specs2Core % Test
+      TypesafeConfig
     )
   )
 
@@ -36,7 +35,7 @@ lazy val caching = module(project, "caching")
   .settings(
     libraryDependencies ++= Seq(
       Scaffeine,
-      Specs2Core % Test
+      Specs2_4Core % Test
     ),
     // NOTICE: This may not be needed anymore if https://github.com/blemale/scaffeine/pull/441 is merged.
     apiMappings ++= {
@@ -63,33 +62,33 @@ lazy val circe = module(project, "circe")
       Squants        % Provided,
       TypesafeConfig % Provided,
       CirceLiteral   % Test,
-      Specs2Core     % Test,
-      Specs2JUnit    % Test
+      Specs2_4Core   % Test,
+      Specs2_4JUnit  % Test
     )
   )
 
 lazy val collections = module(project, "collections")
   .settings(
     libraryDependencies ++= Seq(
-      ScalaCheck       % Test,
-      Specs2Core       % Test,
-      Specs2ScalaCheck % Test
+      ScalaCheck         % Test,
+      Specs2_4Core       % Test,
+      Specs2_4ScalaCheck % Test
     )
   )
 
 lazy val core = module(project, "core")
-  .dependsOn(testkit % Test)
+  .dependsOn(specs2_4 % Test)
   .settings(
     libraryDependencies ++= Seq(
       CirceCore,
       ScalaLogging,
-      TypesafeConfig   % Provided,
+      TypesafeConfig     % Provided,
       UnirestJava,
-      JUnit            % Test,
-      ScalaCheck       % Test,
-      Specs2Core       % Test,
-      Specs2JUnit      % Test,
-      Specs2ScalaCheck % Test
+      JUnit              % Test,
+      ScalaCheck         % Test,
+      Specs2_4Core       % Test,
+      Specs2_4JUnit      % Test,
+      Specs2_4ScalaCheck % Test
     )
   )
 
@@ -100,7 +99,7 @@ lazy val hashing = module(project, "hashing")
   .settings(libraryDependencies ++= Seq(FastMd5))
 
 lazy val io = module(project, "io")
-  .dependsOn(aws, testkit % Test)
+  .dependsOn(aws, specs2_4 % Test)
   .settings(
     libraryDependencies ++= Seq(
       AwsJavaSdkCore,
@@ -116,7 +115,7 @@ lazy val io = module(project, "io")
       ScalaPool.cross(CrossVersion.for3Use2_13),
       SshJ,
       TypesafeConfig,
-      Specs2Core % Test
+      Specs2_4Core % Test
     )
   )
 
@@ -124,7 +123,7 @@ lazy val pekko = module(project, "pekko")
   .settings(libraryDependencies ++= Seq(PekkoActor % Provided))
 
 lazy val pekkoHttp = module(project, "pekko-http")
-  .dependsOn(core % Test, testkit % Test)
+  .dependsOn(core % Test, specs2_4 % Test)
   .settings(
     libraryDependencies ++= Seq(
       ScalaLogging,
@@ -136,25 +135,36 @@ lazy val pekkoHttp = module(project, "pekko-http")
       TypesafeConfig,
       PekkoActorTestkitTyped % Test,
       PekkoHttpTestkit       % Test,
-      Specs2Core             % Test
+      Specs2_4Core           % Test
     )
   )
 
 lazy val profiling = module(project, "profiling")
   .settings(libraryDependencies ++= Seq(ScalaLogging, SimpleJmx))
 
-lazy val testkit = module(project, "testkit")
+lazy val specs2_4 = module(project, "specs2_4")
   .settings(
     libraryDependencies ++= Seq(
       ScalaTestCore,
-      Specs2Common  % Provided,
-      Specs2Core    % Provided,
-      Specs2Matcher % Provided
+      Specs2_4Common  % Provided,
+      Specs2_4Core    % Provided,
+      Specs2_4Matcher % Provided
+    )
+  )
+
+lazy val specs2_5 = module(project, "specs2_5")
+  .settings(
+    scalaVersion       := Versions.Scala3,
+    crossScalaVersions := List(Versions.Scala3),
+    libraryDependencies ++= Seq(
+      Specs2_5Common  % Provided,
+      Specs2_5Core    % Provided,
+      Specs2_5Matcher % Provided
     )
   )
 
 lazy val time = module(project, "time")
-  .settings(libraryDependencies ++= Seq(JodaTime, Specs2Core % Test))
+  .settings(libraryDependencies ++= Seq(JodaTime, Specs2_4Core % Test))
 
 lazy val apso = (project in file("."))
   .settings(commonSettings: _*)
@@ -185,7 +195,8 @@ lazy val apso = (project in file("."))
     pekko,
     pekkoHttp,
     profiling,
-    testkit,
+    specs2_4,
+    specs2_5,
     time
   )
 
