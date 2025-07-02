@@ -5,7 +5,7 @@ import spray.boilerplate.BoilerplatePlugin
 ThisBuild / organization := "com.kevel"
 
 ThisBuild / scalaVersion       := Versions.Scala213
-ThisBuild / crossScalaVersions := List(Versions.Scala213, Versions.Scala3)
+ThisBuild / crossScalaVersions := Nil
 
 val javaVersion = "11"
 
@@ -13,10 +13,11 @@ val javaVersion = "11"
 // and scala-xml 2.x are "mostly" binary compatible.
 ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
 
-def module(project: Project, moduleName: String) =
+def module(project: Project, moduleName: String, crossScala: List[String] = List(Versions.Scala213, Versions.Scala3)) =
   (project in file(moduleName))
     .settings(name := s"apso-$moduleName")
     .settings(commonSettings: _*)
+    .settings(crossScalaVersions := crossScala)
 
 lazy val aws = module(project, "aws")
   .dependsOn(core)
@@ -152,7 +153,7 @@ lazy val specs2_4 = module(project, "specs2_4")
     )
   )
 
-lazy val specs2_5 = module(project, "specs2_5")
+lazy val specs2_5 = module(project, "specs2_5", List(Versions.Scala3))
   .settings(
     scalaVersion       := Versions.Scala3,
     crossScalaVersions := List(Versions.Scala3),
@@ -166,9 +167,7 @@ lazy val specs2_5 = module(project, "specs2_5")
 lazy val time = module(project, "time")
   .settings(libraryDependencies ++= Seq(JodaTime, Specs2_4Core % Test))
 
-lazy val apso = (project in file("."))
-  .settings(commonSettings: _*)
-  .settings(name := "apso")
+lazy val docs = (project in file("apso-docs"))
   .dependsOn(
     aws,
     caching,
@@ -181,30 +180,13 @@ lazy val apso = (project in file("."))
     pekko,
     pekkoHttp,
     profiling,
-    time
-  )
-  .aggregate(
-    aws,
-    caching,
-    circe,
-    collections,
-    core,
-    encryption,
-    hashing,
-    io,
-    pekko,
-    pekkoHttp,
-    profiling,
     specs2_4,
-    specs2_5,
     time
   )
-
-lazy val docs = (project in file("apso-docs"))
-  .dependsOn(apso)
   .settings(commonSettings: _*)
   .settings(
     // format: off
+    crossScalaVersions := List(Versions.Scala213),
     mdocOut := (ThisBuild / baseDirectory).value,
 
     mdocVariables := Map(
