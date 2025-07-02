@@ -18,6 +18,25 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.24.0] - 2025-07-02
+This release adds a module for `specs2` v5 and renames the `testkit` module to keep consistency.
+
+### Added
+- Add module for `specs2` v5: `apso-specs2_5` ([#862](https://github.com/adzerk/apso/pull/862)).
+
+### Changed
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.786 ([#857](https://github.com/adzerk/apso/pull/857)).
+- Update aws-java-sdk-s3 to 1.12.787 ([#858](https://github.com/adzerk/apso/pull/858)).
+- Update pekko-actor, ... to 1.1.4 ([#859](https://github.com/adzerk/apso/pull/859)).
+- Update circe-core, circe-generic, ... to 0.14.14 ([#860](https://github.com/adzerk/apso/pull/860)).
+- Change deprecated sonatype snapshots repo definition ([#861](https://github.com/adzerk/apso/pull/861)).
+- Rename `apso-testkit` module to `apso-specs2_4` ([#862](https://github.com/adzerk/apso/pull/862)).
+- Update scalafmt-core to 3.9.8 ([#863](https://github.com/adzerk/apso/pull/863)).
+- Update sbt-scalafmt to 2.5.5 ([#864](https://github.com/adzerk/apso/pull/864)).
+
+[0.24.0]: https://github.com/adzerk/apso/compare/v0.23.0...v0.24.0
+
+
 ## [0.23.0] - 2025-06-09
 This release removes the dependency on `nscala-time` from apso-time, relying solely on `org.joda.time`'s API. This avoids introducing this dependency to any downstream users.
 
