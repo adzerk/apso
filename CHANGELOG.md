@@ -34,6 +34,9 @@ This release adds a module for `specs2` v5 and renames the `testkit` module to k
 - Update scalafmt-core to 3.9.8 ([#863](https://github.com/adzerk/apso/pull/863)).
 - Update sbt-scalafmt to 2.5.5 ([#864](https://github.com/adzerk/apso/pull/864)).
 
+### Removed
+- Remove publish of aggregate root module `apso` ([#867](https://github.com/adzerk/apso/pull/867)).
+
 [0.24.0]: https://github.com/adzerk/apso/compare/v0.23.0...v0.24.0
 
 
