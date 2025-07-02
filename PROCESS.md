@@ -19,10 +19,32 @@ We try to adopt _MAJOR.MINOR.PATCH_ [Semantic Versioning 2.0.0](https://semver.o
 
 ## Releasing
 
-### Updating the Changelog
+### Prepare the release
 
 Before releasing, create, if it doesn't exist yet, a [Changelog](CHANGELOG.md) entry for the version you're releasing,
-following the template.
+following the template. 
+
+To figure out what to include in the Changelog, you can check the timestamp of the last tag like the following
+(replacing the actual tag name):
+
+```bash
+$ git show -s --format=%ci v0.23.0 | cat
+tag v0.23.0
+Tagger: Beatriz Magalhães <bmagalhaes@kevel.com>
+
+Release 0.23.0
+2025-06-09 16:32:51 +0100
+```
+
+Then, you can use the [GitHub CLI](https://cli.github.com/) to list the actual PRs (replacing the timestamp with the
+timestamp of the tag obtained above):
+
+```bash
+$ gh pr list --limit 100 --state merged --search "base:master merged:>2025-06-09T16:32:51+0100" --json title,url,number --template '{{range .}}- {{.title}} ([#{{.number}}]({{.url}})).{{"\n"}}{{end}}' | tac
+```
+
+Additionally, the version needs to be updated in the documentation to the one being released. To do this, update the
+`mdoc` variable `VERSION` in [build.sbt](build.sbt) and run `sbt docs/mdoc`.
 
 It's recommended to open a PR with the Changelog changes so that they can be reviewed by someone else from the team.
 
