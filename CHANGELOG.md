@@ -18,6 +18,17 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.24.1] - 2025-07-09
+
+This release updates scala-pool (included in the apso-io module) to 0.5.0. This new version of scala-pool comes with
+native support for Scala 3.
+
+### Changed
+- Update sbt, scripted-plugin to 1.11.3 ([#869](https://github.com/adzerk/apso/pull/869)).
+- Update scala-pool to 0.5.0 ([#870](https://github.com/adzerk/apso/pull/870)).
+
+[0.24.1]: https://github.com/adzerk/apso/compare/v0.24.0...v0.24.1
+
 ## [0.24.0] - 2025-07-02
 This release adds a module for `specs2` v5 and renames the `testkit` module to keep consistency.
 
@@ -39,8 +50,8 @@ This release adds a module for `specs2` v5 and renames the `testkit` module to k
 
 [0.24.0]: https://github.com/adzerk/apso/compare/v0.23.0...v0.24.0
 
-
 ## [0.23.0] - 2025-06-09
+
 This release removes the dependency on `nscala-time` from apso-time, relying solely on `org.joda.time`'s API. This avoids introducing this dependency to any downstream users.
 
 ### Changed
