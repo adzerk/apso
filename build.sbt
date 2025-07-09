@@ -110,10 +110,7 @@ lazy val io = module(project, "io")
       BouncyCastlePkix,
       BouncyCastleProvider,
       ScalaLogging,
-      // FIXME: scala-pool is not avaiable for Scala 3, but we can use the Scala 2.13 version. This is currently only
-      //        being used to manage pools of SFTP clients for the same connection details. We should eventually
-      //        consider an alternative implementation.
-      ScalaPool.cross(CrossVersion.for3Use2_13),
+      ScalaPool,
       SshJ,
       TypesafeConfig,
       Specs2_4Core % Test
