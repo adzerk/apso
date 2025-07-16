@@ -11,11 +11,15 @@ class ImplicitsSpec extends Specification {
       val startDate = new LocalDate("2014-01-01")
       val endDate = new LocalDate("2014-01-03")
 
+      (startDate to startDate) === IndexedSeq(startDate)
+
       (startDate to endDate) === IndexedSeq(
         new LocalDate("2014-01-01"),
         new LocalDate("2014-01-02"),
         new LocalDate("2014-01-03")
       )
+
+      (startDate until startDate) === IndexedSeq.empty
 
       (startDate until endDate) === IndexedSeq(new LocalDate("2014-01-01"), new LocalDate("2014-01-02"))
 
