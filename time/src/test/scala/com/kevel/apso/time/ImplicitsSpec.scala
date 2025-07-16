@@ -11,11 +11,15 @@ class ImplicitsSpec extends Specification {
       val startDate = new LocalDate("2014-01-01")
       val endDate = new LocalDate("2014-01-03")
 
+      (startDate to startDate) === IndexedSeq(startDate)
+
       (startDate to endDate) === IndexedSeq(
         new LocalDate("2014-01-01"),
         new LocalDate("2014-01-02"),
         new LocalDate("2014-01-03")
       )
+
+      (startDate until startDate) === IndexedSeq.empty
 
       (startDate until endDate) === IndexedSeq(new LocalDate("2014-01-01"), new LocalDate("2014-01-02"))
 
@@ -93,6 +97,12 @@ class ImplicitsSpec extends Specification {
       val dateTime3Start = new LocalDate("2014-01-03").toDateTimeAtStartOfDay
       val dateTime3End = new LocalDate("2014-01-03").toDateTimeAtEndOfDay
 
+      dateTime1Start.to(dateTime1Start).toList === List(dateTime1Start)
+      dateTime1Start.to(dateTime3Start).toList === List(dateTime1Start, dateTime2Start, dateTime3Start)
+      dateTime1Start.to(dateTime3End).toList === List(dateTime1Start, dateTime2Start, dateTime3Start)
+      dateTime3End.to(dateTime1Start) must throwAn[IllegalArgumentException]
+
+      dateTime1Start.until(dateTime1Start).toList === List.empty
       dateTime1Start.until(dateTime3Start).toList === List(dateTime1Start, dateTime2Start)
       dateTime1Start.until(dateTime3End).toList === List(dateTime1Start, dateTime2Start, dateTime3Start)
       dateTime3End.until(dateTime1Start) must throwAn[IllegalArgumentException]
