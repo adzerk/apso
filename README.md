@@ -16,13 +16,8 @@ libraryDependencies += "com.kevel" %% "apso-core" % "0.24.1"
 
 The project is divided in modules. You may install other modules for extra functionality.
 
-The TestKit is available under the `apso-testkit` project. You can include it only for the `test` configuration:
-
-```scala
-libraryDependencies += "com.kevel" %% "apso-testkit" % "0.24.1" % "test"
-```
-
-Please take into account that the library is still in an experimental stage and the interfaces might change for subsequent releases.
+> [!NOTE]
+> Please take into account that the library is still in an experimental stage and the interfaces might change for subsequent releases.
 
 ## Table of Contents
 
@@ -62,7 +57,7 @@ Please take into account that the library is still in an experimental stage and 
     - [CpuSampler](#cpusampler)
     - [SimpleJmx](#simplejmx)
 - [Time](#time)
-- [TestKit](#testkit)
+- [Test Kits](#testkit)
 
 ## Core
 
@@ -945,9 +940,9 @@ import com.kevel.apso.time.Implicits._
 // ...
 ```
 
-## TestKit
+## Test Kits
 
-Apso comes with TestKits with extra useful matchers for [specs2](https://etorreborre.github.io/specs2/). The following traits with extra matchers are available:
+Apso comes with Test Kits with extra useful matchers for [specs2](https://etorreborre.github.io/specs2/). The following traits with extra matchers are available:
 
 * `CustomMatchers`: provides a matcher to check if an object is serializable and one to check if a file exists;
 * `FutureExtraMatchers`: provides extra matchers for futures and implicit conversions for awaitables;
