@@ -13,18 +13,4 @@ trait FutureExtraMatchers { this: SpecificationLike =>
     def get = Await.result(awaitable, 1.second)
     def await(timeout: Duration) = Await.result(awaitable, timeout)
   }
-
-  implicit class RichFutureExtraMatcher[T: AsResult](m: => T) {
-
-    /** @return
-      *   a matcher that needs to eventually match, after a given number of retries.
-      */
-    def eventually(retries: Int): T = EventuallyMatchers.eventually(retries, 100.milliseconds)(m)
-  }
-
-  def beEventually[T: AsResult](f: => T): T =
-    eventually(40, 200.milliseconds)(f)
-
-  def beEventually[T: AsResult](retries: Int, sleep: FiniteDuration)(f: => T): T =
-    eventually(retries, sleep)(f)
 }
