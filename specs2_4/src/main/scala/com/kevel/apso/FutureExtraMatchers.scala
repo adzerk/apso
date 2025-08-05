@@ -3,8 +3,6 @@ package com.kevel.apso
 import scala.concurrent._
 import scala.concurrent.duration._
 
-import org.specs2.execute.AsResult
-import org.specs2.matcher._
 import org.specs2.mutable.SpecificationLike
 
 trait FutureExtraMatchers { this: SpecificationLike =>
