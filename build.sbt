@@ -78,7 +78,6 @@ lazy val collections = module(project, "collections")
   )
 
 lazy val core = module(project, "core")
-  .dependsOn(specs2_4 % Test)
   .settings(
     libraryDependencies ++= Seq(
       CirceCore,
@@ -100,7 +99,7 @@ lazy val hashing = module(project, "hashing")
   .settings(libraryDependencies ++= Seq(FastMd5))
 
 lazy val io = module(project, "io")
-  .dependsOn(aws, specs2_4 % Test)
+  .dependsOn(aws)
   .settings(
     libraryDependencies ++= Seq(
       AwsJavaSdkCore,
@@ -121,7 +120,7 @@ lazy val pekko = module(project, "pekko")
   .settings(libraryDependencies ++= Seq(PekkoActor % Provided))
 
 lazy val pekkoHttp = module(project, "pekko-http")
-  .dependsOn(core % Test, specs2_4 % Test)
+  .dependsOn(core)
   .settings(
     libraryDependencies ++= Seq(
       ScalaLogging,
@@ -140,27 +139,6 @@ lazy val pekkoHttp = module(project, "pekko-http")
 lazy val profiling = module(project, "profiling")
   .settings(libraryDependencies ++= Seq(ScalaLogging, SimpleJmx))
 
-lazy val specs2_4 = module(project, "specs2_4")
-  .settings(
-    libraryDependencies ++= Seq(
-      ScalaTestCore,
-      Specs2_4Common  % Provided,
-      Specs2_4Core    % Provided,
-      Specs2_4Matcher % Provided
-    )
-  )
-
-lazy val specs2_5 = module(project, "specs2_5", List(Versions.Scala3))
-  .settings(
-    scalaVersion       := Versions.Scala3,
-    crossScalaVersions := List(Versions.Scala3),
-    libraryDependencies ++= Seq(
-      Specs2_5Common  % Provided,
-      Specs2_5Core    % Provided,
-      Specs2_5Matcher % Provided
-    )
-  )
-
 lazy val time = module(project, "time")
   .settings(libraryDependencies ++= Seq(JodaTime, Specs2_4Core % Test))
 
@@ -177,7 +155,6 @@ lazy val docs = (project in file("apso-docs"))
     pekko,
     pekkoHttp,
     profiling,
-    specs2_4,
     time
   )
   .settings(commonSettings: _*)

@@ -58,7 +58,6 @@ The project is divided in modules. You may install other modules for extra funct
     - [CpuSampler](#cpusampler)
     - [SimpleJmx](#simplejmx)
 - [Time](#time)
-- [Test Kits](#test-kits)
 
 ## Core
 
@@ -676,25 +675,4 @@ import com.kevel.apso.time.Implicits._
 (new DateTime("2012-02-01") until new DateTime("2012-03-01") by Period.days(1))
 
 (new DateTime("2012-01-01") until new DateTime("2012-02-01") by Period.minutes(2))
-```
-
-## Test Kits
-
-Apso comes with Test Kits with extra useful matchers for [specs2](https://etorreborre.github.io/specs2/). The following
-traits with extra matchers are available:
-
-* `CustomMatchers`: provides a matcher to check if an object is serializable and one to check if a file exists;
-* `FutureExtraMatchers`: provides extra matchers for futures and implicit conversions for awaitables;
-* `JreVersionTestHelper`: provides a wrapper for `AsResult` to only run a spec if a specific JRE version is satisfied.
-
-To use the version for version 4 of `specs2`, add the following dependency to your `build.sbt`:
-
-```scala
-libraryDependencies += "com.kevel" %% "apso-specs2_4" % "@VERSION@"
-```
-
-To use the version for version 5 of `specs2` (only available for Scala 3), add the following dependency to your `build.sbt`:
-
-```scala
-libraryDependencies += "com.kevel" %% "apso-specs2_5" % "@VERSION@"
 ```

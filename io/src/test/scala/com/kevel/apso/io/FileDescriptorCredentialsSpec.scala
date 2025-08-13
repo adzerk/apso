@@ -2,9 +2,7 @@ package com.kevel.apso.io
 
 import org.specs2.mutable.Specification
 
-import com.kevel.apso.CustomMatchers
-
-class FileDescriptorCredentialsSpec extends Specification with CustomMatchers {
+class FileDescriptorCredentialsSpec extends Specification {
 
   val fdCredentials = new FileDescriptorCredentials[config.Credentials.Sftp.Entry, (String, String)] {
     def id(path: String): String = path

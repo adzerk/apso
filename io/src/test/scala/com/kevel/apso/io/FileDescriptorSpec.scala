@@ -1,14 +1,24 @@
 package com.kevel.apso.io
 
+import java.io.{FileDescriptor => _, _}
+
+import scala.reflect.ClassTag
 import scala.util.Try
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
+import org.specs2.matcher.Matcher
 import org.specs2.mutable.Specification
 
-import com.kevel.apso.CustomMatchers
 import com.kevel.apso.aws.S3Bucket
 
-class FileDescriptorSpec extends Specification with CustomMatchers {
+class FileDescriptorSpec extends Specification {
+
+  def beSerializable[T <: AnyRef: ClassTag]: Matcher[T] = (obj: T) => {
+    val buffer = new ByteArrayOutputStream(10000)
+    val out = new ObjectOutputStream(buffer)
+    out.writeObject(obj) must
+      (not(throwA[NotSerializableException]) and not(throwAn[InvalidClassException]))
+  }
 
   "A FileDescriptor" should {
     val fdConfig = config.Credentials(
