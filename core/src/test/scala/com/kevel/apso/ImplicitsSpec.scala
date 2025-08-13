@@ -7,7 +7,7 @@ import org.specs2.mutable._
 
 import com.kevel.apso.Implicits._
 
-class ImplicitsSpec extends Specification with ScalaCheck with FutureExtraMatchers {
+class ImplicitsSpec extends Specification with ScalaCheck {
 
   "An ApsoRandom" should {
 

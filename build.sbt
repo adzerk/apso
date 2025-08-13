@@ -120,6 +120,7 @@ lazy val pekko = module(project, "pekko")
   .settings(libraryDependencies ++= Seq(PekkoActor % Provided))
 
 lazy val pekkoHttp = module(project, "pekko-http")
+  .dependsOn(core)
   .settings(
     libraryDependencies ++= Seq(
       ScalaLogging,
