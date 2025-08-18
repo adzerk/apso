@@ -18,6 +18,35 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.25.0] - 2025-08-18
+
+In this release, we are removing the `specs2_5` and `specs2_4` modules. This decision is based on the fact that
+at this point in time the upstream library exposes equivalent functionality and there is no point in maintaining
+a parallel implementation.
+
+> You might be interested in the recommended migration:
+> - `CustomMatchers`: reason about `File` and `Serializable` directly.
+> - `FutureExtraMatchers`: use [specs2 matchers](https://etorreborre.github.io/specs2/guide/SPECS2-5.5.8/org.specs2.guide.Matchers.html) for `Future`.
+> - `JceTestHelper` and `JreVersionTestHelper`: copy [the implementation](https://github.com/adzerk/apso/blob/v0.24.1/specs2_4/src/main/scala/com/kevel/apso/JceTestHelper.scala) to your project if needed.
+
+### Changed
+- Update typesafe:config to 1.4.4 ([#874](https://github.com/adzerk/apso/pull/874)).
+- Test single element time/date ranges ([#875](https://github.com/adzerk/apso/pull/875)).
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.788 ([#876](https://github.com/adzerk/apso/pull/876)).
+- Update pekko-actor, ... to 1.1.5 ([#877](https://github.com/adzerk/apso/pull/877)).
+- Update unirest-java-core to 4.5.0 ([#878](https://github.com/adzerk/apso/pull/878)).
+- Fix README Maven Central badge link ([#879](https://github.com/adzerk/apso/pull/879)).
+- Update commons-codec to 1.19.0 ([#880](https://github.com/adzerk/apso/pull/880)).
+- Update testkit reference in README ([#881](https://github.com/adzerk/apso/pull/881)).
+- Update sbt, scripted-plugin to 1.11.4 ([#882](https://github.com/adzerk/apso/pull/882)).
+- Update scalafmt-core to 3.9.9 ([#883](https://github.com/adzerk/apso/pull/883)).
+
+### Removed
+- Remove redundant methods from testkits ([#884](https://github.com/adzerk/apso/pull/884)).
+- Remove test kits ([#886](https://github.com/adzerk/apso/pull/886)).
+
+[0.25.0]: https://github.com/adzerk/apso/compare/v0.24.1...v0.25.0
+
 ## [0.24.1] - 2025-07-09
 
 This release updates scala-pool (included in the apso-io module) to 0.5.0. This new version of scala-pool comes with
