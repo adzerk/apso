@@ -349,6 +349,8 @@ class S3Bucket(
       else new GetObjectRequest(bucketName, sanitizeKey(key))
     s3.getObject(req).getObjectContent
   }
+  private def log(isError: Boolean, message: String, cause: Throwable): Unit =
+    if (isError) logger.error(message, cause) else logger.warn(message, cause)
 
   /** FIXME: We should not rely on the [[AmazonClientException#isRetryable]] method since it's for internal use.
     */
@@ -360,7 +362,7 @@ class S3Bucket(
         case 403 =>
           logger.error("No permission to access the file", ex); true // no need to retry
         case _ =>
-          logger.error(
+          logger.warn(
             s"""|S3 service error: ${ex.getMessage}. Extended request id: ${ex.getExtendedRequestId}
                       |Additional details: ${ex.getAdditionalDetails}""".stripMargin,
             ex
@@ -369,18 +371,17 @@ class S3Bucket(
       }
 
     case ex: AmazonServiceException =>
-      logger.error(s"Service error: ${ex.getMessage}", ex); !ex.isRetryable
+      log(!ex.isRetryable, s"Service error: ${ex.getMessage}", ex); !ex.isRetryable
 
     case ex: AmazonClientException
-        if ex.getMessage ==
-          "Unable to load AWS credentials from any provider in the chain" =>
+        if ex.getMessage == "Unable to load AWS credentials from any provider in the chain" =>
       logger.error("Unable to load AWS credentials", ex); true
 
     case ex: AmazonClientException =>
-      logger.error("Client error pulling file", ex); !ex.isRetryable
+      log(!ex.isRetryable, "Client error pulling file", ex); !ex.isRetryable
 
     case ex: Exception =>
-      logger.error("An error occurred", ex); false
+      logger.warn("An error occurred", ex); false
   }
 
   private[this] def retry[T](f: => T, tries: Int = 3, sleepTime: Int = 5000): Option[T] =
