@@ -18,6 +18,18 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.25.1] - 2025-08-19
+
+This release adds retries to `S3Bucket`'s listing methods - `getObjectsWithMatchingPrefix` and `getFilesInFolder` and
+adjusts the retry log levels for transient errors.
+
+### Changed
+- Update version mdoc var to 0.25.0 ([#888](https://github.com/adzerk/apso/pull/888)).
+- Add retries to `S3Bucket` listing methods ([#889](https://github.com/adzerk/apso/pull/889)).
+- Adjust S3 retry log levels for transient errors ([#890](https://github.com/adzerk/apso/pull/890)).
+
+[0.25.1]: https://github.com/adzerk/apso/compare/v0.25.0...v0.25.1
+
 ## [0.25.0] - 2025-08-18
 
 In this release, we are removing the `specs2_5` and `specs2_4` modules. This decision is based on the fact that
