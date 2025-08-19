@@ -134,19 +134,20 @@ class S3Bucket(
     * @return
     *   a list of objects in a bucket matching a given prefix.
     */
-  def getObjectsWithMatchingPrefix(prefix: String, includeDirectories: Boolean = false): Iterator[S3ObjectSummary] = {
-    logger.info(s"Finding files matching prefix '$prefix'...")
+  def getObjectsWithMatchingPrefix(prefix: String, includeDirectories: Boolean = false): Iterator[S3ObjectSummary] =
+    retry {
+      logger.info(s"Finding files matching prefix '$prefix'...")
 
-    val listings = Iterator.iterate(s3.listObjects(bucketName, sanitizeKey(prefix))) { listing =>
-      if (listing.isTruncated) {
-        logger.debug("Asking for another batch of objects...")
-        s3.listNextBatchOfObjects(listing)
-      } else null
-    }
+      val listings = Iterator.iterate(s3.listObjects(bucketName, sanitizeKey(prefix))) { listing =>
+        if (listing.isTruncated) {
+          logger.debug("Asking for another batch of objects...")
+          s3.listNextBatchOfObjects(listing)
+        } else null
+      }
 
-    val objects = listings.takeWhile(_ != null).flatMap(_.getObjectSummaries.asScala)
-    if (includeDirectories) objects else objects.filterNot(_.getKey.endsWith("/"))
-  }
+      val objects = listings.takeWhile(_ != null).flatMap(_.getObjectSummaries.asScala)
+      if (includeDirectories) objects else objects.filterNot(_.getKey.endsWith("/"))
+    }.getOrElse(Iterator.empty)
 
   /** Assuming prefix points to a folder, returns all filenames and optional object summaries immediately below that
     * folder. Only actual files will have an S3ObjectSummary, folders won't.
@@ -156,7 +157,7 @@ class S3Bucket(
     * @return
     *   a list of filenames and optional object summaries in a bucket directly "below" the provided prefix.
     */
-  def getFilesInFolder(prefix: String): Iterator[(String, Option[S3ObjectSummary])] = {
+  def getFilesInFolder(prefix: String): Iterator[(String, Option[S3ObjectSummary])] = retry {
     logger.info(s"Finding files in folder '$prefix'...")
 
     val sanitizedPrefix = if (prefix.nonEmpty) s"${sanitizeKey(prefix)}/" else ""
@@ -178,7 +179,7 @@ class S3Bucket(
         listing.getObjectSummaries.asScala
           .map(summary => (summary.getKey(), Some(summary))) ++ listing.getCommonPrefixes.asScala.map((_, None))
       )
-  }
+  }.getOrElse(Iterator.empty)
 
   /** Returns a list of filenames and directories in a bucket matching a given prefix.
     *
