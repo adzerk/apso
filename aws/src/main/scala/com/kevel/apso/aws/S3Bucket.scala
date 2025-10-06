@@ -37,6 +37,7 @@ class S3Bucket(
   private[this] lazy val configPrefix = "aws.s3"
   private[this] lazy val region = Try(config.getString(configPrefix + ".region"))
   private[this] lazy val maxConnections = Try(config.getInt(configPrefix + ".max-connections"))
+  private[this] lazy val maxErrorRetry = Try(config.getInt(configPrefix + ".max-error-retry"))
 
   @transient private[this] var _s3: AmazonS3 = _
 
@@ -45,6 +46,7 @@ class S3Bucket(
       val defaultConfig = new ClientConfiguration()
         .withTcpKeepAlive(true)
         .withMaxConnections(maxConnections.getOrElse(ClientConfiguration.DEFAULT_MAX_CONNECTIONS))
+        .withMaxErrorRetry(maxErrorRetry.getOrElse(ClientConfiguration.DEFAULT_RETRY_POLICY.getMaxErrorRetry))
 
       _s3 = AmazonS3ClientBuilder.standard
         .withCredentials(credentialsProvider())
