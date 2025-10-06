@@ -24,6 +24,9 @@ This release introduces a new configuration key, `aws.s3.max-error-retry`, for t
 failed retryable requests of the S3 client.
 
 ### Added
+- Add `aws.s3.max-error-retry` config to `S3Bucket` ([#909](https://github.com/adzerk/apso/pull/909)).
+
+### Changed
 - Update mdoc version to 0.25.1 ([#892](https://github.com/adzerk/apso/pull/892)).
 - Update sbt, scripted-plugin to 1.11.5 ([#893](https://github.com/adzerk/apso/pull/893)).
 - Update pekko-actor, ... to 1.2.0 ([#894](https://github.com/adzerk/apso/pull/894)).
@@ -40,7 +43,8 @@ failed retryable requests of the S3 client.
 - Update specs2-core, specs2-junit, ... to 4.22.0 ([#905](https://github.com/adzerk/apso/pull/905)).
 - Update circe-core, circe-generic, ... to 0.14.15 ([#906](https://github.com/adzerk/apso/pull/906)).
 - Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.792 ([#907](https://github.com/adzerk/apso/pull/907)).
-- Add `aws.s3.max-error-retry` config to `S3Bucket` ([#909](https://github.com/adzerk/apso/pull/909)).
+
+[0.25.2]: https://github.com/adzerk/apso/compare/v0.25.1...v0.25.2
 
 ## [0.25.1] - 2025-08-19
 
