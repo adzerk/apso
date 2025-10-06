@@ -18,6 +18,30 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.25.2] - 2025-10-06
+
+This release introduces a new configuration key, `aws.s3.max-error-retry`, for the maximum number of retry attempts for
+failed retryable requests of the S3 client.
+
+### Added
+- Update mdoc version to 0.25.1 ([#892](https://github.com/adzerk/apso/pull/892)).
+- Update sbt, scripted-plugin to 1.11.5 ([#893](https://github.com/adzerk/apso/pull/893)).
+- Update pekko-actor, ... to 1.2.0 ([#894](https://github.com/adzerk/apso/pull/894)).
+- Update unirest-java-core to 4.5.1 ([#895](https://github.com/adzerk/apso/pull/895)).
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.790 ([#896](https://github.com/adzerk/apso/pull/896)).
+- Update aws-java-sdk-s3 to 1.12.791 ([#897](https://github.com/adzerk/apso/pull/897)).
+- Update sbt, scripted-plugin to 1.11.6 ([#898](https://github.com/adzerk/apso/pull/898)).
+- Update scalacheck to 1.19.0 ([#899](https://github.com/adzerk/apso/pull/899)).
+- Update typesafe:config to 1.4.5 ([#900](https://github.com/adzerk/apso/pull/900)).
+- Update scala-logging to 3.9.6 ([#901](https://github.com/adzerk/apso/pull/901)).
+- Update bcpkix-jdk18on, bcprov-jdk18on to 1.82 ([#902](https://github.com/adzerk/apso/pull/902)).
+- Update scalafmt-core to 3.9.10 ([#903](https://github.com/adzerk/apso/pull/903)).
+- Update pekko-actor, ... to 1.2.1 ([#904](https://github.com/adzerk/apso/pull/904)).
+- Update specs2-core, specs2-junit, ... to 4.22.0 ([#905](https://github.com/adzerk/apso/pull/905)).
+- Update circe-core, circe-generic, ... to 0.14.15 ([#906](https://github.com/adzerk/apso/pull/906)).
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.792 ([#907](https://github.com/adzerk/apso/pull/907)).
+- Add `aws.s3.max-error-retry` config to `S3Bucket` ([#909](https://github.com/adzerk/apso/pull/909)).
+
 ## [0.25.1] - 2025-08-19
 
 This release adds retries to `S3Bucket`'s listing methods - `getObjectsWithMatchingPrefix` and `getFilesInFolder` and
