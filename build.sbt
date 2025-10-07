@@ -164,7 +164,10 @@ lazy val docs = (project in file("apso-docs"))
     mdocOut := (ThisBuild / baseDirectory).value,
 
     mdocVariables := Map(
-      "VERSION" -> "0.25.1" // This version should be set to the currently released version.
+      "VERSION" ->
+        // This is reading the most recent header from the CHANGELOG that looks like a version, assuming that's the most
+        // recent version to refer to in the docs.
+        IO.readLines(file("CHANGELOG.md")).flatMap("""^## \[([0-9.]+)\]""".r.findFirstMatchIn).head.group(1)
     ),
 
     publish / skip := true
