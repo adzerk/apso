@@ -43,9 +43,6 @@ timestamp of the tag obtained above):
 $ gh pr list --limit 100 --state merged --search "base:master merged:>2025-06-09T16:32:51+0100" --json title,url,number --template '{{range .}}- {{.title}} ([#{{.number}}]({{.url}})).{{"\n"}}{{end}}' | tac
 ```
 
-Additionally, the version needs to be updated in the documentation to the one being released. To do this, update the
-`mdoc` variable `VERSION` in [build.sbt](build.sbt) and run `sbt docs/mdoc`.
-
 It's recommended to open a PR with the Changelog changes so that they can be reviewed by someone else from the team.
 
 ### Releasing artifacts
