@@ -13,6 +13,7 @@ object Dependencies {
     val Circe          = "0.14.15"
     val CommonsCodec   = "1.19.0"
     val FastMd5        = "2.7.1"
+    val GoogleCloud    = "26.69.0"
     val JUnit          = "4.13.2"
     val JodaTime       = "2.14.0"
     val ScalaCheck     = "1.19.0"
@@ -40,6 +41,7 @@ object Dependencies {
   val CirceParser            = "io.circe"                   %% "circe-parser"              % Versions.Circe
   val CommonsCodec           = "commons-codec"               % "commons-codec"             % Versions.CommonsCodec
   val FastMd5                = "com.joyent.util"             % "fast-md5"                  % Versions.FastMd5
+  val GoogleCloudStorage     = "com.google.cloud"            % "google-cloud-storage"      % "2.58.1"
   val JUnit                  = "junit"                       % "junit"                     % Versions.JUnit
   val JodaTime               = "joda-time"                   % "joda-time"                 % Versions.JodaTime
   val PekkoActor             = "org.apache.pekko"           %% "pekko-actor"               % Versions.Pekko
