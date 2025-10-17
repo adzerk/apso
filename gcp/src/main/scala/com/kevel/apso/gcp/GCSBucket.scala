@@ -127,7 +127,6 @@ final class GCSBucket(
   def push(key: String, inputStream: InputStream, @unused length: Option[Long]): Boolean = {
     logger.info(s"Pushing to 'gs://$bucketName/$key'")
     val info = BlobInfo.newBuilder(blobId(key)).build()
-    println(info)
     storage.createFrom(info, new BufferedInputStream(inputStream)).exists()
   }
 

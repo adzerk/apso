@@ -70,11 +70,9 @@ case class GCSFileDescriptor(
 
   override def list: Iterator[GCSFileDescriptor] = {
     val prefix = elements.mkString("/")
-    println(s"prefix: $prefix")
     bucket
       .getFilesInFolder(prefix)
       .map { case (key, info) =>
-        println(s"$key info: $info")
         this.copy(elements = key.split("/").toList, summary = info)
       }
   }
