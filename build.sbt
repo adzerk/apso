@@ -31,6 +31,17 @@ lazy val aws = module(project, "aws")
     )
   )
 
+lazy val gcp = module(project, "gcp")
+  .dependsOn(core)
+  .settings(
+    libraryDependencies ++= Seq(
+      ScalaLogging,
+      GoogleCloudStorage,
+      ScalaLogging,
+      TypesafeConfig
+    )
+  )
+
 lazy val caching = module(project, "caching")
   .enablePlugins(BoilerplatePlugin)
   .settings(
@@ -100,6 +111,7 @@ lazy val hashing = module(project, "hashing")
 
 lazy val io = module(project, "io")
   .dependsOn(aws)
+  .dependsOn(gcp)
   .settings(
     libraryDependencies ++= Seq(
       AwsJavaSdkCore,
@@ -108,6 +120,7 @@ lazy val io = module(project, "io")
       // Remove once com.hierynomus:sshj releases a version with https://github.com/hierynomus/sshj/pull/938
       BouncyCastlePkix,
       BouncyCastleProvider,
+      GoogleCloudStorage,
       ScalaLogging,
       ScalaPool,
       SshJ,
@@ -150,6 +163,7 @@ lazy val docs = (project in file("apso-docs"))
     collections,
     core,
     encryption,
+    gcp,
     hashing,
     io,
     pekko,

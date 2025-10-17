@@ -151,6 +151,9 @@ class S3Bucket(
       if (includeDirectories) objects else objects.filterNot(_.getKey.endsWith("/"))
     }.getOrElse(Iterator.empty)
 
+  // FIXME: If the root directory/prefix was created by the `mkdirs` method (where we create an object with 0 bytes)
+  //        that root directory will be present in the results. Evaluate if we should filter it out since it does not
+  //        represent a file/folder inside the requested prefix.
   /** Assuming prefix points to a folder, returns all filenames and optional object summaries immediately below that
     * folder. Only actual files will have an S3ObjectSummary, folders won't.
     *
