@@ -3,7 +3,7 @@ package com.kevel.apso.io
 import java.io.InputStream
 import java.net.URI
 
-import com.google.cloud.storage.{Blob, StorageOptions}
+import com.google.cloud.storage.{Blob, Storage, StorageOptions}
 
 import com.kevel.apso.gcp.GCSBucket
 
@@ -111,12 +111,26 @@ case class GCSFileDescriptor(
 
 object GCSFileDescriptor {
 
-  // Creates a GCSFileDescriptor from "bucket/path/…"
+  /** Creates a GCSFileDescriptor from "bucket/path/..." using the default storage instance with Application Default
+    * Credentials (ADC).
+    */
   def apply(path: String): GCSFileDescriptor = {
     path.split('/').toList match {
       case gcsBucket :: gcsPath =>
         // Application Default Credentials (ADC)
         val bucket = new GCSBucket(gcsBucket, StorageOptions.getDefaultInstance.getService)
+        GCSFileDescriptor(bucket, gcsPath.filterNot(_.trim.isEmpty))
+      case _ =>
+        throw new IllegalArgumentException("Error parsing GCS URI")
+    }
+  }
+
+  /** Creates a GCSFileDescriptor from "bucket/path/..." and a GCS Storage instance.
+    */
+  def apply(path: String, mkStorage: () => Storage): GCSFileDescriptor = {
+    path.split('/').toList match {
+      case gcsBucket :: gcsPath =>
+        val bucket = new GCSBucket(gcsBucket, mkStorage)
         GCSFileDescriptor(bucket, gcsPath.filterNot(_.trim.isEmpty))
       case _ =>
         throw new IllegalArgumentException("Error parsing GCS URI")
