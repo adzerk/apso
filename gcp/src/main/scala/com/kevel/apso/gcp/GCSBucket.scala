@@ -1,18 +1,17 @@
 package com.kevel.apso.gcp
 
-import java.io.{BufferedInputStream, BufferedOutputStream, File, FileInputStream, FileOutputStream, InputStream}
+import java.io.{BufferedInputStream, File, FileInputStream, InputStream}
 import java.nio.channels.Channels
+import java.nio.file.Path
 
 import scala.annotation.unused
 import scala.jdk.CollectionConverters._
-import scala.util.{Failure, Success, Try, Using}
+import scala.util.{Failure, Success, Try}
 
 import com.google.cloud.BaseServiceException
 import com.google.cloud.storage.Storage.BlobListOption
 import com.google.cloud.storage.{Blob, BlobId, BlobInfo, Storage, StorageException}
 import com.typesafe.scalalogging.LazyLogging
-
-import com.kevel.apso.gcp.GCSBucket.GCSDownloader
 
 final class GCSBucket(
     val bucketName: String,
@@ -202,10 +201,15 @@ final class GCSBucket(
     *   true if the pull was successful, false otherwise
     */
   def pull(key: String, destination: String): Boolean = retry {
-    logger.info(s"Pulling 'gs://$bucketName/$key' to '$destination'")
-    Using(new GCSDownloader(stream(key, 0L), destination))(_.download()).get
-    logger.info(s"Downloaded 'gs://$bucketName/$key' to '$destination'. Closing files.")
-  }.isDefined
+    Option(storage.get(blobId(key))) match {
+      case Some(b) =>
+        logger.info(s"Pulling 'gs://$bucketName/$key' to '$destination'")
+        b.downloadTo(Path.of(destination))
+        logger.info(s"Downloaded 'gs://$bucketName/$key' to '$destination'. Closing files.")
+        true
+      case None => false
+    }
+  }.getOrElse(false)
 
   def stream(key: String, offset: Long = 0L): InputStream = {
     logger.info(s"Streaming 'gs://$bucketName/$key' starting at $offset")
@@ -248,27 +252,4 @@ final class GCSBucket(
 
         case _ => None
       }
-}
-
-object GCSBucket {
-  private class GCSDownloader(inputStream: InputStream, fileDestination: String) extends AutoCloseable {
-    private[this] val outputStream: BufferedOutputStream = {
-      val f = new File(fileDestination).getCanonicalFile
-      f.getParentFile.mkdirs()
-      new BufferedOutputStream(new FileOutputStream(f))
-    }
-
-    def close(): Unit = {
-      try inputStream.close()
-      catch { case _: Throwable => }
-      try outputStream.flush()
-      catch { case _: Throwable => }
-      try outputStream.close()
-      catch { case _: Throwable => }
-    }
-
-    def download(): Unit = {
-      inputStream.transferTo(outputStream)
-    }
-  }
 }
