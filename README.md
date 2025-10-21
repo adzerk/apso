@@ -49,6 +49,8 @@ The project is divided in modules. You may install other modules for extra funct
         - [CircularIterator](#circulariterator)
         - [MergedBufferedIterator](#mergedbufferediterator)
 - [Encryption](#encryption)
+- [Google Cloud Platform](#google-cloud-platform) 
+    - [GCSBucket](#gcsbucket)
 - [Hashing](#hashing)
 - [IO](#io)
     - [FileDescriptor](#filedescriptor)
@@ -622,9 +624,9 @@ To use it in an existing SBT project, add the following dependency to your `buil
 ```scala
 libraryDependencies += "com.kevel" %% "apso-gcp" % "0.25.2"
 ```
-### GCSBuckets
+### GCSBucket
 
-The `GCSBuckets` class wraps an instance of `Storage` (from GCS SDK for Java) and exposes a higher level interface for pushing and pulling files to and from a bucket.
+The `GCSBucket` class wraps an instance of `Storage` (from GCS SDK for Java) and exposes a higher level interface for pushing and pulling files to and from a bucket.
 
 ## Encryption
 
