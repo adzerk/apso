@@ -201,15 +201,10 @@ final class GCSBucket(
     *   true if the pull was successful, false otherwise
     */
   def pull(key: String, destination: String): Boolean = retry {
-    Option(storage.get(blobId(key))) match {
-      case Some(b) =>
-        logger.info(s"Pulling 'gs://$bucketName/$key' to '$destination'")
-        b.downloadTo(Path.of(destination))
-        logger.info(s"Downloaded 'gs://$bucketName/$key' to '$destination'. Closing files.")
-        true
-      case None => false
-    }
-  }.getOrElse(false)
+    logger.info(s"Pulling 'gs://$bucketName/$key' to '$destination'")
+    storage.downloadTo(blobId(key), Path.of(destination))
+    logger.info(s"Downloaded 'gs://$bucketName/$key' to '$destination'. Closing files.")
+  }.isDefined
 
   def stream(key: String, offset: Long = 0L): InputStream = {
     logger.info(s"Streaming 'gs://$bucketName/$key' starting at $offset")
