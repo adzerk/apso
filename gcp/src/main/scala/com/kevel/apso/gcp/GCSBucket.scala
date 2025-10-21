@@ -71,7 +71,7 @@ final class GCSBucket(
       .filter(b => includeDirectories || !b.getName.endsWith("/"))
   }.getOrElse(Iterator.empty)
 
-  // FIXME: If the root directory/prefix was created by the `mkdirs` method (where we create an object with 0 bytes)
+  // FIXME: If the root directory/prefix was created by the `createDirectory` method (where we create an object with 0 bytes)
   //        that root directory will be present in the results. Evaluate if we should filter it out since it does not
   //        represent a file/folder inside the requested prefix.
   /** Assuming prefix points to a folder, returns all filenames and optional object blobs immediately below that folder.
