@@ -210,7 +210,9 @@ object FileDescriptor {
       case ("file", path) => LocalFileDescriptor(path)
       case ("s3", path)   => S3FileDescriptor(path, credentialsConfig.s3)
       case ("sftp", path) => SftpFileDescriptor(path, credentialsConfig.sftp)
-      case _              => throw new UnsupportedOperationException("Protocol not supported")
+      // For GCS we only support ADC credentials.
+      case ("gs", path) => GCSFileDescriptor(path)
+      case _            => throw new UnsupportedOperationException("Protocol not supported")
     }
   }
 

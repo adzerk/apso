@@ -49,6 +49,8 @@ The project is divided in modules. You may install other modules for extra funct
         - [CircularIterator](#circulariterator)
         - [MergedBufferedIterator](#mergedbufferediterator)
 - [Encryption](#encryption)
+- [Google Cloud Platform](#google-cloud-platform) 
+    - [GCSBucket](#gcsbucket)
 - [Hashing](#hashing)
 - [IO](#io)
     - [FileDescriptor](#filedescriptor)
@@ -476,6 +478,19 @@ val it2 = MergedBufferedIterator(List(
 it2.mergeSorted(Iterator(4, 6).buffered).toList
 ```
 
+## Google Cloud Platform
+
+Apso provides a group of classes to ease the interaction with the Google Cloud Platform, namely GCS.
+
+To use it in an existing SBT project, add the following dependency to your `build.sbt`:
+
+```scala
+libraryDependencies += "com.kevel" %% "apso-gcp" % "@VERSION@"
+```
+### GCSBucket
+
+The `GCSBucket` class wraps an instance of `Storage` (from GCS SDK for Java) and exposes a higher level interface for pushing and pulling files to and from a bucket.
+
 ## Encryption
 
 Apso provides some simple utility classes to deal with encryption and decryption of data, and methods that ease the
@@ -536,6 +551,7 @@ libraryDependencies += "com.kevel" %% "apso-io" % "@VERSION@"
 Apso introduces the concept of a `FileDescriptor`: a representation of a file stored in an arbitrary location. A descriptor includes logic to copy files to and from a local filesystem, as well as filesystem navigation logic. The following implementations of `FileDescriptor` are available:
 
 * LocalFileDescriptor (for files in the local filesystem);
+* GCSFileDescriptor (for files in GCS);
 * S3FileDescriptor (for files in S3);
 * SftpFileDescriptor (for files served over SFTP).
 
