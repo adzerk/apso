@@ -18,6 +18,32 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.26.0] - 2025-10-06
+
+This release introduces the `GCSBucket` utility that wraps the Google Cloud Storage (GCS) Java SDK `Storage` interface
+to provide a higher-level interface for pushing and pulling files to and from a bucket. It also provides a new
+implementation of `FileDescriptor` for GCS named `GCSFileDescriptor`.
+
+### Added
+- Add GCSFileDescriptor ([#917](https://github.com/adzerk/apso/pull/917)).
+
+### Changed
+- Update sbt, scripted-plugin to 1.11.7 ([#908](https://github.com/adzerk/apso/pull/908)).
+- Read the most recent version for the docs from the Changelog ([#911](https://github.com/adzerk/apso/pull/911)).
+- Update scala-library to 2.13.17 ([#912](https://github.com/adzerk/apso/pull/912)).
+- Update sbt-scalafix to 0.14.4 ([#913](https://github.com/adzerk/apso/pull/913)).
+- Update mdoc, sbt-mdoc to 2.8.0 ([#914](https://github.com/adzerk/apso/pull/914)).
+- Update scala3-library to 3.3.7 ([#915](https://github.com/adzerk/apso/pull/915)).
+- Update scalafmt-core to 3.10.0 ([#916](https://github.com/adzerk/apso/pull/916)).
+- Update scalafmt-core to 3.10.1 ([#918](https://github.com/adzerk/apso/pull/918)).
+- Update specs2-core, specs2-junit, ... to 4.23.0 ([#919](https://github.com/adzerk/apso/pull/919)).
+- Update pekko-http, pekko-http-core, ... to 1.3.0 ([#920](https://github.com/adzerk/apso/pull/920)).
+
+### Fixed
+- Fix 0.25.2 changelog ([#910](https://github.com/adzerk/apso/pull/910)).
+
+[0.26.0]: https://github.com/adzerk/apso/compare/v0.25.2...v0.26.0
+
 ## [0.25.2] - 2025-10-06
 
 This release introduces a new configuration key, `aws.s3.max-error-retry`, for the maximum number of retry attempts for
