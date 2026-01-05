@@ -23,9 +23,9 @@ lazy val aws = module(project, "aws")
   .dependsOn(core)
   .settings(
     libraryDependencies ++= Seq(
-      ScalaLogging,
-      AwsJavaSdkS3,
-      AwsJavaSdkCore,
+      AwsSdkCrt,
+      AwsSdkS3,
+      AwsSdkS3Transfer,
       ScalaLogging,
       TypesafeConfig
     )
@@ -114,8 +114,6 @@ lazy val io = module(project, "io")
   .dependsOn(gcp)
   .settings(
     libraryDependencies ++= Seq(
-      AwsJavaSdkCore,
-      AwsJavaSdkS3,
       // FIX: Explicitly override transient bouncy castle versions from `sshj`: https://security.snyk.io/vuln/SNYK-JAVA-ORGBOUNCYCASTLE-6612984
       // Remove once com.hierynomus:sshj releases a version with https://github.com/hierynomus/sshj/pull/938
       BouncyCastlePkix,

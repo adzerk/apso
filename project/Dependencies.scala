@@ -7,7 +7,8 @@ object Dependencies {
 
     val Pekko          = "1.4.0"
     val PekkoHttp      = "1.3.0"
-    val Aws            = "1.12.797"
+    val Aws            = "2.41.1"
+    val AwsCrt         = "0.41.0"
     val BouncyCastle   = "1.83"
     val Cats           = "2.13.0"
     val Circe          = "0.14.15"
@@ -30,8 +31,9 @@ object Dependencies {
   }
 
   // scalafmt: { maxColumn = 200 }
-  val AwsJavaSdkCore         = "com.amazonaws"               % "aws-java-sdk-core"         % Versions.Aws
-  val AwsJavaSdkS3           = "com.amazonaws"               % "aws-java-sdk-s3"           % Versions.Aws
+  val AwsSdkS3Transfer       = "software.amazon.awssdk"      % "s3-transfer-manager"       % Versions.Aws
+  val AwsSdkS3               = "software.amazon.awssdk"      % "s3"                        % Versions.Aws
+  val AwsSdkCrt              = "software.amazon.awssdk.crt"  % "aws-crt"                   % Versions.AwsCrt
   val BouncyCastlePkix       = "org.bouncycastle"            % "bcpkix-jdk18on"            % Versions.BouncyCastle
   val BouncyCastleProvider   = "org.bouncycastle"            % "bcprov-jdk18on"            % Versions.BouncyCastle
   val CatsCore               = "org.typelevel"              %% "cats-core"                 % Versions.Cats

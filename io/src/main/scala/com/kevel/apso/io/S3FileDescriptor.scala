@@ -5,15 +5,15 @@ import java.net.URI
 
 import scala.collection.concurrent.TrieMap
 
-import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
-import com.amazonaws.services.s3.model.S3ObjectSummary
+import software.amazon.awssdk.auth.credentials.{AwsBasicCredentials, StaticCredentialsProvider}
+import software.amazon.awssdk.services.s3.model.S3Object
 
 import com.kevel.apso.aws.{S3Bucket, SerializableAWSCredentials}
 
 case class S3FileDescriptor(
     bucket: S3Bucket,
     protected val elements: List[String],
-    private var summary: Option[S3ObjectSummary] = None
+    private var summary: Option[S3Object] = None
 ) extends FileDescriptor
     with RemoteFileDescriptor {
 
@@ -34,11 +34,11 @@ case class S3FileDescriptor(
     new URI(s"s3://$path")
 
   def size = summary match {
-    case Some(info) => info.getSize
+    case Some(info) => info.size
     case None       => bucket.size(builtPath)
   }
 
-  def lastModifiedTimestamp = summary.fold(bucket.lastModified(builtPath))(_.getLastModified().getTime())
+  def lastModifiedTimestamp = summary.fold(bucket.lastModified(builtPath))(_.lastModified.toEpochMilli)
 
   def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean): Boolean = {
     if (localTarget.isDirectory) {
@@ -96,11 +96,11 @@ case class S3FileDescriptor(
 
   def listAllFilesWithPrefix(prefix: String): Iterator[S3FileDescriptor] = {
     listS3WithPrefix(prefix, includeDirectories = false).map { info =>
-      this.copy(elements = info.getKey.split("/").toList, summary = Some(info))
+      this.copy(elements = info.key.split("/").toList, summary = Some(info))
     }
   }
 
-  private[this] def listS3WithPrefix(prefix: String, includeDirectories: Boolean): Iterator[S3ObjectSummary] = {
+  private[this] def listS3WithPrefix(prefix: String, includeDirectories: Boolean): Iterator[S3Object] = {
     bucket.getObjectsWithMatchingPrefix(buildPath(elements :+ prefix), includeDirectories)
   }
 
@@ -160,7 +160,7 @@ object S3FileDescriptor {
     * @return
     *   a s3 file descriptor
     */
-  def apply(path: String, credentials: BasicAWSCredentials): S3FileDescriptor = {
+  def apply(path: String, credentials: AwsBasicCredentials): S3FileDescriptor = {
     apply(path, Some(SerializableAWSCredentials(credentials)))
   }
 
@@ -188,7 +188,7 @@ object S3FileDescriptor {
     path.split('/').toList match {
       case s3bucket :: s3path =>
         def newBucket = credentials.fold(new S3Bucket(s3bucket)) { s3Cred =>
-          new S3Bucket(s3bucket, () => new AWSStaticCredentialsProvider(s3Cred))
+          new S3Bucket(s3bucket, () => StaticCredentialsProvider.create(s3Cred))
         }
         val s3BucketRef = s3Buckets.getOrElseUpdate(s3bucket, newBucket)
         S3FileDescriptor(s3BucketRef, s3path.filterNot(_.trim == ""))

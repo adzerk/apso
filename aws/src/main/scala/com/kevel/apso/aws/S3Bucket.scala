@@ -1,34 +1,36 @@
 package com.kevel.apso.aws
 
 import java.io._
-import java.util.concurrent.{Executors, ThreadFactory}
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.{CompletableFuture, CompletionException, LinkedBlockingQueue, ThreadPoolExecutor, TimeUnit}
 
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try, Using}
 
-import com.amazonaws.auth._
-import com.amazonaws.client.builder.ExecutorFactory
-import com.amazonaws.services.s3.model._
-import com.amazonaws.services.s3.transfer.{TransferManager, TransferManagerBuilder}
-import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
-import com.amazonaws.{AmazonClientException, AmazonServiceException, ClientConfiguration}
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider
+import software.amazon.awssdk.core.ResponseInputStream
+import software.amazon.awssdk.core.async.{AsyncRequestBody, AsyncResponseTransformer}
+import software.amazon.awssdk.core.exception.{SdkClientException, SdkException}
+import software.amazon.awssdk.regions
+import software.amazon.awssdk.services.s3.S3AsyncClient
+import software.amazon.awssdk.services.s3.crt.S3CrtRetryConfiguration
+import software.amazon.awssdk.services.s3.model._
+import software.amazon.awssdk.transfer.s3.{S3TransferManager, model}
 
-import com.kevel.apso.aws.S3Bucket.S3ObjectDownloader
-
-/** A representation of an Amazon's S3 bucket. This class wraps an `AmazonS3Client` and provides a higher level
-  * interface for pushing and pulling files to and from a bucket.
+/** A representation of an Amazon's S3 bucket. This class wraps an `S3AsyncClient` and provides a higher level interface
+  * for pushing and pulling files to and from a bucket.
   *
   * @param bucketName
   *   the name of the bucket
   * @param credentialsProvider
-  *   optional AWS credentials provider to use (since AWSCredentials are not serializable). If the parameter is not
+  *   optional AWS credentials provider to use (since AwsCredentials are not serializable). If the parameter is not
   *   supplied, they will be retrieved from the [[CredentialStore]].
   */
 class S3Bucket(
     val bucketName: String,
-    private val credentialsProvider: () => AWSCredentialsProvider = () => CredentialStore
+    private val credentialsProvider: () => AwsCredentialsProvider = () => CredentialStore.credentialsProvider
 ) extends LazyLogging
     with Serializable {
 
@@ -39,58 +41,59 @@ class S3Bucket(
   private[this] lazy val maxConnections = Try(config.getInt(configPrefix + ".max-connections"))
   private[this] lazy val maxErrorRetry = Try(config.getInt(configPrefix + ".max-error-retry"))
 
-  @transient private[this] var _s3: AmazonS3 = _
-
-  private[this] def s3 = {
-    if (_s3 == null) {
-      val defaultConfig = new ClientConfiguration()
-        .withTcpKeepAlive(true)
-        .withMaxConnections(maxConnections.getOrElse(ClientConfiguration.DEFAULT_MAX_CONNECTIONS))
-        .withMaxErrorRetry(maxErrorRetry.getOrElse(ClientConfiguration.DEFAULT_RETRY_POLICY.getMaxErrorRetry))
-
-      _s3 = AmazonS3ClientBuilder.standard
-        .withCredentials(credentialsProvider())
-        .withClientConfiguration(defaultConfig)
-        .withForceGlobalBucketAccessEnabled(true)
-        .build()
-
-      if (!_s3.doesBucketExistV2(bucketName)) {
-        _s3.createBucket(
-          new CreateBucketRequest(bucketName, region.map(Region.fromValue).getOrElse(Region.US_Standard))
-        )
+  @transient private[this] lazy val defaultExecutor = {
+    val maxPoolSize = 100;
+    val threadCount = new AtomicInteger(0)
+    // NOTE: This is the default thread pool used by the `TransferManager`. I had to replicate it here
+    // to make sure that threads are daemonized. This could be problematic, e.g. shutting down the
+    // JVM before a transfer has finished, although this won't happen in our use case since we
+    // always wait for transfers to finish.
+    // (This code is replicated from the AWS SDK with the addition of the `setDaemon` call).
+    val executor: ThreadPoolExecutor = new ThreadPoolExecutor(
+      0,
+      maxPoolSize,
+      60,
+      TimeUnit.SECONDS,
+      new LinkedBlockingQueue(1_000),
+      (runnable) => {
+        val thread = new Thread(runnable)
+        thread.setName(s"apso-transfer-manager-${threadCount.getAndIncrement()}")
+        thread.setDaemon(true)
+        thread
       }
-    }
-    _s3
+    )
+    executor.allowCoreThreadTimeOut(true);
+    executor
   }
 
-  @transient private[this] var _transferManager: TransferManager = _
+  @transient private[this] lazy val s3Client = {
+    val client = S3AsyncClient
+      .crtBuilder()
+      .credentialsProvider(credentialsProvider())
+      .region(region.map(regions.Region.of).getOrElse(regions.Region.US_EAST_1))
 
-  private[this] def transferManager = {
-    if (_transferManager == null) {
-      // This is the default thread pool used by the `TransferManager`. I had to replicate it here
-      // to make sure that threads are daemonized. This could be problematic, e.g. shutting down the
-      // JVM before a transfer has finished, although this won't happen in our use case since we
-      // always wait for transfers to finish.
-      // (This code is copy-pasted from the AWS SDK with the addition of the `setDaemon` call).
-      val executor = Executors.newFixedThreadPool(
-        10,
-        new ThreadFactory() {
-          var threadCount = 1
-          def newThread(r: Runnable) = {
-            val thread = new Thread(r)
-            thread.setDaemon(true)
-            thread.setName(s"s3-transfer-manager-worker-$threadCount")
-            threadCount += 1
-            thread
-          }
-        }
-      )
-
-      val executorFactory = new ExecutorFactory { def newExecutor() = executor }
-      _transferManager = TransferManagerBuilder.standard.withS3Client(s3).withExecutorFactory(executorFactory).build()
+    maxConnections.foreach { connections =>
+      client.maxConcurrency(connections)
     }
-    _transferManager
+
+    maxErrorRetry.foreach { maxRetries =>
+      client.retryConfiguration(S3CrtRetryConfiguration.builder().numRetries(maxRetries).build())
+    }
+
+    val s3 = client.build()
+    if (!bucketExists(s3)) s3.createBucket(_.bucket(bucketName)).join()
+    s3
   }
+
+  private[this] def bucketExists(s3Client: S3AsyncClient): Boolean = retry {
+    try {
+      s3Client.headBucket(_.bucket(bucketName)).join()
+      true
+    } catch {
+      case ce: CompletionException if ce.getCause.isInstanceOf[NoSuchBucketException] =>
+        false
+    }
+  }.getOrElse(false)
 
   private[this] def splitKey(key: String) = {
     val iExtensionPoint = key.lastIndexOf('.')
@@ -104,6 +107,19 @@ class S3Bucket(
 
   private[this] def sanitizeKey(key: String) = if (key.startsWith("./")) key.drop(2) else key
 
+  private[this] def listObjectsV2Iterator(req: ListObjectsV2Request) = Iterator
+    .iterate(s3Client.listObjectsV2(req).join()) { listing =>
+      if (listing.isTruncated) {
+        logger.debug("Asking for another batch of objects...")
+        s3Client.listObjectsV2(req.toBuilder.continuationToken(listing.nextContinuationToken).build).join()
+      } else null
+    }
+    .takeWhile(_ != null)
+
+  private[this] def getTransferManager = {
+    S3TransferManager.builder().s3Client(s3Client).executor(defaultExecutor).build()
+  }
+
   /** Returns size of the file in the location specified by `key` in the bucket. If the file doesn't exist the return
     * value is 0.
     *
@@ -113,8 +129,8 @@ class S3Bucket(
     *   the size of the file in the location specified by `key` in the bucket if the exists, 0 otherwise.
     */
   def size(key: String): Long = retry {
-    s3.getObjectMetadata(bucketName, key).getContentLength
-  }.getOrElse(0)
+    s3Client.headObject(_.bucket(bucketName).key(sanitizeKey(key))).join().contentLength().longValue()
+  }.getOrElse(0L)
 
   /** Returns the last modified timestamp of the file in the location specified by `key` in the bucket. If the file
     * doesn't exist the return value is 0L. The decision to return 0L in those cases is to align with
@@ -126,8 +142,9 @@ class S3Bucket(
     *   the last modified timestamp of the file in the location specified by `key` in the bucket if it exists, 0L
     *   otherwise.
     */
-  def lastModified(key: String): Long =
-    retry(s3.getObjectMetadata(bucketName, key).getLastModified().getTime()).getOrElse(0)
+  def lastModified(key: String): Long = retry {
+    s3Client.headObject(_.bucket(bucketName).key(sanitizeKey(key))).join().lastModified().toEpochMilli()
+  }.getOrElse(0)
 
   /** Returns a list of objects in a bucket matching a given prefix.
     *
@@ -136,20 +153,14 @@ class S3Bucket(
     * @return
     *   a list of objects in a bucket matching a given prefix.
     */
-  def getObjectsWithMatchingPrefix(prefix: String, includeDirectories: Boolean = false): Iterator[S3ObjectSummary] =
-    retry {
-      logger.info(s"Finding files matching prefix '$prefix'...")
+  def getObjectsWithMatchingPrefix(prefix: String, includeDirectories: Boolean = false): Iterator[S3Object] = retry {
+    logger.info(s"Finding files matching prefix '$prefix'...")
 
-      val listings = Iterator.iterate(s3.listObjects(bucketName, sanitizeKey(prefix))) { listing =>
-        if (listing.isTruncated) {
-          logger.debug("Asking for another batch of objects...")
-          s3.listNextBatchOfObjects(listing)
-        } else null
-      }
+    val req = ListObjectsV2Request.builder.bucket(bucketName).prefix(sanitizeKey(prefix)).build
+    val objects = listObjectsV2Iterator(req).flatMap(_.contents.asScala)
 
-      val objects = listings.takeWhile(_ != null).flatMap(_.getObjectSummaries.asScala)
-      if (includeDirectories) objects else objects.filterNot(_.getKey.endsWith("/"))
-    }.getOrElse(Iterator.empty)
+    if (includeDirectories) objects else objects.filterNot(_.key.endsWith("/"))
+  }.getOrElse(Iterator.empty)
 
   // FIXME: If the root directory/prefix was created by the `mkdirs` method (where we create an object with 0 bytes)
   //        that root directory will be present in the results. Evaluate if we should filter it out since it does not
@@ -162,27 +173,18 @@ class S3Bucket(
     * @return
     *   a list of filenames and optional object summaries in a bucket directly "below" the provided prefix.
     */
-  def getFilesInFolder(prefix: String): Iterator[(String, Option[S3ObjectSummary])] = retry {
+  def getFilesInFolder(prefix: String): Iterator[(String, Option[S3Object])] = retry {
     logger.info(s"Finding files in folder '$prefix'...")
 
     val sanitizedPrefix = if (prefix.nonEmpty) s"${sanitizeKey(prefix)}/" else ""
 
-    val listings = Iterator.iterate(
-      s3.listObjects(
-        new ListObjectsRequest().withBucketName(bucketName).withPrefix(sanitizedPrefix).withDelimiter("/")
-      )
-    )(listing => {
-      if (listing.isTruncated) {
-        logger.debug("Asking for another batch of objects...")
-        s3.listNextBatchOfObjects(listing)
-      } else null
-    })
+    val req =
+      ListObjectsV2Request.builder.bucket(bucketName).prefix(sanitizeKey(sanitizedPrefix)).delimiter("/").build
 
-    listings
-      .takeWhile(_ != null)
+    listObjectsV2Iterator(req)
       .flatMap(listing =>
-        listing.getObjectSummaries.asScala
-          .map(summary => (summary.getKey(), Some(summary))) ++ listing.getCommonPrefixes.asScala.map((_, None))
+        listing.contents.asScala
+          .map(summary => (summary.key, Some(summary))) ++ listing.commonPrefixes.asScala.map(p => (p.prefix, None))
       )
   }.getOrElse(Iterator.empty)
 
@@ -194,7 +196,7 @@ class S3Bucket(
     *   a list of filenames in a bucket matching a given prefix.
     */
   def getFilesWithMatchingPrefix(prefix: String, includeDirectories: Boolean = false): Iterator[String] =
-    getObjectsWithMatchingPrefix(prefix, includeDirectories).map(_.getKey)
+    getObjectsWithMatchingPrefix(prefix, includeDirectories).map(_.key)
 
   /** Pushes a given local `File` to the location specified by `key` in the bucket.
     *
@@ -207,9 +209,16 @@ class S3Bucket(
     */
   def push(key: String, file: File): Boolean = retry {
     logger.info(s"Pushing file '${file.getPath}' to 's3://$bucketName/$key'")
-    transferManager
-      .upload(new PutObjectRequest(bucketName, sanitizeKey(key), file))
-      .waitForUploadResult()
+
+    Using(getTransferManager) {
+      _.uploadFile(
+        model.UploadFileRequest
+          .builder()
+          .putObjectRequest(_.bucket(bucketName).key(sanitizeKey(key)))
+          .source(file)
+          .build()
+      ).completionFuture().join()
+    }.get
   }.isDefined
 
   /** Pushes a given `InputStream` to the location specified by `key` in the bucket.
@@ -225,11 +234,25 @@ class S3Bucket(
     */
   def push(key: String, inputStream: InputStream, length: Option[Long]): Boolean = retry {
     logger.info(s"Pushing to 's3://$bucketName/$key'")
-    val metadata = new ObjectMetadata()
-    length.foreach(metadata.setContentLength)
-    transferManager
-      .upload(new PutObjectRequest(bucketName, sanitizeKey(key), inputStream, metadata))
-      .waitForUploadResult()
+    val req = PutObjectRequest.builder().bucket(bucketName).key(sanitizeKey(key))
+    length.foreach(req.contentLength(_))
+
+    Using(getTransferManager) { transfer =>
+      transfer
+        .upload(
+          model.UploadRequest
+            .builder()
+            .putObjectRequest(req.build())
+            .requestBody(AsyncRequestBody.fromInputStream { b =>
+              b.inputStream(inputStream)
+              length.foreach(b.contentLength(_))
+              b.executor(defaultExecutor)
+            })
+            .build()
+        )
+        .completionFuture()
+        .join()
+    }.get
   }.isDefined
 
   /** Deletes the file in the location specified by `key` in the bucket.
@@ -240,7 +263,7 @@ class S3Bucket(
     *   true if the deletion was successful, false otherwise.
     */
   def delete(key: String): Boolean = retry {
-    s3.deleteObject(bucketName, sanitizeKey(key))
+    s3Client.deleteObject(_.bucket(bucketName).key(sanitizeKey(key))).join()
   }.isDefined
 
   /** Checks if the file in the location specified by `key` in the bucket exists. It returns false if just checking for
@@ -252,7 +275,17 @@ class S3Bucket(
     *   true if the file exists, false otherwise.
     */
   def exists(key: String): Boolean = retry {
-    key.nonEmpty && s3.doesObjectExist(bucketName, key)
+    def aux(): Boolean = {
+      try {
+        s3Client.headObject(_.bucket(bucketName).key(sanitizeKey(key))).join()
+        true
+      } catch {
+        case ce: CompletionException if ce.getCause.isInstanceOf[NoSuchKeyException] =>
+          false
+      }
+    }
+
+    key.nonEmpty && aux()
   }.getOrElse(false)
 
   /** Checks if the location specified by `key` is a directory.
@@ -263,23 +296,19 @@ class S3Bucket(
     *   true if the path is a directory, false otherwise.
     */
   def isDirectory(key: String): Boolean = retry {
-    s3.listObjects(
-      new ListObjectsRequest()
-        .withBucketName(bucketName)
-        .withMaxKeys(2)
-        .withPrefix(key)
-    ).getObjectSummaries
+    s3Client
+      .listObjectsV2(_.bucket(bucketName).maxKeys(2).prefix(sanitizeKey(key)))
+      .join()
+      .contents
       .asScala
-  }.exists { _.exists(_.getKey.startsWith(key + "/")) }
+  }.exists(_.exists(_.key.startsWith(key + "/")))
 
   /** Checks whether the bucket exists
     *
     * @return
     *   true if the bucket exists, false otherwise.
     */
-  def bucketExists: Boolean = retry {
-    s3.doesBucketExistV2(bucketName)
-  }.getOrElse(false)
+  def bucketExists: Boolean = bucketExists(s3Client)
 
   /** Sets an access control list on a given Amazon S3 object.
     *
@@ -288,9 +317,9 @@ class S3Bucket(
     * @param acl
     *   the `CannedAccessControlList` to be applied to the Amazon S3 object
     */
-  def setAcl(key: String, acl: CannedAccessControlList) = {
+  def setAcl(key: String, acl: ObjectCannedACL) = {
     logger.info(s"Setting 's3://$bucketName/$key' permissions to '$acl'")
-    s3.setObjectAcl(bucketName, key, acl)
+    s3Client.putObjectAcl(_.bucket(bucketName).key(sanitizeKey(key)).acl(acl)).join()
   }
 
   /** Creates an empty directory at the given `key` location
@@ -302,12 +331,14 @@ class S3Bucket(
     */
   def createDirectory(key: String): Boolean = retry {
     logger.info(s"Creating directory in 's3://$bucketName/$key'")
-
     val emptyContent = new ByteArrayInputStream(Array[Byte]())
-    val metadata = new ObjectMetadata()
-    metadata.setContentLength(0)
 
-    s3.putObject(new PutObjectRequest(bucketName, sanitizeKey(key) + "/", emptyContent, metadata))
+    s3Client
+      .putObject(
+        b => { b.bucket(bucketName).key(sanitizeKey(key) + "/"); () },
+        AsyncRequestBody.fromInputStream(emptyContent, 0, defaultExecutor)
+      )
+      .join()
   }.isDefined
 
   /** Backups a remote file with the given `key`. A backup consists in copying the supplied file to a backup folder
@@ -322,13 +353,11 @@ class S3Bucket(
     val sanitizedKey = sanitizeKey(key)
     val (mainKey, name, extension) = splitKey(sanitizedKey)
 
-    s3.copyObject(
-      new CopyObjectRequest(
-        bucketName,
-        sanitizedKey,
-        bucketName,
-        mainKey + "/backup/" + name.substring(mainKey.length + 1) + extension
-      )
+    s3Client.copyObject(
+      _.sourceBucket(bucketName)
+        .sourceKey(sanitizedKey)
+        .destinationBucket(bucketName)
+        .destinationKey(mainKey + "/backup/" + name.substring(mainKey.length + 1) + extension)
     )
   }.isDefined
 
@@ -343,47 +372,55 @@ class S3Bucket(
     */
   def pull(key: String, destination: String): Boolean = retry {
     logger.info(s"Pulling 's3://$bucketName/$key' to '$destination'")
-    Using(new S3ObjectDownloader(s3, bucketName, sanitizeKey(key), destination))(_.download()).get
+
+    val req = GetObjectRequest.builder().bucket(bucketName).key(sanitizeKey(key)).build()
+    val destinationFile = new File(destination).getCanonicalFile
+    destinationFile.getParentFile.mkdirs()
+    s3Client.getObject(req, destinationFile.toPath()).join()
     logger.info(s"Downloaded 's3://$bucketName/$key' to '$destination'. Closing files.")
   }.isDefined
 
   def stream(key: String, offset: Long = 0L): InputStream = {
     logger.info(s"Streaming 's3://$bucketName/$key' starting at $offset")
-    val req =
-      if (offset > 0) new GetObjectRequest(bucketName, sanitizeKey(key)).withRange(offset)
-      else new GetObjectRequest(bucketName, sanitizeKey(key))
-    s3.getObject(req).getObjectContent
+    val req = GetObjectRequest.builder.bucket(bucketName).key(sanitizeKey(key))
+
+    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Range
+    if (offset > 0) req.range(s"bytes=$offset-")
+
+    val fut: CompletableFuture[ResponseInputStream[GetObjectResponse]] =
+      s3Client.getObject(req.build(), AsyncResponseTransformer.toBlockingInputStream)
+
+    val stream = fut.join()
+    stream
   }
+
   private def log(isError: Boolean, message: String, cause: Throwable): Unit =
     if (isError) logger.error(message, cause) else logger.warn(message, cause)
 
-  /** FIXME: We should not rely on the [[AmazonClientException#isRetryable]] method since it's for internal use.
-    */
   private[this] def handler: PartialFunction[Throwable, Boolean] = {
-    case ex: AmazonS3Exception =>
-      ex.getStatusCode match {
+    case ex: S3Exception =>
+      ex.statusCode() match {
         case 404 =>
           logger.error("The specified file does not exist", ex); true // no need to retry
         case 403 =>
           logger.error("No permission to access the file", ex); true // no need to retry
         case _ =>
           logger.warn(
-            s"""|S3 service error: ${ex.getMessage}. Extended request id: ${ex.getExtendedRequestId}
-                      |Additional details: ${ex.getAdditionalDetails}""".stripMargin,
+            s"""|S3 service error: ${ex.getMessage}. Extended request id: ${ex.requestId}
+                      |Message: ${ex.getMessage}""".stripMargin,
             ex
           )
           false
       }
+    case ex: SdkClientException =>
+      log(!ex.retryable, s"Client Exception: ${ex.getMessage}", ex); !ex.retryable
 
-    case ex: AmazonServiceException =>
-      log(!ex.isRetryable, s"Service error: ${ex.getMessage}", ex); !ex.isRetryable
+    case ex: SdkException =>
+      log(!ex.retryable, s"SDK Exception: ${ex.getMessage}", ex); !ex.retryable
 
-    case ex: AmazonClientException
-        if ex.getMessage == "Unable to load AWS credentials from any provider in the chain" =>
-      logger.error("Unable to load AWS credentials", ex); true
-
-    case ex: AmazonClientException =>
-      log(!ex.isRetryable, "Client error pulling file", ex); !ex.isRetryable
+    case ex: CompletionException =>
+      logger.warn("Completion Exception", ex)
+      handler(ex.getCause)
 
     case ex: Exception =>
       logger.warn("An error occurred", ex); false
@@ -407,40 +444,5 @@ class S3Bucket(
   override def equals(obj: Any): Boolean = obj match {
     case b: S3Bucket => b.bucketName == bucketName
     case _           => false
-  }
-}
-
-object S3Bucket {
-  private class S3ObjectDownloader(s3: AmazonS3, bucketName: String, key: String, fileDestination: String)
-      extends AutoCloseable {
-    private[this] val s3Object: S3Object = s3.getObject(new GetObjectRequest(bucketName, key))
-    private[this] val inputStream: S3ObjectInputStream = s3Object.getObjectContent
-    private[this] val outputStream: BufferedOutputStream = {
-      val f = new File(fileDestination).getCanonicalFile
-      f.getParentFile.mkdirs()
-      new BufferedOutputStream(new FileOutputStream(f))
-    }
-
-    def close(): Unit = {
-      try inputStream.close()
-      catch { case _: Throwable => }
-      try s3Object.close()
-      catch { case _: Throwable => }
-      try outputStream.flush()
-      catch { case _: Throwable => }
-      try outputStream.close()
-      catch { case _: Throwable => }
-    }
-
-    def download(): Unit = {
-      var read = 0
-      val bytes = new Array[Byte](1024)
-
-      read = inputStream.read(bytes)
-      while (read != -1) {
-        outputStream.write(bytes, 0, read)
-        read = inputStream.read(bytes)
-      }
-    }
   }
 }

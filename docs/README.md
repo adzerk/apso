@@ -49,7 +49,7 @@ The project is divided in modules. You may install other modules for extra funct
         - [CircularIterator](#circulariterator)
         - [MergedBufferedIterator](#mergedbufferediterator)
 - [Encryption](#encryption)
-- [Google Cloud Platform](#google-cloud-platform) 
+- [Google Cloud Platform](#google-cloud-platform)
     - [GCSBucket](#gcsbucket)
 - [Hashing](#hashing)
 - [IO](#io)
@@ -290,7 +290,7 @@ libraryDependencies += "com.kevel" %% "apso-aws" % "@VERSION@"
 
 ### ConfigCredentialsProvider
 
-The `ConfigCredentialsProvider` is an `AWSCredentialsProvider` (from AWS SDK for Java) that retrieves credentials from a typesafe configuration, allowing customization of its `Config` object, as well as the access key and secret key paths:
+The `ConfigCredentialsProvider` is an `AwsCredentialsProvider` (from AWS SDK for Java) that retrieves credentials from a typesafe configuration, allowing customization of its `Config` object, as well as the access key and secret key paths:
 
 ```scala mdoc:silent
 import com.kevel.apso.aws._
@@ -305,26 +305,25 @@ val confProvider = ConfigCredentialsProvider(
     }
   }"""),
   accessKeyPath = "aws.access-key",
-  secretKeyPath = "aws.secret-key")
+  secretKeyPath = "aws.secret-key"
+)
 
-val credentials = confProvider.getCredentials
+confProvider.accessKeyPath
 
-credentials.getAWSAccessKeyId
-
-credentials.getAWSSecretKey
+confProvider.secretKeyPath
 ```
 
 ### CredentialStore
 
-The `CredentialStore` object serves as an endpoint for the retrieval of AWS credentials from available configurations. It extends the chain in the `DefaultAWSCredentialsProviderChain` (from AWS SDK for Java) with the retrieval of AWS credentials through the default typesafe configuration file (typically `application.conf`).
+The `CredentialStore` object serves as an endpoint for the retrieval of AWS credentials from available configurations. It extends the chain in the `DefaultCredentialsProvider` (from AWS SDK for Java) with the retrieval of AWS credentials through the default typesafe configuration file (typically `application.conf`).
 
 ### S3Bucket
 
-The `S3Bucket` class wraps an instance of `AmazonS3Client` (from AWS SDK for Java) and exposes a higher level interface for pushing and pulling files to and from a bucket.
+The `S3Bucket` class wraps an instance of `S3AsyncClient` (from AWS SDK for Java) and exposes a higher level interface for pushing and pulling files to and from a bucket.
 
 ### SerializableAWSCredentials
 
-The `SerializableAWSCredentials` class provides a serializable container for AWS credentials, extending the `AWSCredentials` class (from AWS SDK for Java).
+The `SerializableAWSCredentials` class provides a serializable container for AWS credentials, extending the `AwsCredentials` class (from AWS SDK for Java).
 
 ## Caching
 
