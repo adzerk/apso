@@ -50,7 +50,6 @@ The behavior of the `S3FileDescriptor`, `S3Bucket` and `ConfigCredentialsProvide
 - Update AWS SDK to version 2 (breaking) ([#945](https://github.com/adzerk/apso/pull/945)).
 - Update unirest-java-core to 4.7.1 ([#946](https://github.com/adzerk/apso/pull/946)).
 
-
 [0.27.0]: https://github.com/adzerk/apso/compare/v0.26.0...v0.27.0
 
 ## [0.26.0] - 2025-10-29
