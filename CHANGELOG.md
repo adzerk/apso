@@ -18,6 +18,41 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.27.0] - 2026-01-14
+
+This release updates the AWS SDK to version 2 introducing API breaking changes as the AWS exposed types have changed.
+The behavior of the `S3FileDescriptor`, `S3Bucket` and `ConfigCredentialsProvider` should remain the same.
+
+### Changed
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.793 ([#922](https://github.com/adzerk/apso/pull/922)).
+- Update google-cloud-storage to 2.59.0 ([#923](https://github.com/adzerk/apso/pull/923)).
+- Update sbt-scalafmt to 2.5.6 ([#924](https://github.com/adzerk/apso/pull/924)).
+- Update commons-codec to 1.20.0 ([#925](https://github.com/adzerk/apso/pull/925)).
+- Update google-cloud-storage to 2.60.0 ([#926](https://github.com/adzerk/apso/pull/926)).
+- Update unirest-java-core to 4.6.0 ([#927](https://github.com/adzerk/apso/pull/927)).
+- Update pekko-actor, ... to 1.3.0 ([#928](https://github.com/adzerk/apso/pull/928)).
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.794 ([#929](https://github.com/adzerk/apso/pull/929)).
+- Update bcpkix-jdk18on, bcprov-jdk18on to 1.83 ([#930](https://github.com/adzerk/apso/pull/930)).
+- Update scala-library to 2.13.18 ([#931](https://github.com/adzerk/apso/pull/931)).
+- Update scalafmt-core to 3.10.2 ([#932](https://github.com/adzerk/apso/pull/932)).
+- Update unirest-java-core to 4.7.0 ([#933](https://github.com/adzerk/apso/pull/933)).
+- Update mdoc, sbt-mdoc to 2.8.1 ([#934](https://github.com/adzerk/apso/pull/934)).
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.795 ([#935](https://github.com/adzerk/apso/pull/935)).
+- Update pekko-actor, ... to 1.4.0 ([#936](https://github.com/adzerk/apso/pull/936)).
+- Update sbt-scalafix to 0.14.5 ([#937](https://github.com/adzerk/apso/pull/937)).
+- Update sbt-boilerplate to 0.8.0 ([#938](https://github.com/adzerk/apso/pull/938)).
+- Update google-cloud-storage to 2.61.0 ([#939](https://github.com/adzerk/apso/pull/939)).
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.796 ([#940](https://github.com/adzerk/apso/pull/940)).
+- Update mdoc, sbt-mdoc to 2.8.2 ([#941](https://github.com/adzerk/apso/pull/941)).
+- Update scalafmt-core to 3.10.3 ([#942](https://github.com/adzerk/apso/pull/942)).
+- Update aws-java-sdk-core, aws-java-sdk-s3 to 1.12.797 ([#943](https://github.com/adzerk/apso/pull/943)).
+- Update sbt, scripted-plugin to 1.12.0 ([#944](https://github.com/adzerk/apso/pull/944)).
+- Update AWS SDK to version 2 (breaking) ([#945](https://github.com/adzerk/apso/pull/945)).
+- Update unirest-java-core to 4.7.1 ([#946](https://github.com/adzerk/apso/pull/946)).
+
+
+[0.27.0]: https://github.com/adzerk/apso/compare/v0.26.0...v0.27.0
+
 ## [0.26.0] - 2025-10-29
 
 This release introduces the `GCSBucket` utility that wraps the Google Cloud Storage (GCS) Java SDK `Storage` interface
