@@ -18,6 +18,24 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.27.1] - 2026-01-20
+
+This patch release makes sure the S3 client used underneath the `S3Bucket` data type has cross-region access enabled,
+aligning its implementation with what was previously done in 0.26.0.
+
+### Changed
+- Remove the developers tag from pom.xml ([#948](https://github.com/adzerk/apso/pull/948)).
+- Update s3, s3-transfer-manager to 2.41.8 ([#949](https://github.com/adzerk/apso/pull/949)).
+- Update aws-crt to 0.42.2 ([#950](https://github.com/adzerk/apso/pull/950)).
+- Update google-cloud-storage to 2.62.0 ([#951](https://github.com/adzerk/apso/pull/951)).
+- Update scalafmt-core to 3.10.4 ([#952](https://github.com/adzerk/apso/pull/952)).
+- Update s3, s3-transfer-manager to 2.41.10 ([#953](https://github.com/adzerk/apso/pull/953)).
+
+### Fixed
+- Enable cross-region access in S3 client ([#954](https://github.com/adzerk/apso/pull/954)).
+
+[0.27.1]: https://github.com/adzerk/apso/compare/v0.27.0...v0.27.1
+
 ## [0.27.0] - 2026-01-14
 
 This release updates the AWS SDK to version 2 introducing API breaking changes as the AWS exposed types have changed.
