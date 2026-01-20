@@ -70,7 +70,7 @@ class S3Bucket(
     val client = S3AsyncClient
       .crtBuilder()
       .credentialsProvider(credentialsProvider())
-      .region(region.map(regions.Region.of).getOrElse(regions.Region.US_EAST_1))
+      .crossRegionAccessEnabled(true)
 
     maxConnections.foreach { connections =>
       client.maxConcurrency(connections)
@@ -81,7 +81,19 @@ class S3Bucket(
     }
 
     val s3 = client.build()
-    if (!bucketExists(s3)) s3.createBucket(_.bucket(bucketName)).join()
+    if (!bucketExists(s3))
+      s3.createBucket(
+        CreateBucketRequest
+          .builder()
+          .bucket(bucketName)
+          .createBucketConfiguration(
+            CreateBucketConfiguration
+              .builder()
+              .locationConstraint(region.getOrElse(regions.Region.US_EAST_1.id()))
+              .build()
+          )
+          .build()
+      ).join()
     s3
   }
 
