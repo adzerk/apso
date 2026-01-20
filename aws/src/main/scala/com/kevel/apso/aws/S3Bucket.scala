@@ -82,18 +82,22 @@ class S3Bucket(
 
     val s3 = client.build()
     if (!bucketExists(s3))
-      s3.createBucket(
-        CreateBucketRequest
+      s3.createBucket({
+        val requestBuilder = CreateBucketRequest
           .builder()
           .bucket(bucketName)
-          .createBucketConfiguration(
-            CreateBucketConfiguration
-              .builder()
-              .locationConstraint(region.getOrElse(regions.Region.US_EAST_1.id()))
-              .build()
-          )
-          .build()
-      ).join()
+
+        if (region.toOption.exists(_ != regions.Region.US_EAST_1.id()))
+          requestBuilder
+            .createBucketConfiguration(
+              CreateBucketConfiguration
+                .builder()
+                .locationConstraint(region.get)
+                .build()
+            )
+            .build()
+        else requestBuilder.build()
+      }).join()
     s3
   }
 
