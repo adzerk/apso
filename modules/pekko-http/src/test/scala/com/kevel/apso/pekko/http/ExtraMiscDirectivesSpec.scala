@@ -3,8 +3,8 @@ package com.kevel.apso.pekko.http
 import scala.concurrent.duration.*
 
 import org.apache.pekko.http.scaladsl.model.StatusCodes.*
-import org.apache.pekko.http.scaladsl.model.headers.CacheDirectives.*
 import org.apache.pekko.http.scaladsl.model.headers.*
+import org.apache.pekko.http.scaladsl.model.headers.CacheDirectives.*
 import org.apache.pekko.http.scaladsl.server.Directives.*
 import org.apache.pekko.http.scaladsl.server.Route
 import org.apache.pekko.http.scaladsl.testkit.Specs2RouteTest

@@ -7,9 +7,9 @@ import scala.concurrent.{Future, Promise}
 
 import org.apache.pekko.NotUsed
 import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.model.*
 import org.apache.pekko.http.scaladsl.model.RemoteAddress.IP
 import org.apache.pekko.http.scaladsl.model.StatusCodes.*
-import org.apache.pekko.http.scaladsl.model.*
 import org.apache.pekko.http.scaladsl.model.headers.*
 import org.apache.pekko.http.scaladsl.server.Directives.*
 import org.apache.pekko.http.scaladsl.server.RouteResult
