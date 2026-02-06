@@ -2,12 +2,12 @@ package com.kevel.apso.pekko.http
 
 import java.net.URI
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.util.Try
 
-import org.apache.pekko.http.scaladsl.model.headers.CacheDirectives._
-import org.apache.pekko.http.scaladsl.model.headers._
-import org.apache.pekko.http.scaladsl.server.Directives._
+import org.apache.pekko.http.scaladsl.model.headers.*
+import org.apache.pekko.http.scaladsl.model.headers.CacheDirectives.*
+import org.apache.pekko.http.scaladsl.server.Directives.*
 import org.apache.pekko.http.scaladsl.server.{Directive0, Directive1}
 
 /** Exposes additional misc directives not present in

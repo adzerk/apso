@@ -18,7 +18,7 @@ class TypedMap[T] private (val inner: Map[ClassTag[_], T]) {
   def values = inner.values
   override def toString = inner.toString()
   override def equals(other: Any) = other match {
-    case that: TypedMap[_] => this.inner == that.inner
+    case that: TypedMap[?] => this.inner == that.inner
     case _                 => false
   }
   override def hashCode = inner.hashCode()
@@ -26,11 +26,11 @@ class TypedMap[T] private (val inner: Map[ClassTag[_], T]) {
 
 object TypedMap {
   def empty[T] = new TypedMap[T](Map())
-  def apply[T](items: Typed[_ <: T]*) = new TypedMap[T](Map(items.map(_.toPair): _*))
+  def apply[T](items: Typed[? <: T]*) = new TypedMap[T](Map(items.map(_.toPair)*))
 }
 
 class Typed[A](value: A)(implicit val key: ClassTag[A]) {
-  def toPair: (ClassTag[_], A) = (key, value)
+  def toPair: (ClassTag[?], A) = (key, value)
 }
 object Typed {
   implicit def toTyped[A: ClassTag](a: A): Typed[A] = new Typed(a)

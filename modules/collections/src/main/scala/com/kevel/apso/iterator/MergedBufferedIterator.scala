@@ -13,7 +13,7 @@ case class MergedBufferedIterator[T](iterators: List[BufferedIterator[T]])(impli
 
   private[this] lazy val nonEmptyIterators = {
     val pq = new PriorityQueue[BufferedIterator[T]]
-    pq.enqueue(iterators.filter(_.hasNext): _*)
+    pq.enqueue(iterators.filter(_.hasNext)*)
     pq
   }
 

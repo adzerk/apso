@@ -2,7 +2,7 @@ package com.kevel.apso.pekko.http
 
 import org.apache.pekko.http.scaladsl.model.RemoteAddress
 import org.apache.pekko.http.scaladsl.server.Directive1
-import org.apache.pekko.http.scaladsl.server.Directives._
+import org.apache.pekko.http.scaladsl.server.Directives.*
 
 /** Directives to extract the value of the clients' IP addresses.
   */

@@ -1,9 +1,8 @@
 package com.kevel.apso.time
 
+import Implicits.*
 import org.joda.time.{DateTime, DateTimeZone, Interval, LocalDate, LocalDateTime, Period}
-import org.specs2.mutable._
-
-import Implicits._
+import org.specs2.mutable.*
 
 class ImplicitsSpec extends Specification {
   "An ApsoTimeLocalDate" should {

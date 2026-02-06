@@ -1,8 +1,8 @@
 package com.kevel.apso.circe
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
-import io.circe.syntax._
+import io.circe.syntax.*
 import io.circe.{Json, JsonObject}
 
 /** Object containing helpers for converting between JSON values and other structures.
@@ -22,17 +22,17 @@ object JsonConvert {
     case n: Double      => n.asJson
     case b: Boolean     => b.asJson
     case str: String    => str.asJson
-    case map: Map[_, _] =>
+    case map: Map[?, ?] =>
       Json.fromJsonObject(
         JsonObject.fromIterable(map.iterator.map { case (k, v) => (k.toString, toJson(v)) }.to(Iterable))
       )
-    case map: java.util.Map[_, _] =>
+    case map: java.util.Map[?, ?] =>
       Json.fromJsonObject(
         JsonObject.fromIterable(map.asScala.iterator.map { case (k, v) => (k.toString, toJson(v)) }.to(Iterable))
       )
-    case t: IterableOnce[_]       => Json.fromValues(t.iterator.map(toJson).toVector)
-    case t: java.lang.Iterable[_] => Json.fromValues(t.asScala.map(toJson).toVector)
-    case arr: Array[_]            => Json.fromValues(arr.toVector.map(toJson))
+    case t: IterableOnce[?]       => Json.fromValues(t.iterator.map(toJson).toVector)
+    case t: java.lang.Iterable[?] => Json.fromValues(t.asScala.map(toJson).toVector)
+    case arr: Array[?]            => Json.fromValues(arr.toVector.map(toJson))
     case _                        => Json.fromString(obj.toString)
   }
 }

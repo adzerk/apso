@@ -21,7 +21,7 @@ package com.kevel.apso.collection
 
 import scala.annotation.tailrec
 import scala.reflect.ClassTag
-import scala.{specialized => spec}
+import scala.specialized as spec
 
 /** Exception thrown when a `DeboxMap` factory is called with a different number of keys and values.
   * @param k

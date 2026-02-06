@@ -1,6 +1,6 @@
 package com.kevel.apso.iterator
 
-import org.specs2.mutable._
+import org.specs2.mutable.*
 
 class CircularIteratorSpec extends Specification {
   "A CircularIterator" should {

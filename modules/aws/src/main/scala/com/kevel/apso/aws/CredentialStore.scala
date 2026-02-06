@@ -1,6 +1,6 @@
 package com.kevel.apso.aws
 
-import software.amazon.awssdk.auth.credentials._
+import software.amazon.awssdk.auth.credentials.*
 
 object CredentialStore {
 

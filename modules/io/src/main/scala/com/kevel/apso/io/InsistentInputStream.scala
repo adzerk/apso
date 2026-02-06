@@ -3,7 +3,7 @@ package com.kevel.apso.io
 import java.io.InputStream
 
 import scala.annotation.tailrec
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.util.{Failure, Success, Try}
 
 import com.typesafe.scalalogging.LazyLogging

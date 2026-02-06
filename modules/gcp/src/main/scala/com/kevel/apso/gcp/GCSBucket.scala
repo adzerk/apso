@@ -5,7 +5,7 @@ import java.nio.channels.Channels
 import java.nio.file.Path
 
 import scala.annotation.unused
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.{Failure, Success, Try}
 
 import com.google.cloud.BaseServiceException

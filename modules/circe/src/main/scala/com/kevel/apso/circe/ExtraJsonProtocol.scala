@@ -2,18 +2,18 @@ package com.kevel.apso.circe
 
 import java.net.URI
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.util.Try
 
 import com.typesafe.config.{Config, ConfigFactory, ConfigRenderOptions}
-import io.circe._
+import io.circe.*
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
-import io.circe.parser._
+import io.circe.parser.*
 import org.joda.time.format.ISODateTimeFormat
-import org.joda.time.{Duration => _, _}
+import org.joda.time.{Duration as _, *}
 import squants.market.{Currency, MoneyContext}
 
-import com.kevel.apso.circe.syntax._
+import com.kevel.apso.circe.syntax.*
 
 /** Provides Encoders and Decoders for some relevant types.
   */

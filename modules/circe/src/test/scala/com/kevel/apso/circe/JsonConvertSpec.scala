@@ -1,8 +1,8 @@
 package com.kevel.apso.circe
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
-import io.circe.parser._
+import io.circe.parser.*
 import org.specs2.matcher.EitherMatchers
 import org.specs2.mutable.Specification
 

@@ -3,9 +3,9 @@ package com.kevel.apso
 import scala.util.Random
 
 import org.specs2.ScalaCheck
-import org.specs2.mutable._
+import org.specs2.mutable.*
 
-import com.kevel.apso.Implicits._
+import com.kevel.apso.Implicits.*
 
 class ImplicitsSpec extends Specification with ScalaCheck {
 

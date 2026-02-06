@@ -1,8 +1,8 @@
 package com.kevel.apso.iterator
 
-import org.specs2.mutable._
+import org.specs2.mutable.*
 
-import com.kevel.apso.iterator.Implicits._
+import com.kevel.apso.iterator.Implicits.*
 
 class ImplicitsSpec extends Specification {
   "An ApsoBufferedIterator" should {
