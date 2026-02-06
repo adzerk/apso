@@ -50,7 +50,7 @@ case class SteppedInterval(interval: ReadableInterval, step: Period) extends Ite
 case class EmptySteppedInterval(step: Period) extends IterableInterval {
 
   def length = 0
-  def apply(idx: Int): Nothing = throw new IndexOutOfBoundsException
+  def apply(idx: Int): DateTime = throw new IndexOutOfBoundsException
   def by(newStep: Period): EmptySteppedInterval = new EmptySteppedInterval(newStep)
 }
 
