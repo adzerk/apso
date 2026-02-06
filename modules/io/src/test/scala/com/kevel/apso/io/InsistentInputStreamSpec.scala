@@ -2,7 +2,7 @@ package com.kevel.apso.io
 
 import java.io.InputStream
 
-import org.specs2.mutable._
+import org.specs2.mutable.*
 
 class InsistentInputStreamSpec extends Specification {
 

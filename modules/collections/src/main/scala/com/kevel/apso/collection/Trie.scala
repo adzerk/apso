@@ -18,7 +18,7 @@ case class Trie[K, V](value: Option[V] = None, nodes: Map[K, Trie[K, V]] = Map[K
     */
   def set(k: Seq[K], v: V): Trie[K, V] = {
     k match {
-      case Seq(h, t @ _*) =>
+      case Seq(h, t*) =>
         this.copy(
           value,
           nodes.get(h) match {
@@ -38,7 +38,7 @@ case class Trie[K, V](value: Option[V] = None, nodes: Map[K, Trie[K, V]] = Map[K
     */
   def get(k: Seq[K]): Option[V] = {
     k match {
-      case Seq(h, t @ _*) =>
+      case Seq(h, t*) =>
         nodes.get(h) match {
           case Some(trie) => trie.get(t)
           case _          => None

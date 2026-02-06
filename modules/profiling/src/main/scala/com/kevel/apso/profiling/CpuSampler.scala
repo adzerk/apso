@@ -7,7 +7,7 @@ import scala.collection.mutable
 
 import com.typesafe.scalalogging.Logger
 
-import com.kevel.apso.profiling.CpuSampler._
+import com.kevel.apso.profiling.CpuSampler.*
 
 /** A lightweight CPU profiler based on call stack sampling.
   *

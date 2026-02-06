@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream
 
 import scala.io.Source
 
-import org.specs2.mutable._
+import org.specs2.mutable.*
 
 class LazySequenceInputStreamSpec extends Specification {
 

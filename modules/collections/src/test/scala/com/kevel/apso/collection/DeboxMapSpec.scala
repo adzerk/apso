@@ -6,14 +6,14 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Prop.forAll
 import org.scalacheck.{Arbitrary, Gen}
 import org.specs2.ScalaCheck
-import org.specs2.mutable._
+import org.specs2.mutable.*
 
 class DeboxMapSpec extends Specification with ScalaCheck {
   type K = String
   type V = Int
 
   def genDeboxMap[A: Arbitrary: ClassTag, B: Arbitrary: ClassTag]: Gen[DeboxMap[A, B]] = {
-    import org.scalacheck.Gen._
+    import org.scalacheck.Gen.*
     for {
       keys <- listOf(arbitrary[A])
       values <- listOfN(keys.size, arbitrary[B])

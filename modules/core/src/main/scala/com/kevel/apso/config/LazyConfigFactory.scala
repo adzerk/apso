@@ -3,7 +3,7 @@ package com.kevel.apso.config
 import java.io.File
 import java.net.{MalformedURLException, URI}
 
-import com.typesafe.config._
+import com.typesafe.config.*
 import com.typesafe.config.impl.Parseable
 
 /** Contains static methods for creating `Config` instances in a lazy way.

@@ -1,12 +1,12 @@
 package com.kevel.apso.circe
 
 import io.circe.Json
-import io.circe.generic.semiauto._
-import io.circe.literal._
-import io.circe.syntax._
+import io.circe.generic.semiauto.*
+import io.circe.literal.*
+import io.circe.syntax.*
 import org.specs2.mutable.Specification
 
-import com.kevel.apso.circe.Implicits._
+import com.kevel.apso.circe.Implicits.*
 
 class ImplicitsSpec extends Specification {
   "The Apso Json Implicits should" should {

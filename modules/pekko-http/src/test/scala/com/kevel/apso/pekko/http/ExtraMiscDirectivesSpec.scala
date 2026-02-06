@@ -1,11 +1,11 @@
 package com.kevel.apso.pekko.http
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
-import org.apache.pekko.http.scaladsl.model.StatusCodes._
-import org.apache.pekko.http.scaladsl.model.headers.CacheDirectives._
-import org.apache.pekko.http.scaladsl.model.headers._
-import org.apache.pekko.http.scaladsl.server.Directives._
+import org.apache.pekko.http.scaladsl.model.StatusCodes.*
+import org.apache.pekko.http.scaladsl.model.headers.CacheDirectives.*
+import org.apache.pekko.http.scaladsl.model.headers.*
+import org.apache.pekko.http.scaladsl.server.Directives.*
 import org.apache.pekko.http.scaladsl.server.Route
 import org.apache.pekko.http.scaladsl.testkit.Specs2RouteTest
 import org.specs2.mutable.Specification
@@ -13,7 +13,7 @@ import org.specs2.mutable.Specification
 class ExtraMiscDirectivesSpec extends Specification with Specs2RouteTest {
 
   "The ExtraMiscDirectives" should {
-    import ExtraMiscDirectives._
+    import ExtraMiscDirectives.*
 
     def noCacheRoute: Route = cacheControlNoCache(complete(OK))
 

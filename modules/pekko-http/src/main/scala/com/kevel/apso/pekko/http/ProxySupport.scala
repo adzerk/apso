@@ -8,13 +8,13 @@ import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.http.scaladsl.Http
-import org.apache.pekko.http.scaladsl.model._
-import org.apache.pekko.http.scaladsl.model.headers._
-import org.apache.pekko.http.scaladsl.server.Directives._
+import org.apache.pekko.http.scaladsl.model.*
+import org.apache.pekko.http.scaladsl.model.headers.*
+import org.apache.pekko.http.scaladsl.server.Directives.*
 import org.apache.pekko.http.scaladsl.server.RouteResult.Complete
 import org.apache.pekko.http.scaladsl.server.{Directive1, RequestContext, Route, RouteResult}
 import org.apache.pekko.stream.Materializer
-import org.apache.pekko.stream.QueueOfferResult.{Dropped, Enqueued, Failure => OfferFailure, QueueClosed}
+import org.apache.pekko.stream.QueueOfferResult.{Dropped, Enqueued, Failure as OfferFailure, QueueClosed}
 import org.apache.pekko.stream.scaladsl.{Keep, Sink, Source}
 
 /** Adds proxy to pekko-http services to proxy requests to other hosts.

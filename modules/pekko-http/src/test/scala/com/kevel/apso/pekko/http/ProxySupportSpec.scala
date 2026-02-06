@@ -2,16 +2,16 @@ package com.kevel.apso.pekko.http
 
 import java.net.InetAddress
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{Future, Promise}
 
 import org.apache.pekko.NotUsed
 import org.apache.pekko.http.scaladsl.Http
 import org.apache.pekko.http.scaladsl.model.RemoteAddress.IP
-import org.apache.pekko.http.scaladsl.model.StatusCodes._
-import org.apache.pekko.http.scaladsl.model._
-import org.apache.pekko.http.scaladsl.model.headers._
-import org.apache.pekko.http.scaladsl.server.Directives._
+import org.apache.pekko.http.scaladsl.model.StatusCodes.*
+import org.apache.pekko.http.scaladsl.model.*
+import org.apache.pekko.http.scaladsl.model.headers.*
+import org.apache.pekko.http.scaladsl.server.Directives.*
 import org.apache.pekko.http.scaladsl.server.RouteResult
 import org.apache.pekko.http.scaladsl.server.RouteResult.Complete
 import org.apache.pekko.http.scaladsl.testkit.{RouteTestTimeout, Specs2RouteTest}
@@ -20,7 +20,7 @@ import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 
-import com.kevel.apso.NetUtils._
+import com.kevel.apso.NetUtils.*
 
 class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Specs2RouteTest with ProxySupport {
 

@@ -1,7 +1,7 @@
 package com.kevel.apso.aws
 
 import com.typesafe.config.{Config, ConfigFactory}
-import software.amazon.awssdk.auth.credentials._
+import software.amazon.awssdk.auth.credentials.*
 
 /** AWS credentials provider that retrieves credentials from a typesafe configuration.
   * @param config

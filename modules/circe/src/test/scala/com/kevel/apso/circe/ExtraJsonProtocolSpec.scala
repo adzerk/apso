@@ -2,21 +2,21 @@ package com.kevel.apso.circe
 
 import java.net.URI
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import com.typesafe.config.{Config, ConfigFactory}
-import io.circe._
-import io.circe.literal._
-import io.circe.parser._
-import io.circe.syntax._
+import io.circe.*
+import io.circe.literal.*
+import io.circe.parser.*
+import io.circe.syntax.*
 import org.joda.time.{DateTime, Interval, LocalDate, Period}
 import org.specs2.mutable.Specification
-import squants.market._
+import squants.market.*
 
 class ExtraJsonProtocolSpec extends Specification {
 
   "The object ExtraJsonProtocol" should {
-    import ExtraJsonProtocol._
+    import ExtraJsonProtocol.*
 
     "provide an Encoder and Decoder for FiniteDuration" in {
       val duration = 10.seconds

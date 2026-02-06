@@ -1,7 +1,7 @@
 package com.kevel.apso.encryption
 
 import java.io.InputStream
-import java.security._
+import java.security.*
 
 import org.apache.commons.codec.binary.Base64
 import org.bouncycastle.jce.provider.BouncyCastleProvider

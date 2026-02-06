@@ -1,7 +1,7 @@
 package com.kevel.apso.collection
 
 import org.specs2.matcher.Matcher
-import org.specs2.mutable._
+import org.specs2.mutable.*
 
 class TypedMapSpec extends Specification {
 

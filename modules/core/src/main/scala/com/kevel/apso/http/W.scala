@@ -1,6 +1,6 @@
 package com.kevel.apso.http
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import com.typesafe.scalalogging.Logger
 import io.circe.Json

@@ -1,10 +1,10 @@
 package com.kevel.apso.aws
 
-import java.io._
+import java.io.*
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.{CompletableFuture, CompletionException, LinkedBlockingQueue, ThreadPoolExecutor, TimeUnit}
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.{Failure, Success, Try, Using}
 
 import com.typesafe.config.ConfigFactory
@@ -16,7 +16,7 @@ import software.amazon.awssdk.core.exception.{SdkClientException, SdkException}
 import software.amazon.awssdk.regions
 import software.amazon.awssdk.services.s3.S3AsyncClient
 import software.amazon.awssdk.services.s3.crt.S3CrtRetryConfiguration
-import software.amazon.awssdk.services.s3.model._
+import software.amazon.awssdk.services.s3.model.*
 import software.amazon.awssdk.transfer.s3.{S3TransferManager, model}
 
 /** A representation of an Amazon's S3 bucket. This class wraps an `S3AsyncClient` and provides a higher level interface

@@ -4,7 +4,7 @@ import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.util.Try
 
-import io.circe._
+import io.circe.*
 
 /** Object containing implicit classes and methods related to JSON handling.
   */

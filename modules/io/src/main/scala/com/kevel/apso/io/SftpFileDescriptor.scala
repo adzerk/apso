@@ -1,20 +1,20 @@
 package com.kevel.apso.io
 
-import java.io.{FileDescriptor => _, _}
+import java.io.{FileDescriptor as _, *}
 import java.net.URI
 import java.util.concurrent.{ConcurrentHashMap, TimeoutException}
 
-import scala.concurrent.duration._
-import scala.jdk.CollectionConverters._
+import scala.concurrent.duration.*
+import scala.jdk.CollectionConverters.*
 import scala.util.{Properties, Try}
 
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 import io.github.andrebeat.pool.{Lease, Pool}
-import net.schmizz.sshj._
+import net.schmizz.sshj.*
 import net.schmizz.sshj.common.SSHException
-import net.schmizz.sshj.sftp._
-import net.schmizz.sshj.transport.verification._
+import net.schmizz.sshj.sftp.*
+import net.schmizz.sshj.transport.verification.*
 import net.schmizz.sshj.userauth.password.PasswordUtils
 import net.schmizz.sshj.xfer.InMemorySourceFile
 

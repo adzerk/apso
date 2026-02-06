@@ -1,6 +1,6 @@
 package com.kevel.apso.io
 
-import java.io.{FileDescriptor => _, _}
+import java.io.{FileDescriptor as _, *}
 
 import scala.reflect.ClassTag
 import scala.util.Try

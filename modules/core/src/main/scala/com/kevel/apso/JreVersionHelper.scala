@@ -1,6 +1,6 @@
 package com.kevel.apso
 
-import JreVersionHelper._
+import JreVersionHelper.*
 
 trait JreVersionHelper {
   def jreVersion: (Int, Int) = System.getProperty("java.version") match {
