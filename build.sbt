@@ -14,7 +14,7 @@ val javaVersion = "11"
 ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
 
 def module(project: Project, moduleName: String, crossScala: List[String] = List(Versions.Scala213, Versions.Scala3)) =
-  (project in file(moduleName))
+  (project in file(s"modules/$moduleName"))
     .settings(name := s"apso-$moduleName")
     .settings(commonSettings: _*)
     .settings(crossScalaVersions := crossScala)
