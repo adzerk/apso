@@ -123,7 +123,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
     }
   }
 
-  def stream(offset: Long = 0L) = {
+  def stream(offset: Long = 0L): FileInputStream = {
     val is = new FileInputStream(file)
     if (offset > 0L) is.skip(offset)
     is

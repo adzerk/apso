@@ -40,7 +40,7 @@ case class SteppedInterval(interval: ReadableInterval, step: Period) extends Ite
 
   def apply(idx: Int) = interval.getStart.plus(step.multipliedBy(idx))
 
-  def by(newStep: Period) = new SteppedInterval(interval, newStep)
+  def by(newStep: Period): SteppedInterval = new SteppedInterval(interval, newStep)
 }
 
 /** An iterable time interval with no elements.
@@ -50,8 +50,8 @@ case class SteppedInterval(interval: ReadableInterval, step: Period) extends Ite
 case class EmptySteppedInterval(step: Period) extends IterableInterval {
 
   def length = 0
-  def apply(idx: Int) = throw new IndexOutOfBoundsException
-  def by(newStep: Period) = new EmptySteppedInterval(newStep)
+  def apply(idx: Int): DateTime = throw new IndexOutOfBoundsException
+  def by(newStep: Period): EmptySteppedInterval = new EmptySteppedInterval(newStep)
 }
 
 /** Companion object containing a facotry for iterable time intervals.

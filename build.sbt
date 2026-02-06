@@ -221,7 +221,7 @@ lazy val commonSettings = Seq(
 
     CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, _)) =>
-        withCommon("-Ywarn-dead-code", "-Ywarn-unused:imports")
+        withCommon("-Xsource:3", "-Ywarn-dead-code", "-Ywarn-unused:imports")
 
       case Some((3, _)) =>
         withCommon("-Wunused:imports")

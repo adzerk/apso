@@ -49,7 +49,7 @@ class InsistentInputStreamSpec extends Specification {
             iter.next()
           }
         }
-        override def skip(l: Long) = throw new Exception("unoptimized skip")
+        override def skip(l: Long): Long = throw new Exception("unoptimized skip")
       }
 
     val testBadInputStream = () =>
