@@ -200,11 +200,6 @@ lazy val commonSettings = Seq(
 
   scalafmtOnCompile := true,
 
-  // Enable Scalafix.
-  semanticdbEnabled := true,
-  semanticdbVersion := scalafixSemanticdb.revision,
-  scalafixOnCompile := true,
-
   scalacOptions ++= {
     lazy val commonFlags = Seq(
       "-encoding", "UTF-8",
