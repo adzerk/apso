@@ -72,7 +72,7 @@ failed retries due to incorrect client pool management upon failure.
 ### Fixed
 - `SftpFileDescriptor`: always release lease on close ([#1001](https://github.com/adzerk/apso/pull/1001)).
 
-[0.27.1]: https://github.com/adzerk/apso/compare/v0.27.0...v0.27.1
+[0.27.2]: https://github.com/adzerk/apso/compare/v0.27.1...v0.27.2
 
 ## [0.27.1] - 2026-01-20
 
