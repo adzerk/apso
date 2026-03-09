@@ -18,6 +18,62 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.27.2] - 2026-03-09
+
+This patch fixes an issue where `SftpFileDescriptor.stream` would stop working indefinitely after a certain number of 
+failed retries due to incorrect client pool management upon failure.
+
+### Changed
+- Update unirest-java-core to 4.7.4 ([#956](https://github.com/adzerk/apso/pull/956)).
+- Update sbt, scripted-plugin to 1.12.1 ([#957](https://github.com/adzerk/apso/pull/957)).
+- Update s3, s3-transfer-manager to 2.41.15 ([#958](https://github.com/adzerk/apso/pull/958)).
+- Update scalafmt-core to 3.10.5 ([#959](https://github.com/adzerk/apso/pull/959)).
+- Update s3, s3-transfer-manager to 2.41.16 ([#960](https://github.com/adzerk/apso/pull/960)).
+- Update google-cloud-storage to 2.62.1 ([#961](https://github.com/adzerk/apso/pull/961)).
+- Update commons-codec to 1.21.0 ([#962](https://github.com/adzerk/apso/pull/962)).
+- Update scalafmt-core to 3.10.6 ([#963](https://github.com/adzerk/apso/pull/963)).
+- Update s3, s3-transfer-manager to 2.41.19 ([#964](https://github.com/adzerk/apso/pull/964)).
+- Update simplejmx to 2.3 ([#965](https://github.com/adzerk/apso/pull/965)).
+- Update simplejmx to 3.1 ([#966](https://github.com/adzerk/apso/pull/966)).
+- Update sbt, scripted-plugin to 1.12.2 ([#967](https://github.com/adzerk/apso/pull/967)).
+- Update s3, s3-transfer-manager to 2.41.21 ([#968](https://github.com/adzerk/apso/pull/968)).
+- Update aws-crt to 0.43.1 ([#969](https://github.com/adzerk/apso/pull/969)).
+- Update s3, s3-transfer-manager to 2.41.23 ([#970](https://github.com/adzerk/apso/pull/970)).
+- Move modules to a `modules` subdirectory ([#971](https://github.com/adzerk/apso/pull/971)).
+- Use `Xsource:3` for Scala 2 builds ([#972](https://github.com/adzerk/apso/pull/972)).
+- Remove Scalafix, use Scalafmt for import rewrites and enable Scala 3 rewrites ([#973](https://github.com/adzerk/apso/pull/973)).
+- Update s3, s3-transfer-manager to 2.41.24 ([#974](https://github.com/adzerk/apso/pull/974)).
+- Update s3, s3-transfer-manager to 2.41.25 ([#975](https://github.com/adzerk/apso/pull/975)).
+- Update scalafmt-core to 3.10.7 ([#976](https://github.com/adzerk/apso/pull/976)).
+- Update google-cloud-storage to 2.63.0 ([#978](https://github.com/adzerk/apso/pull/978)).
+- Update s3, s3-transfer-manager to 2.41.29 ([#979](https://github.com/adzerk/apso/pull/979)).
+- Update aws-crt to 0.43.3 ([#980](https://github.com/adzerk/apso/pull/980)).
+- Update sbt, scripted-plugin to 1.12.3 ([#981](https://github.com/adzerk/apso/pull/981)).
+- Update simplejmx to 3.2 ([#982](https://github.com/adzerk/apso/pull/982)).
+- Update s3, s3-transfer-manager to 2.41.31 ([#983](https://github.com/adzerk/apso/pull/983)).
+- Update s3, s3-transfer-manager to 2.41.33 ([#984](https://github.com/adzerk/apso/pull/984)).
+- Update aws-crt to 0.43.4 ([#985](https://github.com/adzerk/apso/pull/985)).
+- Update s3, s3-transfer-manager to 2.41.34 ([#986](https://github.com/adzerk/apso/pull/986)).
+- Update typesafe:config to 1.4.6 ([#987](https://github.com/adzerk/apso/pull/987)).
+- Update sbt, scripted-plugin to 1.12.4 ([#988](https://github.com/adzerk/apso/pull/988)).
+- Update s3, s3-transfer-manager to 2.42.0 ([#989](https://github.com/adzerk/apso/pull/989)).
+- Update s3, s3-transfer-manager to 2.42.2 ([#990](https://github.com/adzerk/apso/pull/990)).
+- Update google-cloud-storage to 2.64.0 ([#991](https://github.com/adzerk/apso/pull/991)).
+- Update s3, s3-transfer-manager to 2.42.4 ([#992](https://github.com/adzerk/apso/pull/992)).
+- Update sbt, scripted-plugin to 1.12.5 ([#993](https://github.com/adzerk/apso/pull/993)).
+- Update s3, s3-transfer-manager to 2.42.5 ([#994](https://github.com/adzerk/apso/pull/994)).
+- Update aws-crt to 0.43.5 ([#995](https://github.com/adzerk/apso/pull/995)).
+- Update s3, s3-transfer-manager to 2.42.7 ([#996](https://github.com/adzerk/apso/pull/996)).
+- Update aws-crt to 0.43.6 ([#997](https://github.com/adzerk/apso/pull/997)).
+- Update joda-time to 2.14.1 ([#998](https://github.com/adzerk/apso/pull/998)).
+- Update s3, s3-transfer-manager to 2.42.8 ([#999](https://github.com/adzerk/apso/pull/999)).
+- Update aws-crt to 0.43.7 ([#1000](https://github.com/adzerk/apso/pull/1000)).
+
+### Fixed
+- `SftpFileDescriptor`: always release lease on close ([#1001](https://github.com/adzerk/apso/pull/1001)).
+
+[0.27.1]: https://github.com/adzerk/apso/compare/v0.27.0...v0.27.1
+
 ## [0.27.1] - 2026-01-20
 
 This patch release makes sure the S3 client used underneath the `S3Bucket` data type has cross-region access enabled,
