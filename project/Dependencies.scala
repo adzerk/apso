@@ -7,7 +7,7 @@ object Dependencies {
 
     val Pekko          = "1.4.0"
     val PekkoHttp      = "1.3.0"
-    val Aws            = "2.42.7"
+    val Aws            = "2.42.8"
     val AwsCrt         = "0.43.7"
     val BouncyCastle   = "1.83"
     val Cats           = "2.13.0"
@@ -16,7 +16,7 @@ object Dependencies {
     val FastMd5        = "2.7.1"
     val Gcp            = "2.64.0"
     val JUnit          = "4.13.2"
-    val JodaTime       = "2.14.0"
+    val JodaTime       = "2.14.1"
     val ScalaCheck     = "1.19.0"
     val ScalaLogging   = "3.9.6"
     val ScalaPool      = "0.5.0"
