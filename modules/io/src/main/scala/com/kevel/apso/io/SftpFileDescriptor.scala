@@ -199,8 +199,8 @@ case class SftpFileDescriptor(
     override def markSupported() = inner.markSupported()
     override def reset() = inner.reset()
     override def close() = {
-      inner.close()
-      sftpLease.release()
+      try { inner.close() }
+      finally { sftpLease.release() }
     }
   }
 
