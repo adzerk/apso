@@ -202,13 +202,13 @@ final class GCSBucket(
     */
   def pull(key: String, destination: String): Boolean = retry {
     logger.info(s"Pulling 'gs://$bucketName/$key' to '$destination'")
-    storage.downloadTo(blobId(key), Path.of(destination))
+    storage.downloadTo(blobId(key), Path.of(destination), Storage.BlobSourceOption.shouldReturnRawInputStream(true))
     logger.info(s"Downloaded 'gs://$bucketName/$key' to '$destination'. Closing files.")
   }.isDefined
 
   def stream(key: String, offset: Long = 0L): InputStream = {
     logger.info(s"Streaming 'gs://$bucketName/$key' starting at $offset")
-    val reader = storage.reader(blobId(key))
+    val reader = storage.reader(blobId(key), Storage.BlobSourceOption.shouldReturnRawInputStream(true))
     if (offset > 0L) reader.seek(offset)
     Channels.newInputStream(reader)
   }
