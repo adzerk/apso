@@ -9,7 +9,7 @@ import scala.jdk.CollectionConverters.*
 import scala.util.{Failure, Success, Try}
 
 import com.google.cloud.BaseServiceException
-import com.google.cloud.storage.Storage.BlobListOption
+import com.google.cloud.storage.Storage.{BlobListOption, BlobSourceOption, BlobWriteOption}
 import com.google.cloud.storage.{Blob, BlobId, BlobInfo, Storage, StorageException}
 import com.typesafe.scalalogging.LazyLogging
 
@@ -19,6 +19,16 @@ final class GCSBucket(
 ) extends Serializable
     with LazyLogging {
   @transient private[this] lazy val storage: Storage = mkStorage()
+
+  // Disable automatic decompression of gzip-encoded objects so that callers receive the raw bytes as stored in GCS.
+  // Without this, the GCS client transparently decompresses objects with `Content-Encoding: gzip`, which breaks
+  // callers that expect to handle decompression themselves (e.g. when streaming .gz files).
+  private[this] val rawInputStream = BlobSourceOption.shouldReturnRawInputStream(true)
+
+  // Prevent the GCS client from setting `Content-Encoding: gzip` on uploads. Without this, the server may
+  // auto-compress the content, causing subsequent downloads to be transparently decompressed — which is
+  // inconsistent with how S3 behaves and breaks callers that rely on getting back the exact bytes they uploaded.
+  private[this] val noGzipTranscoding = BlobWriteOption.disableGzipContent()
 
   private def blobId(key: String) = BlobId.of(bucketName, key)
 
@@ -126,7 +136,7 @@ final class GCSBucket(
   def push(key: String, inputStream: InputStream, @unused length: Option[Long]): Boolean = {
     logger.info(s"Pushing to 'gs://$bucketName/$key'")
     val info = BlobInfo.newBuilder(blobId(key)).build()
-    storage.createFrom(info, new BufferedInputStream(inputStream)).exists()
+    storage.createFrom(info, new BufferedInputStream(inputStream), noGzipTranscoding).exists()
   }
 
   /** Deletes the file in the location specified by `key` in the bucket.
@@ -202,13 +212,13 @@ final class GCSBucket(
     */
   def pull(key: String, destination: String): Boolean = retry {
     logger.info(s"Pulling 'gs://$bucketName/$key' to '$destination'")
-    storage.downloadTo(blobId(key), Path.of(destination), Storage.BlobSourceOption.shouldReturnRawInputStream(true))
+    storage.downloadTo(blobId(key), Path.of(destination), rawInputStream)
     logger.info(s"Downloaded 'gs://$bucketName/$key' to '$destination'. Closing files.")
   }.isDefined
 
   def stream(key: String, offset: Long = 0L): InputStream = {
     logger.info(s"Streaming 'gs://$bucketName/$key' starting at $offset")
-    val reader = storage.reader(blobId(key), Storage.BlobSourceOption.shouldReturnRawInputStream(true))
+    val reader = storage.reader(blobId(key), rawInputStream)
     if (offset > 0L) reader.seek(offset)
     Channels.newInputStream(reader)
   }
