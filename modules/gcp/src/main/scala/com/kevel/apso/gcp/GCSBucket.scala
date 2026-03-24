@@ -13,22 +13,14 @@ import com.google.cloud.storage.Storage.{BlobListOption, BlobSourceOption, BlobW
 import com.google.cloud.storage.{Blob, BlobId, BlobInfo, Storage, StorageException}
 import com.typesafe.scalalogging.LazyLogging
 
+import com.kevel.apso.gcp.GCSBucket.{noGzipTranscoding, rawInputStream}
+
 final class GCSBucket(
     val bucketName: String,
     mkStorage: () => Storage
 ) extends Serializable
     with LazyLogging {
   @transient private[this] lazy val storage: Storage = mkStorage()
-
-  // Disable automatic decompression of gzip-encoded objects so that callers receive the raw bytes as stored in GCS.
-  // Without this, the GCS client transparently decompresses objects with `Content-Encoding: gzip`, which breaks
-  // callers that expect to handle decompression themselves (e.g. when streaming .gz files).
-  private[this] val rawInputStream = BlobSourceOption.shouldReturnRawInputStream(true)
-
-  // Prevent the GCS client from setting `Content-Encoding: gzip` on uploads. Without this, the server may
-  // auto-compress the content, causing subsequent downloads to be transparently decompressed — which is
-  // inconsistent with how S3 behaves and breaks callers that rely on getting back the exact bytes they uploaded.
-  private[this] val noGzipTranscoding = BlobWriteOption.disableGzipContent()
 
   private def blobId(key: String) = BlobId.of(bucketName, key)
 
@@ -257,4 +249,16 @@ final class GCSBucket(
 
         case _ => None
       }
+}
+
+object GCSBucket {
+  // Disable automatic decompression of gzip-encoded objects so that callers receive the raw bytes as stored in GCS.
+  // Without this, the GCS client transparently decompresses objects with `Content-Encoding: gzip`, which breaks
+  // callers that expect to handle decompression themselves (e.g. when streaming .gz files).
+  private val rawInputStream = BlobSourceOption.shouldReturnRawInputStream(true)
+
+  // Prevent the GCS client from setting `Content-Encoding: gzip` on uploads. Without this, the server may auto-compress
+  // the content, causing subsequent downloads to be transparently decompressed — which would break the contract of
+  // `FileDescriptor`, since `GCSFileDescriptor` relies on `GCSBucket` to return the exact bytes that were uploaded.
+  private val noGzipTranscoding = BlobWriteOption.disableGzipContent()
 }
