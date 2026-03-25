@@ -18,6 +18,30 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.27.3] - 2026-03-25
+
+This patch fixes an issue where `GCSBucket` would automatically transcode gzip-encoded content on upload and download,
+breaking the `FileDescriptor` contract as implemented by `GCSFileDescriptor`, which delegates to `GCSBucket` underneath.
+
+### Changed
+- Update s3, s3-transfer-manager to 2.42.9 ([#1003](https://github.com/adzerk/apso/pull/1003)).
+- Update s3, s3-transfer-manager to 2.42.11 ([#1004](https://github.com/adzerk/apso/pull/1004)).
+- Update aws-crt to 0.43.8 ([#1005](https://github.com/adzerk/apso/pull/1005)).
+- Update s3, s3-transfer-manager to 2.42.13 ([#1006](https://github.com/adzerk/apso/pull/1006)).
+- Update sbt, scripted-plugin to 1.12.6 ([#1007](https://github.com/adzerk/apso/pull/1007)).
+- Update s3, s3-transfer-manager to 2.42.15 ([#1008](https://github.com/adzerk/apso/pull/1008)).
+- Update unirest-java-core to 4.8.0 ([#1009](https://github.com/adzerk/apso/pull/1009)).
+- Update s3, s3-transfer-manager to 2.42.17 ([#1010](https://github.com/adzerk/apso/pull/1010)).
+- Update s3, s3-transfer-manager to 2.42.18 ([#1012](https://github.com/adzerk/apso/pull/1012)).
+- Update aws-crt to 0.43.9 ([#1013](https://github.com/adzerk/apso/pull/1013)).
+- Update sbt, scripted-plugin to 1.12.7 ([#1014](https://github.com/adzerk/apso/pull/1014)).
+- Update s3, s3-transfer-manager to 2.42.19 ([#1015](https://github.com/adzerk/apso/pull/1015)).
+
+### Fixed
+- Disable automatic gzip transcoding in `GCSBucket` on upload and download ([#1011](https://github.com/adzerk/apso/pull/1011)).
+
+[0.27.3]: https://github.com/adzerk/apso/compare/v0.27.2...v0.27.3
+
 ## [0.27.2] - 2026-03-09
 
 This patch fixes an issue where `SftpFileDescriptor.stream` would stop working indefinitely after a certain number of 
