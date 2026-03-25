@@ -9,9 +9,11 @@ import scala.jdk.CollectionConverters.*
 import scala.util.{Failure, Success, Try}
 
 import com.google.cloud.BaseServiceException
-import com.google.cloud.storage.Storage.BlobListOption
+import com.google.cloud.storage.Storage.{BlobListOption, BlobSourceOption, BlobWriteOption}
 import com.google.cloud.storage.{Blob, BlobId, BlobInfo, Storage, StorageException}
 import com.typesafe.scalalogging.LazyLogging
+
+import com.kevel.apso.gcp.GCSBucket.{noGzipTranscoding, rawInputStream}
 
 final class GCSBucket(
     val bucketName: String,
@@ -126,7 +128,7 @@ final class GCSBucket(
   def push(key: String, inputStream: InputStream, @unused length: Option[Long]): Boolean = {
     logger.info(s"Pushing to 'gs://$bucketName/$key'")
     val info = BlobInfo.newBuilder(blobId(key)).build()
-    storage.createFrom(info, new BufferedInputStream(inputStream)).exists()
+    storage.createFrom(info, new BufferedInputStream(inputStream), noGzipTranscoding).exists()
   }
 
   /** Deletes the file in the location specified by `key` in the bucket.
@@ -202,13 +204,13 @@ final class GCSBucket(
     */
   def pull(key: String, destination: String): Boolean = retry {
     logger.info(s"Pulling 'gs://$bucketName/$key' to '$destination'")
-    storage.downloadTo(blobId(key), Path.of(destination))
+    storage.downloadTo(blobId(key), Path.of(destination), rawInputStream)
     logger.info(s"Downloaded 'gs://$bucketName/$key' to '$destination'. Closing files.")
   }.isDefined
 
   def stream(key: String, offset: Long = 0L): InputStream = {
     logger.info(s"Streaming 'gs://$bucketName/$key' starting at $offset")
-    val reader = storage.reader(blobId(key))
+    val reader = storage.reader(blobId(key), rawInputStream)
     if (offset > 0L) reader.seek(offset)
     Channels.newInputStream(reader)
   }
@@ -247,4 +249,16 @@ final class GCSBucket(
 
         case _ => None
       }
+}
+
+object GCSBucket {
+  // Disable automatic decompression of gzip-encoded objects so that callers receive the raw bytes as stored in GCS.
+  // Without this, the GCS client transparently decompresses objects with `Content-Encoding: gzip`, which breaks
+  // callers that expect to handle decompression themselves (e.g. when streaming .gz files).
+  private val rawInputStream = BlobSourceOption.shouldReturnRawInputStream(true)
+
+  // Prevent the GCS client from setting `Content-Encoding: gzip` on uploads. Without this, the server may auto-compress
+  // the content, causing subsequent downloads to be transparently decompressed — which would break the contract of
+  // `FileDescriptor`, since `GCSFileDescriptor` relies on `GCSBucket` to return the exact bytes that were uploaded.
+  private val noGzipTranscoding = BlobWriteOption.disableGzipContent()
 }
