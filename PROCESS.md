@@ -22,7 +22,7 @@ We try to adopt _MAJOR.MINOR.PATCH_ [Semantic Versioning 2.0.0](https://semver.o
 ### Prepare the release
 
 Before releasing, create, if it doesn't exist yet, a [Changelog](CHANGELOG.md) entry for the version you're releasing,
-following the template. 
+following the template.
 
 To figure out what to include in the Changelog, you can check the timestamp of the last tag like the following
 (replacing the actual tag name):
