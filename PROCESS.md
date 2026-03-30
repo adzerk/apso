@@ -22,7 +22,7 @@ We try to adopt _MAJOR.MINOR.PATCH_ [Semantic Versioning 2.0.0](https://semver.o
 ### Prepare the release
 
 Before releasing, create, if it doesn't exist yet, a [Changelog](CHANGELOG.md) entry for the version you're releasing,
-following the template. 
+following the template.
 
 To figure out what to include in the Changelog, you can check the timestamp of the last tag like the following
 (replacing the actual tag name):
@@ -47,8 +47,6 @@ It's recommended to open a PR with the Changelog changes so that they can be rev
 
 ### Releasing artifacts
 
-To release the artifacts in the Sonatype's release repository, which eventually gets synced to
-[Maven Central](https://repo1.maven.org/maven2/com/kevel), simply use `sbt` to run `release`.
-
-This will result in the releasing of all the `apso-*` libraries. Please ensure you are using Java 11 when releasing
-new versions.
+To release the artifacts in the Sonatype's release repository, which eventually gets synced to [Maven
+Central](https://repo1.maven.org/maven2/com/kevel), simply use `sbt` to run `release` from the `master` branch. This
+will result in the releasing of all the `apso-*` libraries.
