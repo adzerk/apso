@@ -27,7 +27,7 @@ object Dependencies {
     val Squants        = "1.8.3"
     val SshJ           = "0.40.0"
     val TypesafeConfig = "1.4.8"
-    val UnirestJava    = "4.9.0"
+    val UnirestJava    = "4.10.0"
   }
 
   // scalafmt: { maxColumn = 200 }
