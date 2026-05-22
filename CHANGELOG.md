@@ -18,6 +18,74 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.27.4] - 2026-05-22
+
+This release adds support for instantiating an `SftpFileDescriptor` with the private key content provided directly,
+instead of from a file path.
+
+### Added
+- Add support for configuring private key content for SftpFileDescriptor ([#1075](https://github.com/adzerk/apso/pull/1075)).
+
+### Changed
+- Remove mention of the need for Java 11 ([#1017](https://github.com/adzerk/apso/pull/1017)).
+- Update google-cloud-storage to 2.64.1 ([#1018](https://github.com/adzerk/apso/pull/1018)).
+- Update sbt, scripted-plugin to 1.12.8 ([#1019](https://github.com/adzerk/apso/pull/1019)).
+- Update s3, s3-transfer-manager to 2.42.21 ([#1020](https://github.com/adzerk/apso/pull/1020)).
+- Update s3, s3-transfer-manager to 2.42.23 ([#1021](https://github.com/adzerk/apso/pull/1021)).
+- Update aws-crt to 0.44.0 ([#1022](https://github.com/adzerk/apso/pull/1022)).
+- Update unirest-java-core to 4.8.1 ([#1023](https://github.com/adzerk/apso/pull/1023)).
+- Update s3, s3-transfer-manager to 2.42.25 ([#1024](https://github.com/adzerk/apso/pull/1024)).
+- Update pekko-actor, ... to 1.5.0 ([#1025](https://github.com/adzerk/apso/pull/1025)).
+- Update s3, s3-transfer-manager to 2.42.27 ([#1026](https://github.com/adzerk/apso/pull/1026)).
+- Update s3, s3-transfer-manager to 2.42.28 ([#1027](https://github.com/adzerk/apso/pull/1027)).
+- Update sbt, scripted-plugin to 1.12.9 ([#1028](https://github.com/adzerk/apso/pull/1028)).
+- Update s3, s3-transfer-manager to 2.42.29 ([#1029](https://github.com/adzerk/apso/pull/1029)).
+- Update s3, s3-transfer-manager to 2.42.33 ([#1031](https://github.com/adzerk/apso/pull/1031)).
+- Update google-cloud-storage to 2.66.0 ([#1033](https://github.com/adzerk/apso/pull/1033)).
+- Update mdoc, sbt-mdoc to 2.9.0 ([#1034](https://github.com/adzerk/apso/pull/1034)).
+- Update sbt-scalafmt to 2.6.0 ([#1035](https://github.com/adzerk/apso/pull/1035)).
+- Update scalafmt-core to 3.11.0 ([#1036](https://github.com/adzerk/apso/pull/1036)).
+- Update google-cloud-storage to 2.67.0 ([#1037](https://github.com/adzerk/apso/pull/1037)).
+- Update bcpkix-jdk18on, bcprov-jdk18on to 1.84 ([#1038](https://github.com/adzerk/apso/pull/1038)).
+- Update s3, s3-transfer-manager to 2.42.34 ([#1039](https://github.com/adzerk/apso/pull/1039)).
+- Update aws-crt to 0.45.0 ([#1040](https://github.com/adzerk/apso/pull/1040)).
+- Update s3, s3-transfer-manager to 2.42.35 ([#1041](https://github.com/adzerk/apso/pull/1041)).
+- Update aws-crt to 0.45.1 ([#1042](https://github.com/adzerk/apso/pull/1042)).
+- Update s3, s3-transfer-manager to 2.42.36 ([#1043](https://github.com/adzerk/apso/pull/1043)).
+- Update s3, s3-transfer-manager to 2.42.37 ([#1044](https://github.com/adzerk/apso/pull/1044)).
+- Update s3, s3-transfer-manager to 2.42.39 ([#1045](https://github.com/adzerk/apso/pull/1045)).
+- Update commons-codec to 1.22.0 ([#1046](https://github.com/adzerk/apso/pull/1046)).
+- Update s3, s3-transfer-manager to 2.42.41 ([#1047](https://github.com/adzerk/apso/pull/1047)).
+- Update sbt, scripted-plugin to 1.12.10 ([#1048](https://github.com/adzerk/apso/pull/1048)).
+- Update typesafe:config to 1.4.7 ([#1049](https://github.com/adzerk/apso/pull/1049)).
+- Update joda-time to 2.14.2 ([#1050](https://github.com/adzerk/apso/pull/1050)).
+- Update s3, s3-transfer-manager to 2.43.0 ([#1051](https://github.com/adzerk/apso/pull/1051)).
+- Update aws-crt to 0.45.2 ([#1052](https://github.com/adzerk/apso/pull/1052)).
+- Update pekko-actor, ... to 1.6.0 ([#1053](https://github.com/adzerk/apso/pull/1053)).
+- Update s3, s3-transfer-manager to 2.43.2 ([#1054](https://github.com/adzerk/apso/pull/1054)).
+- Update sbt, scripted-plugin to 1.12.11 ([#1055](https://github.com/adzerk/apso/pull/1055)).
+- Update s3, s3-transfer-manager to 2.44.0 ([#1056](https://github.com/adzerk/apso/pull/1056)).
+- Update unirest-java-core to 4.9.0 ([#1057](https://github.com/adzerk/apso/pull/1057)).
+- Update typesafe:config to 1.4.8 ([#1058](https://github.com/adzerk/apso/pull/1058)).
+- Update s3, s3-transfer-manager to 2.44.1 ([#1059](https://github.com/adzerk/apso/pull/1059)).
+- Update s3, s3-transfer-manager to 2.44.2 ([#1060](https://github.com/adzerk/apso/pull/1060)).
+- Update google-cloud-storage to 2.68.0 ([#1061](https://github.com/adzerk/apso/pull/1061)).
+- Update s3, s3-transfer-manager to 2.44.3 ([#1062](https://github.com/adzerk/apso/pull/1062)).
+- Update sbt-release to 1.5.0 ([#1063](https://github.com/adzerk/apso/pull/1063)).
+- Update s3, s3-transfer-manager to 2.44.4 ([#1064](https://github.com/adzerk/apso/pull/1064)).
+- Update aws-crt to 0.45.3 ([#1065](https://github.com/adzerk/apso/pull/1065)).
+- Update unirest-java-core to 4.10.0 ([#1066](https://github.com/adzerk/apso/pull/1066)).
+- Update sbt-scalafmt to 2.6.1 ([#1067](https://github.com/adzerk/apso/pull/1067)).
+- Update scalafmt-core to 3.11.1 ([#1068](https://github.com/adzerk/apso/pull/1068)).
+- Update aws-crt to 0.45.4 ([#1069](https://github.com/adzerk/apso/pull/1069)).
+- Update s3, s3-transfer-manager to 2.44.6 ([#1070](https://github.com/adzerk/apso/pull/1070)).
+- Update s3, s3-transfer-manager to 2.44.7 ([#1071](https://github.com/adzerk/apso/pull/1071)).
+- Update s3, s3-transfer-manager to 2.44.8 ([#1072](https://github.com/adzerk/apso/pull/1072)).
+- Update s3, s3-transfer-manager to 2.44.9 ([#1073](https://github.com/adzerk/apso/pull/1073)).
+- Update s3, s3-transfer-manager to 2.44.10 ([#1074](https://github.com/adzerk/apso/pull/1074)).
+
+[0.27.4]: https://github.com/adzerk/apso/compare/v0.27.3...v0.27.4
+
 ## [0.27.3] - 2026-03-25
 
 This patch fixes an issue where `GCSBucket` would automatically transcode gzip-encoded content on upload and download,
