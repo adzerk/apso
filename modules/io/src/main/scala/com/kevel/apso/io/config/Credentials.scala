@@ -23,6 +23,7 @@ object Credentials {
     object Entry {
       case class Basic(username: String, password: String) extends Entry
       case class PublicKey(username: String, keypairFile: String, passphrase: Option[String]) extends Entry
+      case class PublicKeyContent(username: String, privateKey: String, passphrase: Option[String]) extends Entry
     }
   }
 }
