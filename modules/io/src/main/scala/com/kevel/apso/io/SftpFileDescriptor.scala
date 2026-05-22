@@ -345,6 +345,12 @@ object SftpFileDescriptor {
               username,
               Left(Identity(Right(new File(Properties.userHome + "/.ssh/" + keypairFile)), passphrase))
             )
+          case config.Credentials.Sftp.Entry.PublicKeyContent(username, privateKey, passphrase) =>
+            SftpFileDescriptor.Credentials(
+              hostname,
+              username,
+              Left(Identity(Left(privateKey), passphrase))
+            )
         }
       }
     }
