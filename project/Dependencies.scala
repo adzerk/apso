@@ -7,14 +7,14 @@ object Dependencies {
 
     val Pekko          = "1.6.0"
     val PekkoHttp      = "1.3.0"
-    val Aws            = "2.46.0"
+    val Aws            = "2.46.5"
     val AwsCrt         = "0.47.0"
     val BouncyCastle   = "1.84"
     val Cats           = "2.13.0"
     val Circe          = "0.14.15"
     val CommonsCodec   = "1.22.0"
     val FastMd5        = "2.7.1"
-    val Gcp            = "2.68.0"
+    val Gcp            = "2.69.0"
     val JUnit          = "4.13.2"
     val JodaTime       = "2.14.2"
     val ScalaCheck     = "1.19.0"
@@ -26,7 +26,7 @@ object Dependencies {
     val Specs2_5       = "5.6.4"
     val Squants        = "1.8.3"
     val SshJ           = "0.40.0"
-    val TypesafeConfig = "1.4.8"
+    val TypesafeConfig = "1.4.9"
     val UnirestJava    = "4.10.0"
   }
 
