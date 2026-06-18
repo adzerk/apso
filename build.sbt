@@ -10,7 +10,7 @@ val javaVersion = "11"
 
 // Workaround for incompatible scala-xml versions taken from https://github.com/scala/bug/issues/12632. scala-xml 1.x
 // and scala-xml 2.x are "mostly" binary compatible.
-ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
+libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
 
 def module(project: Project, moduleName: String, crossScala: List[String] = List(Versions.Scala213, Versions.Scala3)) =
   (project in file(s"modules/$moduleName"))
@@ -160,7 +160,7 @@ lazy val docs = (project in file("apso-docs"))
   .settings(
     // format: off
     crossScalaVersions := List(Versions.Scala213),
-    mdocOut := (ThisBuild / baseDirectory).value,
+    mdocOut := baseDirectory.value,
 
     mdocVariables := Map(
       "VERSION" ->
@@ -241,8 +241,8 @@ lazy val commonSettings = Seq(
 )
 
 releaseCrossBuild    := true
-releaseTagComment    := s"Release ${(ThisBuild / version).value}"
-releaseCommitMessage := s"Set version to ${(ThisBuild / version).value}"
+releaseTagComment    := s"Release ${version.value}"
+releaseCommitMessage := s"Set version to ${version.value}"
 
 releaseProcess := Seq[ReleaseStep](
   checkSnapshotDependencies,
