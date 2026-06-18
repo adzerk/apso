@@ -2,10 +2,9 @@ import Dependencies._
 import ReleaseTransformations._
 import spray.boilerplate.BoilerplatePlugin
 
-ThisBuild / organization := "com.kevel"
-
-ThisBuild / scalaVersion       := Versions.Scala213
-ThisBuild / crossScalaVersions := Nil
+organization       := "com.kevel"
+scalaVersion       := Versions.Scala213
+crossScalaVersions := Nil
 
 val javaVersion = "11"
 
