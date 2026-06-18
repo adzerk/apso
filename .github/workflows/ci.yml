@@ -44,6 +44,7 @@ jobs:
         run: sbt -Dsbt.color=always "++${{ matrix.scala }} test"
 
       - name: Check mdoc for uncommitted changes
+        if: matrix.scala == '2.13'
         run: sbt -Dsbt.color=always "docs/mdoc --check"
 
       - name: Compile API documentation
