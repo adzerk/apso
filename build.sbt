@@ -15,7 +15,7 @@ ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" 
 def module(project: Project, moduleName: String, crossScala: List[String] = List(Versions.Scala213, Versions.Scala3)) =
   (project in file(s"modules/$moduleName"))
     .settings(name := s"apso-$moduleName")
-    .settings(commonSettings: _*)
+    .settings(commonSettings *)
     .settings(crossScalaVersions := crossScala)
 
 lazy val aws = module(project, "aws")
@@ -156,7 +156,7 @@ lazy val docs = (project in file("apso-docs"))
     profiling,
     time
   )
-  .settings(commonSettings: _*)
+  .settings(commonSettings *)
   .settings(
     // format: off
     crossScalaVersions := List(Versions.Scala213),
