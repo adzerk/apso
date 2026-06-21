@@ -21,7 +21,7 @@ case class Cache(timeToLive: Option[FiniteDuration], maximumSize: Option[Long]) 
     withTimeToLive
   }
 
-  /** A [[com.github.blemale.scaffeine.Scaffeine]] cache implementation for this configuration. Use this over the
+  /** A Scaffeine cache implementation for this configuration. Use this over the
     * [[com.kevel.apso.caching.CachedFunctionsExtras]] if you need finer-grained control over cache insertions.
     *
     * @tparam K
@@ -29,7 +29,7 @@ case class Cache(timeToLive: Option[FiniteDuration], maximumSize: Option[Long]) 
     * @tparam V
     *   the value type.
     * @return
-    *   a [[com.github.blemale.scaffeine.Scaffeine]] cache implementation.
+    *   a Scaffeine cache implementation.
     */
   def implementation[K, V]: scaffeine.Cache[K, V] = build.build()
 }
