@@ -11,7 +11,7 @@ object Dependencies {
     val AwsCrt         = "0.47.1"
     val BouncyCastle   = "1.84"
     val Cats           = "2.13.0"
-    val Circe          = "0.14.15"
+    val Circe          = "0.14.16"
     val CommonsCodec   = "1.22.0"
     val FastMd5        = "2.7.1"
     val Gcp            = "2.69.0"
