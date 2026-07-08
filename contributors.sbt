@@ -1,4 +1,4 @@
-ThisBuild / pomExtra := {
+pomExtra :=
   <developers>
     <developer>
       <id>ruippeixotog</id>
@@ -57,4 +57,3 @@ ThisBuild / pomExtra := {
       </roles>
     </developer>
   </developers>
-}
