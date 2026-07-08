@@ -2,21 +2,20 @@ import Dependencies._
 import ReleaseTransformations._
 import spray.boilerplate.BoilerplatePlugin
 
-ThisBuild / organization := "com.kevel"
-
-ThisBuild / scalaVersion       := Versions.Scala213
-ThisBuild / crossScalaVersions := Nil
+organization       := "com.kevel"
+scalaVersion       := Versions.Scala213
+crossScalaVersions := Nil
 
 val javaVersion = "11"
 
 // Workaround for incompatible scala-xml versions taken from https://github.com/scala/bug/issues/12632. scala-xml 1.x
 // and scala-xml 2.x are "mostly" binary compatible.
-ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
+libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
 
 def module(project: Project, moduleName: String, crossScala: List[String] = List(Versions.Scala213, Versions.Scala3)) =
   (project in file(s"modules/$moduleName"))
     .settings(name := s"apso-$moduleName")
-    .settings(commonSettings: _*)
+    .settings(commonSettings *)
     .settings(crossScalaVersions := crossScala)
 
 lazy val aws = module(project, "aws")
@@ -48,19 +47,7 @@ lazy val caching = module(project, "caching")
     libraryDependencies ++= Seq(
       Scaffeine,
       Specs2_4Core % Test
-    ),
-    // NOTICE: This may not be needed anymore if https://github.com/blemale/scaffeine/pull/441 is merged.
-    apiMappings ++= {
-      val scaffeineJar     = (Compile / dependencyClasspath).value.map(_.data).find(_.getName.contains("scaffeine")).get
-      val scaffeineModule  = libraryDependencies.value.find(_.name == "scaffeine").get
-      val path             = CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2, 13)) => "scaffeine_2.13"
-        case Some((3, _))  => "scaffeine_3"
-        case _             => throw new RuntimeException("Unsupported Scala version")
-      }
-      val scaffeineVersion = scaffeineModule.revision
-      Map(scaffeineJar -> url(s"https://www.javadoc.io/doc/com.github.blemale/$path/$scaffeineVersion/"))
-    }
+    )
   )
 
 lazy val circe = module(project, "circe")
@@ -169,11 +156,11 @@ lazy val docs = (project in file("apso-docs"))
     profiling,
     time
   )
-  .settings(commonSettings: _*)
+  .settings(commonSettings *)
   .settings(
     // format: off
     crossScalaVersions := List(Versions.Scala213),
-    mdocOut := (ThisBuild / baseDirectory).value,
+    mdocOut := baseDirectory.value,
 
     mdocVariables := Map(
       "VERSION" ->
@@ -254,8 +241,8 @@ lazy val commonSettings = Seq(
 )
 
 releaseCrossBuild    := true
-releaseTagComment    := s"Release ${(ThisBuild / version).value}"
-releaseCommitMessage := s"Set version to ${(ThisBuild / version).value}"
+releaseTagComment    := s"Release ${version.value}"
+releaseCommitMessage := s"Set version to ${version.value}"
 
 releaseProcess := Seq[ReleaseStep](
   checkSnapshotDependencies,
