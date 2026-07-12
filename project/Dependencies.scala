@@ -9,7 +9,7 @@ object Dependencies {
     val PekkoHttp      = "1.3.0"
     val Aws            = "2.47.5"
     val AwsCrt         = "0.47.3"
-    val BouncyCastle   = "1.84"
+    val BouncyCastle   = "1.85"
     val Cats           = "2.13.0"
     val Circe          = "0.14.16"
     val CommonsCodec   = "1.22.0"
