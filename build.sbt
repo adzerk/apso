@@ -229,11 +229,11 @@ lazy val commonSettings = Seq(
   Test / publishArtifact := false,
   pomIncludeRepository := { _ => false },
 
-  licenses := Seq("Apache License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
-  homepage := Some(url("https://github.com/adzerk/apso")),
+  licenses := Seq("Apache License, Version 2.0" -> uri("http://www.apache.org/licenses/LICENSE-2.0")),
+  homepage := Some(uri("https://github.com/adzerk/apso")),
   scmInfo := Some(
     ScmInfo(
-      url("https://github.com/adzerk/apso"),
+      uri("https://github.com/adzerk/apso"),
       "scm:git:ssh://git@github.com/adzerk/apso.git"
     )
   )
