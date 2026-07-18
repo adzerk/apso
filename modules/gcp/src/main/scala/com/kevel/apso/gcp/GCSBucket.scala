@@ -219,9 +219,11 @@ final class GCSBucket(
     case ex: StorageException =>
       ex.getCode match {
         case 404 =>
-          logger.error("The specified file does not exist", ex); true // no need to retry
+          logger.error("The specified file does not exist", ex)
+          true // no need to retry
         case 403 =>
-          logger.error("No permission to access the file", ex); true // no need to retry
+          logger.error("No permission to access the file", ex)
+          true // no need to retry
         case _ =>
           logger.warn(
             s"""|GCS service error: ${ex.getMessage}.
@@ -232,12 +234,15 @@ final class GCSBucket(
       }
 
     case ex: BaseServiceException =>
-      logger.warn("An error occurred", ex); ex.isRetryable
+      logger.warn("An error occurred", ex)
+      ex.isRetryable
   }
 
   private[this] def retry[T](f: => T, tries: Int = 3, sleepTime: Int = 5000): Option[T] =
-    if (tries == 0) { logger.error("Max retries reached. Aborting GCS operation"); None }
-    else
+    if (tries == 0) {
+      logger.error("Max retries reached. Aborting GCS operation")
+      None
+    } else
       Try(f) match {
         case Success(res)              => Some(res)
         case Failure(e) if !handler(e) =>

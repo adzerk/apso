@@ -29,7 +29,7 @@ object Implicits {
       val (prefix, nextJson) = prefixesAndJsons.dequeue()
 
       nextJson.asObject.foreach(jsonObject =>
-        jsonObject.toIterable.foreach({ case (k, v) =>
+        jsonObject.toIterable.foreach { case (k, v) =>
           if (!(ignoreNull && v.isNull)) {
             val kk = if (prefix.nonEmpty) s"$prefix$separator$k" else k
             if (v.isObject) {
@@ -38,7 +38,7 @@ object Implicits {
               builder += onLeaf(kk, v)
             }
           }
-        })
+        }
       )
     }
     builder.result()
