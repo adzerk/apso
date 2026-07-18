@@ -13,9 +13,21 @@ class ImplicitsSpec extends Specification with ScalaCheck {
 
     class MockRandom(elems: Double*) extends Random {
       private[this] var nextElems = elems.toList
-      override def nextInt() = { val e = nextElems.head.toInt; nextElems = nextElems.tail; e }
-      override def nextInt(n: Int) = { val e = nextElems.head.toInt % n; nextElems = nextElems.tail; e }
-      override def nextDouble() = { val e = nextElems.head; nextElems = nextElems.tail; e }
+      override def nextInt() = {
+        val e = nextElems.head.toInt
+        nextElems = nextElems.tail
+        e
+      }
+      override def nextInt(n: Int) = {
+        val e = nextElems.head.toInt % n
+        nextElems = nextElems.tail
+        e
+      }
+      override def nextDouble() = {
+        val e = nextElems.head
+        nextElems = nextElems.tail
+        e
+      }
     }
 
     def centralMoment(n: Int, xs: Iterable[Double]) = {
