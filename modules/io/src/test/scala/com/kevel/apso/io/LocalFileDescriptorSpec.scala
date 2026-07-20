@@ -115,7 +115,7 @@ class LocalFileDescriptorSpec extends Specification {
       val source = LocalFileDescriptor("/tmp") / randomFolder / randomString
       source.write("hello world")
 
-      source.move(s"../$randomString") must beSome.which { destination =>
+      source.move(s"../$randomString") must beSome[LocalFileDescriptor].which { destination =>
         destination.readString must beEqualTo("hello world")
         source.exists must beFalse
       }
@@ -125,7 +125,7 @@ class LocalFileDescriptorSpec extends Specification {
       val source = LocalFileDescriptor("/tmp") / randomFolder / randomString
       source.write("hello world")
 
-      source.move(randomString) must beSome.which { destination =>
+      source.move(randomString) must beSome[LocalFileDescriptor].which { destination =>
         destination.readString must beEqualTo("hello world")
         source.exists must beFalse
       }
@@ -136,7 +136,7 @@ class LocalFileDescriptorSpec extends Specification {
       (source / "one").write("hello world")
       (source / "two").write("hello world 2")
 
-      source.move(randomString) must beSome.which { destination =>
+      source.move(randomString) must beSome[LocalFileDescriptor].which { destination =>
         destination.list.toSet must beEqualTo(Set(destination / "one", destination / "two"))
         (destination / "one").readString must beEqualTo("hello world")
         (destination / "two").readString must beEqualTo("hello world 2")
