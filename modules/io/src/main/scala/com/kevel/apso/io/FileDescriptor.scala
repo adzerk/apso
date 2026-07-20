@@ -205,7 +205,9 @@ trait FileDescriptor {
     */
   protected final def mvLocation(pathString: String): Self = {
     val requestedDestination = parent().cd(pathString).asInstanceOf[Self]
-    if (requestedDestination.isDirectory) requestedDestination.child(name).asInstanceOf[Self] else requestedDestination
+    if (requestedDestination.exists && requestedDestination.isDirectory)
+      requestedDestination.child(name).asInstanceOf[Self]
+    else requestedDestination
   }
 
   /** Move the file to a new location in the same file system. Cross file system moves are not supported.
