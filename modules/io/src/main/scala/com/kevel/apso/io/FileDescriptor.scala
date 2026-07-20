@@ -210,7 +210,7 @@ trait FileDescriptor {
 
   /** Move the file to a new location in the same file system. Cross file system moves are not supported.
     *
-    * This operation may be more efficient than a manual [[upload]] followed by a [[delete]].
+    * This operation may be more efficient than a manual `upload` followed by a `delete`.
     *
     * @param pathString
     *   the new location, specified using unix's mv syntax related to the current directory.

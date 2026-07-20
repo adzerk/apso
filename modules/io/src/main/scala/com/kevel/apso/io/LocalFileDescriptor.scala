@@ -193,7 +193,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
 
   def move(pathString: String): Option[LocalFileDescriptor] = {
     val destination = mvLocation(pathString)
-    if (destination == this) Some(this)
+    if (destination.path == path) Some(this)
     else
       try {
         Files.move(normalizedPath, destination.normalizedPath, StandardCopyOption.ATOMIC_MOVE)
