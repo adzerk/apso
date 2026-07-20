@@ -3,6 +3,8 @@ package com.kevel.apso.io
 import java.io.InputStream
 import java.net.URI
 
+import scala.util.Using
+
 import com.google.cloud.storage.{Blob, Storage, StorageOptions}
 
 import com.kevel.apso.gcp.GCSBucket
@@ -104,6 +106,15 @@ case class GCSFileDescriptor(
     val result = isDirectory || bucket.createDirectory(builtPath)
     isDirectoryLocal = result
     result
+  }
+
+  def move(pathString: String): Option[GCSFileDescriptor] = {
+    val destination = mvLocation(pathString)
+    if (destination.elements == elements) Some(this)
+    else {
+      val copied = Using.resource(stream())(input => destination.upload(input, Some(size)))
+      if (copied && delete()) Some(destination.copy(summary = None)) else None
+    }
   }
 
   override def toString: String = uri.toString

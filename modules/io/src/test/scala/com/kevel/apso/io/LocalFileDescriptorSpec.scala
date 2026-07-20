@@ -111,6 +111,39 @@ class LocalFileDescriptorSpec extends Specification {
         LocalFileDescriptor("/tmp/one/two/four/five")
     }
 
+    "move a file to its parent directory" in {
+      val source = LocalFileDescriptor("/tmp") / randomFolder / randomString
+      source.write("hello world")
+
+      source.move(s"../$randomString") must beSome.which { destination =>
+        destination.readString must beEqualTo("hello world")
+        source.exists must beFalse
+      }
+    }
+
+    "move a file to the same directory" in {
+      val source = LocalFileDescriptor("/tmp") / randomFolder / randomString
+      source.write("hello world")
+
+      source.move(randomString) must beSome.which { destination =>
+        destination.readString must beEqualTo("hello world")
+        source.exists must beFalse
+      }
+    }
+
+    "move a directory" in {
+      val source = LocalFileDescriptor("/tmp") / randomFolder / randomString
+      (source / "one").write("hello world")
+      (source / "two").write("hello world 2")
+
+      source.move(randomString) must beSome.which { destination =>
+        destination.list.toSet must beEqualTo(Set(destination / "one", destination / "two"))
+        (destination / "one").readString must beEqualTo("hello world")
+        (destination / "two").readString must beEqualTo("hello world 2")
+        source.exists must beFalse
+      }
+    }
+
     "create intermediary folders when required" in {
       val fd = LocalFileDescriptor("/tmp") / randomFolder / randomString
       val f = fd.children("one", "two")

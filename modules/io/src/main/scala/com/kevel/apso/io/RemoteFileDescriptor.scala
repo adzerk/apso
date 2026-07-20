@@ -1,8 +1,6 @@
 package com.kevel.apso.io
 
 trait RemoteFileDescriptor { this: FileDescriptor =>
-  type Self <: RemoteFileDescriptor
-
   protected def elements: List[String]
   protected def root: String
 
