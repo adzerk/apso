@@ -61,15 +61,6 @@ case class GCSFileDescriptor(
 
   def stream(offset: Long = 0L): InputStream = bucket.stream(builtPath, offset)
 
-  override def cd(pathString: String): GCSFileDescriptor = {
-    val newPath = pathString.split("/").map(_.trim).toList.foldLeft(elements) {
-      case (acc, "." | "") => acc
-      case (acc, "..")     => acc.dropRight(1)
-      case (acc, segment)  => acc :+ segment
-    }
-    this.copy(elements = newPath)
-  }
-
   override def list: Iterator[GCSFileDescriptor] = {
     val prefix = elements.mkString("/")
     bucket
@@ -84,9 +75,6 @@ case class GCSFileDescriptor(
       this.copy(elements = blob.getName.split("/").toList, summary = Some(blob))
     }
   }
-
-  override def sibling(f: String => String): GCSFileDescriptor =
-    GCSFileDescriptor(bucket, elements.dropRight(1) :+ f(name))
 
   private lazy val isDirectoryRemote: Boolean =
     elements.isEmpty || bucket.isDirectory(builtPath)

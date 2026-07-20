@@ -86,7 +86,7 @@ trait FileDescriptor {
     * @return
     *   an iterator with the lines of this file.
     */
-  def lines(): Iterator[String] = Source.fromInputStream(stream()).getLines()
+  final def lines(): Iterator[String] = Source.fromInputStream(stream()).getLines()
 
   /** Returns true if the fd points to a directory
     * @return
@@ -130,7 +130,7 @@ trait FileDescriptor {
     * @return
     *   the new file descriptor with the updated path
     */
-  def /(name: String): Self = child(name)
+  final def /(name: String): Self = child(name)
 
   /** Adds multiple new child nodes to the filesystem path.
     * @param names
@@ -138,7 +138,7 @@ trait FileDescriptor {
     * @return
     *   the new file descriptor with the updated path
     */
-  def children(names: String*): Self =
+  final def children(names: String*): Self =
     names.foldLeft(this.asInstanceOf[Self])((acc, c) => acc.child(c).asInstanceOf[Self])
 
   /** Changes the path of the file descriptor using unix's cd syntax related to the current directory.
@@ -154,7 +154,7 @@ trait FileDescriptor {
     * @return
     *   the new file descriptor with the updated path
     */
-  def cd(pathString: String): Self = {
+  final def cd(pathString: String): Self = {
     pathString.split("/").toList.foldLeft(this.asInstanceOf[Self]) {
       case (acc, "." | "") => acc
       case (acc, "..")     => acc.parent().asInstanceOf[Self]
@@ -168,7 +168,7 @@ trait FileDescriptor {
     * @return
     *   a new file descriptor pointing to a sibling of the current file descriptor
     */
-  def sibling(name: String): Self = sibling(_ => name)
+  final def sibling(name: String): Self = sibling(_ => name)
 
   /** Returns a new file descriptor pointing to a sibling of the current file descriptor
     * @param f
@@ -176,7 +176,7 @@ trait FileDescriptor {
     * @return
     *   a new file descriptor pointing to a sibling of the current file descriptor
     */
-  def sibling(f: String => String): Self = parent().child(f(name)).asInstanceOf[Self]
+  final def sibling(f: String => String): Self = parent().child(f(name)).asInstanceOf[Self]
 
   /** Returns true if the file pointed by the file descriptor exists
     * @return

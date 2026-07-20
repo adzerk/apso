@@ -77,15 +77,6 @@ case class S3FileDescriptor(
 
   def stream(offset: Long = 0L) = bucket.stream(builtPath, offset)
 
-  override def cd(pathString: String): S3FileDescriptor = {
-    val newPath = pathString.split("/").map(_.trim).toList.foldLeft(elements) {
-      case (acc, "." | "") => acc
-      case (acc, "..")     => acc.dropRight(1)
-      case (acc, segment)  => acc :+ segment
-    }
-    this.copy(elements = newPath)
-  }
-
   override def list: Iterator[S3FileDescriptor] = {
     val prefix = elements.mkString("/")
     bucket
@@ -103,10 +94,6 @@ case class S3FileDescriptor(
 
   private[this] def listS3WithPrefix(prefix: String, includeDirectories: Boolean): Iterator[S3Object] = {
     bucket.getObjectsWithMatchingPrefix(buildPath(elements :+ prefix), includeDirectories)
-  }
-
-  override def sibling(f: String => String): S3FileDescriptor = {
-    S3FileDescriptor(bucket, elements.dropRight(1) :+ f(name))
   }
 
   private lazy val isDirectoryRemote = {
