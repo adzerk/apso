@@ -10,6 +10,8 @@ import scala.io.Source
   */
 trait FileDescriptor {
 
+  type Self <: FileDescriptor
+
   /** Returns the unique identifier of this file in its location.
     * @return
     *   the unique identifier of this file in its location.
@@ -96,7 +98,7 @@ trait FileDescriptor {
     * @return
     *   a iterator of file descriptors
     */
-  def list: Iterator[FileDescriptor]
+  def list: Iterator[Self]
 
   /** Lists all files down the file hierarchy tree that whose relative path match the given prefix
     * @param prefix
@@ -104,7 +106,7 @@ trait FileDescriptor {
     * @return
     *   a iterator of file descriptors
     */
-  def listAllFilesWithPrefix(prefix: String): Iterator[FileDescriptor]
+  def listAllFilesWithPrefix(prefix: String): Iterator[Self]
 
   /** Returns the file descriptor `n` node up in the filesystem path.
     * @param n
@@ -112,7 +114,7 @@ trait FileDescriptor {
     * @return
     *   the file descriptor `n` node up in the filesystem path.
     */
-  def parent(n: Int = 1): FileDescriptor
+  def parent(n: Int = 1): Self
 
   /** Adds a new child node to the filesystem path.
     * @param name
@@ -120,7 +122,7 @@ trait FileDescriptor {
     * @return
     *   the new file descriptor with the updated path
     */
-  def child(name: String): FileDescriptor
+  def child(name: String): Self
 
   /** Adds a new child node to the filesystem path.
     * @param name
@@ -128,7 +130,7 @@ trait FileDescriptor {
     * @return
     *   the new file descriptor with the updated path
     */
-  def /(name: String): FileDescriptor = child(name)
+  def /(name: String): Self = child(name)
 
   /** Adds multiple new child nodes to the filesystem path.
     * @param names
@@ -136,8 +138,8 @@ trait FileDescriptor {
     * @return
     *   the new file descriptor with the updated path
     */
-  def children(names: String*): FileDescriptor =
-    names.foldLeft(this)((acc, c) => acc.child(c))
+  def children(names: String*): Self =
+    names.foldLeft(this.asInstanceOf[Self])((acc, c) => acc.child(c).asInstanceOf[Self])
 
   /** Changes the path of the file descriptor using unix's cd syntax related to the current directory.
     *
@@ -152,11 +154,11 @@ trait FileDescriptor {
     * @return
     *   the new file descriptor with the updated path
     */
-  def cd(pathString: String): FileDescriptor = {
-    pathString.split("/").toList.foldLeft(this) {
+  def cd(pathString: String): Self = {
+    pathString.split("/").toList.foldLeft(this.asInstanceOf[Self]) {
       case (acc, "." | "") => acc
-      case (acc, "..")     => acc.parent()
-      case (acc, segment)  => acc.child(segment)
+      case (acc, "..")     => acc.parent().asInstanceOf[Self]
+      case (acc, segment)  => acc.child(segment).asInstanceOf[Self]
     }
   }
 
@@ -166,7 +168,7 @@ trait FileDescriptor {
     * @return
     *   a new file descriptor pointing to a sibling of the current file descriptor
     */
-  def sibling(name: String): FileDescriptor = sibling(_ => name)
+  def sibling(name: String): Self = sibling(_ => name)
 
   /** Returns a new file descriptor pointing to a sibling of the current file descriptor
     * @param f
@@ -174,7 +176,7 @@ trait FileDescriptor {
     * @return
     *   a new file descriptor pointing to a sibling of the current file descriptor
     */
-  def sibling(f: String => String): FileDescriptor = parent().child(f(name))
+  def sibling(f: String => String): Self = parent().child(f(name)).asInstanceOf[Self]
 
   /** Returns true if the file pointed by the file descriptor exists
     * @return
@@ -193,6 +195,31 @@ trait FileDescriptor {
     *   true if the creation of successful, false otherwise.
     */
   def mkdirs(): Boolean
+
+  /** A new file descriptor pointing to the new location of the file after a candidate move operation.
+    *
+    * @param pathString
+    *   the new location, specified using unix's mv syntax related to the current directory.
+    * @return
+    *   the candidate file descriptor.
+    */
+  protected final def mvLocation(pathString: String): Self = {
+    val requestedDestination = parent().cd(pathString).asInstanceOf[Self]
+    if (requestedDestination.exists && requestedDestination.isDirectory)
+      requestedDestination.child(name).asInstanceOf[Self]
+    else requestedDestination
+  }
+
+  /** Move the file to a new location in the same file system. Cross file system moves are not supported.
+    *
+    * This operation may be more efficient than a manual `upload` followed by a `delete`.
+    *
+    * @param pathString
+    *   the new location, specified using unix's mv syntax related to the current directory.
+    * @return
+    *   the new file descriptor with the updated path if the move was successful, None otherwise.
+    */
+  def move(pathString: String): Option[Self]
 }
 
 object FileDescriptor {

@@ -4,6 +4,7 @@ import java.io.InputStream
 import java.net.URI
 
 import scala.collection.concurrent.TrieMap
+import scala.util.Using
 
 import software.amazon.awssdk.auth.credentials.{AwsBasicCredentials, StaticCredentialsProvider}
 import software.amazon.awssdk.services.s3.model.S3Object
@@ -125,6 +126,15 @@ case class S3FileDescriptor(
     val result = isDirectory || bucket.createDirectory(builtPath)
     isDirectoryLocal = result
     result
+  }
+
+  def move(pathString: String): Option[S3FileDescriptor] = {
+    val destination = mvLocation(pathString)
+    if (destination.elements == elements) Some(this)
+    else {
+      val copied = Using.resource(stream())(input => destination.upload(input, Some(size)))
+      if (copied && delete()) Some(destination.copy(summary = None)) else None
+    }
   }
 
   override def toString: String =

@@ -141,6 +141,13 @@ case class SftpFileDescriptor(
   def mkdirs(): Boolean =
     Try(sftp(_.mkdirs(path))).isSuccess
 
+  def move(pathString: String): Option[SftpFileDescriptor] = {
+    val destination = mvLocation(pathString)
+    if (destination.path == path) Some(this)
+    else if (destination.parent().mkdirs() && Try(sftp(_.rename(path, destination.path))).isSuccess) Some(destination)
+    else None
+  }
+
   def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean): Boolean = {
     require(!localTarget.isDirectory, s"Local file descriptor can't point to a directory: ${localTarget.path}")
     require(!isDirectory, s"Remote file descriptor can't point to a directory: ${this.path}")

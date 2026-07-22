@@ -5,6 +5,7 @@ import java.net.URI
 import java.nio.file.{Files, Path, Paths, StandardCopyOption}
 
 import scala.io.Source
+import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
 import com.typesafe.scalalogging.LazyLogging
@@ -12,6 +13,8 @@ import com.typesafe.scalalogging.LazyLogging
 import com.kevel.apso.Implicits.ApsoCloseable
 
 case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with LazyLogging {
+
+  type Self = LocalFileDescriptor
 
   @transient private[this] var _normalizedPath: Path = _
 
@@ -186,6 +189,20 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
   def rename(to: LocalFileDescriptor): Option[LocalFileDescriptor] = {
     to.parent().mkdirs()
     if (file.renameTo(to.file)) Some(to) else None
+  }
+
+  def move(pathString: String): Option[LocalFileDescriptor] = {
+    val destination = mvLocation(pathString)
+    if (destination.path == path) Some(this)
+    else
+      try {
+        Files.move(normalizedPath, destination.normalizedPath, StandardCopyOption.ATOMIC_MOVE)
+        Some(destination)
+      } catch {
+        case NonFatal(_) =>
+          logger.warn(s"File move failed from $path to ${destination.path}")
+          None
+      }
   }
 
   /** Writes the given string `str` to the file pointed by the file descriptor
