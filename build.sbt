@@ -2,8 +2,8 @@ import Dependencies._
 import ReleaseTransformations._
 import spray.boilerplate.BoilerplatePlugin
 
-organization := "com.kevel"
-scalaVersion := Versions.Scala213
+organization       := "com.kevel"
+scalaVersion       := Versions.Scala213
 crossScalaVersions := Nil
 
 val javaVersion = "11"
@@ -57,20 +57,20 @@ lazy val circe = module(project, "circe")
       CirceCore,
       CirceGeneric,
       CirceParser,
-      JodaTime % Provided,
-      Squants % Provided,
+      JodaTime       % Provided,
+      Squants        % Provided,
       TypesafeConfig % Provided,
-      CirceLiteral % Test,
-      Specs2_4Core % Test,
-      Specs2_4JUnit % Test
+      CirceLiteral   % Test,
+      Specs2_4Core   % Test,
+      Specs2_4JUnit  % Test
     )
   )
 
 lazy val collections = module(project, "collections")
   .settings(
     libraryDependencies ++= Seq(
-      ScalaCheck % Test,
-      Specs2_4Core % Test,
+      ScalaCheck         % Test,
+      Specs2_4Core       % Test,
       Specs2_4ScalaCheck % Test
     )
   )
@@ -80,12 +80,12 @@ lazy val core = module(project, "core")
     libraryDependencies ++= Seq(
       CirceCore,
       ScalaLogging,
-      TypesafeConfig % Provided,
+      TypesafeConfig     % Provided,
       UnirestJava,
-      JUnit % Test,
-      ScalaCheck % Test,
-      Specs2_4Core % Test,
-      Specs2_4JUnit % Test,
+      JUnit              % Test,
+      ScalaCheck         % Test,
+      Specs2_4Core       % Test,
+      Specs2_4JUnit      % Test,
       Specs2_4ScalaCheck % Test
     )
   )
@@ -122,15 +122,15 @@ lazy val pekkoHttp = module(project, "pekko-http")
   .settings(
     libraryDependencies ++= Seq(
       ScalaLogging,
-      PekkoActor % Provided,
-      PekkoHttp % Provided,
-      PekkoHttpCore % Provided,
-      PekkoStream % Provided,
+      PekkoActor             % Provided,
+      PekkoHttp              % Provided,
+      PekkoHttpCore          % Provided,
+      PekkoStream            % Provided,
       ScalaLogging,
       TypesafeConfig,
       PekkoActorTestkitTyped % Test,
-      PekkoHttpTestkit % Test,
-      Specs2_4Core % Test
+      PekkoHttpTestkit       % Test,
+      Specs2_4Core           % Test
     )
   )
 
@@ -240,8 +240,8 @@ lazy val commonSettings = Seq(
   // format: on
 )
 
-releaseCrossBuild := true
-releaseTagComment := s"Release ${version.value}"
+releaseCrossBuild    := true
+releaseTagComment    := s"Release ${version.value}"
 releaseCommitMessage := s"Set version to ${version.value}"
 
 releaseProcess := Seq[ReleaseStep](
