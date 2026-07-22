@@ -199,7 +199,9 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
         Files.move(normalizedPath, destination.normalizedPath, StandardCopyOption.ATOMIC_MOVE)
         Some(destination)
       } catch {
-        case NonFatal(_) => None
+        case NonFatal(_) =>
+          logger.warn(s"File move failed from $path to ${destination.path}")
+          None
       }
   }
 
