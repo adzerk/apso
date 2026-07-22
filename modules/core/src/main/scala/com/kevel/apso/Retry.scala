@@ -16,7 +16,7 @@ object Retry {
       case 0 =>
         f
       case _ =>
-        f recoverWith {
+        f.recoverWith {
           case NonFatal(
                 _
               ) => // it would be indifferent to use a Throwable here because Futures don't catch Fatal exceptions

@@ -17,7 +17,7 @@ class FileDescriptorSpec extends Specification {
     val buffer = new ByteArrayOutputStream(10000)
     val out = new ObjectOutputStream(buffer)
     out.writeObject(obj) must
-      (not(throwA[NotSerializableException]) and not(throwAn[InvalidClassException]))
+      (not(throwA[NotSerializableException]).and(not(throwAn[InvalidClassException])))
   }
 
   "A FileDescriptor" should {

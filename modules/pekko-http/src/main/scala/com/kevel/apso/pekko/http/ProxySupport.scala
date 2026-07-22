@@ -184,8 +184,8 @@ trait ProxySupport extends ClientIPDirectives {
     }
 
     private[this] lazy val sink = Sink.foreach[(Try[HttpResponse], Promise[RouteResult])] {
-      case ((Success(resp), p)) => p.success(Complete(resp))
-      case ((Failure(e), p))    => p.failure(e)
+      case (Success(resp), p) => p.success(Complete(resp))
+      case (Failure(e), p)    => p.failure(e)
     }
 
     private[this] lazy val queue = source.via(flow).toMat(sink)(Keep.left).run()

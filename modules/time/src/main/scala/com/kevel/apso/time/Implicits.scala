@@ -147,7 +147,7 @@ object Implicits {
       else {
         val q = (interval.toDuration.getMillis / n).toInt
         (0 until n).map { i =>
-          new Interval(interval.getStart.plus(q * i), (interval.getStart.plus(q * (i + 1))))
+          new Interval(interval.getStart.plus(q * i), interval.getStart.plus(q * (i + 1)))
         }
       }
     }
