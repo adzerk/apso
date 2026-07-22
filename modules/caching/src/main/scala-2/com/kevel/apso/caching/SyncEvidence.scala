@@ -9,7 +9,7 @@ import scala.concurrent.Future
   * @tparam A
   *   the tagged type.
   */
-class SyncEvidence[A]
+class SyncEvidence[A] private[caching] ()
 
 object SyncEvidence extends LowPrioritySyncEvidence {
   implicit def ev1[A]: SyncEvidence[Future[A]] = new SyncEvidence[Future[A]]

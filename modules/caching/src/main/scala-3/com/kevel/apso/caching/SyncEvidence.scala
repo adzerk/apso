@@ -9,7 +9,7 @@ import scala.util.NotGiven
   * @tparam A
   *   the tagged type.
   */
-class SyncEvidence[A]
+class SyncEvidence[A] private[caching] ()
 
 object SyncEvidence {
   given [A](using NotGiven[A <:< Future[?]]): SyncEvidence[A] = SyncEvidence[A]
