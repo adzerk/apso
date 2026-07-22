@@ -42,7 +42,7 @@ class S3Bucket(
   private[this] lazy val maxErrorRetry = Try(config.getInt(configPrefix + ".max-error-retry"))
 
   @transient private[this] lazy val defaultExecutor = {
-    val maxPoolSize = 100;
+    val maxPoolSize = 100
     val threadCount = new AtomicInteger(0)
     // NOTE: This is the default thread pool used by the `TransferManager`. I had to replicate it here
     // to make sure that threads are daemonized. This could be problematic, e.g. shutting down the
@@ -55,14 +55,14 @@ class S3Bucket(
       60,
       TimeUnit.SECONDS,
       new LinkedBlockingQueue(1_000),
-      (runnable) => {
+      runnable => {
         val thread = new Thread(runnable)
         thread.setName(s"apso-transfer-manager-${threadCount.getAndIncrement()}")
         thread.setDaemon(true)
         thread
       }
     )
-    executor.allowCoreThreadTimeOut(true);
+    executor.allowCoreThreadTimeOut(true)
     executor
   }
 
@@ -82,7 +82,7 @@ class S3Bucket(
 
     val s3 = client.build()
     if (!bucketExists(s3))
-      s3.createBucket({
+      s3.createBucket {
         val requestBuilder = CreateBucketRequest
           .builder()
           .bucket(bucketName)
@@ -97,7 +97,7 @@ class S3Bucket(
             )
             .build()
         else requestBuilder.build()
-      }).join()
+      }.join()
     s3
   }
 
@@ -351,7 +351,10 @@ class S3Bucket(
 
     s3Client
       .putObject(
-        b => { b.bucket(bucketName).key(sanitizeKey(key) + "/"); () },
+        b => {
+          b.bucket(bucketName).key(sanitizeKey(key) + "/")
+          ()
+        },
         AsyncRequestBody.fromInputStream(emptyContent, 0, defaultExecutor)
       )
       .join()
@@ -417,9 +420,11 @@ class S3Bucket(
     case ex: S3Exception =>
       ex.statusCode() match {
         case 404 =>
-          logger.error("The specified file does not exist", ex); true // no need to retry
+          logger.error("The specified file does not exist", ex)
+          true // no need to retry
         case 403 =>
-          logger.error("No permission to access the file", ex); true // no need to retry
+          logger.error("No permission to access the file", ex)
+          true // no need to retry
         case _ =>
           logger.warn(
             s"""|S3 service error: ${ex.getMessage}. Extended request id: ${ex.requestId}
@@ -429,22 +434,27 @@ class S3Bucket(
           false
       }
     case ex: SdkClientException =>
-      log(!ex.retryable, s"Client Exception: ${ex.getMessage}", ex); !ex.retryable
+      log(!ex.retryable, s"Client Exception: ${ex.getMessage}", ex)
+      !ex.retryable
 
     case ex: SdkException =>
-      log(!ex.retryable, s"SDK Exception: ${ex.getMessage}", ex); !ex.retryable
+      log(!ex.retryable, s"SDK Exception: ${ex.getMessage}", ex)
+      !ex.retryable
 
     case ex: CompletionException =>
       logger.warn("Completion Exception", ex)
       handler(ex.getCause)
 
     case ex: Exception =>
-      logger.warn("An error occurred", ex); false
+      logger.warn("An error occurred", ex)
+      false
   }
 
   private[this] def retry[T](f: => T, tries: Int = 3, sleepTime: Int = 5000): Option[T] =
-    if (tries == 0) { logger.error("Max retries reached. Aborting S3 operation"); None }
-    else
+    if (tries == 0) {
+      logger.error("Max retries reached. Aborting S3 operation")
+      None
+    } else
       Try(f) match {
         case Success(res)              => Some(res)
         case Failure(e) if !handler(e) =>

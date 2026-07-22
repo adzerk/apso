@@ -28,7 +28,9 @@ class InsistentInputStream(
   def this(streamBuilder: () => InputStream, maxRetries: Int, backoff: Option[FiniteDuration]) =
     this(
       { x =>
-        val is = streamBuilder(); is.skip(x); is
+        val is = streamBuilder()
+        is.skip(x)
+        is
       },
       maxRetries,
       backoff
@@ -37,14 +39,18 @@ class InsistentInputStream(
   def this(streamBuilder: () => InputStream, maxRetries: Int) =
     this(
       { x =>
-        val is = streamBuilder(); is.skip(x); is
+        val is = streamBuilder()
+        is.skip(x)
+        is
       },
       maxRetries
     )
 
   def this(streamBuilder: () => InputStream) =
     this({ x =>
-      val is = streamBuilder(); is.skip(x); is
+      val is = streamBuilder()
+      is.skip(x)
+      is
     })
 
   private[this] var innerStream: InputStream = streamBuilder(0)
