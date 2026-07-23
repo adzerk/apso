@@ -155,7 +155,7 @@ trait FileDescriptor {
     *   the new file descriptor with the updated path
     */
   def cd(pathString: String): Self = {
-    pathString.split("/").map(_.trim).toList.foldLeft(this.asInstanceOf[Self]) {
+    pathString.split("/").iterator.map(_.trim).foldLeft(this.asInstanceOf[Self]) {
       case (acc, "." | "") => acc
       case (acc, "..")     => acc.parent().asInstanceOf[Self]
       case (acc, segment)  => acc.child(segment).asInstanceOf[Self]
