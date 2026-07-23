@@ -1,5 +1,5 @@
-import Dependencies._
-import ReleaseTransformations._
+import Dependencies.*
+import ReleaseTransformations.*
 import spray.boilerplate.BoilerplatePlugin
 
 organization       := "com.kevel"
@@ -12,10 +12,96 @@ val javaVersion = "11"
 // and scala-xml 2.x are "mostly" binary compatible.
 libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
 
+resolvers ++=
+  Seq(
+    Resolver.sonatypeCentralSnapshots,
+    Resolver.typesafeRepo("snapshots"),
+    "Spray Repository" at "https://repo.spray.io/",
+    "Bintray Scalaz Releases" at "https://dl.bintray.com/scalaz/releases",
+    "JCenter Repository" at "https://jcenter.bintray.com/"
+  )
+
+scalafmtOnCompile := true
+
+scalacOptions ++= {
+  lazy val commonFlags = Seq(
+    "-encoding",
+    "UTF-8",
+    "-language:higherKinds",
+    "-language:implicitConversions",
+    "-feature",
+    "-unchecked",
+    "-deprecation",
+    "-release",
+    javaVersion,
+    "-Xfatal-warnings"
+  )
+
+  def withCommon(flags: String*) =
+    commonFlags ++ flags
+
+  CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, _)) =>
+      withCommon("-Xsource:3", "-Ywarn-dead-code", "-Ywarn-unused:imports")
+
+    case Some((3, _)) =>
+      withCommon("-Wunused:imports")
+
+    case _ =>
+      throw new RuntimeException("Unsupported Scala version")
+  }
+}
+
+javacOptions ++= List(
+  "--release",
+  javaVersion
+)
+
+autoAPIMappings := true
+
+publishTo := {
+  val centralSnapshots = "https://central.sonatype.com/repository/maven-snapshots/"
+  if (isSnapshot.value) Some("central-snapshots" at centralSnapshots)
+  else localStaging.value
+}
+
+publishMavenStyle      := true
+Test / publishArtifact := false
+pomIncludeRepository   := { _ => false }
+
+licenses := Seq("Apache License, Version 2.0" -> uri("http://www.apache.org/licenses/LICENSE-2.0"))
+homepage := Some(uri("https://github.com/adzerk/apso"))
+scmInfo  := Some(
+  ScmInfo(
+    uri("https://github.com/adzerk/apso"),
+    "scm:git:ssh://git@github.com/adzerk/apso.git"
+  )
+)
+
+releaseCrossBuild    := true
+releaseTagComment    := s"Release ${version.value}"
+releaseCommitMessage := s"Set version to ${version.value}"
+
+releaseProcess := Seq[ReleaseStep](
+  checkSnapshotDependencies,
+  inquireVersions,
+  runClean,
+  runTest,
+  setReleaseVersion,
+  commitReleaseVersion,
+  tagRelease,
+  releaseStepCommandAndRemaining("+publishSigned"),
+  releaseStepCommand("sonaRelease"),
+  setNextVersion,
+  commitNextVersion,
+  pushChanges
+)
+
+LocalRootProject / publish / skip := true
+
 def module(project: Project, moduleName: String, crossScala: List[String] = List(Versions.Scala213, Versions.Scala3)) =
   (project in file(s"modules/$moduleName"))
     .settings(name := s"apso-$moduleName")
-    .settings(commonSettings *)
     .settings(crossScalaVersions := crossScala)
 
 lazy val aws = module(project, "aws")
@@ -141,26 +227,10 @@ lazy val time = module(project, "time")
   .settings(libraryDependencies ++= Seq(JodaTime, Specs2_4Core % Test))
 
 lazy val docs = (project in file("apso-docs"))
-  .dependsOn(
-    aws,
-    caching,
-    circe,
-    collections,
-    core,
-    encryption,
-    gcp,
-    hashing,
-    io,
-    pekko,
-    pekkoHttp,
-    profiling,
-    time
-  )
-  .settings(commonSettings *)
+  .dependsOn(aws, caching, circe, collections, core, encryption, gcp, hashing, io, pekko, pekkoHttp, profiling, time)
   .settings(
-    // format: off
     crossScalaVersions := List(Versions.Scala213),
-    mdocOut := baseDirectory.value,
+    mdocOut            := baseDirectory.value,
 
     mdocVariables := Map(
       "VERSION" ->
@@ -170,91 +240,5 @@ lazy val docs = (project in file("apso-docs"))
     ),
 
     publish / skip := true
-    // format: on
   )
   .enablePlugins(MdocPlugin)
-
-lazy val commonSettings = Seq(
-  // format: off
-  resolvers ++=
-      Seq(
-        Resolver.sonatypeCentralSnapshots,
-        Resolver.typesafeRepo("snapshots"),
-        "Spray Repository"                  at  "https://repo.spray.io/",
-        "Bintray Scalaz Releases"           at  "https://dl.bintray.com/scalaz/releases",
-        "JCenter Repository"                at  "https://jcenter.bintray.com/"
-      ),
-
-  scalafmtOnCompile := true,
-
-  scalacOptions ++= {
-    lazy val commonFlags = Seq(
-      "-encoding", "UTF-8",
-      "-language:higherKinds",
-      "-language:implicitConversions",
-      "-feature",
-      "-unchecked",
-      "-deprecation",
-      "-release", javaVersion,
-      "-Xfatal-warnings")
-
-    def withCommon(flags: String*) =
-      commonFlags ++ flags
-
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, _)) =>
-        withCommon("-Xsource:3", "-Ywarn-dead-code", "-Ywarn-unused:imports")
-
-      case Some((3, _)) =>
-        withCommon("-Wunused:imports")
-
-      case _ =>
-        throw new RuntimeException("Unsupported Scala version")
-    }
-  },
-
-  javacOptions ++= List(
-    "--release", javaVersion
-  ),
-
-  autoAPIMappings := true,
-
-  publishTo := {
-    val centralSnapshots = "https://central.sonatype.com/repository/maven-snapshots/"
-    if (isSnapshot.value) Some("central-snapshots" at centralSnapshots)
-    else localStaging.value
-  },
-
-  publishMavenStyle := true,
-  Test / publishArtifact := false,
-  pomIncludeRepository := { _ => false },
-
-  licenses := Seq("Apache License, Version 2.0" -> uri("http://www.apache.org/licenses/LICENSE-2.0")),
-  homepage := Some(uri("https://github.com/adzerk/apso")),
-  scmInfo := Some(
-    ScmInfo(
-      uri("https://github.com/adzerk/apso"),
-      "scm:git:ssh://git@github.com/adzerk/apso.git"
-    )
-  )
-  // format: on
-)
-
-releaseCrossBuild    := true
-releaseTagComment    := s"Release ${version.value}"
-releaseCommitMessage := s"Set version to ${version.value}"
-
-releaseProcess := Seq[ReleaseStep](
-  checkSnapshotDependencies,
-  inquireVersions,
-  runClean,
-  runTest,
-  setReleaseVersion,
-  commitReleaseVersion,
-  tagRelease,
-  releaseStepCommandAndRemaining("+publishSigned"),
-  releaseStepCommand("sonaRelease"),
-  setNextVersion,
-  commitNextVersion,
-  pushChanges
-)
