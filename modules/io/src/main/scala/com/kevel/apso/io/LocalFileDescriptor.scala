@@ -45,27 +45,9 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
     LocalFileDescriptor(parentPath.toString)
   }
 
-  override def /(name: String): LocalFileDescriptor = child(name)
-
   def child(name: String): LocalFileDescriptor = {
     val childPath = normalizedPath.resolve(name)
     LocalFileDescriptor(childPath.toString)
-  }
-
-  override def children(names: String*): LocalFileDescriptor = {
-    val childPath = names.foldLeft(normalizedPath) { (acc, child) =>
-      acc.resolve(child)
-    }
-    LocalFileDescriptor(childPath.toString)
-  }
-
-  override def cd(pathString: String): LocalFileDescriptor = {
-    val newPath = pathString.split("/").map(_.trim).toList.foldLeft(normalizedPath) {
-      case (acc, "." | "") => acc
-      case (acc, "..")     => acc.getParent
-      case (acc, segment)  => acc.resolve(segment)
-    }
-    LocalFileDescriptor(newPath.toString)
   }
 
   def download(localTarget: LocalFileDescriptor, safeDownloading: Boolean): Boolean = {
@@ -156,10 +138,6 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
   }
 
   def exists: Boolean = file.exists()
-
-  override def sibling(f: String => String): LocalFileDescriptor = {
-    LocalFileDescriptor(normalizedPath.resolveSibling(f(name)).toString)
-  }
 
   def delete(): Boolean = file.delete()
 

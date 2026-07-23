@@ -130,7 +130,7 @@ trait FileDescriptor {
     * @return
     *   the new file descriptor with the updated path
     */
-  def /(name: String): Self = child(name)
+  final def /(name: String): Self = child(name)
 
   /** Adds multiple new child nodes to the filesystem path.
     * @param names
@@ -155,7 +155,7 @@ trait FileDescriptor {
     *   the new file descriptor with the updated path
     */
   def cd(pathString: String): Self = {
-    pathString.split("/").toList.foldLeft(this.asInstanceOf[Self]) {
+    pathString.split("/").iterator.map(_.trim).foldLeft(this.asInstanceOf[Self]) {
       case (acc, "." | "") => acc
       case (acc, "..")     => acc.parent().asInstanceOf[Self]
       case (acc, segment)  => acc.child(segment).asInstanceOf[Self]
@@ -168,7 +168,7 @@ trait FileDescriptor {
     * @return
     *   a new file descriptor pointing to a sibling of the current file descriptor
     */
-  def sibling(name: String): Self = sibling(_ => name)
+  final def sibling(name: String): Self = sibling(_ => name)
 
   /** Returns a new file descriptor pointing to a sibling of the current file descriptor
     * @param f

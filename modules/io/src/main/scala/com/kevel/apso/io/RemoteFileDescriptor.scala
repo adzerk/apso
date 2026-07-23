@@ -25,12 +25,9 @@ trait RemoteFileDescriptor { this: FileDescriptor =>
 
   protected def duplicate(elements: List[String]): Self
 
-  def parent(n: Int = 1): Self =
+  final def parent(n: Int = 1): Self =
     this.duplicate(elements = elements.dropRight(n))
 
-  def child(name: String): Self =
+  final def child(name: String): Self =
     this.duplicate(elements = elements ++ sanitize(name).toList)
-
-  override def children(names: String*): Self =
-    this.duplicate(elements = elements ++ names.flatMap(sanitize))
 }
