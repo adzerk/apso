@@ -29,19 +29,19 @@ import scala.specialized as spec
   * @param v
   *   the number of values
   */
-class InvalidSizes(k: Int, v: Int) extends Exception("%s, %s" format (k, v))
+class InvalidSizes(k: Int, v: Int) extends Exception("%s, %s".format(k, v))
 
 /** Exception thrown when a `DeboxMap` factory is called requiring an invalid preallocated size.
   * @param n
   *   the requested size
   */
-class MapOverflow(n: Int) extends Exception("size %s exceeds max" format n)
+class MapOverflow(n: Int) extends Exception("size %s exceeds max".format(n))
 
 /** Exception thrown when trying to access a non-existent key in a `DeboxMap`.
   * @param k
   *   the non-existent key
   */
-class NotFound(k: String) extends Exception("key %s was not found" format k)
+class NotFound(k: String) extends Exception("key %s was not found".format(k))
 
 /** Object containing factory methods for `DeboxMaps`.
   */

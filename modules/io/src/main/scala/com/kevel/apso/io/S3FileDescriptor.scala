@@ -81,9 +81,9 @@ case class S3FileDescriptor(
     val prefix = elements.mkString("/")
     bucket
       .getFilesInFolder(prefix)
-      .map({ case (key, info) =>
+      .map { case (key, info) =>
         this.copy(elements = elements :+ key.stripPrefix(prefix).stripPrefix("/").stripSuffix("/"), summary = info)
-      })
+      }
   }
 
   def listAllFilesWithPrefix(prefix: String): Iterator[S3FileDescriptor] = {

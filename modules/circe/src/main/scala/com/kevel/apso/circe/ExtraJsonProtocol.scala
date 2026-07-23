@@ -26,13 +26,14 @@ trait ExtraTimeJsonProtocol {
   implicit val finiteDurationEncoder: Encoder[FiniteDuration] =
     Encoder.forProduct1("milliseconds")(_.toMillis)
   implicit val finiteDurationDecoder: Decoder[FiniteDuration] =
-    Decoder[Long].emapPrettyTry(v => tryToParseDuration(v.toString)) or
-      Decoder[String].emapPrettyTry(v => tryToParseDuration(v)) or
-      Decoder.forProduct1[FiniteDuration, Long]("milliseconds")(_.millis) or
-      Decoder.forProduct1[FiniteDuration, Long]("seconds")(_.seconds) or
-      Decoder.forProduct1[FiniteDuration, Long]("minutes")(_.minutes) or
-      Decoder.forProduct1[FiniteDuration, Long]("hours")(_.hours) or
-      Decoder.forProduct1[FiniteDuration, Long]("days")(_.days)
+    Decoder[Long]
+      .emapPrettyTry(v => tryToParseDuration(v.toString))
+      .or(Decoder[String].emapPrettyTry(v => tryToParseDuration(v)))
+      .or(Decoder.forProduct1[FiniteDuration, Long]("milliseconds")(_.millis))
+      .or(Decoder.forProduct1[FiniteDuration, Long]("seconds")(_.seconds))
+      .or(Decoder.forProduct1[FiniteDuration, Long]("minutes")(_.minutes))
+      .or(Decoder.forProduct1[FiniteDuration, Long]("hours")(_.hours))
+      .or(Decoder.forProduct1[FiniteDuration, Long]("days")(_.days))
 
   implicit val intervalEncoder: Encoder[Interval] =
     Encoder.forProduct2("startMillis", "endMillis")(int => (int.getStartMillis, int.getEndMillis))
