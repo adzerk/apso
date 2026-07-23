@@ -86,7 +86,7 @@ trait FileDescriptor {
     * @return
     *   an iterator with the lines of this file.
     */
-  final def lines(): Iterator[String] = Source.fromInputStream(stream()).getLines()
+  def lines(): Iterator[String] = Source.fromInputStream(stream()).getLines()
 
   /** Returns true if the fd points to a directory
     * @return
@@ -138,7 +138,7 @@ trait FileDescriptor {
     * @return
     *   the new file descriptor with the updated path
     */
-  final def children(names: String*): Self =
+  def children(names: String*): Self =
     names.foldLeft(this.asInstanceOf[Self])((acc, c) => acc.child(c).asInstanceOf[Self])
 
   /** Changes the path of the file descriptor using unix's cd syntax related to the current directory.
@@ -176,7 +176,7 @@ trait FileDescriptor {
     * @return
     *   a new file descriptor pointing to a sibling of the current file descriptor
     */
-  final def sibling(f: String => String): Self = parent().child(f(name)).asInstanceOf[Self]
+  def sibling(f: String => String): Self = parent().child(f(name)).asInstanceOf[Self]
 
   /** Returns true if the file pointed by the file descriptor exists
     * @return
