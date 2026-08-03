@@ -4,8 +4,9 @@ import java.io.*
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.{CompletableFuture, CompletionException, LinkedBlockingQueue, ThreadPoolExecutor, TimeUnit}
 
+import scala.concurrent.duration.*
 import scala.jdk.CollectionConverters.*
-import scala.util.{Failure, Success, Try, Using}
+import scala.util.{Try, Using}
 
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
@@ -13,11 +14,15 @@ import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider
 import software.amazon.awssdk.core.ResponseInputStream
 import software.amazon.awssdk.core.async.{AsyncRequestBody, AsyncResponseTransformer}
 import software.amazon.awssdk.core.exception.{SdkClientException, SdkException}
+import software.amazon.awssdk.core.retry.RetryUtils
 import software.amazon.awssdk.regions
 import software.amazon.awssdk.services.s3.S3AsyncClient
 import software.amazon.awssdk.services.s3.crt.S3CrtRetryConfiguration
 import software.amazon.awssdk.services.s3.model.*
 import software.amazon.awssdk.transfer.s3.{S3TransferManager, model}
+
+import com.kevel.apso.Retry
+import com.kevel.apso.aws.S3Bucket.isSlowDown
 
 /** A representation of an Amazon's S3 bucket. This class wraps an `S3AsyncClient` and provides a higher level interface
   * for pushing and pulling files to and from a bucket.
@@ -40,6 +45,8 @@ class S3Bucket(
   private[this] lazy val region = Try(config.getString(configPrefix + ".region"))
   private[this] lazy val maxConnections = Try(config.getInt(configPrefix + ".max-connections"))
   private[this] lazy val maxErrorRetry = Try(config.getInt(configPrefix + ".max-error-retry"))
+  private[this] lazy val retryOnSlowDown =
+    Try(config.getBoolean(configPrefix + ".retry-on-slow-down")).getOrElse(true)
 
   @transient private[this] lazy val defaultExecutor = {
     val maxPoolSize = 100
@@ -169,14 +176,15 @@ class S3Bucket(
     * @return
     *   a list of objects in a bucket matching a given prefix.
     */
-  def getObjectsWithMatchingPrefix(prefix: String, includeDirectories: Boolean = false): Iterator[S3Object] = retry {
-    logger.info(s"Finding files matching prefix '$prefix'...")
+  def getObjectsWithMatchingPrefix(prefix: String, includeDirectories: Boolean = false): Iterator[S3Object] =
+    retry {
+      logger.info(s"Finding files matching prefix '$prefix'...")
 
-    val req = ListObjectsV2Request.builder.bucket(bucketName).prefix(sanitizeKey(prefix)).build
-    val objects = listObjectsV2Iterator(req).flatMap(_.contents.asScala)
+      val req = ListObjectsV2Request.builder.bucket(bucketName).prefix(sanitizeKey(prefix)).build
+      val objects = listObjectsV2Iterator(req).flatMap(_.contents.asScala)
 
-    if (includeDirectories) objects else objects.filterNot(_.key.endsWith("/"))
-  }.getOrElse(Iterator.empty)
+      if (includeDirectories) objects else objects.filterNot(_.key.endsWith("/"))
+    }.getOrElse(Iterator.empty)
 
   // FIXME: If the root directory/prefix was created by the `mkdirs` method (where we create an object with 0 bytes)
   //        that root directory will be present in the results. Evaluate if we should filter it out since it does not
@@ -413,10 +421,30 @@ class S3Bucket(
     stream
   }
 
+  private[aws] def retry[T](f: => T, maxRetries: Int = 2): Option[T] =
+    Retry
+      .exponentialBackOff(
+        maxRetries = maxRetries,
+        base = S3Bucket.BaseBackOff,
+        max = Some(S3Bucket.MaxBackOff),
+        jitter = S3Bucket.BackOffJitter,
+        retryWhen = !handler(_),
+        onRetry = (ex, delay, remaining) =>
+          logger.warn(s"Error during S3 operation. Retrying in ${delay.toMillis}ms ($remaining more times)", ex),
+        onMaxRetriesReached = ex => logger.error("Max retries reached. Aborting S3 operation", ex)
+      )(f)
+      .toOption
+
   private def log(isError: Boolean, message: String, cause: Throwable): Unit =
     if (isError) logger.error(message, cause) else logger.warn(message, cause)
 
   private[this] def handler: PartialFunction[Throwable, Boolean] = {
+    // Matched ahead of the shape-specific cases below, since a slow down is reported both as a service error and as a
+    // client-side error, depending on the client in use.
+    case ex: SdkException if isSlowDown(ex) =>
+      log(!retryOnSlowDown, s"S3 slow down: ${ex.getMessage}", ex)
+      !retryOnSlowDown
+
     case ex: S3Exception =>
       ex.statusCode() match {
         case 404 =>
@@ -428,11 +456,12 @@ class S3Bucket(
         case _ =>
           logger.warn(
             s"""|S3 service error: ${ex.getMessage}. Extended request id: ${ex.requestId}
-                      |Message: ${ex.getMessage}""".stripMargin,
+                |Message: ${ex.getMessage}""".stripMargin,
             ex
           )
           false
       }
+
     case ex: SdkClientException =>
       log(!ex.retryable, s"Client Exception: ${ex.getMessage}", ex)
       !ex.retryable
@@ -450,25 +479,32 @@ class S3Bucket(
       false
   }
 
-  private[this] def retry[T](f: => T, tries: Int = 3, sleepTime: Int = 5000): Option[T] =
-    if (tries == 0) {
-      logger.error("Max retries reached. Aborting S3 operation")
-      None
-    } else
-      Try(f) match {
-        case Success(res)              => Some(res)
-        case Failure(e) if !handler(e) =>
-          if (tries > 1) {
-            logger.warn(s"Error during S3 operation. Retrying in ${sleepTime}ms (${tries - 1} more times)")
-            Thread.sleep(sleepTime)
-          }
-          retry(f, tries - 1, sleepTime)
-
-        case _ => None
-      }
-
   override def equals(obj: Any): Boolean = obj match {
     case b: S3Bucket => b.bucketName == bucketName
     case _           => false
   }
+}
+
+object S3Bucket extends LazyLogging {
+  private[aws] val BaseBackOff = 3.seconds
+  private[aws] val MaxBackOff = 30.seconds
+  private[aws] val BackOffJitter = 1.second
+
+  /** The error string with which the CRT-based S3 client reports a throttled request.
+    *
+    * The CRT signals throttling through its `AWS_ERROR_S3_SLOW_DOWN` error, which reaches the SDK as an
+    * `SdkClientException` whose message embeds only the rendered error string, and not the numeric error code.
+    */
+  private[aws] val SlowDownErrorMessage = "Response code indicates throttling"
+
+  /** Returns whether the given exception reports S3 having throttled the request.
+    *
+    * A throttled request surfaces either as a service error, which S3 reports with a `503` status code, or as a
+    * client-side error, which is how the CRT-based client reports it.
+    */
+  private[aws] def isSlowDown(ex: SdkException): Boolean =
+    RetryUtils.isThrottlingException(ex) || (ex match {
+      case ex: SdkClientException => Option(ex.getMessage).exists(_.contains(SlowDownErrorMessage))
+      case _                      => false
+    })
 }
