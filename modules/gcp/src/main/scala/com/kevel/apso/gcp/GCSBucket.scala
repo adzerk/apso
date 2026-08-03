@@ -5,14 +5,15 @@ import java.nio.channels.Channels
 import java.nio.file.Path
 
 import scala.annotation.unused
+import scala.concurrent.duration.*
 import scala.jdk.CollectionConverters.*
-import scala.util.{Failure, Success, Try}
 
 import com.google.cloud.BaseServiceException
 import com.google.cloud.storage.Storage.{BlobListOption, BlobSourceOption, BlobWriteOption}
 import com.google.cloud.storage.{Blob, BlobId, BlobInfo, Storage, StorageException}
 import com.typesafe.scalalogging.LazyLogging
 
+import com.kevel.apso.Retry
 import com.kevel.apso.gcp.GCSBucket.{noGzipTranscoding, rawInputStream}
 
 final class GCSBucket(
@@ -215,6 +216,9 @@ final class GCSBucket(
     Channels.newInputStream(reader)
   }
 
+  private def log(isError: Boolean, message: String, cause: Throwable): Unit =
+    if (isError) logger.error(message, cause) else logger.warn(message, cause)
+
   private[this] def handler: PartialFunction[Throwable, Boolean] = {
     case ex: StorageException =>
       ex.getCode match {
@@ -225,38 +229,40 @@ final class GCSBucket(
           logger.error("No permission to access the file", ex)
           true // no need to retry
         case _ =>
-          logger.warn(
+          log(
+            !ex.isRetryable,
             s"""|GCS service error: ${ex.getMessage}.
                 |Additional details: ${ex.getDebugInfo}""".stripMargin,
             ex
           )
-          false
+          !ex.isRetryable
       }
 
     case ex: BaseServiceException =>
-      logger.warn("An error occurred", ex)
-      ex.isRetryable
+      log(!ex.isRetryable, "An error occurred", ex)
+      !ex.isRetryable
   }
 
-  private[this] def retry[T](f: => T, tries: Int = 3, sleepTime: Int = 5000): Option[T] =
-    if (tries == 0) {
-      logger.error("Max retries reached. Aborting GCS operation")
-      None
-    } else
-      Try(f) match {
-        case Success(res)              => Some(res)
-        case Failure(e) if !handler(e) =>
-          if (tries > 1) {
-            logger.warn(s"Error during GCS operation. Retrying in ${sleepTime}ms (${tries - 1} more times)")
-            Thread.sleep(sleepTime)
-          }
-          retry(f, tries - 1, sleepTime)
-
-        case _ => None
-      }
+  private[gcp] def retry[T](f: => T, maxRetries: Int = 2): Option[T] =
+    Retry
+      .exponentialBackOff(
+        maxRetries = maxRetries,
+        base = GCSBucket.BaseBackOff,
+        max = Some(GCSBucket.MaxBackOff),
+        jitter = GCSBucket.BackOffJitter,
+        retryWhen = !handler(_),
+        onRetry = (ex, delay, remaining) =>
+          logger.warn(s"Error during GCS operation. Retrying in ${delay.toMillis}ms ($remaining more times)", ex),
+        onMaxRetriesReached = ex => logger.error("Max retries reached. Aborting GCS operation", ex)
+      )(f)
+      .toOption
 }
 
 object GCSBucket {
+  private[gcp] val BaseBackOff = 3.seconds
+  private[gcp] val MaxBackOff = 30.seconds
+  private[gcp] val BackOffJitter = 1.second
+
   // Disable automatic decompression of gzip-encoded objects so that callers receive the raw bytes as stored in GCS.
   // Without this, the GCS client transparently decompresses objects with `Content-Encoding: gzip`, which breaks
   // callers that expect to handle decompression themselves (e.g. when streaming .gz files).
