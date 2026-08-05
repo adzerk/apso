@@ -6,7 +6,7 @@ organization       := "com.kevel"
 scalaVersion       := Versions.Scala213
 crossScalaVersions := Nil
 
-val javaVersion = "11"
+val javaVersion = "17"
 
 // Workaround for incompatible scala-xml versions taken from https://github.com/scala/bug/issues/12632. scala-xml 1.x
 // and scala-xml 2.x are "mostly" binary compatible.
