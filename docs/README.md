@@ -321,6 +321,17 @@ The `CredentialStore` object serves as an endpoint for the retrieval of AWS cred
 
 The `S3Bucket` class wraps an instance of `S3AsyncClient` (from AWS SDK for Java) and exposes a higher level interface for pushing and pulling files to and from a bucket.
 
+It reads the following optional keys from the typesafe configuration, leaving the corresponding behavior of the underlying client untouched when a key is unset:
+
+| Key | Default | Description |
+| --- | --- | --- |
+| `aws.s3.region` | the client's default region | The location constraint with which to create the bucket, when it doesn't exist yet. |
+| `aws.s3.max-connections` | computed by the client from its target throughput | The maximum number of S3 connections that should be established during a transfer. |
+| `aws.s3.max-error-retry` | the client's default retry configuration | The maximum number of retry attempts performed by the underlying client for failed retryable requests. |
+| `aws.s3.retry-on-slow-down` | `true` | Whether to retry a request that S3 throttled, identified whether it is reported as a service error or as a client-side error. |
+
+Failed operations that are worth retrying are retried waiting for an exponentially growing duration, jittered so that concurrent callers don't retry in lockstep.
+
 ### SerializableAWSCredentials
 
 The `SerializableAWSCredentials` class provides a serializable container for AWS credentials, extending the `AwsCredentials` class (from AWS SDK for Java).
