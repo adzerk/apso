@@ -47,6 +47,7 @@ sealed trait SyncMemoizeFn1[[#I0#], V] extends Function1[[#I0#], V] {
   private lazy val cache: LoadingCache[([#I0#]), V] = cacheConfig.build.build(fn.tupled)
   override def apply([#i0: I0#]): V = cache.get(([#i0#]))
   def invalidate([#i0: I0#]): Unit = cache.invalidate(([#i0#]))
+  def invalidateAll(): Unit = cache.invalidateAll()
 }#
 ]
 
@@ -63,6 +64,7 @@ sealed trait AsyncMemoizeFn1[[#I0#], V] extends Function1[[#I0#], Future[V]] {
   private lazy val cache: AsyncLoadingCache[([#I0#]), V] = cacheConfig.build.buildAsyncFuture(fn.tupled)
   override def apply([#i0: I0#]): Future[V] = cache.get(([#i0#]))
   def invalidate([#i0: I0#]): Unit = cache.synchronous().invalidate(([#i0#]))
+  def invalidateAll(): Unit = cache.synchronous().invalidateAll()
 }#
 ]
 
