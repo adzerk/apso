@@ -60,6 +60,28 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
         quickly(cachedF() must beEqualTo(2))
       }
 
+      "evicting a key after explicit invalidation" in {
+        val counter = new AtomicInteger(0)
+        val f = () => counter.getAndIncrement()
+        val cachedF = f.cachedSync(config.Cache(Some(1.day), None))
+        cachedF() must beEqualTo(0)
+        cachedF() must beEqualTo(0)
+        cachedF.invalidate()
+        cachedF() must beEqualTo(1)
+      }
+
+      "evicting the entire cache after explicit invalidation" in {
+        val counter = new AtomicInteger(0)
+        val f: Int => Int = x => x + counter.getAndIncrement()
+        val cachedF = f.cachedSync(config.Cache(None, None))
+        cachedF(1) must beEqualTo(1)
+        cachedF(2) must beEqualTo(3)
+        cachedF(2) must beEqualTo(3)
+        cachedF.invalidateAll()
+        cachedF(1) must beEqualTo(3)
+        cachedF(2) must beEqualTo(5)
+      }
+
       "that resorts to the `hashCode` method of the key" in {
         val hashCodeCallCounter = new AtomicInteger(0)
         val toStringCallCounter = new AtomicInteger(0)
