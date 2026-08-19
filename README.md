@@ -416,6 +416,8 @@ y
 // res31: AtomicInteger = 3
 ```
 
+Cached function types provide `invalidate` and/or `invalidateAll` methods for use cases where the cache needs to be invalidated before the expiration time is reached.
+
 ## Collections
 
 The `apso-collections` module provides some helpful collections. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
