@@ -5,14 +5,17 @@ import java.nio.channels.Channels
 import java.nio.file.Path
 
 import scala.annotation.unused
+import scala.concurrent.duration.*
 import scala.jdk.CollectionConverters.*
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 
 import com.google.cloud.BaseServiceException
 import com.google.cloud.storage.Storage.{BlobListOption, BlobSourceOption, BlobWriteOption}
 import com.google.cloud.storage.{Blob, BlobId, BlobInfo, Storage, StorageException}
+import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 
+import com.kevel.apso.Retry
 import com.kevel.apso.gcp.GCSBucket.{noGzipTranscoding, rawInputStream}
 
 final class GCSBucket(
@@ -21,6 +24,18 @@ final class GCSBucket(
 ) extends Serializable
     with LazyLogging {
   @transient private[this] lazy val storage: Storage = mkStorage()
+
+  private[this] lazy val config = ConfigFactory.load()
+
+  private[this] lazy val retryPrefix = "gcp.storage.retry"
+  private[this] lazy val retryMaxRetries =
+    Try(config.getInt(retryPrefix + ".max-retries")).getOrElse(GCSBucket.DefaultMaxRetries)
+  private[this] lazy val retryBaseBackOff =
+    Try(config.getDuration(retryPrefix + ".base-backoff").toMillis.millis).getOrElse(GCSBucket.DefaultBaseBackOff)
+  private[this] lazy val retryMaxBackOff =
+    Try(config.getDuration(retryPrefix + ".max-backoff").toMillis.millis).getOrElse(GCSBucket.DefaultMaxBackOff)
+  private[this] lazy val retryJitter =
+    Try(config.getDouble(retryPrefix + ".jitter")).getOrElse(GCSBucket.DefaultJitter)
 
   private def blobId(key: String) = BlobId.of(bucketName, key)
 
@@ -215,6 +230,9 @@ final class GCSBucket(
     Channels.newInputStream(reader)
   }
 
+  private def log(isError: Boolean, message: String, cause: Throwable): Unit =
+    if (isError) logger.error(message, cause) else logger.warn(message, cause)
+
   private[this] def handler: PartialFunction[Throwable, Boolean] = {
     case ex: StorageException =>
       ex.getCode match {
@@ -225,38 +243,43 @@ final class GCSBucket(
           logger.error("No permission to access the file", ex)
           true // no need to retry
         case _ =>
-          logger.warn(
+          log(
+            !ex.isRetryable,
             s"""|GCS service error: ${ex.getMessage}.
                 |Additional details: ${ex.getDebugInfo}""".stripMargin,
             ex
           )
-          false
+          !ex.isRetryable
       }
 
     case ex: BaseServiceException =>
-      logger.warn("An error occurred", ex)
-      ex.isRetryable
+      log(!ex.isRetryable, "An error occurred", ex)
+      !ex.isRetryable
   }
 
-  private[this] def retry[T](f: => T, tries: Int = 3, sleepTime: Int = 5000): Option[T] =
-    if (tries == 0) {
-      logger.error("Max retries reached. Aborting GCS operation")
-      None
-    } else
-      Try(f) match {
-        case Success(res)              => Some(res)
-        case Failure(e) if !handler(e) =>
-          if (tries > 1) {
-            logger.warn(s"Error during GCS operation. Retrying in ${sleepTime}ms (${tries - 1} more times)")
-            Thread.sleep(sleepTime)
-          }
-          retry(f, tries - 1, sleepTime)
-
-        case _ => None
-      }
+  private[gcp] def retry[T](f: => T): Option[T] =
+    Retry
+      .exponentialBackOff(
+        maxRetries = retryMaxRetries,
+        base = retryBaseBackOff,
+        max = Some(retryMaxBackOff),
+        jitter = retryJitter,
+        // `handler` is partial, so anything it doesn't classify is treated as worth retrying rather than thrown.
+        retryWhen = ex => !handler.applyOrElse(ex, (_: Throwable) => false),
+        // The failure itself is already logged by `handler`, so it isn't logged again here.
+        onRetry = (_, delay, remaining) =>
+          logger.warn(s"Error during GCS operation. Retrying in ${delay.toMillis}ms ($remaining more times)"),
+        onMaxRetriesReached = _ => logger.error("Max retries reached. Aborting GCS operation")
+      )(f)
+      .toOption
 }
 
 object GCSBucket {
+  private[gcp] val DefaultMaxRetries = 2
+  private[gcp] val DefaultBaseBackOff = 3.seconds
+  private[gcp] val DefaultMaxBackOff = 30.seconds
+  private[gcp] val DefaultJitter = 1d
+
   // Disable automatic decompression of gzip-encoded objects so that callers receive the raw bytes as stored in GCS.
   // Without this, the GCS client transparently decompresses objects with `Content-Encoding: gzip`, which breaks
   // callers that expect to handle decompression themselves (e.g. when streaming .gz files).
