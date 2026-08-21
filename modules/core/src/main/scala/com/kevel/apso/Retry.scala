@@ -1,10 +1,12 @@
 package com.kevel.apso
 
+import java.util.concurrent.ThreadLocalRandom
+
 import scala.annotation.tailrec
 import scala.concurrent.duration.*
 import scala.concurrent.{ExecutionContext, Future, blocking}
 import scala.util.control.NonFatal
-import scala.util.{Failure, Random, Success, Try}
+import scala.util.{Failure, Success, Try}
 
 /** Utility object with retry mechanisms.
   */
@@ -86,7 +88,8 @@ object Retry {
     * @param factor
     *   the factor of the exponential duration
     * @param jitter
-    *   the upper bound of the random duration added to the result
+    *   the fraction of the waiting duration to randomize, from `0.0` for no jitter to `1.0` for a duration uniformly
+    *   distributed between zero and the full waiting duration
     * @return
     *   the duration to wait before the next attempt
     */
@@ -95,11 +98,14 @@ object Retry {
       base: FiniteDuration,
       max: Option[FiniteDuration] = None,
       factor: Double = 2.0,
-      jitter: FiniteDuration = 1.second
+      jitter: Double = 1.0
   ): FiniteDuration = {
     val exponential = (base.toMillis * Math.pow(factor, attempt.toDouble)).toLong
     val capped = max.fold(exponential)(m => Math.min(exponential, m.toMillis))
-    (capped + (Random.nextDouble() * jitter.toMillis).toLong).millis
+    val jitterFraction = Math.min(1.0, Math.max(0.0, jitter))
+    (((1.0 - jitterFraction) * capped) + (ThreadLocalRandom
+      .current()
+      .nextDouble() * jitterFraction * capped)).toLong.millis
   }
 
   /** Performs a function `f` until it succeeds or until maximum retries is reached, waiting between attempts for a
@@ -114,7 +120,8 @@ object Retry {
     * @param factor
     *   the factor of the exponential duration
     * @param jitter
-    *   the upper bound of the random duration added to each waiting duration
+    *   the fraction of each waiting duration to randomize, from `0.0` for no jitter to `1.0` for a duration uniformly
+    *   distributed between zero and the full waiting duration
     * @param retryWhen
     *   the predicate deciding whether a failure is worth retrying
     * @param onRetry
@@ -132,7 +139,7 @@ object Retry {
       base: FiniteDuration,
       max: Option[FiniteDuration] = None,
       factor: Double = 2.0,
-      jitter: FiniteDuration = 1.second,
+      jitter: Double = 1.0,
       retryWhen: Throwable => Boolean = _ => true,
       onRetry: (Throwable, FiniteDuration, Int) => Unit = (_, _, _) => (),
       onMaxRetriesReached: Throwable => Unit = _ => ()
@@ -149,7 +156,7 @@ object Retry {
           } else {
             val delay = exponentialBackOffDelay(attempt, base, max, factor, jitter)
             onRetry(ex, delay, maxRetries - attempt)
-            Thread.sleep(delay.toMillis)
+            blocking(Thread.sleep(delay.toMillis))
             aux(attempt + 1)
           }
       }

@@ -92,38 +92,51 @@ class RetrySpec(implicit ee: ExecutionEnv) extends Specification {
 
     "compute an exponentially growing back-off delay" in {
       val delays =
-        (0 until 4).map(attempt => Retry.exponentialBackOffDelay(attempt, 100.millis, jitter = Duration.Zero))
+        (0 until 4).map(attempt => Retry.exponentialBackOffDelay(attempt, 100.millis, jitter = 0.0))
 
       delays.map(_.toMillis) must beEqualTo(Seq(100L, 200L, 400L, 800L))
     }
 
     "cap the back-off delay with the given maximum" in {
-      val delays = (0 until 4).map(attempt =>
-        Retry.exponentialBackOffDelay(attempt, 100.millis, Some(250.millis), jitter = Duration.Zero)
-      )
+      val delays =
+        (0 until 4).map(attempt => Retry.exponentialBackOffDelay(attempt, 100.millis, Some(250.millis), jitter = 0.0))
 
       delays.map(_.toMillis) must beEqualTo(Seq(100L, 200L, 250L, 250L))
     }
 
     "grow the back-off delay by the given factor" in {
-      val delays = (0 until 4).map(attempt =>
-        Retry.exponentialBackOffDelay(attempt, 100.millis, factor = 3.0, jitter = Duration.Zero)
-      )
+      val delays =
+        (0 until 4).map(attempt => Retry.exponentialBackOffDelay(attempt, 100.millis, factor = 3.0, jitter = 0.0))
 
       delays.map(_.toMillis) must beEqualTo(Seq(100L, 300L, 900L, 2_700L))
     }
 
-    "add at most the given jitter to the back-off delay" in {
-      val delays = (1 to 50).map(_ => Retry.exponentialBackOffDelay(0, 100.millis, jitter = 50.millis).toMillis)
+    "randomize the whole back-off delay with a full jitter" in {
+      val delays = (1 to 100).map(_ => Retry.exponentialBackOffDelay(0, 100.millis, jitter = 1.0).toMillis)
 
-      forall(delays)(d => d must beBetween(100L, 150L))
+      forall(delays)(d => d must beBetween(0L, 100L))
       delays.distinct.size must be_>(1) // the jitter is random, so the delays must not all be the same
+      delays.min must be_<(50L) // the delays spread over the whole range, instead of clustering near the top
+    }
+
+    "randomize only the given fraction of the back-off delay" in {
+      val delays = (1 to 100).map(_ => Retry.exponentialBackOffDelay(0, 100.millis, jitter = 0.25).toMillis)
+
+      forall(delays)(d => d must beBetween(75L, 100L))
+      delays.distinct.size must be_>(1)
+    }
+
+    "clamp the jitter to a fraction of the back-off delay" in {
+      Retry.exponentialBackOffDelay(0, 100.millis, jitter = -1.0).toMillis must beEqualTo(100L)
+
+      val delays = (1 to 20).map(_ => Retry.exponentialBackOffDelay(0, 100.millis, jitter = 2.0).toMillis)
+      forall(delays)(d => d must beBetween(0L, 100L))
     }
 
     "retry a given function with exponential back-off a number of times" in {
       var attempts = 0
 
-      val f = Retry.exponentialBackOff(10, 1.milli, jitter = Duration.Zero) {
+      val f = Retry.exponentialBackOff(10, 1.milli, jitter = 0.0) {
         attempts = attempts + 1
         if (attempts <= 3) throw new RuntimeException("Doomed")
         else attempts
@@ -137,7 +150,7 @@ class RetrySpec(implicit ee: ExecutionEnv) extends Specification {
       var attempts = 0
       val retries = 5
 
-      val f = Retry.exponentialBackOff[Any](retries, 1.milli, jitter = Duration.Zero) {
+      val f = Retry.exponentialBackOff[Any](retries, 1.milli, jitter = 0.0) {
         attempts = attempts + 1
         throw new RuntimeException("Doomed")
       }
@@ -152,7 +165,7 @@ class RetrySpec(implicit ee: ExecutionEnv) extends Specification {
       val f = Retry.exponentialBackOff[Any](
         10,
         1.milli,
-        jitter = Duration.Zero,
+        jitter = 0.0,
         retryWhen = _.getMessage != "Fatal"
       ) {
         attempts = attempts + 1
@@ -169,7 +182,7 @@ class RetrySpec(implicit ee: ExecutionEnv) extends Specification {
       Retry.exponentialBackOff[Any](
         2,
         1.milli,
-        jitter = Duration.Zero,
+        jitter = 0.0,
         retryWhen = { _ =>
           seen += 1
           true
@@ -187,7 +200,7 @@ class RetrySpec(implicit ee: ExecutionEnv) extends Specification {
       Retry.exponentialBackOff[Any](
         3,
         100.millis,
-        jitter = Duration.Zero,
+        jitter = 0.0,
         onRetry = (ex, delay, remaining) => retries = retries :+ (ex.getMessage, delay.toMillis, remaining)
       ) {
         throw new RuntimeException("Doomed")
@@ -203,7 +216,7 @@ class RetrySpec(implicit ee: ExecutionEnv) extends Specification {
       val f = Retry.exponentialBackOff[Any](
         2,
         1.milli,
-        jitter = Duration.Zero,
+        jitter = 0.0,
         onMaxRetriesReached = ex => reached = reached :+ ex.getMessage
       ) {
         throw new RuntimeException("Doomed")
@@ -221,7 +234,7 @@ class RetrySpec(implicit ee: ExecutionEnv) extends Specification {
       val f = Retry.exponentialBackOff[Any](
         5,
         1.milli,
-        jitter = Duration.Zero,
+        jitter = 0.0,
         retryWhen = _ => false,
         onRetry = (_, _, _) => retried = retried + 1,
         onMaxRetriesReached = _ => reached = reached + 1
@@ -243,7 +256,7 @@ class RetrySpec(implicit ee: ExecutionEnv) extends Specification {
       val f = Retry.exponentialBackOff(
         5,
         1.milli,
-        jitter = Duration.Zero,
+        jitter = 0.0,
         onMaxRetriesReached = _ => reached = reached + 1
       ) {
         attempts = attempts + 1
@@ -261,7 +274,7 @@ class RetrySpec(implicit ee: ExecutionEnv) extends Specification {
       val f = Retry.exponentialBackOff(
         5,
         1.milli,
-        jitter = Duration.Zero,
+        jitter = 0.0,
         onRetry = (_, _, _) => retried = retried + 1,
         onMaxRetriesReached = _ => reached = reached + 1
       )(42)
@@ -279,7 +292,7 @@ class RetrySpec(implicit ee: ExecutionEnv) extends Specification {
       val f = Retry.exponentialBackOff[Any](
         0,
         1.milli,
-        jitter = Duration.Zero,
+        jitter = 0.0,
         onRetry = (_, _, _) => retried = retried + 1,
         onMaxRetriesReached = _ => reached = reached + 1
       ) {
