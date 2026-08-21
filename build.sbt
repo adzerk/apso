@@ -230,7 +230,7 @@ lazy val docs = (project in file("apso-docs"))
   .dependsOn(aws, caching, circe, collections, core, encryption, gcp, hashing, io, pekko, pekkoHttp, profiling, time)
   .settings(
     crossScalaVersions := List(Versions.Scala213),
-    mdocOut            := baseDirectory.value,
+    mdocOut            := (LocalRootProject / baseDirectory).value,
 
     mdocVariables := Map(
       "VERSION" ->

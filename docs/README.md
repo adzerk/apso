@@ -389,6 +389,8 @@ Await.result(cachedFutFn(3), Duration.Inf)
 y
 ```
 
+Cached function types provide `invalidate` and `invalidateAll` methods for use cases where the cache needs to be invalidated before the expiration time is reached.
+
 ## Collections
 
 The `apso-collections` module provides some helpful collections. To use it in an existing SBT project, add the following dependency to your `build.sbt`:
