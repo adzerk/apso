@@ -452,8 +452,9 @@ class S3Bucket(
     if (isError) logger.error(message, cause) else logger.warn(message, cause)
 
   private[this] def handler: PartialFunction[Throwable, Boolean] = {
-    // Matched ahead of the shape-specific cases below, since a slow down is reported both as a service error and as a
-    // client-side error, depending on the client in use.
+    // Matched ahead of the shape-specific cases below, since a slow-down is reported both as a service error and as a
+    // client-side error, depending on the client in use. The CRT-based client reports it as the latter with `retryable`
+    // set to false, which is why the cases below can't be relied on to retry throttled requests.
     case ex: SdkException if isSlowDown(ex) =>
       log(!retryOnSlowDown, s"S3 slow down: ${ex.getMessage}", ex)
       !retryOnSlowDown
