@@ -389,7 +389,7 @@ Await.result(cachedFutFn(3), Duration.Inf)
 y
 ```
 
-Cached function types provide `invalidate` and/or `invalidateAll` methods for use cases where the cache needs to be invalidated before the expiration time is reached.
+Cached function types provide `invalidate` and `invalidateAll` methods for use cases where the cache needs to be invalidated before the expiration time is reached.
 
 ## Collections
 
