@@ -18,6 +18,7 @@ sealed trait SyncMemoizeFn0[V] extends (() => V) {
   private lazy val cache: LoadingCache[Unit, V] = cacheConfig.build.build(fn)
   override def apply(): V = cache.get(())
   def invalidate(): Unit = cache.invalidate(())
+  def invalidateAll(): Unit = cache.invalidateAll()
 }
 
 /**
@@ -32,6 +33,7 @@ sealed trait AsyncMemoizeFn0[V] extends (() => Future[V]) {
   private lazy val cache: AsyncLoadingCache[Unit, V] = cacheConfig.build.buildAsyncFuture(fn)
   override def apply(): Future[V] = cache.get(())
   def invalidate(): Unit = cache.synchronous().invalidate(())
+  def invalidateAll(): Unit = cache.synchronous().invalidateAll()
 }
 
 [#
