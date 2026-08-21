@@ -345,9 +345,13 @@ It reads the following optional keys from the typesafe configuration, leaving th
 | `aws.s3.region` | the client's default region | The location constraint with which to create the bucket, when it doesn't exist yet. |
 | `aws.s3.max-connections` | computed by the client from its target throughput | The maximum number of S3 connections that should be established during a transfer. |
 | `aws.s3.max-error-retry` | the client's default retry configuration | The maximum number of retry attempts performed by the underlying client for failed retryable requests. |
-| `aws.s3.retry-on-slow-down` | `true` | Whether to retry a request that S3 throttled, identified whether it is reported as a service error or as a client-side error. |
+| `aws.s3.retry.on-slow-down` | `true` | Whether to retry a request that S3 throttled, identified whether it is reported as a service error or as a client-side error. |
+| `aws.s3.retry.max-retries` | `2` | The maximum number of times to retry an operation, on top of its first attempt. |
+| `aws.s3.retry.base-backoff` | `3 seconds` | The duration to wait before the first retry, doubling on every subsequent one. |
+| `aws.s3.retry.max-backoff` | `30 seconds` | The duration with which to cap the growth of the waiting duration. |
+| `aws.s3.retry.jitter` | `1.0` | The fraction of each waiting duration to randomize, from `0.0` for no jitter to `1.0` for a duration uniformly distributed between zero and the full waiting duration. |
 
-Failed operations that are worth retrying are retried waiting for an exponentially growing duration, jittered so that concurrent callers don't retry in lockstep.
+Failed operations that are worth retrying are retried waiting for an exponentially growing duration, jittered so that concurrent callers don't retry in lockstep. Note that the `aws.s3.retry` keys configure these retries, performed by `S3Bucket` itself, while `aws.s3.max-error-retry` configures the ones performed by the underlying client.
 
 ### SerializableAWSCredentials
 
@@ -637,6 +641,17 @@ libraryDependencies += "com.kevel" %% "apso-gcp" % "0.27.4"
 ### GCSBucket
 
 The `GCSBucket` class wraps an instance of `Storage` (from GCS SDK for Java) and exposes a higher level interface for pushing and pulling files to and from a bucket.
+
+It reads the following optional keys from the typesafe configuration:
+
+| Key | Default | Description |
+| --- | --- | --- |
+| `gcp.storage.retry.max-retries` | `2` | The maximum number of times to retry an operation, on top of its first attempt. |
+| `gcp.storage.retry.base-backoff` | `3 seconds` | The duration to wait before the first retry, doubling on every subsequent one. |
+| `gcp.storage.retry.max-backoff` | `30 seconds` | The duration with which to cap the growth of the waiting duration. |
+| `gcp.storage.retry.jitter` | `1.0` | The fraction of each waiting duration to randomize, from `0.0` for no jitter to `1.0` for a duration uniformly distributed between zero and the full waiting duration. |
+
+These keys configure the retries performed by `GCSBucket` itself, which are independent from the ones performed by the underlying client. An operation is retried whenever the client reports its failure as retryable, which covers the requests GCS throttles.
 
 ## Encryption
 

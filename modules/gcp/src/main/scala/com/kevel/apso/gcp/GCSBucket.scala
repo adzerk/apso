@@ -7,10 +7,12 @@ import java.nio.file.Path
 import scala.annotation.unused
 import scala.concurrent.duration.*
 import scala.jdk.CollectionConverters.*
+import scala.util.Try
 
 import com.google.cloud.BaseServiceException
 import com.google.cloud.storage.Storage.{BlobListOption, BlobSourceOption, BlobWriteOption}
 import com.google.cloud.storage.{Blob, BlobId, BlobInfo, Storage, StorageException}
+import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 
 import com.kevel.apso.Retry
@@ -22,6 +24,18 @@ final class GCSBucket(
 ) extends Serializable
     with LazyLogging {
   @transient private[this] lazy val storage: Storage = mkStorage()
+
+  private[this] lazy val config = ConfigFactory.load()
+
+  private[this] lazy val retryPrefix = "gcp.storage.retry"
+  private[this] lazy val retryMaxRetries =
+    Try(config.getInt(retryPrefix + ".max-retries")).getOrElse(GCSBucket.DefaultMaxRetries)
+  private[this] lazy val retryBaseBackOff =
+    Try(config.getDuration(retryPrefix + ".base-backoff").toMillis.millis).getOrElse(GCSBucket.DefaultBaseBackOff)
+  private[this] lazy val retryMaxBackOff =
+    Try(config.getDuration(retryPrefix + ".max-backoff").toMillis.millis).getOrElse(GCSBucket.DefaultMaxBackOff)
+  private[this] lazy val retryJitter =
+    Try(config.getDouble(retryPrefix + ".jitter")).getOrElse(GCSBucket.DefaultJitter)
 
   private def blobId(key: String) = BlobId.of(bucketName, key)
 
@@ -243,25 +257,28 @@ final class GCSBucket(
       !ex.isRetryable
   }
 
-  private[gcp] def retry[T](f: => T, maxRetries: Int = 2): Option[T] =
+  private[gcp] def retry[T](f: => T): Option[T] =
     Retry
       .exponentialBackOff(
-        maxRetries = maxRetries,
-        base = GCSBucket.BaseBackOff,
-        max = Some(GCSBucket.MaxBackOff),
-        jitter = GCSBucket.BackOffJitter,
-        retryWhen = !handler(_),
-        onRetry = (ex, delay, remaining) =>
-          logger.warn(s"Error during GCS operation. Retrying in ${delay.toMillis}ms ($remaining more times)", ex),
-        onMaxRetriesReached = ex => logger.error("Max retries reached. Aborting GCS operation", ex)
+        maxRetries = retryMaxRetries,
+        base = retryBaseBackOff,
+        max = Some(retryMaxBackOff),
+        jitter = retryJitter,
+        // `handler` is partial, so anything it doesn't classify is treated as worth retrying rather than thrown.
+        retryWhen = ex => !handler.applyOrElse(ex, (_: Throwable) => false),
+        // The failure itself is already logged by `handler`, so it isn't logged again here.
+        onRetry = (_, delay, remaining) =>
+          logger.warn(s"Error during GCS operation. Retrying in ${delay.toMillis}ms ($remaining more times)"),
+        onMaxRetriesReached = _ => logger.error("Max retries reached. Aborting GCS operation")
       )(f)
       .toOption
 }
 
 object GCSBucket {
-  private[gcp] val BaseBackOff = 3.seconds
-  private[gcp] val MaxBackOff = 30.seconds
-  private[gcp] val BackOffJitter = 1.second
+  private[gcp] val DefaultMaxRetries = 2
+  private[gcp] val DefaultBaseBackOff = 3.seconds
+  private[gcp] val DefaultMaxBackOff = 30.seconds
+  private[gcp] val DefaultJitter = 1d
 
   // Disable automatic decompression of gzip-encoded objects so that callers receive the raw bytes as stored in GCS.
   // Without this, the GCS client transparently decompresses objects with `Content-Encoding: gzip`, which breaks

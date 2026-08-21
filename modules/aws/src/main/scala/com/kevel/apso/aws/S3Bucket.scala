@@ -42,11 +42,22 @@ class S3Bucket(
   private[this] lazy val config = ConfigFactory.load()
 
   private[this] lazy val configPrefix = "aws.s3"
+  private[this] lazy val retryPrefix = configPrefix + ".retry"
+
   private[this] lazy val region = Try(config.getString(configPrefix + ".region"))
   private[this] lazy val maxConnections = Try(config.getInt(configPrefix + ".max-connections"))
   private[this] lazy val maxErrorRetry = Try(config.getInt(configPrefix + ".max-error-retry"))
+
   private[this] lazy val retryOnSlowDown =
-    Try(config.getBoolean(configPrefix + ".retry-on-slow-down")).getOrElse(true)
+    Try(config.getBoolean(retryPrefix + ".on-slow-down")).getOrElse(true)
+  private[this] lazy val retryMaxRetries =
+    Try(config.getInt(retryPrefix + ".max-retries")).getOrElse(S3Bucket.DefaultMaxRetries)
+  private[this] lazy val retryBaseBackOff =
+    Try(config.getDuration(retryPrefix + ".base-backoff").toMillis.millis).getOrElse(S3Bucket.DefaultBaseBackOff)
+  private[this] lazy val retryMaxBackOff =
+    Try(config.getDuration(retryPrefix + ".max-backoff").toMillis.millis).getOrElse(S3Bucket.DefaultMaxBackOff)
+  private[this] lazy val retryJitter =
+    Try(config.getDouble(retryPrefix + ".jitter")).getOrElse(S3Bucket.DefaultJitter)
 
   @transient private[this] lazy val defaultExecutor = {
     val maxPoolSize = 100
@@ -421,17 +432,19 @@ class S3Bucket(
     stream
   }
 
-  private[aws] def retry[T](f: => T, maxRetries: Int = 2): Option[T] =
+  private[aws] def retry[T](f: => T): Option[T] =
     Retry
       .exponentialBackOff(
-        maxRetries = maxRetries,
-        base = S3Bucket.BaseBackOff,
-        max = Some(S3Bucket.MaxBackOff),
-        jitter = S3Bucket.BackOffJitter,
-        retryWhen = !handler(_),
-        onRetry = (ex, delay, remaining) =>
-          logger.warn(s"Error during S3 operation. Retrying in ${delay.toMillis}ms ($remaining more times)", ex),
-        onMaxRetriesReached = ex => logger.error("Max retries reached. Aborting S3 operation", ex)
+        maxRetries = retryMaxRetries,
+        base = retryBaseBackOff,
+        max = Some(retryMaxBackOff),
+        jitter = retryJitter,
+        // `handler` is partial, so anything it doesn't classify is treated as worth retrying rather than thrown.
+        retryWhen = ex => !handler.applyOrElse(ex, (_: Throwable) => false),
+        // The failure itself is already logged by `handler`, so it isn't logged again here.
+        onRetry = (_, delay, remaining) =>
+          logger.warn(s"Error during S3 operation. Retrying in ${delay.toMillis}ms ($remaining more times)"),
+        onMaxRetriesReached = _ => logger.error("Max retries reached. Aborting S3 operation")
       )(f)
       .toOption
 
@@ -486,9 +499,10 @@ class S3Bucket(
 }
 
 object S3Bucket extends LazyLogging {
-  private[aws] val BaseBackOff = 3.seconds
-  private[aws] val MaxBackOff = 30.seconds
-  private[aws] val BackOffJitter = 1.second
+  private[aws] val DefaultMaxRetries = 2
+  private[aws] val DefaultBaseBackOff = 3.seconds
+  private[aws] val DefaultMaxBackOff = 30.seconds
+  private[aws] val DefaultJitter = 1d
 
   /** The error string with which the CRT-based S3 client reports a throttled request.
     *
