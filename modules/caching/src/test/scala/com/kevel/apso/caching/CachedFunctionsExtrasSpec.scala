@@ -62,12 +62,17 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
 
       "evicting a key after explicit invalidation" in {
         val counter = new AtomicInteger(0)
-        val f = () => counter.getAndIncrement()
+        val f: Int => Int = x => x + counter.getAndIncrement()
         val cachedF = f.cachedSync(config.Cache(Some(1.day), None))
-        cachedF() must beEqualTo(0)
-        cachedF() must beEqualTo(0)
-        cachedF.invalidate()
-        cachedF() must beEqualTo(1)
+        cachedF(1) must beEqualTo(1)
+        cachedF(1) must beEqualTo(1)
+        cachedF(2) must beEqualTo(3)
+        cachedF.invalidate(1)
+        cachedF(1) must beEqualTo(3)
+        cachedF(2) must beEqualTo(3)
+        cachedF.invalidate(2)
+        cachedF(1) must beEqualTo(3)
+        cachedF(2) must beEqualTo(5)
       }
 
       "evicting the entire cache after explicit invalidation" in {
