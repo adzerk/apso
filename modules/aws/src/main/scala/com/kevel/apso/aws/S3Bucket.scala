@@ -360,6 +360,30 @@ class S3Bucket(
       .join()
   }.isDefined
 
+  /** Copies the object in the location specified by `sourceKey` to `destinationKey`, in the same bucket.
+    *
+    * The copy is performed by S3 itself (`CopyObject`), so the object's bytes never travel through this process.
+    *
+    * @param sourceKey
+    *   the remote pathname to copy from
+    * @param destinationKey
+    *   the remote pathname to copy to
+    * @return
+    *   true if the copy was successful, false otherwise.
+    */
+  def copy(sourceKey: String, destinationKey: String): Boolean = retry {
+    logger.info(s"Copying 's3://$bucketName/$sourceKey' to 's3://$bucketName/$destinationKey'")
+
+    s3Client
+      .copyObject(
+        _.sourceBucket(bucketName)
+          .sourceKey(sanitizeKey(sourceKey))
+          .destinationBucket(bucketName)
+          .destinationKey(sanitizeKey(destinationKey))
+      )
+      .join()
+  }.isDefined
+
   /** Backups a remote file with the given `key`. A backup consists in copying the supplied file to a backup folder
     * under the same bucket and folder the file is currently in.
     *
