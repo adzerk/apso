@@ -78,10 +78,9 @@ scmInfo  := Some(
   )
 )
 
-releaseCrossBuild       := true
-releaseTagComment       := s"Release ${version.value}"
-releaseCommitMessage    := s"Set version to ${version.value}"
-releaseUseGlobalVersion := false // so that an unscoped version in `version.sbt` works
+releaseCrossBuild    := true
+releaseTagComment    := s"Release ${version.value}"
+releaseCommitMessage := s"Set version to ${version.value}"
 
 releaseProcess := Seq[ReleaseStep](
   checkSnapshotDependencies,
