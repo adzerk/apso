@@ -23,6 +23,9 @@ Use the following schema when setting up the Changelog for a new release. Remove
 This release adds an experimental `move` method to `FileDescriptor` and makes it possible to invalidate the underlying
 cache, either entirely or scoped to a key, for cached functions in `apso-caching`.
 
+Note that the current implementation of `move` may not be resilient in all scenarios, specially when used in remote
+file descriptors. We are planning to overhaul the `FileDescriptor` interfaces and implementations in upcoming releases.
+
 ### Added
 - Add move operation to `FileDescriptor` and refine base typing ([#1128](https://github.com/adzerk/apso/pull/1128)).
 - Add invalidation methods to cached functions ([#1160](https://github.com/adzerk/apso/pull/1160)).
