@@ -50,6 +50,9 @@ jobs:
       - name: Compile API documentation
         run: sbt -Dsbt.color=always "++${{ matrix.scala }} doc"
 
+      - name: Publish locally
+        run: sbt -Dsbt.color=always "++${{ matrix.scala }} publishLocal"
+
   validate-changelog:
     timeout-minutes: 5
     runs-on: ubuntu-latest
