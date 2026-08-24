@@ -18,6 +18,47 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.27.5] - 2026-09-24
+
+This release adds an experimental `move` method to `FileDescriptor` and makes it possible to invalidate the underlying
+cache, either entirely or scoped to a key, for cached functions in `apso-caching`.
+
+Note that the current implementation of `move` may not be resilient in all scenarios, specially when used in remote
+file descriptors. We are planning to overhaul the `FileDescriptor` interfaces and implementations in upcoming releases.
+
+### Added
+- Add move operation to `FileDescriptor` and refine base typing ([#1128](https://github.com/adzerk/apso/pull/1128)).
+- Add invalidation methods to cached functions ([#1160](https://github.com/adzerk/apso/pull/1160)).
+
+### Changed
+- Update typesafe:config to 1.4.9 ([#1084](https://github.com/adzerk/apso/pull/1084)).
+- Update scala3-library to 3.3.8 ([#1089](https://github.com/adzerk/apso/pull/1089)).
+- Update sbt, scripted-plugin to 1.12.13 ([#1098](https://github.com/adzerk/apso/pull/1098)).
+- Update circe-core, circe-generic, ... to 0.14.16 ([#1100](https://github.com/adzerk/apso/pull/1100)).
+- Update deprecated GitHub Actions ([#1108](https://github.com/adzerk/apso/pull/1108)).
+- Update bcpkix-jdk18on, bcprov-jdk18on to 1.85 ([#1112](https://github.com/adzerk/apso/pull/1112)).
+- Make SyncEvidence a public class ([#1118](https://github.com/adzerk/apso/pull/1118)).
+- Use uri instead of deprecated url in build.sbt ([#1119](https://github.com/adzerk/apso/pull/1119)).
+- Tighten `scalafmt` settings ([#1120](https://github.com/adzerk/apso/pull/1120)).
+- Update mdoc, sbt-mdoc to 2.9.1 ([#1123](https://github.com/adzerk/apso/pull/1123)).
+- Update sbt-scalafmt to 2.6.2 ([#1124](https://github.com/adzerk/apso/pull/1124)).
+- Add move operation to `FileDescriptor` and refine base typing ([#1128](https://github.com/adzerk/apso/pull/1128)).
+- Remove unnecessary `FileDescriptor` overrides ([#1129](https://github.com/adzerk/apso/pull/1129)).
+- Use global common settings in build.sbt ([#1133](https://github.com/adzerk/apso/pull/1133)).
+- Update unirest-java-core to 4.10.1 ([#1134](https://github.com/adzerk/apso/pull/1134)).
+- Update pekko-http, pekko-http-core, ... to 1.4.0 ([#1136](https://github.com/adzerk/apso/pull/1136)).
+- Update joda-time to 2.14.3 ([#1138](https://github.com/adzerk/apso/pull/1138)).
+- Update scalafmt-core to 3.11.5 ([#1140](https://github.com/adzerk/apso/pull/1140)).
+- Format build files ([#1143](https://github.com/adzerk/apso/pull/1143)).
+- Update commons-codec to 1.22.1 ([#1144](https://github.com/adzerk/apso/pull/1144)).
+- Update google-cloud-storage to 2.71.0 ([#1146](https://github.com/adzerk/apso/pull/1146)).
+- Update aws-crt to 0.48.4 ([#1158](https://github.com/adzerk/apso/pull/1158)).
+- Add invalidation methods to cached functions ([#1160](https://github.com/adzerk/apso/pull/1160)).
+- Update sbt-pgp to 2.3.2 ([#1161](https://github.com/adzerk/apso/pull/1161)).
+- Update pekko-actor, ... to 1.7.0 ([#1162](https://github.com/adzerk/apso/pull/1162)).
+- Update sbt to 2.0.7 ([#1163](https://github.com/adzerk/apso/pull/1163)).
+- Update s3, s3-transfer-manager to 2.54.2 ([#1165](https://github.com/adzerk/apso/pull/1165)).
+
 ## [0.27.4] - 2026-05-22
 
 This release adds support for instantiating an `SftpFileDescriptor` with the private key content provided directly,
