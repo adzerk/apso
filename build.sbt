@@ -133,7 +133,9 @@ lazy val caching = module(project, "caching")
     libraryDependencies ++= Seq(
       Scaffeine,
       Specs2_4Core % Test
-    )
+    ),
+    // Workaround for duplicate sbt-boilerplate generation under sbt2+; revisit upon updates
+    Compile / packageSrc / mappings ~= (xs => xs.distinct)
   )
 
 lazy val circe = module(project, "circe")
