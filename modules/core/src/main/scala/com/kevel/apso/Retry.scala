@@ -156,7 +156,7 @@ object Retry {
           } else {
             val delay = exponentialBackOffDelay(attempt, base, max, factor, jitter)
             onRetry(ex, delay, maxRetries - attempt)
-            blocking(Thread.sleep(delay.toMillis))
+            Thread.sleep(delay.toMillis)
             aux(attempt + 1)
           }
       }
