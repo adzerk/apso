@@ -112,7 +112,8 @@ lazy val aws = module(project, "aws")
       AwsSdkS3,
       AwsSdkS3Transfer,
       ScalaLogging,
-      TypesafeConfig
+      TypesafeConfig,
+      Specs2_4Core % Test
     )
   )
 
