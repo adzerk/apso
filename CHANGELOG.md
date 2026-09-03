@@ -18,6 +18,26 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.27.6] - 2026-09-04
+
+This release changes the `FileDescriptor` GCP and S3 implementations to retry using exponential backoff and `S3FileDescriptor` to retry on slow down errors (configurable through `aws.s3.retry.on-slow-down`).
+
+### Changed
+
+- Handle throttling in `FileDescriptor` implementations ([#1149](https://github.com/adzerk/apso/pull/1149)).
+- Ensure publish process works in CI ([#1168](https://github.com/adzerk/apso/pull/1168)).
+- Update google-cloud-storage to 2.72.0 ([#1169](https://github.com/adzerk/apso/pull/1169)).
+- Update s3, s3-transfer-manager to 2.54.3 ([#1170](https://github.com/adzerk/apso/pull/1170)).
+- Update s3, s3-transfer-manager to 2.54.5 ([#1171](https://github.com/adzerk/apso/pull/1171)).
+- Update sbt to 2.0.8 ([#1172](https://github.com/adzerk/apso/pull/1172)).
+- Update scalacheck to 1.20.0 ([#1173](https://github.com/adzerk/apso/pull/1173)).
+- Update s3, s3-transfer-manager to 2.54.7 ([#1174](https://github.com/adzerk/apso/pull/1174)).
+- Update s3, s3-transfer-manager to 2.54.10 ([#1175](https://github.com/adzerk/apso/pull/1175)).
+
+### Fixed
+
+- Work around duplicate sbt-boilerplate generation under sbt2 and bump version ([#1167](https://github.com/adzerk/apso/pull/1167)).
+
 ## [0.27.5] - 2026-09-24
 
 This release adds an experimental `move` method to `FileDescriptor` and makes it possible to invalidate the underlying
