@@ -220,7 +220,6 @@ final class GCSBucket(
     *   true if the copy was successful, false otherwise.
     */
   def copy(sourceKey: String, destinationKey: String): Boolean = retry {
-    logger.info(s"Copying 'gs://$bucketName/$sourceKey' to 'gs://$bucketName/$destinationKey'")
     storage.copy(CopyRequest.of(blobId(sourceKey), blobId(destinationKey))).getResult()
   }.isDefined
 
