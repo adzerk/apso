@@ -173,7 +173,7 @@ breaking the `FileDescriptor` contract as implemented by `GCSFileDescriptor`, wh
 
 ## [0.27.2] - 2026-03-09
 
-This patch fixes an issue where `SftpFileDescriptor.stream` would stop working indefinitely after a certain number of 
+This patch fixes an issue where `SftpFileDescriptor.stream` would stop working indefinitely after a certain number of
 failed retries due to incorrect client pool management upon failure.
 
 ### Changed
