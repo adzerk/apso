@@ -38,6 +38,8 @@ This release changes the `FileDescriptor` GCP and S3 implementations to retry us
 
 - Work around duplicate sbt-boilerplate generation under sbt2 and bump version ([#1167](https://github.com/adzerk/apso/pull/1167)).
 
+[0.27.6]: https://github.com/adzerk/apso/compare/v0.27.5...v0.27.6
+
 ## [0.27.5] - 2026-09-24
 
 This release adds an experimental `move` method to `FileDescriptor` and makes it possible to invalidate the underlying
@@ -78,6 +80,8 @@ file descriptors. We are planning to overhaul the `FileDescriptor` interfaces an
 - Update pekko-actor, ... to 1.7.0 ([#1162](https://github.com/adzerk/apso/pull/1162)).
 - Update sbt to 2.0.7 ([#1163](https://github.com/adzerk/apso/pull/1163)).
 - Update s3, s3-transfer-manager to 2.54.2 ([#1165](https://github.com/adzerk/apso/pull/1165)).
+
+[0.27.5]: https://github.com/adzerk/apso/compare/v0.27.4...v0.27.5
 
 ## [0.27.4] - 2026-05-22
 
