@@ -40,7 +40,7 @@ This release changes the `FileDescriptor` GCP and S3 implementations to retry us
 
 [0.27.6]: https://github.com/adzerk/apso/compare/v0.27.5...v0.27.6
 
-## [0.27.5] - 2026-09-24
+## [0.27.5] - 2026-08-24
 
 This release adds an experimental `move` method to `FileDescriptor` and makes it possible to invalidate the underlying
 cache, either entirely or scoped to a key, for cached functions in `apso-caching`.
