@@ -379,6 +379,42 @@ class S3Bucket(
       .join()
   }.isDefined
 
+  /** Copies the object in the location specified by `sourceKey` to `destinationKey`, in the same bucket.
+    *
+    * The copy is performed by S3 itself, so the object's bytes never travel through this process. The Transfer Manager
+    * uses `CopyObject` for small objects and multipart copy for large objects.
+    *
+    * @see
+    *   [[https://docs.aws.amazon.com/AmazonS3/latest/userguide/copy-object.html Copying objects in Amazon S3]]
+    * @see
+    *   [[https://docs.aws.amazon.com/java/api/latest/software/amazon/awssdk/transfer/s3/S3TransferManager.html#copy(software.amazon.awssdk.transfer.s3.model.CopyRequest) S3TransferManager.copy]]
+    *
+    * @param sourceKey
+    *   the remote pathname to copy from
+    * @param destinationKey
+    *   the remote pathname to copy to
+    * @return
+    *   true if the copy was successful, false otherwise.
+    */
+  def copy(sourceKey: String, destinationKey: String): Boolean = retry {
+    Using(getTransferManager) {
+      _.copy(
+        model.CopyRequest
+          .builder()
+          .copyObjectRequest(
+            CopyObjectRequest
+              .builder()
+              .sourceBucket(bucketName)
+              .sourceKey(sanitizeKey(sourceKey))
+              .destinationBucket(bucketName)
+              .destinationKey(sanitizeKey(destinationKey))
+              .build()
+          )
+          .build()
+      ).completionFuture().join()
+    }.get
+  }.isDefined
+
   /** Backups a remote file with the given `key`. A backup consists in copying the supplied file to a backup folder
     * under the same bucket and folder the file is currently in.
     *

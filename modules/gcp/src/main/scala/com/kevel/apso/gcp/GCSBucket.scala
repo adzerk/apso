@@ -10,7 +10,7 @@ import scala.jdk.CollectionConverters.*
 import scala.util.Try
 
 import com.google.cloud.BaseServiceException
-import com.google.cloud.storage.Storage.{BlobListOption, BlobSourceOption, BlobWriteOption}
+import com.google.cloud.storage.Storage.{BlobListOption, BlobSourceOption, BlobWriteOption, CopyRequest}
 import com.google.cloud.storage.{Blob, BlobId, BlobInfo, Storage, StorageException}
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
@@ -206,6 +206,21 @@ final class GCSBucket(
 
     val info = BlobInfo.newBuilder(blobId(dirKey)).build()
     storage.create(info, Array.emptyByteArray)
+  }.isDefined
+
+  /** Copies the object in the location specified by `sourceKey` to `destinationKey`, in the same bucket.
+    *
+    * The copy is performed by GCS itself (the `rewrite` API), so the object's bytes never travel through this process.
+    *
+    * @param sourceKey
+    *   the remote pathname to copy from
+    * @param destinationKey
+    *   the remote pathname to copy to
+    * @return
+    *   true if the copy was successful, false otherwise.
+    */
+  def copy(sourceKey: String, destinationKey: String): Boolean = retry {
+    storage.copy(CopyRequest.of(blobId(sourceKey), blobId(destinationKey))).getResult()
   }.isDefined
 
   /** Pulls a remote file with the given `key`, to the local storage in the pathname provided by `destination`.
