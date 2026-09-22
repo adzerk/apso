@@ -16,7 +16,7 @@ object Dependencies {
     val FastMd5        = "2.7.1"
     val Gcp            = "2.73.0"
     val JUnit          = "4.13.2"
-    val JodaTime       = "2.14.3"
+    val JodaTime       = "2.14.4"
     val ScalaCheck     = "1.20.0"
     val ScalaLogging   = "3.9.6"
     val ScalaPool      = "0.5.0"
