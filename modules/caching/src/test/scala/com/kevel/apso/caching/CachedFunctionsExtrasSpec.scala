@@ -1,6 +1,6 @@
 package com.kevel.apso.caching
 
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 import java.util.logging.{Level, Logger}
 
 import scala.concurrent.duration.DurationInt
@@ -249,6 +249,34 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
 
         cachedF(1) must beEqualTo(2).await
         cachedF(2) must beEqualTo(3).await
+      }
+
+      "using the last completed result, even if a refresh is being computed" in {
+        val calls = new AtomicInteger(0)
+        val computing = new AtomicBoolean(false)
+        val getter = () => {
+          val c = calls.getAndIncrement()
+          if (c == 0) Future.successful(0)
+          else
+            Future {
+              computing.set(true)
+              Thread.sleep(1000)
+              computing.set(false)
+              c
+            }
+        }
+        val cachedGetter = getter.cachedAsync(config.Cache(None, None, Some(500.millis)))
+
+        cachedGetter() must beEqualTo(0).await
+        calls.get() must beEqualTo(1)
+        computing.get() must beFalse
+
+        eventually(retries = 6, sleep = 100.millis) {
+          cachedGetter() must beEqualTo(0).await
+          computing.get() must beTrue
+          cachedGetter() must beEqualTo(0).await
+          calls.get() must beEqualTo(2)
+        }
       }
     }
   }
