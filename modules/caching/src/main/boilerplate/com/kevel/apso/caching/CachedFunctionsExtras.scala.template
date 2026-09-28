@@ -33,6 +33,7 @@ trait CachedFunctionsExtras {
     /**
      * Caches the result of this asynchronous computation. Failing futures will eventually be evicted automatically.
      * @param conf the underlying cache settings.
+     * @param defaultValue a default value to return if a completed value is not in cache. If not provided, the on-going future will be returned.
      * @return a cached function.
      */
     final def cachedAsync(conf: config.Cache, defaultValue: => Option[V] = None): AsyncMemoizeFn0[V] = {
@@ -44,6 +45,7 @@ trait CachedFunctionsExtras {
     /**
      * Caches the result of this asynchronous computation. Failing futures will eventually be evicted automatically.
      * @param conf the underlying cache settings.
+     * @param defaultValue a default value to return if a completed value is not in cache. If not provided, the on-going future will be returned.
      * @return a cached function.
      */
     final def cachedAsync(conf: config.Cache, defaultValue: ([#I0#]) => Option[V] = ([#i0: I0#]) => None): AsyncMemoizeFn1[[#I0#], V] = {
