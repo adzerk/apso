@@ -35,8 +35,8 @@ trait CachedFunctionsExtras {
      * @param conf the underlying cache settings.
      * @return a cached function.
      */
-    final def cachedAsync(conf: config.Cache): AsyncMemoizeFn0[V] = {
-      MemoizeFn.async(fn, conf)
+    final def cachedAsync(conf: config.Cache, defaultValue: => Option[V] = None): AsyncMemoizeFn0[V] = {
+      MemoizeFn.async(fn, conf, defaultValue)
     }
   }
   [#
@@ -46,8 +46,8 @@ trait CachedFunctionsExtras {
      * @param conf the underlying cache settings.
      * @return a cached function.
      */
-    final def cachedAsync(conf: config.Cache): AsyncMemoizeFn1[[#I0#], V] = {
-      MemoizeFn.async(fn, conf)
+    final def cachedAsync(conf: config.Cache, defaultValue: ([#I0#]) => Option[V] = ([#i0: I0#]) => None): AsyncMemoizeFn1[[#I0#], V] = {
+      MemoizeFn.async(fn, conf, defaultValue)
     }
   }#
   ]

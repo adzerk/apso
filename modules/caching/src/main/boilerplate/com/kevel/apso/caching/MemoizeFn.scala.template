@@ -30,8 +30,15 @@ sealed trait SyncMemoizeFn0[V] extends (() => V) {
 sealed trait AsyncMemoizeFn0[V] extends (() => Future[V]) {
   protected def cacheConfig: config.Cache
   protected def fn: Unit => Future[V]
+  protected def defaultValue: Option[V] = None
   private lazy val cache: AsyncLoadingCache[Unit, V] = cacheConfig.build.buildAsyncFuture(fn)
-  override def apply(): Future[V] = cache.get(())
+  override def apply(): Future[V] = {
+    val fut = cache.get(())
+    if (fut.isCompleted) fut else defaultValue match {
+      case Some(v) => Future.successful(v)
+      case None => fut
+    }
+  }
   def invalidate(): Unit = cache.synchronous().invalidate(())
   def invalidateAll(): Unit = cache.synchronous().invalidateAll()
 }
@@ -63,8 +70,15 @@ sealed trait SyncMemoizeFn1[[#I0#], V] extends Function1[[#I0#], V] {
 sealed trait AsyncMemoizeFn1[[#I0#], V] extends Function1[[#I0#], Future[V]] {
   def cacheConfig: config.Cache
   def fn: ([#I0#]) => Future[V]
+  def defaultValue: ([#I0#]) => Option[V] = ([#i0: I0#]) => None
   private lazy val cache: AsyncLoadingCache[([#I0#]), V] = cacheConfig.build.buildAsyncFuture(fn.tupled)
-  override def apply([#i0: I0#]): Future[V] = cache.get(([#i0#]))
+  override def apply([#i0: I0#]): Future[V] = {
+    val fut = cache.get(([#i0#]))
+    if (fut.isCompleted) fut else defaultValue([#i0#]) match {
+      case Some(v) => Future.successful(v)
+      case None => fut
+    }
+  }
   def invalidate([#i0: I0#]): Unit = cache.synchronous().invalidate(([#i0#]))
   def invalidateAll(): Unit = cache.synchronous().invalidateAll()
 }#
@@ -86,14 +100,16 @@ object MemoizeFn {
   }#
 ]
 
-  private[caching] def async[V](function: () => Future[V], conf: config.Cache): AsyncMemoizeFn0[V] = new AsyncMemoizeFn0[V] {
+  private[caching] def async[V](function: () => Future[V], conf: config.Cache, default: => Option[V]): AsyncMemoizeFn0[V] = new AsyncMemoizeFn0[V] {
     def cacheConfig: config.Cache = conf
     def fn: Unit => Future[V] = _ => function()
+    override def defaultValue: Option[V] = default
   }
 [#
-  private[caching] def async[[#I0#], V](function: ([#I0#]) => Future[V], conf: config.Cache): AsyncMemoizeFn1[[#I0#], V] = new AsyncMemoizeFn1[[#I0#], V] {
+  private[caching] def async[[#I0#], V](function: ([#I0#]) => Future[V], conf: config.Cache, default: ([#I0#]) => Option[V]): AsyncMemoizeFn1[[#I0#], V] = new AsyncMemoizeFn1[[#I0#], V] {
     def cacheConfig: config.Cache = conf
     def fn: ([#I0#]) => Future[V] = function
+    override def defaultValue: ([#I0#]) => Option[V] = default
   }#
 ]
 }
