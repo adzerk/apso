@@ -350,6 +350,22 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
         cachedGetter("some") must beEqualTo("default")
       }
 
+      "re-evaluating the default for nullary methods" in {
+        val getter = () => Future.never
+        val defaultCalls = new AtomicInteger(0)
+        val cachedGetter = getter.cachedSync(
+          config.Cache(None, None),
+          defaultValue = {
+            defaultCalls.getAndIncrement()
+            0
+          }
+        )
+
+        cachedGetter() must beEqualTo(0)
+        cachedGetter() must beEqualTo(0)
+        defaultCalls.get() must beEqualTo(2)
+      }
+
       "throwing when the future fails, evicting failed futures" in {
         case object DummyException extends RuntimeException("fail") with NoStackTrace
         val calls = new AtomicInteger(0)
