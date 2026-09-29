@@ -39,6 +39,13 @@ trait CachedFunctionsExtras {
     final def cachedAsync(conf: config.Cache, defaultValue: => Option[V] = None): AsyncMemoizeFn0[V] = {
       MemoizeFn.async(fn, conf, defaultValue)
     }
+
+    /**
+     * Caches this asynchronous computation and returns its completed value, using `defaultValue` if no value is immediately available.
+     */
+    final def cachedSync(conf: config.Cache, defaultValue: => V): SyncMemoizeFutureFn0[V] = {
+      MemoizeFn.syncAsync(fn, conf, defaultValue)
+    }
   }
   [#
   final implicit class Fn1AsyncCachingExtras[[#I0#], V](fn: Function1[[#I0#], Future[V]]) {
@@ -50,6 +57,13 @@ trait CachedFunctionsExtras {
      */
     final def cachedAsync(conf: config.Cache, defaultValue: ([#I0#]) => Option[V] = ([#i0: I0#]) => None): AsyncMemoizeFn1[[#I0#], V] = {
       MemoizeFn.async(fn, conf, defaultValue)
+    }
+
+    /**
+     * Caches this asynchronous computation and returns its completed value, using `defaultValue` while no value is immediately available.
+     */
+    final def cachedSync(conf: config.Cache, defaultValue: ([#I0#]) => V): SyncMemoizeFutureFn1[[#I0#], V] = {
+      MemoizeFn.syncAsync(fn, conf, defaultValue)
     }
   }#
   ]

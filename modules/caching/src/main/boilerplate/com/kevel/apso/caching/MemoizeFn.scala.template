@@ -43,6 +43,14 @@ sealed trait AsyncMemoizeFn0[V] extends (() => Future[V]) {
   def invalidateAll(): Unit = cache.synchronous().invalidateAll()
 }
 
+/** A synchronous view of an asynchronous cached function with a fallback value. */
+sealed trait SyncMemoizeFutureFn0[V] extends (() => V) {
+  protected def asyncFn: AsyncMemoizeFn0[V]
+  override def apply(): V = asyncFn().value.get.get
+  def invalidate(): Unit = asyncFn.invalidate()
+  def invalidateAll(): Unit = asyncFn.invalidateAll()
+}
+
 [#
 /**
   * Provides a memoization mechanism for synchronous functions with 1 arguments using Caffeine.
@@ -84,6 +92,16 @@ sealed trait AsyncMemoizeFn1[[#I0#], V] extends Function1[[#I0#], Future[V]] {
 }#
 ]
 
+[#
+/** A synchronous view of an asynchronous cached function with a fallback value. */
+sealed trait SyncMemoizeFutureFn1[[#I0#], V] extends Function1[[#I0#], V] {
+  protected def asyncFn: AsyncMemoizeFn1[[#I0#], V]
+  override def apply([#i0: I0#]): V = asyncFn([#i0#]).value.get.get
+  def invalidate([#i0: I0#]): Unit = asyncFn.invalidate([#i0#])
+  def invalidateAll(): Unit = asyncFn.invalidateAll()
+}#
+]
+
 object MemoizeFn {
   private[caching] implicit class Function1Ops[A, B](f: A => B) {
     def tupled: A => B = f
@@ -105,11 +123,21 @@ object MemoizeFn {
     def fn: Unit => Future[V] = _ => function()
     override def defaultValue: Option[V] = default
   }
+
+  private[caching] def syncAsync[V](function: () => Future[V], conf: config.Cache, default: => V): SyncMemoizeFutureFn0[V] = new SyncMemoizeFutureFn0[V] {
+    protected val asyncFn: AsyncMemoizeFn0[V] = async(function, conf, Some(default))
+  }
 [#
   private[caching] def async[[#I0#], V](function: ([#I0#]) => Future[V], conf: config.Cache, default: ([#I0#]) => Option[V]): AsyncMemoizeFn1[[#I0#], V] = new AsyncMemoizeFn1[[#I0#], V] {
     def cacheConfig: config.Cache = conf
     def fn: ([#I0#]) => Future[V] = function
     override def defaultValue: ([#I0#]) => Option[V] = default
+  }#
+]
+
+[#
+  private[caching] def syncAsync[[#I0#], V](function: ([#I0#]) => Future[V], conf: config.Cache, default: ([#I0#]) => V): SyncMemoizeFutureFn1[[#I0#], V] = new SyncMemoizeFutureFn1[[#I0#], V] {
+    protected val asyncFn: AsyncMemoizeFn1[[#I0#], V] = async(function, conf, ([#i0: I0#]) => Some(default([#i0#])))
   }#
 ]
 }

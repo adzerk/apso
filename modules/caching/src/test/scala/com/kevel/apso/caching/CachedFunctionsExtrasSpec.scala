@@ -5,6 +5,7 @@ import java.util.logging.{Level, Logger}
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Future, Promise}
+import scala.util.control.NoStackTrace
 
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.execute.AsResult
@@ -312,6 +313,53 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
 
         cachedGetter("default") must beEqualTo(-1).await
         cachedGetter("other") must beEqualTo(0).await
+      }
+    }
+
+    "provide a synchronous view over an asynchronous computation with a default" in {
+
+      "yielding the default when no value is yet available" in {
+        val calls = new AtomicInteger(0)
+        val getter = () =>
+          Future {
+            val c = calls.getAndIncrement()
+            Thread.sleep(500)
+            c
+          }
+
+        val cachedGetter = getter.cachedSync(config.Cache(None, None), -1)
+        cachedGetter() must beEqualTo(-1)
+
+        eventually {
+          cachedGetter() must beEqualTo(0)
+          calls.get() must beEqualTo(1)
+        }
+      }
+
+      "falling back to the default when the cached value expires" in {
+        val getter = (x: String) =>
+          Future {
+            Thread.sleep(500)
+            x
+          }
+        val cachedGetter = getter.cachedSync(config.Cache(None, None), _ => "default")
+
+        cachedGetter("some") must beEqualTo("default")
+        eventually(cachedGetter("some") must beEqualTo("some"))
+        cachedGetter.invalidate("some")
+        cachedGetter("some") must beEqualTo("default")
+      }
+
+      "throwing when the future fails, evicting failed futures" in {
+        case object DummyException extends RuntimeException("fail") with NoStackTrace
+        val calls = new AtomicInteger(0)
+        val getter = () => {
+          if (calls.getAndIncrement() == 0) Future.failed(DummyException)
+          else Future.successful(1)
+        }
+        val cachedGetter = getter.cachedSync(config.Cache(None, None), -1)
+        eventually(cachedGetter() must throwA[DummyException.type])
+        eventually(cachedGetter() must beEqualTo(1))
       }
     }
   }
