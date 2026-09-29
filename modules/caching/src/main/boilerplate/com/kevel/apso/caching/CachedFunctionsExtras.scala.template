@@ -42,6 +42,9 @@ trait CachedFunctionsExtras {
 
     /**
      * Caches this asynchronous computation and returns its completed value, using `defaultValue` if no value is immediately available.
+     * @param conf the underlying cache settings.
+     * @param defaultValue a default value to return if a completed value is not in cache.
+     * @return a cached function.
      */
     final def cachedSync(conf: config.Cache, defaultValue: => V): SyncMemoizeFutureFn0[V] = {
       MemoizeFn.syncAsync(fn, conf, defaultValue)
@@ -61,6 +64,9 @@ trait CachedFunctionsExtras {
 
     /**
      * Caches this asynchronous computation and returns its completed value, using `defaultValue` while no value is immediately available.
+     * @param conf the underlying cache settings.
+     * @param defaultValue a default value to return if a completed value is not in cache.
+     * @return a cached function.
      */
     final def cachedSync(conf: config.Cache, defaultValue: ([#I0#]) => V): SyncMemoizeFutureFn1[[#I0#], V] = {
       MemoizeFn.syncAsync(fn, conf, defaultValue)
