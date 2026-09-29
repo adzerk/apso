@@ -33,10 +33,21 @@ trait CachedFunctionsExtras {
     /**
      * Caches the result of this asynchronous computation. Failing futures will eventually be evicted automatically.
      * @param conf the underlying cache settings.
+     * @param defaultValue a default value to return if a completed value is not in cache. If not provided, the on-going future will be returned.
      * @return a cached function.
      */
-    final def cachedAsync(conf: config.Cache): AsyncMemoizeFn0[V] = {
-      MemoizeFn.async(fn, conf)
+    final def cachedAsync(conf: config.Cache, defaultValue: => Option[V] = None): AsyncMemoizeFn0[V] = {
+      MemoizeFn.async(fn, conf, defaultValue)
+    }
+
+    /**
+     * Caches this asynchronous computation and returns its completed value, using `defaultValue` if no value is immediately available.
+     * @param conf the underlying cache settings.
+     * @param defaultValue a default value to return if a completed value is not in cache.
+     * @return a cached function.
+     */
+    final def cachedSync(conf: config.Cache, defaultValue: => V): SyncMemoizeFutureFn0[V] = {
+      MemoizeFn.syncAsync(fn, conf, defaultValue)
     }
   }
   [#
@@ -44,10 +55,21 @@ trait CachedFunctionsExtras {
     /**
      * Caches the result of this asynchronous computation. Failing futures will eventually be evicted automatically.
      * @param conf the underlying cache settings.
+     * @param defaultValue a default value to return if a completed value is not in cache. If not provided, the on-going future will be returned.
      * @return a cached function.
      */
-    final def cachedAsync(conf: config.Cache): AsyncMemoizeFn1[[#I0#], V] = {
-      MemoizeFn.async(fn, conf)
+    final def cachedAsync(conf: config.Cache, defaultValue: ([#I0#]) => Option[V] = ([#i0: I0#]) => None): AsyncMemoizeFn1[[#I0#], V] = {
+      MemoizeFn.async(fn, conf, defaultValue)
+    }
+
+    /**
+     * Caches this asynchronous computation and returns its completed value, using `defaultValue` while no value is immediately available.
+     * @param conf the underlying cache settings.
+     * @param defaultValue a default value to return if a completed value is not in cache.
+     * @return a cached function.
+     */
+    final def cachedSync(conf: config.Cache, defaultValue: ([#I0#]) => V): SyncMemoizeFutureFn1[[#I0#], V] = {
+      MemoizeFn.syncAsync(fn, conf, defaultValue)
     }
   }#
   ]

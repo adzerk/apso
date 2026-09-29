@@ -5,6 +5,7 @@ import java.util.logging.{Level, Logger}
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Future, Promise}
+import scala.util.control.NoStackTrace
 
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.execute.AsResult
@@ -277,6 +278,104 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
           cachedGetter() must beEqualTo(0).await
           calls.get() must beEqualTo(2)
         }
+      }
+
+      "yielding a default value if set and the real value is not yet available" in {
+        val calls = new AtomicInteger(0)
+        val getter = () =>
+          Future {
+            val c = calls.getAndIncrement()
+            Thread.sleep(500)
+            c
+          }
+
+        val cachedGetter = getter.cachedAsync(config.Cache(None, None), Some(-1))
+
+        cachedGetter() must beEqualTo(-1).await
+        eventually(calls.get() must beEqualTo(1))
+        cachedGetter() must beEqualTo(-1).await
+        calls.get() must beEqualTo(1)
+
+        eventually(retries = 6, sleep = 100.millis) {
+          cachedGetter() must beEqualTo(0).await
+          calls.get() must beEqualTo(1)
+        }
+      }
+
+      "yielding a default value if set and the real value is not yet available, depending on arguments" in {
+        val getter = (_: String) =>
+          Future {
+            Thread.sleep(500)
+            0
+          }
+
+        val cachedGetter = getter.cachedAsync(config.Cache(None, None), arg => Option.when(arg == "default")(-1))
+
+        cachedGetter("default") must beEqualTo(-1).await
+        cachedGetter("other") must beEqualTo(0).await
+      }
+    }
+
+    "provide a synchronous view over an asynchronous computation with a default" in {
+
+      "yielding the default when no value is yet available" in {
+        val calls = new AtomicInteger(0)
+        val getter = () =>
+          Future {
+            val c = calls.getAndIncrement()
+            Thread.sleep(500)
+            c
+          }
+
+        val cachedGetter = getter.cachedSync(config.Cache(None, None), -1)
+        cachedGetter() must beEqualTo(-1)
+
+        eventually {
+          cachedGetter() must beEqualTo(0)
+          calls.get() must beEqualTo(1)
+        }
+      }
+
+      "falling back to the default when the cached value expires" in {
+        val getter = (x: String) =>
+          Future {
+            Thread.sleep(500)
+            x
+          }
+        val cachedGetter = getter.cachedSync(config.Cache(None, None), _ => "default")
+
+        cachedGetter("some") must beEqualTo("default")
+        eventually(cachedGetter("some") must beEqualTo("some"))
+        cachedGetter.invalidate("some")
+        cachedGetter("some") must beEqualTo("default")
+      }
+
+      "re-evaluating the default for nullary methods" in {
+        val getter = () => Future.never
+        val defaultCalls = new AtomicInteger(0)
+        val cachedGetter = getter.cachedSync(
+          config.Cache(None, None),
+          defaultValue = {
+            defaultCalls.getAndIncrement()
+            0
+          }
+        )
+
+        cachedGetter() must beEqualTo(0)
+        cachedGetter() must beEqualTo(0)
+        defaultCalls.get() must beEqualTo(2)
+      }
+
+      "throwing when the future fails, evicting failed futures" in {
+        case object DummyException extends RuntimeException("fail") with NoStackTrace
+        val calls = new AtomicInteger(0)
+        val getter = () => {
+          if (calls.getAndIncrement() == 0) Future.failed(DummyException)
+          else Future.successful(1)
+        }
+        val cachedGetter = getter.cachedSync(config.Cache(None, None), -1)
+        eventually(cachedGetter() must throwA[DummyException.type])
+        eventually(cachedGetter() must beEqualTo(1))
       }
     }
   }
