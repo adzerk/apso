@@ -314,6 +314,22 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
         cachedGetter("default") must beEqualTo(-1).await
         cachedGetter("other") must beEqualTo(0).await
       }
+
+      "providing a way to prefetch for nullary caches" in {
+        val calls = new AtomicInteger(0)
+        val getter = () => {
+          calls.getAndIncrement()
+          Future.successful(0)
+        }
+
+        val unwarmedGetter = getter.cachedAsync(config.Cache(None, None))
+        Thread.sleep(200)
+        calls.get() must beEqualTo(0)
+
+        val warmedGetter = getter.cachedAsync(config.Cache(None, None), preload = true)
+        Thread.sleep(200)
+        calls.get() must beEqualTo(1)
+      }
     }
 
     "provide a synchronous view over an asynchronous computation with a default" in {

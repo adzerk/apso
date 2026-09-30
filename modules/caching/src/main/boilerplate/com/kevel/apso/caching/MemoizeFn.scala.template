@@ -118,14 +118,15 @@ object MemoizeFn {
   }#
 ]
 
-  private[caching] def async[V](function: () => Future[V], conf: config.Cache, default: => Option[V]): AsyncMemoizeFn0[V] = new AsyncMemoizeFn0[V] {
+  private[caching] def async[V](function: () => Future[V], conf: config.Cache, default: => Option[V], preload: Boolean = false): AsyncMemoizeFn0[V] = new AsyncMemoizeFn0[V] {
     override val cacheConfig: config.Cache = conf
     override val fn: Unit => Future[V] = _ => function()
     override def defaultValue: Option[V] = default
+    if (preload) apply()
   }
 
-  private[caching] def syncAsync[V](function: () => Future[V], conf: config.Cache, default: => V): SyncMemoizeFutureFn0[V] = new SyncMemoizeFutureFn0[V] {
-    protected val asyncFn: AsyncMemoizeFn0[V] = async(function, conf, Some(default))
+  private[caching] def syncAsync[V](function: () => Future[V], conf: config.Cache, default: => V, preload: Boolean = false): SyncMemoizeFutureFn0[V] = new SyncMemoizeFutureFn0[V] {
+    protected val asyncFn: AsyncMemoizeFn0[V] = async(function, conf, Some(default), preload)
   }
 [#
   private[caching] def async[[#I0#], V](function: ([#I0#]) => Future[V], conf: config.Cache, default: ([#I0#]) => Option[V]): AsyncMemoizeFn1[[#I0#], V] = new AsyncMemoizeFn1[[#I0#], V] {

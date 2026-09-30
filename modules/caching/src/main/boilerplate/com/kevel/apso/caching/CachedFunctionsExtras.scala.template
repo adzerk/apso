@@ -34,20 +34,22 @@ trait CachedFunctionsExtras {
      * Caches the result of this asynchronous computation. Failing futures will eventually be evicted automatically.
      * @param conf the underlying cache settings.
      * @param defaultValue a default value to return if a completed value is not in cache. If not provided, the on-going future will be returned.
+     * @param preload whether to preload the cache with a value immediately, without waiting for the first call to `apply()`.
      * @return a cached function.
      */
-    final def cachedAsync(conf: config.Cache, defaultValue: => Option[V] = None): AsyncMemoizeFn0[V] = {
-      MemoizeFn.async(fn, conf, defaultValue)
+    final def cachedAsync(conf: config.Cache, defaultValue: => Option[V] = None, preload: Boolean = false): AsyncMemoizeFn0[V] = {
+      MemoizeFn.async(fn, conf, defaultValue, preload)
     }
 
     /**
      * Caches this asynchronous computation and returns its completed value, using `defaultValue` if no value is immediately available.
      * @param conf the underlying cache settings.
      * @param defaultValue a default value to return if a completed value is not in cache.
+     * @param preload whether to preload the cache with a value immediately, without waiting for the first call to `apply()`.
      * @return a cached function.
      */
-    final def cachedSync(conf: config.Cache, defaultValue: => V): SyncMemoizeFutureFn0[V] = {
-      MemoizeFn.syncAsync(fn, conf, defaultValue)
+    final def cachedSync(conf: config.Cache, defaultValue: => V, preload: Boolean = false): SyncMemoizeFutureFn0[V] = {
+      MemoizeFn.syncAsync(fn, conf, defaultValue, preload)
     }
   }
   [#
