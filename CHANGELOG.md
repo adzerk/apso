@@ -18,6 +18,32 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.28.0] - 2026-09-30
+
+This release bumps the minimum required Java version to 17, adds new caching capabilities and makes the implementation of `FileDescriptor`'s `move` more resilient.
+
+### Added
+
+- Add default for `cachedAsync` and a synchronous viewer over an async cache ([#1195](https://github.com/adzerk/apso/pull/1195)).
+
+### Changed
+
+- Bump Java version to 17 ([#1121](https://github.com/adzerk/apso/pull/1121)).
+- Update mdoc, sbt-mdoc to 2.9.2 ([#1178](https://github.com/adzerk/apso/pull/1178)).
+- Update bcpkix-jdk18on, bcprov-jdk18on to 1.86 ([#1184](https://github.com/adzerk/apso/pull/1184)).
+- Update sshj to 0.41.1 ([#1186](https://github.com/adzerk/apso/pull/1186)).
+- Update joda-time to 2.14.4 ([#1187](https://github.com/adzerk/apso/pull/1187)).
+- Update sbt to 2.0.9 ([#1188](https://github.com/adzerk/apso/pull/1188)).
+- Update google-cloud-storage to 2.74.0 ([#1190](https://github.com/adzerk/apso/pull/1190)).
+- Update s3, s3-transfer-manager to 2.55.6 ([#1192](https://github.com/adzerk/apso/pull/1192)).
+- Expose Scaffeine `refreshAfterWrite` ([#1193](https://github.com/adzerk/apso/pull/1193)).
+
+### Fixed
+
+- Prefer CopyRequest for `move` API ([#1182](https://github.com/adzerk/apso/pull/1182)).
+
+[0.28.0]: https://github.com/adzerk/apso/compare/v0.27.6...v0.28.0
+
 ## [0.27.6] - 2026-09-04
 
 This release changes the `FileDescriptor` GCP and S3 implementations to retry using exponential backoff and `S3FileDescriptor` to retry on slow down errors (configurable through `aws.s3.retry.on-slow-down`).
