@@ -18,9 +18,9 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
-## [0.27.7] - 2026-09-30
+## [0.28.0] - 2026-09-30
 
-This release adds new caching capabilities and makes the implementation of `FileDescriptor`'s `move` more resilient.
+This release bumps the minimum required Java version to 17, adds new caching capabilities and makes the implementation of `FileDescriptor`'s `move` more resilient.
 
 ### Added
 
@@ -42,7 +42,7 @@ This release adds new caching capabilities and makes the implementation of `File
 
 - Prefer CopyRequest for `move` API ([#1182](https://github.com/adzerk/apso/pull/1182)).
 
-[0.27.7]: https://github.com/adzerk/apso/compare/v0.27.6...v0.27.7
+[0.28.0]: https://github.com/adzerk/apso/compare/v0.27.6...v0.28.0
 
 ## [0.27.6] - 2026-09-04
 
