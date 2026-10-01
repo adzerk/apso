@@ -122,7 +122,7 @@ object MemoizeFn {
     override val cacheConfig: config.Cache = conf
     override val fn: Unit => Future[V] = _ => function()
     override def defaultValue: Option[V] = default
-    if (preload) cache.get(())
+    if (preload) try { cache.get(()) } catch { case scala.util.control.NonFatal(_) => () }
   }
 
   private[caching] def syncAsync[V](function: () => Future[V], conf: config.Cache, default: => V, preload: Boolean = false): SyncMemoizeFutureFn0[V] = new SyncMemoizeFutureFn0[V] {
