@@ -352,15 +352,16 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
 
       "yielding the default when no value is yet available" in {
         val calls = new AtomicInteger(0)
-        val getter = () =>
-          Future {
-            val c = calls.getAndIncrement()
-            Thread.sleep(500)
-            c
-          }
+        val promise = Promise[Unit]()
+        val getter = () => {
+          val c = calls.getAndIncrement()
+          promise.future.map(_ => c)
+        }
 
         val cachedGetter = getter.cachedSync(config.Cache(None, None), -1)
         cachedGetter() must beEqualTo(-1)
+
+        promise.success(())
 
         eventually {
           cachedGetter() must beEqualTo(0)
@@ -369,14 +370,14 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
       }
 
       "falling back to the default when the cached value expires" in {
+        val promise = Promise[Unit]()
         val getter = (x: String) =>
-          Future {
-            Thread.sleep(500)
-            x
-          }
+          if (promise.isCompleted) Future.never
+          else promise.future.map(_ => x)
         val cachedGetter = getter.cachedSync(config.Cache(None, None), _ => "default")
 
         cachedGetter("some") must beEqualTo("default")
+        promise.success(())
         eventually(cachedGetter("some") must beEqualTo("some"))
         cachedGetter.invalidate("some")
         cachedGetter("some") must beEqualTo("default")
