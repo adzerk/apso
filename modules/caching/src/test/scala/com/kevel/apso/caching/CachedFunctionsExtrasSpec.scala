@@ -282,37 +282,69 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
 
       "yielding a default value if set and the real value is not yet available" in {
         val calls = new AtomicInteger(0)
-        val getter = () =>
-          Future {
-            val c = calls.getAndIncrement()
-            Thread.sleep(500)
-            c
-          }
+        val promise = Promise[Unit]()
+        val getter = () => {
+          val c = calls.getAndIncrement()
+          promise.future.map(_ => c)
+        }
 
         val cachedGetter = getter.cachedAsync(config.Cache(None, None), Some(-1))
 
         cachedGetter() must beEqualTo(-1).await
         eventually(calls.get() must beEqualTo(1))
-        cachedGetter() must beEqualTo(-1).await
-        calls.get() must beEqualTo(1)
 
-        eventually(retries = 6, sleep = 100.millis) {
+        promise.success(())
+
+        eventually {
           cachedGetter() must beEqualTo(0).await
           calls.get() must beEqualTo(1)
         }
       }
 
       "yielding a default value if set and the real value is not yet available, depending on arguments" in {
-        val getter = (_: String) =>
-          Future {
-            Thread.sleep(500)
-            0
-          }
+        val promise = Promise[Unit]()
+        val getter = (_: String) => promise.future.map(_ => 0)
 
         val cachedGetter = getter.cachedAsync(config.Cache(None, None), arg => Option.when(arg == "default")(-1))
 
         cachedGetter("default") must beEqualTo(-1).await
-        cachedGetter("other") must beEqualTo(0).await
+
+        val f = cachedGetter("other")
+        Thread.sleep(500)
+        f.isCompleted must beFalse
+
+        promise.success(())
+
+        eventually(f.value.get.get must beEqualTo(0))
+      }
+
+      "providing a way to prefetch for nullary caches" in {
+        val calls = new AtomicInteger(0)
+        val getter = () => {
+          calls.getAndIncrement()
+          Future.successful(0)
+        }
+
+        val unwarmedGetter = getter.cachedAsync(config.Cache(None, None))
+        Thread.sleep(200)
+        calls.get() must beEqualTo(0)
+
+        val warmedGetter = getter.cachedAsync(config.Cache(None, None), preload = true)
+        Thread.sleep(200)
+        calls.get() must beEqualTo(1)
+      }
+
+      "providing a way to prefetch for nullary caches, without being poisoned by load exceptions" in {
+        val calls = new AtomicInteger(0)
+        val getter = () => {
+          if (calls.getAndIncrement() == 0) throw new Exception("dummy") with NoStackTrace
+          else Future.successful(0)
+        }
+
+        val warmedGetter = getter.cachedAsync(config.Cache(None, None), preload = true)
+        Thread.sleep(200)
+        calls.get() must beEqualTo(1)
+        warmedGetter() must beEqualTo(0).await
       }
     }
 
@@ -320,15 +352,16 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
 
       "yielding the default when no value is yet available" in {
         val calls = new AtomicInteger(0)
-        val getter = () =>
-          Future {
-            val c = calls.getAndIncrement()
-            Thread.sleep(500)
-            c
-          }
+        val promise = Promise[Unit]()
+        val getter = () => {
+          val c = calls.getAndIncrement()
+          promise.future.map(_ => c)
+        }
 
         val cachedGetter = getter.cachedSync(config.Cache(None, None), -1)
         cachedGetter() must beEqualTo(-1)
+
+        promise.success(())
 
         eventually {
           cachedGetter() must beEqualTo(0)
@@ -337,14 +370,14 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
       }
 
       "falling back to the default when the cached value expires" in {
+        val promise = Promise[Unit]()
         val getter = (x: String) =>
-          Future {
-            Thread.sleep(500)
-            x
-          }
+          if (promise.isCompleted) Future.never
+          else promise.future.map(_ => x)
         val cachedGetter = getter.cachedSync(config.Cache(None, None), _ => "default")
 
         cachedGetter("some") must beEqualTo("default")
+        promise.success(())
         eventually(cachedGetter("some") must beEqualTo("some"))
         cachedGetter.invalidate("some")
         cachedGetter("some") must beEqualTo("default")
