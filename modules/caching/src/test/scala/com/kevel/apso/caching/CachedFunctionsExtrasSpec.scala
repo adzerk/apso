@@ -299,7 +299,7 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
         )
 
         cachedGetter() must beEqualTo(10).await
-        eventually(retries = 10, sleep = 20.millis) {
+        eventually {
           cachedGetter() must beEqualTo(10).await
           rejected.isCompleted must beTrue
         }
@@ -307,7 +307,7 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
         cachedGetter() must beEqualTo(10).await
 
         replacement.success(20)
-        eventually(retries = 10, sleep = 20.millis)(cachedGetter() must beEqualTo(20).await)
+        eventually(cachedGetter() must beEqualTo(20).await)
       }
 
       "yielding a default value if set and the real value is not yet available" in {
