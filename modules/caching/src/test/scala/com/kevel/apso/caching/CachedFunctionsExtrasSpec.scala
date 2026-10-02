@@ -280,6 +280,36 @@ class CachedFunctionsExtrasSpec(implicit ee: ExecutionEnv) extends Specification
         }
       }
 
+      "replacing nullary cached values only when the predicate accepts the refresh" in {
+        val calls = new AtomicInteger(0)
+        val rejected = Promise[(Int, Int)]()
+        val replacement = Promise[Int]()
+        val getter = () =>
+          calls.getAndIncrement() match {
+            case 0 => Future.successful(10)
+            case 1 => Future.successful(5)
+            case _ => replacement.future
+          }
+        val cachedGetter = getter.cachedAsync(
+          config.Cache(None, None, Some(50.millis)),
+          replacePredicate = (oldValue, newValue) => {
+            if (newValue == 5) rejected.trySuccess((oldValue, newValue))
+            newValue > oldValue
+          }
+        )
+
+        cachedGetter() must beEqualTo(10).await
+        eventually {
+          cachedGetter() must beEqualTo(10).await
+          rejected.isCompleted must beTrue
+        }
+        rejected.future must beEqualTo((10, 5)).await
+        cachedGetter() must beEqualTo(10).await
+
+        replacement.success(20)
+        eventually(cachedGetter() must beEqualTo(20).await)
+      }
+
       "yielding a default value if set and the real value is not yet available" in {
         val calls = new AtomicInteger(0)
         val getter = () =>

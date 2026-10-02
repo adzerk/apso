@@ -2,7 +2,7 @@ package com.kevel.apso.caching
 
 import com.github.blemale.scaffeine.{AsyncLoadingCache, LoadingCache}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 import MemoizeFn._
 
@@ -31,7 +31,13 @@ sealed trait AsyncMemoizeFn0[V] extends (() => Future[V]) {
   protected def cacheConfig: config.Cache
   protected def fn: Unit => Future[V]
   protected def defaultValue: Option[V]
-  protected lazy val cache: AsyncLoadingCache[Unit, V] = cacheConfig.build.buildAsyncFuture(fn)
+  protected def replacePredicate: (V, V) => Boolean
+  protected lazy val cache: AsyncLoadingCache[Unit, V] = cacheConfig.build.buildAsyncFuture(
+    fn,
+    reloadLoader = Some((key: Unit, oldValue: V) => fn(key).map { newValue =>
+      if (replacePredicate(oldValue, newValue)) newValue else oldValue
+    }(ExecutionContext.parasitic))
+  )
   override def apply(): Future[V] = {
     val fut = cache.get(())
     if (fut.isCompleted) fut else defaultValue match {
@@ -118,15 +124,16 @@ object MemoizeFn {
   }#
 ]
 
-  private[caching] def async[V](function: () => Future[V], conf: config.Cache, default: => Option[V], preload: Boolean = false): AsyncMemoizeFn0[V] = new AsyncMemoizeFn0[V] {
+  private[caching] def async[V](function: () => Future[V], conf: config.Cache, default: => Option[V], preload: Boolean = false, replace: (V, V) => Boolean = (_: V, _: V) => true): AsyncMemoizeFn0[V] = new AsyncMemoizeFn0[V] {
     override val cacheConfig: config.Cache = conf
     override val fn: Unit => Future[V] = _ => function()
     override def defaultValue: Option[V] = default
+    override val replacePredicate: (V, V) => Boolean = replace
     if (preload) try { cache.get(()) } catch { case scala.util.control.NonFatal(_) => () }
   }
 
-  private[caching] def syncAsync[V](function: () => Future[V], conf: config.Cache, default: => V, preload: Boolean = false): SyncMemoizeFutureFn0[V] = new SyncMemoizeFutureFn0[V] {
-    protected val asyncFn: AsyncMemoizeFn0[V] = async(function, conf, Some(default), preload)
+  private[caching] def syncAsync[V](function: () => Future[V], conf: config.Cache, default: => V, preload: Boolean = false, replace: (V, V) => Boolean = (_: V, _: V) => true): SyncMemoizeFutureFn0[V] = new SyncMemoizeFutureFn0[V] {
+    protected val asyncFn: AsyncMemoizeFn0[V] = async(function, conf, Some(default), preload, replace)
   }
 [#
   private[caching] def async[[#I0#], V](function: ([#I0#]) => Future[V], conf: config.Cache, default: ([#I0#]) => Option[V]): AsyncMemoizeFn1[[#I0#], V] = new AsyncMemoizeFn1[[#I0#], V] {
