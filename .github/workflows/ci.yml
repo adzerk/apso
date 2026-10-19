@@ -32,7 +32,7 @@ jobs:
 
       - name: Update dependencies
         if: steps.setup-java.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt update
 
       - name: Compile and check format
         run: >-

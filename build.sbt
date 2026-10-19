@@ -3,7 +3,7 @@ import ReleaseTransformations.*
 import spray.boilerplate.BoilerplatePlugin
 
 organization := "com.kevel"
-scalaVersion := Versions.Scala3
+scalaVersion := Versions.Scala
 
 val javaVersion = "17"
 
