@@ -6,7 +6,7 @@ Apso is Kevel's collection of Scala utility libraries. It provides a series of u
 
 ## Installation
 
-Apso's latest release is built against Scala 2.13 and Scala 3.
+Apso's latest release is built against Scala 3.
 
 To use the `core` project in an existing SBT project, add the following dependency to your `build.sbt`:
 
@@ -128,7 +128,7 @@ distFromOffice((38.7223032, -9.1414664))
 Apso provides implicit conversions from `String`, `Seq[_]`, `Map[_, _]`, `Seq[Map[_, _]]` and `AutoCloseable` to extended types that come packed with extended features.
 
 ```scala mdoc:reset
-import com.kevel.apso.Implicits._
+import com.kevel.apso.Implicits.*
 
 Seq(1, 3, 5).mergeSorted(Seq(2, 4))
 
@@ -205,8 +205,8 @@ The `Reflect` object contains helpers for reflection-related tasks, namely to cr
 scala> import com.kevel.apso.Reflect
 import com.kevel.apso.Reflect
 
-scala> import com.kevel.apso.collection._
-import com.kevel.apso.collection._
+scala> import com.kevel.apso.collection.*
+import com.kevel.apso.collection.*
 
 scala> Reflect.newInstance[HMap[Nothing]]("com.kevel.apso.collection.HMap")
 res0: com.kevel.apso.collection.HMap[Nothing] = HMap()
@@ -220,8 +220,8 @@ res1: com.kevel.apso.Reflect.type = com.kevel.apso.Reflect$@3b1dbca
 The `Retry` object provides a method to retry methods or `Future`s a given number of times until they succeed or the specified maximum number of retries is reached:
 
 ```scala mdoc:reset
-import scala.concurrent._
-import scala.concurrent.duration._
+import scala.concurrent.*
+import scala.concurrent.duration.*
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import com.kevel.apso.Retry
@@ -293,9 +293,9 @@ libraryDependencies += "com.kevel" %% "apso-aws" % "@VERSION@"
 The `ConfigCredentialsProvider` is an `AwsCredentialsProvider` (from AWS SDK for Java) that retrieves credentials from a typesafe configuration, allowing customization of its `Config` object, as well as the access key and secret key paths:
 
 ```scala mdoc:silent
-import com.kevel.apso.aws._
+import com.kevel.apso.aws.*
 
-import com.typesafe.config._
+import com.typesafe.config.*
 
 val confProvider = ConfigCredentialsProvider(
   config = ConfigFactory.parseString("""{
@@ -353,9 +353,9 @@ libraryDependencies += "com.kevel" %% "apso-caching" % "@VERSION@"
 The simplest use case is bootstrapping a cache implementation based on a configuration object:
 
 ```scala mdoc:compile-only
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
-import com.kevel.apso.caching._
+import com.kevel.apso.caching.*
 
 val cache = config.Cache(Some(5.seconds), None).implementation[String, Int]
 // cache: com.github.blemale.scaffeine.Cache[String, Int]
@@ -373,13 +373,13 @@ Apso also provides utilities to simplify the caching of method calls. These util
 `cachedAsync()` extension methods over all `FunctionN[]` types:
 
 ```scala mdoc:reset
-import scala.concurrent._
-import scala.concurrent.duration._
+import scala.concurrent.*
+import scala.concurrent.duration.*
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import java.util.concurrent.atomic.AtomicInteger
 
-import com.kevel.apso.caching._
+import com.kevel.apso.caching.*
 
 val x = new AtomicInteger(0)
 
@@ -419,7 +419,7 @@ libraryDependencies += "com.kevel" %% "apso-collections" % "@VERSION@"
 The `Trie` class is an implementation of an immutable trie. An example usage follows:
 
 ```scala mdoc:reset
-import com.kevel.apso.collection._
+import com.kevel.apso.collection.*
 
 val t = Trie[Char, Int]()
 
@@ -437,9 +437,9 @@ nt.get("five")
 The `TypedMap` is a map that associates types with values. It can be used as follows:
 
 ```scala mdoc:reset
-import com.kevel.apso.collection._
+import com.kevel.apso.collection.*
 
-val m = TypedMap("one", 2, 3L)
+val m = TypedMap[Any]("one", 2, 3L)
 
 m[String]
 
@@ -534,7 +534,7 @@ by loading a `KeyStore` file holding a symmetric key, and its use to encrypt and
 decrypt data:
 
 ```scala mdoc:compile-only
-import com.kevel.apso.encryption._
+import com.kevel.apso.encryption.*
 
 val encryptor = Encryptor("AES", getClass.getResourceAsStream("/keystoreFile.jceks"), "keystorePass", "keyAlias", "keyPass")
 
@@ -556,7 +556,7 @@ libraryDependencies += "com.kevel" %% "apso-hashing" % "@VERSION@"
 ```
 
 ```scala mdoc:reset
-import com.kevel.apso.hashing.Implicits._
+import com.kevel.apso.hashing.Implicits.*
 
 "abcd".md5
 
@@ -629,8 +629,8 @@ The `ExtraJsonProtocol` object combines three traits that provide extra `Encoder
 The `json` package provides some implicits around [circe](https://circe.github.io/circe/)'s `Json` to unwrap JSON values, merge two `Json` and create `Json` from a sequence of dot-separated paths with the corresponding leaf values. It also provides methods to access and delete fields on the `Json` object. See the following for sample usage:
 
 ```scala mdoc:reset:silent
-import com.kevel.apso.circe.Implicits._
-import io.circe.syntax._
+import com.kevel.apso.circe.Implicits.*
+import io.circe.syntax.*
 import io.circe.Json
 
 "a".asJson
@@ -667,7 +667,7 @@ js1.deleteField("x")
 The `JsonConvert` object contains helpers for converting between JSON values and other structures. See the following for sample usage:
 
 ```scala mdoc:reset
-import com.kevel.apso.circe._
+import com.kevel.apso.circe.*
 
 JsonConvert.toJson("abcd")
 
@@ -709,9 +709,9 @@ See the following sample usages:
 ```scala mdoc:reset
 import org.joda.time.{DateTime, Period}
 
-import com.kevel.apso.time._
+import com.kevel.apso.time.*
 
-import com.kevel.apso.time.Implicits._
+import com.kevel.apso.time.Implicits.*
 
 (new DateTime("2012-01-01") to new DateTime("2012-01-01")).toList
 

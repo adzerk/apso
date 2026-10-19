@@ -2,9 +2,8 @@ import Dependencies.*
 import ReleaseTransformations.*
 import spray.boilerplate.BoilerplatePlugin
 
-organization       := "com.kevel"
-scalaVersion       := Versions.Scala213
-crossScalaVersions := Nil
+organization := "com.kevel"
+scalaVersion := Versions.Scala
 
 val javaVersion = "17"
 
@@ -23,34 +22,19 @@ resolvers ++=
 
 scalafmtOnCompile := true
 
-scalacOptions ++= {
-  lazy val commonFlags = Seq(
-    "-encoding",
-    "UTF-8",
-    "-language:higherKinds",
-    "-language:implicitConversions",
-    "-feature",
-    "-unchecked",
-    "-deprecation",
-    "-release",
-    javaVersion,
-    "-Xfatal-warnings"
-  )
-
-  def withCommon(flags: String*) =
-    commonFlags ++ flags
-
-  CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, _)) =>
-      withCommon("-Xsource:3", "-Ywarn-dead-code", "-Ywarn-unused:imports")
-
-    case Some((3, _)) =>
-      withCommon("-Wunused:imports")
-
-    case _ =>
-      throw new RuntimeException("Unsupported Scala version")
-  }
-}
+scalacOptions ++= Seq(
+  "-encoding",
+  "UTF-8",
+  "-language:higherKinds",
+  "-language:implicitConversions",
+  "-feature",
+  "-unchecked",
+  "-deprecation",
+  "-release",
+  javaVersion,
+  "-Werror",
+  "-Wunused:imports"
+)
 
 javacOptions ++= List(
   "--release",
@@ -78,7 +62,6 @@ scmInfo  := Some(
   )
 )
 
-releaseCrossBuild    := true
 releaseTagComment    := s"Release ${version.value}"
 releaseCommitMessage := s"Set version to ${version.value}"
 
@@ -90,7 +73,7 @@ releaseProcess := Seq[ReleaseStep](
   setReleaseVersion,
   commitReleaseVersion,
   tagRelease,
-  releaseStepCommandAndRemaining("+publishSigned"),
+  releaseStepCommandAndRemaining("publishSigned"),
   releaseStepCommand("sonaRelease"),
   setNextVersion,
   commitNextVersion,
@@ -99,10 +82,9 @@ releaseProcess := Seq[ReleaseStep](
 
 LocalRootProject / publish / skip := true
 
-def module(project: Project, moduleName: String, crossScala: List[String] = List(Versions.Scala213, Versions.Scala3)) =
+def module(project: Project, moduleName: String) =
   (project in file(s"modules/$moduleName"))
     .settings(name := s"apso-$moduleName")
-    .settings(crossScalaVersions := crossScala)
 
 lazy val aws = module(project, "aws")
   .dependsOn(core)
@@ -232,8 +214,7 @@ lazy val time = module(project, "time")
 lazy val docs = (project in file("apso-docs"))
   .dependsOn(aws, caching, circe, collections, core, encryption, gcp, hashing, io, pekko, pekkoHttp, profiling, time)
   .settings(
-    crossScalaVersions := List(Versions.Scala213),
-    mdocOut            := (LocalRootProject / baseDirectory).value,
+    mdocOut := (LocalRootProject / baseDirectory).value,
 
     mdocVariables := Map(
       "VERSION" ->
