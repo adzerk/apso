@@ -7,13 +7,12 @@ env:
 
 jobs:
   build:
-    name: Scala ${{ matrix.scala }} (Java ${{ matrix.java }})
+    name: Java ${{ matrix.java }}
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        scala: ['2.13', '3.3']
         java: ['17', '21', '25']
 
     steps:
@@ -37,21 +36,20 @@ jobs:
 
       - name: Compile and check format
         run: >-
-          sbt "++${{ matrix.scala }}; Test/compile; scalafmtSbt" &&
+          sbt "Test/compile; scalafmtSbt" &&
           git diff --exit-code
 
       - name: Run tests
-        run: sbt -Dsbt.color=always "++${{ matrix.scala }} testFull"
+        run: sbt -Dsbt.color=always "testFull"
 
       - name: Check mdoc for uncommitted changes
-        if: matrix.scala == '2.13'
         run: sbt -Dsbt.color=always "docs/mdoc --check"
 
       - name: Compile API documentation
-        run: sbt -Dsbt.color=always "++${{ matrix.scala }} doc"
+        run: sbt -Dsbt.color=always "doc"
 
       - name: Publish locally
-        run: sbt -Dsbt.color=always "++${{ matrix.scala }} publishLocal"
+        run: sbt -Dsbt.color=always "publishLocal"
 
   validate-changelog:
     timeout-minutes: 5
