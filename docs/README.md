@@ -439,7 +439,7 @@ The `TypedMap` is a map that associates types with values. It can be used as fol
 ```scala mdoc:reset
 import com.kevel.apso.collection._
 
-val m = TypedMap("one", 2, 3L)
+val m = TypedMap[Any]("one", 2, 3L)
 
 m[String]
 

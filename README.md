@@ -153,16 +153,16 @@ val rand = new scala.util.Random(1)
 ```
 ```scala
 rand.choose((0 to 15).toSeq)
-// res11: Option[Int] = Some(value = 11)
+// res11: Option[Int] = Some(11)
 
 rand.choose((0 to 15).toSeq)
-// res12: Option[Int] = Some(value = 1)
+// res12: Option[Int] = Some(1)
 
 rand.choose((0 to 15).toSeq)
-// res13: Option[Int] = Some(value = 6)
+// res13: Option[Int] = Some(6)
 
 rand.choose((0 to 15).toSeq)
-// res14: Option[Int] = Some(value = 6)
+// res14: Option[Int] = Some(6)
 
 rand.chooseN((0 to 15).toSeq, 4)
 // res15: Seq[Int] = List(9, 8, 3, 0)
@@ -270,7 +270,7 @@ def m() = {
 }
 
 Retry.retry(10)(m())
-// res21: util.Try[Int] = Success(value = 6)
+// res21: Try[Int] = Success(6)
 ```
 
 ## Pekko HTTP
@@ -458,31 +458,20 @@ val nt = t.set("one", 1).set("two", 2).set("three", 3).set("four", 4)
 //     'o' -> Trie(
 //       value = None,
 //       nodes = Map(
-//         'n' -> Trie(
-//           value = None,
-//           nodes = Map('e' -> Trie(value = Some(value = 1), nodes = Map()))
-//         )
+//         'n' -> Trie(value = None, nodes = Map('e' -> Trie(value = Some(1), nodes = Map())))
 //       )
 //     ),
 //     't' -> Trie(
 //       value = None,
 //       nodes = Map(
-//         'w' -> Trie(
-//           value = None,
-//           nodes = Map('o' -> Trie(value = Some(value = 2), nodes = Map()))
-//         ),
+//         'w' -> Trie(value = None, nodes = Map('o' -> Trie(value = Some(2), nodes = Map()))),
 //         'h' -> Trie(
 //           value = None,
 //           nodes = Map(
 //             'r' -> Trie(
 //               value = None,
 //               nodes = Map(
-//                 'e' -> Trie(
-//                   value = None,
-//                   nodes = Map(
-//                     'e' -> Trie(value = Some(value = 3), nodes = Map())
-//                   )
-//                 )
+//                 'e' -> Trie(value = None, nodes = Map('e' -> Trie(value = Some(3), nodes = Map())))
 //               )
 //             )
 //           )
@@ -495,19 +484,19 @@ val nt = t.set("one", 1).set("two", 2).set("three", 3).set("four", 4)
 //         'o' -> Trie(
 //           value = None,
 //           nodes = Map(
-//             'u' -> Trie(
-//               value = None,
-//               nodes = Map('r' -> Trie(value = Some(value = 4), nodes = Map()))
-//             )
+//             'u' -> Trie(value = None, nodes = Map('r' -> Trie(value = Some(4), nodes = Map())))
 //           )
 //         )
-// ...
+//       )
+//     )
+//   )
+// )
 
 nt.get("one")
-// res33: Option[Int] = Some(value = 1)
+// res33: Option[Int] = Some(1)
 
 nt.get("two")
-// res34: Option[Int] = Some(value = 2)
+// res34: Option[Int] = Some(2)
 
 nt.get("five")
 // res35: Option[Int] = None
@@ -520,7 +509,7 @@ The `TypedMap` is a map that associates types with values. It can be used as fol
 ```scala
 import com.kevel.apso.collection._
 
-val m = TypedMap("one", 2, 3L)
+val m = TypedMap[Any]("one", 2, 3L)
 // m: TypedMap[Any] = Map(java.lang.String -> one, Int -> 2, Long -> 3)
 
 m[String]
@@ -533,13 +522,13 @@ m[Long]
 // res39: Long = 3L
 
 m.get[String]
-// res40: Option[String] = Some(value = "one")
+// res40: Option[String] = Some("one")
 
 m.get[Int]
-// res41: Option[Int] = Some(value = 2)
+// res41: Option[Int] = Some(2)
 
 m.get[Long]
-// res42: Option[Long] = Some(value = 3L)
+// res42: Option[Long] = Some(3L)
 
 m.get[Char]
 // res43: Option[Char] = None
@@ -815,27 +804,27 @@ fromFullPaths(Seq(
 // }"""
 
 js1.getField[Int]("a")
-// res59: Option[Int] = Some(value = 2)
+// res59: Option[Int] = Some(2)
 js1.getField[Int]("d.f")
-// res60: Option[Int] = Some(value = 6)
+// res60: Option[Int] = Some(6)
 js1.getField[Int]("x")
 // res61: Option[Int] = None
 
 js1.deleteField("a")
 // res62: Json = JObject(
-//   value = object[b -> 3,d -> {
+//   object[b -> 3,d -> {
 //   "f" : 6
 // }]
 // )
 js1.deleteField("d.f")
 // res63: Json = JObject(
-//   value = object[a -> 2,b -> 3,d -> {
+//   object[a -> 2,b -> 3,d -> {
 //   
 // }]
 // )
 js1.deleteField("x")
 // res64: Json = JObject(
-//   value = object[a -> 2,b -> 3,d -> {
+//   object[a -> 2,b -> 3,d -> {
 //   "f" : 6
 // }]
 // )
@@ -848,13 +837,13 @@ The `JsonConvert` object contains helpers for converting between JSON values and
 import com.kevel.apso.circe._
 
 JsonConvert.toJson("abcd")
-// res66: io.circe.Json = JString(value = "abcd")
+// res66: Json = JString("abcd")
 
 JsonConvert.toJson(1)
-// res67: io.circe.Json = JNumber(value = JsonLong(value = 1L))
+// res67: Json = JNumber(JsonLong(1L))
 
 JsonConvert.toJson(Map(1 -> 2, 3 -> 4))
-// res68: io.circe.Json = JObject(value = object[1 -> 2,3 -> 4])
+// res68: Json = JObject(object[1 -> 2,3 -> 4])
 ```
 
 ## Profiling
