@@ -83,11 +83,11 @@ object CompositeIterator {
     its.headOption
       .map { head =>
         val zero =
-          if (head.isInstanceOf[CompositeIterator[_]]) head.asInstanceOf[CompositeIterator[A]]
+          if (head.isInstanceOf[CompositeIterator[?]]) head.asInstanceOf[CompositeIterator[A]]
           else new CompositeIterator(iterators = Vector(head))
 
         its.tail.foldLeft(zero) { case (c, it) =>
-          if (it.isInstanceOf[CompositeIterator[_]]) {
+          if (it.isInstanceOf[CompositeIterator[?]]) {
             val composite = it.asInstanceOf[CompositeIterator[A]]
             val iterators = composite.current +: composite.iterators
 
