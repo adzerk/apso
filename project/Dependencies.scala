@@ -22,7 +22,7 @@ object Dependencies {
     val ScalaTest      = "3.2.19"
     val SimpleJmx      = "3.2"
     val Specs2_4       = "4.23.0"
-    val Specs2_5       = "5.6.4"
+    val Specs2_5       = "5.9.1"
     val Squants        = "1.8.3"
     val SshJ           = "0.41.2"
     val TypesafeConfig = "1.4.9"
