@@ -2,6 +2,7 @@ package com.kevel.apso.pekko.http
 
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{Future, Promise}
+import scala.jdk.OptionConverters.*
 import scala.util.{Failure, Success, Try}
 
 import com.typesafe.config.ConfigFactory
@@ -59,7 +60,7 @@ trait ProxySupport extends ClientIPDirectives {
   }
 
   private val optionalRemoteAddress: Directive1[Option[RemoteAddress]] =
-    extractRequest.map(_.attribute(AttributeKeys.remoteAddress))
+    extractRequest.map(_.getAttribute(AttributeKeys.remoteAddress).toScala)
 
   private def proxy(
       strictTimeout: Option[FiniteDuration] = None
