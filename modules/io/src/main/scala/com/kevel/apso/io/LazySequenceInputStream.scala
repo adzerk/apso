@@ -9,10 +9,10 @@ import java.io.InputStream
   * @param streams
   *   A sequence of `InputStream` thunks
   */
-class LazySequenceInputStream(private[this] var streams: Seq[() => InputStream]) extends InputStream {
-  private[this] var current: InputStream = null
+class LazySequenceInputStream(private var streams: Seq[() => InputStream]) extends InputStream {
+  private var current: InputStream = null
 
-  private[this] def nextStream() = {
+  private def nextStream() = {
     if (current != null) current.close()
 
     if (streams.nonEmpty) {

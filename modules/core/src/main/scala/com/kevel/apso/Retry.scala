@@ -12,7 +12,7 @@ import scala.util.{Failure, Success, Try}
   */
 object Retry {
 
-  private[this] final def retryFuture[T](maxRetries: Int, inBetweenSleep: Option[FiniteDuration])(
+  private final def retryFuture[T](maxRetries: Int, inBetweenSleep: Option[FiniteDuration])(
       f: => Future[T]
   )(implicit ec: ExecutionContext): Future[T] = {
     maxRetries match {
@@ -29,7 +29,7 @@ object Retry {
     }
   }
 
-  private[this] final def retry[T](maxRetries: Int, inBetweenSleep: Option[FiniteDuration])(f: => T): Try[T] = {
+  private final def retry[T](maxRetries: Int, inBetweenSleep: Option[FiniteDuration])(f: => T): Try[T] = {
     maxRetries match {
       case 0 => Try(f)
       case _ =>

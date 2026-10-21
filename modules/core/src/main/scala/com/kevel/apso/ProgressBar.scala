@@ -16,12 +16,12 @@ case class ProgressBar(
     throughputUnit: String = "ops",
     throughputTransformer: Double => Double = identity
 ) {
-  private[this] var done = 0L
-  private[this] val startTimestamp = System.currentTimeMillis
+  private var done = 0L
+  private val startTimestamp = System.currentTimeMillis
 
-  private[this] val workchars = List('|', '/', '-', '\\')
-  private[this] var lastChar = 0
-  private[this] def workChar = {
+  private val workchars = List('|', '/', '-', '\\')
+  private var lastChar = 0
+  private def workChar = {
     if (lastChar >= (workchars.length - 1)) lastChar = 0
     else lastChar += 1
     workchars(lastChar)

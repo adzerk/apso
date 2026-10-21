@@ -16,7 +16,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
 
   type Self = LocalFileDescriptor
 
-  @transient private[this] var _normalizedPath: Path = _
+  @transient private var _normalizedPath: Path = _
 
   private def normalizedPath = {
     if (_normalizedPath == null) _normalizedPath = file.toPath

@@ -53,11 +53,11 @@ class InsistentInputStream(
       is
     })
 
-  private[this] var innerStream: InputStream = streamBuilder(0)
-  private[this] var currPos: Long = 0
+  private var innerStream: InputStream = streamBuilder(0)
+  private var currPos: Long = 0
 
   @tailrec
-  private[this] def retryStreamCreation(remainingTries: Int): Int = {
+  private def retryStreamCreation(remainingTries: Int): Int = {
     Try(innerStream.close()) // continue even if the close operation fails
     Try {
       backoff.foreach(d => Thread.sleep(d.toMillis))
@@ -72,7 +72,7 @@ class InsistentInputStream(
   }
 
   @tailrec
-  private[this] def readRetries(remainingTries: Int, f: => Int): Int = {
+  private def readRetries(remainingTries: Int, f: => Int): Int = {
     Try(f) match {
       case Success(n) =>
         n

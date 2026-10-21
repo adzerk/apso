@@ -32,7 +32,7 @@ import org.apache.pekko.stream.scaladsl.{Keep, Sink, Source}
   */
 trait ProxySupport extends ClientIPDirectives {
 
-  private[this] def getHeaders(ip: Option[RemoteAddress], headers: List[HttpHeader]) = {
+  private def getHeaders(ip: Option[RemoteAddress], headers: List[HttpHeader]) = {
     // FIXME: Properly decide which headers to keep or filter out.
     //        If designing a proper transparent proxy trait, we should take care of which headers
     //        get passed down. It may be worth looking into the RFC.
@@ -44,7 +44,7 @@ trait ProxySupport extends ClientIPDirectives {
     ip.fold(hs)(addForwardedFor(_, hs))
   }
 
-  private[this] def addForwardedFor(ip: RemoteAddress, headers: List[HttpHeader]): List[HttpHeader] = {
+  private def addForwardedFor(ip: RemoteAddress, headers: List[HttpHeader]): List[HttpHeader] = {
     headers match {
       case Nil =>
         // No `X-Forwarded-For` found in headers, so just add the new one
@@ -58,10 +58,10 @@ trait ProxySupport extends ClientIPDirectives {
     }
   }
 
-  private[this] val optionalRemoteAddress: Directive1[Option[RemoteAddress]] =
+  private val optionalRemoteAddress: Directive1[Option[RemoteAddress]] =
     extractRequest.map(_.attribute(AttributeKeys.remoteAddress))
 
-  private[this] def proxy(
+  private def proxy(
       strictTimeout: Option[FiniteDuration] = None
   )(reqBuilder: (Option[RemoteAddress], RequestContext) => HttpRequest): Route = {
     extractActorSystem { implicit system =>
@@ -138,7 +138,7 @@ trait ProxySupport extends ClientIPDirectives {
         .withHeaders(getHeaders(ip, ctx.request.headers.toList))
   }
 
-  private[this] lazy val defaultQueueSize =
+  private lazy val defaultQueueSize =
     ConfigFactory.load.getInt("pekko.http.host-connection-pool.max-open-requests")
 
   /** A representation of a reverse proxy for a remote host. This class internally materializes a flow that is
@@ -163,10 +163,10 @@ trait ProxySupport extends ClientIPDirectives {
 
     import system.dispatcher
 
-    private[this] lazy val source =
+    private lazy val source =
       Source.queue[(HttpRequest, Promise[RouteResult])](reqQueueSize)
 
-    private[this] lazy val flow = strictTimeout match {
+    private lazy val flow = strictTimeout match {
       case None    => Http().cachedHostConnectionPool[Promise[RouteResult]](host, port)
       case Some(t) =>
         Http()
@@ -183,12 +183,12 @@ trait ProxySupport extends ClientIPDirectives {
           }
     }
 
-    private[this] lazy val sink = Sink.foreach[(Try[HttpResponse], Promise[RouteResult])] {
+    private lazy val sink = Sink.foreach[(Try[HttpResponse], Promise[RouteResult])] {
       case (Success(resp), p) => p.success(Complete(resp))
       case (Failure(e), p)    => p.failure(e)
     }
 
-    private[this] lazy val queue = source.via(flow).toMat(sink)(Keep.left).run()
+    private lazy val queue = source.via(flow).toMat(sink)(Keep.left).run()
 
     /** Sends a manually crafted request to a destination URI.
       *

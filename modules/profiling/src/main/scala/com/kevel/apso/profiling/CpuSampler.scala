@@ -26,11 +26,11 @@ import com.kevel.apso.profiling.CpuSampler.*
 class CpuSampler(samplePeriod: Long = 100, flushPeriod: Long = 10000, logger: Logger = Logger(getClass))
     extends Runnable {
 
-  private[this] val threadBean = ManagementFactory.getThreadMXBean
+  private val threadBean = ManagementFactory.getThreadMXBean
 
-  private[this] var active = true
-  private[this] var lastFlush = 0L
-  private[this] val entries = mutable.Queue[StackTraceElement]()
+  private var active = true
+  private var lastFlush = 0L
+  private val entries = mutable.Queue[StackTraceElement]()
 
   /** Returns a boolean value indicating if the stack trace element should be considered when profiling or not.
     * @param elem
@@ -62,7 +62,7 @@ class CpuSampler(samplePeriod: Long = 100, flushPeriod: Long = 10000, logger: Lo
     lastFlush = System.currentTimeMillis()
   }
 
-  private[this] def aggregateAll(timestamp: Long): Iterator[Entry] = {
+  private def aggregateAll(timestamp: Long): Iterator[Entry] = {
     val acc = mutable.Map[StackTraceElement, Int]()
 
     val total = entries.length
@@ -76,7 +76,7 @@ class CpuSampler(samplePeriod: Long = 100, flushPeriod: Long = 10000, logger: Lo
     }
   }
 
-  private[this] def sampleLoop() = {
+  private def sampleLoop() = {
     while (active) {
       val time = System.currentTimeMillis()
 

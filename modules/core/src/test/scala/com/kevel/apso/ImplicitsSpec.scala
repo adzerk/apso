@@ -12,7 +12,7 @@ class ImplicitsSpec extends Specification with ScalaCheck {
   "An ApsoRandom" should {
 
     class MockRandom(elems: Double*) extends Random {
-      private[this] var nextElems = elems.toList
+      private var nextElems = elems.toList
       override def nextInt() = {
         val e = nextElems.head.toInt
         nextElems = nextElems.tail

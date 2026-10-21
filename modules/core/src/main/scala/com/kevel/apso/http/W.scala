@@ -9,8 +9,8 @@ import kong.unirest.core.{CookieSpecs, HttpRequest, HttpRequestWithBody, HttpRes
 object W {
   case class Timeout(duration: FiniteDuration)
 
-  private[this] lazy val logger = Logger("W")
-  private[this] lazy val defaultTimeout = Timeout(10.seconds)
+  private lazy val logger = Logger("W")
+  private lazy val defaultTimeout = Timeout(10.seconds)
 
   Unirest
     .config()
@@ -18,7 +18,7 @@ object W {
     .followRedirects(false)
     .enableCookieManagement(false)
 
-  implicit private[this] class RichHttpRequest[T <: HttpRequest[T]](val req: HttpRequest[T]) {
+  implicit private class RichHttpRequest[T <: HttpRequest[T]](val req: HttpRequest[T]) {
     def headers(headers: Map[String, Seq[String]]) = {
       headers.foldLeft(req) { case (acc, (k, vs)) =>
         vs.foldLeft(acc) { (acc2, v) => acc2.header(k, v) }
@@ -31,7 +31,7 @@ object W {
     }
   }
 
-  implicit private[this] class RichHttpRequestWithBody(val req: HttpRequestWithBody) {
+  implicit private class RichHttpRequestWithBody(val req: HttpRequestWithBody) {
     def headers(headers: Map[String, Seq[String]]) = {
       headers.foldLeft(req) { case (acc, (k, vs)) =>
         vs.foldLeft(acc) { (acc2, v) => acc2.header(k, v) }

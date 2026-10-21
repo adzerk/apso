@@ -39,27 +39,27 @@ class S3Bucket(
 ) extends LazyLogging
     with Serializable {
 
-  private[this] lazy val config = ConfigFactory.load()
+  private lazy val config = ConfigFactory.load()
 
-  private[this] lazy val configPrefix = "aws.s3"
-  private[this] lazy val retryPrefix = configPrefix + ".retry"
+  private lazy val configPrefix = "aws.s3"
+  private lazy val retryPrefix = configPrefix + ".retry"
 
-  private[this] lazy val region = Try(config.getString(configPrefix + ".region"))
-  private[this] lazy val maxConnections = Try(config.getInt(configPrefix + ".max-connections"))
-  private[this] lazy val maxErrorRetry = Try(config.getInt(configPrefix + ".max-error-retry"))
+  private lazy val region = Try(config.getString(configPrefix + ".region"))
+  private lazy val maxConnections = Try(config.getInt(configPrefix + ".max-connections"))
+  private lazy val maxErrorRetry = Try(config.getInt(configPrefix + ".max-error-retry"))
 
-  private[this] lazy val retryOnSlowDown =
+  private lazy val retryOnSlowDown =
     Try(config.getBoolean(retryPrefix + ".on-slow-down")).getOrElse(true)
-  private[this] lazy val retryMaxRetries =
+  private lazy val retryMaxRetries =
     Try(config.getInt(retryPrefix + ".max-retries")).getOrElse(S3Bucket.DefaultMaxRetries)
-  private[this] lazy val retryBaseBackOff =
+  private lazy val retryBaseBackOff =
     Try(config.getDuration(retryPrefix + ".base-backoff").toMillis.millis).getOrElse(S3Bucket.DefaultBaseBackOff)
-  private[this] lazy val retryMaxBackOff =
+  private lazy val retryMaxBackOff =
     Try(config.getDuration(retryPrefix + ".max-backoff").toMillis.millis).getOrElse(S3Bucket.DefaultMaxBackOff)
-  private[this] lazy val retryJitter =
+  private lazy val retryJitter =
     Try(config.getDouble(retryPrefix + ".jitter")).getOrElse(S3Bucket.DefaultJitter)
 
-  @transient private[this] lazy val defaultExecutor = {
+  @transient private lazy val defaultExecutor = {
     val maxPoolSize = 100
     val threadCount = new AtomicInteger(0)
     // NOTE: This is the default thread pool used by the `TransferManager`. I had to replicate it here
@@ -84,7 +84,7 @@ class S3Bucket(
     executor
   }
 
-  @transient private[this] lazy val s3Client = {
+  @transient private lazy val s3Client = {
     val client = S3AsyncClient
       .crtBuilder()
       .credentialsProvider(credentialsProvider())
@@ -119,7 +119,7 @@ class S3Bucket(
     s3
   }
 
-  private[this] def bucketExists(s3Client: S3AsyncClient): Boolean = retry {
+  private def bucketExists(s3Client: S3AsyncClient): Boolean = retry {
     try {
       s3Client.headBucket(_.bucket(bucketName)).join()
       true
@@ -129,7 +129,7 @@ class S3Bucket(
     }
   }.getOrElse(false)
 
-  private[this] def splitKey(key: String) = {
+  private def splitKey(key: String) = {
     val iExtensionPoint = key.lastIndexOf('.')
     val iSlash = key.lastIndexOf('/')
     val mainKey = if (iSlash != -1) key.substring(0, iSlash) else ""
@@ -139,9 +139,9 @@ class S3Bucket(
     (mainKey, name, extension)
   }
 
-  private[this] def sanitizeKey(key: String) = if (key.startsWith("./")) key.drop(2) else key
+  private def sanitizeKey(key: String) = if (key.startsWith("./")) key.drop(2) else key
 
-  private[this] def listObjectsV2Iterator(req: ListObjectsV2Request) = Iterator
+  private def listObjectsV2Iterator(req: ListObjectsV2Request) = Iterator
     .iterate(s3Client.listObjectsV2(req).join()) { listing =>
       if (listing.isTruncated) {
         logger.debug("Asking for another batch of objects...")
@@ -150,7 +150,7 @@ class S3Bucket(
     }
     .takeWhile(_ != null)
 
-  private[this] def getTransferManager = {
+  private def getTransferManager = {
     S3TransferManager.builder().s3Client(s3Client).executor(defaultExecutor).build()
   }
 
@@ -487,7 +487,7 @@ class S3Bucket(
   private def log(isError: Boolean, message: String, cause: Throwable): Unit =
     if (isError) logger.error(message, cause) else logger.warn(message, cause)
 
-  private[this] def handler: PartialFunction[Throwable, Boolean] = {
+  private def handler: PartialFunction[Throwable, Boolean] = {
     // Matched ahead of the shape-specific cases below, since a slow-down is reported both as a service error and as a
     // client-side error, depending on the client in use. The CRT-based client reports it as the latter with `retryable`
     // set to false, which is why the cases below can't be relied on to retry throttled requests.
