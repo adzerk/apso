@@ -4,7 +4,7 @@ import scala.reflect.ClassTag
 
 /** Typed map that associates types with values. Based on http://stackoverflow.com/a/7337610/4243494
   */
-class TypedMap[T] private (val inner: Map[ClassTag[_], T]) {
+class TypedMap[T] private (val inner: Map[ClassTag[?], T]) {
   def +[U >: T, L <: U](t: Typed[L]) = new TypedMap[U](inner.+[U](t.toPair))
   def +[U >: T, L <: U: ClassTag](x: L)(implicit ct: ClassTag[L]) = new TypedMap[U](inner.+[U](ct -> x))
   def -[A <: T: ClassTag](implicit ct: ClassTag[A]) = new TypedMap(inner - ct)
@@ -36,6 +36,6 @@ object Typed {
   implicit def toTyped[A: ClassTag](a: A): Typed[A] = new Typed(a)
 
   implicit class TypableOps[A](val a: A) extends AnyVal {
-    def typedAs[T >: A: ClassTag](implicit ct: ClassTag[T]): Typed[T] = new Typed[T](a)(ct)
+    def typedAs[T >: A: ClassTag](implicit ct: ClassTag[T]): Typed[T] = new Typed[T](a)(using ct)
   }
 }

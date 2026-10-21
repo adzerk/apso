@@ -67,7 +67,7 @@ class TypedMapSpec extends Specification {
     }
 
     "have correct types" in {
-      TypedMap.empty must beTypedAs[TypedMap[_]]
+      TypedMap.empty must beTypedAs[TypedMap[?]]
       TypedMap.empty[Int] must beTypedAs[TypedMap[Int]]
       (TypedMap.empty + 2) must beTypedAs[TypedMap[Int]]
       TypedMap(2) must beTypedAs[TypedMap[Int]]

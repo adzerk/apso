@@ -10,7 +10,7 @@ object Geo {
     */
   type Coordinates = (Double, Double)
 
-  private[this] val EARTH_RADIUS = 6371.009 // kilometers
+  private val EARTH_RADIUS = 6371.009 // kilometers
 
   /** Returns the distance in kilometers between two points on the planet Earth, calculated by the spherical law of
     * cosines (https://en.wikipedia.org/wiki/Great-circle_distance#Formulas).

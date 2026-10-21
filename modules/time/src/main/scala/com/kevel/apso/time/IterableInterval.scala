@@ -16,7 +16,7 @@ trait IterableInterval extends IndexedSeq[DateTime] {
     * @return
     *   an iterable interval with the same time range and with the given step.
     */
-  def by(step: Period): IterableInterval
+  infix def by(step: Period): IterableInterval
 }
 
 /** A view of a `ReadableInterval` as an indexed sequence of `DateTimes`.
@@ -88,6 +88,6 @@ object IterableInterval {
   */
 case class LocalDateInterval(i: IterableInterval) extends IndexedSeq[LocalDate] {
   def apply(idx: Int): LocalDate = i(idx).toLocalDate
-  def by(newStep: Period) = LocalDateInterval(i.by(newStep))
+  infix def by(newStep: Period) = LocalDateInterval(i.by(newStep))
   def length = i.length
 }
