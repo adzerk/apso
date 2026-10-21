@@ -4,6 +4,7 @@ import java.io.{FileInputStream, FileWriter, InputStream}
 import java.net.URI
 import java.nio.file.{Files, Path, Paths, StandardCopyOption}
 
+import scala.compiletime.uninitialized
 import scala.io.Source
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
@@ -16,7 +17,7 @@ case class LocalFileDescriptor(initialPath: String) extends FileDescriptor with 
 
   type Self = LocalFileDescriptor
 
-  @transient private var _normalizedPath: Path = _
+  @transient private var _normalizedPath: Path = uninitialized
 
   private def normalizedPath = {
     if (_normalizedPath == null) _normalizedPath = file.toPath
