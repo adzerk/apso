@@ -86,13 +86,13 @@ class ImplicitsSpec extends Specification {
       "which removes null values" in {
         val encoderWithouNulls = deriveEncoder[Foo].withoutNulls
 
-        Foo(1, None).asJson(encoderWithouNulls) mustEqual json"""{ "a": 1 }"""
+        Foo(1, None).asJson(using encoderWithouNulls) mustEqual json"""{ "a": 1 }"""
       }
 
       "which add fields" in {
         val encoderWithExtraField = deriveEncoder[Foo].withExtraField("c", 2.asJson)
 
-        Foo(1, Some("x")).asJson(encoderWithExtraField) mustEqual json"""{ "a": 1, "b": "x", "c": 2 }"""
+        Foo(1, Some("x")).asJson(using encoderWithExtraField) mustEqual json"""{ "a": 1, "b": "x", "c": 2 }"""
       }
     }
   }

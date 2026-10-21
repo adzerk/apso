@@ -36,6 +36,6 @@ object Typed {
   implicit def toTyped[A: ClassTag](a: A): Typed[A] = new Typed(a)
 
   implicit class TypableOps[A](val a: A) extends AnyVal {
-    def typedAs[T >: A: ClassTag](implicit ct: ClassTag[T]): Typed[T] = new Typed[T](a)(ct)
+    def typedAs[T >: A: ClassTag](implicit ct: ClassTag[T]): Typed[T] = new Typed[T](a)(using ct)
   }
 }
