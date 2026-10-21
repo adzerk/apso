@@ -20,7 +20,7 @@ import com.kevel.apso.circe.syntax.*
 object ExtraJsonProtocol extends ExtraTimeJsonProtocol with ExtraHttpJsonProtocol with ExtraMiscJsonProtocol
 
 trait ExtraTimeJsonProtocol {
-  private[this] def tryToParseDuration(duration: String): Try[FiniteDuration] =
+  private def tryToParseDuration(duration: String): Try[FiniteDuration] =
     Try(Duration.fromNanos(ConfigFactory.parseString(s"d=$duration").getDuration("d").toNanos))
 
   implicit val finiteDurationEncoder: Encoder[FiniteDuration] =

@@ -23,18 +23,18 @@ final class GCSBucket(
     mkStorage: () => Storage
 ) extends Serializable
     with LazyLogging {
-  @transient private[this] lazy val storage: Storage = mkStorage()
+  @transient private lazy val storage: Storage = mkStorage()
 
-  private[this] lazy val config = ConfigFactory.load()
+  private lazy val config = ConfigFactory.load()
 
-  private[this] lazy val retryPrefix = "gcp.storage.retry"
-  private[this] lazy val retryMaxRetries =
+  private lazy val retryPrefix = "gcp.storage.retry"
+  private lazy val retryMaxRetries =
     Try(config.getInt(retryPrefix + ".max-retries")).getOrElse(GCSBucket.DefaultMaxRetries)
-  private[this] lazy val retryBaseBackOff =
+  private lazy val retryBaseBackOff =
     Try(config.getDuration(retryPrefix + ".base-backoff").toMillis.millis).getOrElse(GCSBucket.DefaultBaseBackOff)
-  private[this] lazy val retryMaxBackOff =
+  private lazy val retryMaxBackOff =
     Try(config.getDuration(retryPrefix + ".max-backoff").toMillis.millis).getOrElse(GCSBucket.DefaultMaxBackOff)
-  private[this] lazy val retryJitter =
+  private lazy val retryJitter =
     Try(config.getDouble(retryPrefix + ".jitter")).getOrElse(GCSBucket.DefaultJitter)
 
   private def blobId(key: String) = BlobId.of(bucketName, key)
@@ -248,7 +248,7 @@ final class GCSBucket(
   private def log(isError: Boolean, message: String, cause: Throwable): Unit =
     if (isError) logger.error(message, cause) else logger.warn(message, cause)
 
-  private[this] def handler: PartialFunction[Throwable, Boolean] = {
+  private def handler: PartialFunction[Throwable, Boolean] = {
     case ex: StorageException =>
       ex.getCode match {
         case 404 =>

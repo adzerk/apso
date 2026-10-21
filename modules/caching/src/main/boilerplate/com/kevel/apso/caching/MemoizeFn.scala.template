@@ -36,7 +36,7 @@ sealed trait AsyncMemoizeFn0[V] extends (() => Future[V]) {
     fn,
     reloadLoader = Some((key: Unit, oldValue: V) => fn(key).map { newValue =>
       if (replacePredicate(oldValue, newValue)) newValue else oldValue
-    }(ExecutionContext.parasitic))
+    }(using ExecutionContext.parasitic))
   )
   override def apply(): Future[V] = {
     val fut = cache.get(())

@@ -67,12 +67,12 @@ case class SftpFileDescriptor(
 
   def fileAttributes = if (_fileAttributes == null) None else _fileAttributes
 
-  protected[this] val root = ""
+  protected val root = ""
 
-  private[this] def sftpClient() =
+  private def sftpClient() =
     SftpFileDescriptor.acquireConnection(host, port, username, password, identity)
 
-  private[this] def sftp[A](block: SFTPClient => A): A = {
+  private def sftp[A](block: SFTPClient => A): A = {
     def doConnect(retries: Int): A =
       try {
         sftpClient().use { sftp =>
@@ -190,10 +190,10 @@ case class SftpFileDescriptor(
   }
 
   def stream(offset: Long = 0L) = new InputStream {
-    private[this] lazy val sftpLease = sftpClient()
-    private[this] lazy val sftp = sftpLease.get()
-    private[this] lazy val remoteFile = sftp.sftpClient.open(path)
-    private[this] lazy val inner = new remoteFile.RemoteFileInputStream()
+    private lazy val sftpLease = sftpClient()
+    private lazy val sftp = sftpLease.get()
+    private lazy val remoteFile = sftp.sftpClient.open(path)
+    private lazy val inner = new remoteFile.RemoteFileInputStream()
     if (offset > 0) inner.skip(offset)
 
     def read() = inner.read()
@@ -228,21 +228,21 @@ case class SftpFileDescriptor(
 }
 
 object SftpFileDescriptor {
-  private[this] val fdConf = ConfigFactory.load()
-  private[this] val maxConnections = fdConf.getInt("apso.io.file-descriptor.sftp.max-connections-per-host")
-  private[this] val maxIdleTime =
+  private val fdConf = ConfigFactory.load()
+  private val maxConnections = fdConf.getInt("apso.io.file-descriptor.sftp.max-connections-per-host")
+  private val maxIdleTime =
     Duration.fromNanos(fdConf.getDuration("apso.io.file-descriptor.sftp.max-idle-time").toNanos)
-  private[this] val leaseAcquireMaxDuration =
+  private val leaseAcquireMaxDuration =
     Duration.fromNanos(fdConf.getDuration("apso.io.file-descriptor.sftp.max-lease-acquire-duration").toNanos)
 
   // We can't share the same connection if any of the connection details are different (host, port, username, password, identity)
-  private[this] val connectionPools =
+  private val connectionPools =
     new ConcurrentHashMap[(String, Int, String, Option[String], Option[Identity]), Pool[SftpClient]]()
 
   // This is just a helper class to tie together the lifetime of the SFTPClient
   // with the SSHClient, i.e. when we close the SFTPClient we also want to
   // disconnect the underlying SSH connection.
-  private class SftpClient(private[this] val ssh: SSHClient) {
+  private class SftpClient(private val ssh: SSHClient) {
     val sftpClient = ssh.newSFTPClient
     def close() = {
       sftpClient.close()
@@ -252,7 +252,7 @@ object SftpFileDescriptor {
 
   case class Credentials(host: String, port: String, auth: Either[Identity, String])
 
-  private[this] def sshClient(
+  private def sshClient(
       host: String,
       port: Int,
       username: String,
@@ -323,7 +323,7 @@ object SftpFileDescriptor {
 
   case class Identity(sshKey: Either[String, File], passphrase: Option[String])
 
-  private[this] val idRegex = """(.*@)?([\-|\d|\w|\.]+)(:\d+)?(\/.*)?""".r
+  private val idRegex = """(.*@)?([\-|\d|\w|\.]+)(:\d+)?(\/.*)?""".r
 
   private def splitMeta(url: String): (String, Int, String) = {
     url match {
@@ -335,7 +335,7 @@ object SftpFileDescriptor {
     }
   }
 
-  private[this] val credentials =
+  private val credentials =
     new FileDescriptorCredentials[config.Credentials.Sftp.Entry, SftpFileDescriptor.Credentials] {
       def id(path: String) = splitMeta(path)._1
 

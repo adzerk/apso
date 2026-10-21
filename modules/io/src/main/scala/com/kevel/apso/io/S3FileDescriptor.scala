@@ -91,7 +91,7 @@ case class S3FileDescriptor(
     }
   }
 
-  private[this] def listS3WithPrefix(prefix: String, includeDirectories: Boolean): Iterator[S3Object] = {
+  private def listS3WithPrefix(prefix: String, includeDirectories: Boolean): Iterator[S3Object] = {
     bucket.getObjectsWithMatchingPrefix(buildPath(elements :+ prefix), includeDirectories)
   }
 
