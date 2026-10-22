@@ -7,7 +7,7 @@ import java.nio.file.Path
 import scala.annotation.unused
 import scala.concurrent.duration.*
 import scala.jdk.CollectionConverters.*
-import scala.util.Try
+import scala.util.{Try, Using}
 
 import com.google.cloud.BaseServiceException
 import com.google.cloud.storage.Storage.{BlobListOption, BlobSourceOption, BlobWriteOption, CopyRequest}
@@ -124,10 +124,13 @@ final class GCSBucket(
     */
   def push(key: String, file: File): Boolean = {
     logger.info(s"Pushing file '${file.getPath}' to 'gs://$bucketName/$key'")
-    push(key, new FileInputStream(file), None)
+    retry(Using.resource(new FileInputStream(file))(upload(key, _))).getOrElse(false)
   }
 
   /** Pushes a given `InputStream` to the location specified by `key` in the bucket.
+    *
+    * Unlike other operations, a failed push isn't retried here, since part of the stream may have been consumed by
+    * then. Retries are left to the underlying client.
     *
     * NOTE: We are ignoring the length parameter for now.
     *
@@ -142,6 +145,16 @@ final class GCSBucket(
     */
   def push(key: String, inputStream: InputStream, @unused length: Option[Long]): Boolean = {
     logger.info(s"Pushing to 'gs://$bucketName/$key'")
+    Try(upload(key, inputStream)).fold(
+      ex => {
+        logger.error(s"Failed to push to 'gs://$bucketName/$key'", ex)
+        false
+      },
+      identity
+    )
+  }
+
+  private def upload(key: String, inputStream: InputStream): Boolean = {
     val info = BlobInfo.newBuilder(blobId(key)).build()
     storage.createFrom(info, new BufferedInputStream(inputStream), noGzipTranscoding).exists()
   }

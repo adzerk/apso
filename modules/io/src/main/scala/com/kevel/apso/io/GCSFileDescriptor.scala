@@ -3,7 +3,7 @@ package com.kevel.apso.io
 import java.io.InputStream
 import java.net.URI
 
-import com.google.cloud.storage.{Blob, Storage, StorageOptions}
+import com.google.cloud.storage.{Blob, Storage, StorageOptions, StorageRetryStrategy}
 
 import com.kevel.apso.gcp.GCSBucket
 
@@ -108,14 +108,22 @@ case class GCSFileDescriptor(
 
 object GCSFileDescriptor {
 
-  /** Creates a GCSFileDescriptor from "bucket/path/..." using the default storage instance with Application Default
-    * Credentials (ADC).
+  /** Creates a GCSFileDescriptor from "bucket/path/..." using a storage instance with Application Default Credentials
+    * (ADC). The instance retries every request whose failure is transient, uploads without preconditions included.
     */
   def apply(path: String): GCSFileDescriptor = {
     path.split('/').toList match {
       case gcsBucket :: gcsPath =>
         // Application Default Credentials (ADC)
-        val bucket = new GCSBucket(gcsBucket, StorageOptions.getDefaultInstance.getService)
+        val bucket = new GCSBucket(
+          gcsBucket,
+          () =>
+            StorageOptions
+              .newBuilder()
+              .setStorageRetryStrategy(StorageRetryStrategy.getUniformStorageRetryStrategy)
+              .build()
+              .getService
+        )
         GCSFileDescriptor(bucket, gcsPath.filterNot(_.trim.isEmpty))
       case _ =>
         throw new IllegalArgumentException("Error parsing GCS URI")

@@ -516,7 +516,7 @@ It reads the following optional keys from the typesafe configuration:
 | `gcp.storage.retry.max-backoff` | `30 seconds` | The duration with which to cap the growth of the waiting duration. |
 | `gcp.storage.retry.jitter` | `1.0` | The fraction of each waiting duration to randomize, from `0.0` for no jitter to `1.0` for a duration uniformly distributed between zero and the full waiting duration. |
 
-These keys configure the retries performed by `GCSBucket` itself, which are independent from the ones performed by the underlying client. An operation is retried whenever the client reports its failure as retryable, which covers the requests GCS throttles.
+These keys configure the retries performed by `GCSBucket` itself, which are independent from the ones performed by the underlying client. An operation is retried whenever the client reports its failure as retryable, which covers the requests GCS throttles. Pushing an `InputStream` is the exception: since a failed attempt may have consumed part of the stream, it's never retried by `GCSBucket`, and retrying it is left to the underlying client. The client built by `GCSFileDescriptor("bucket/path")` uses `StorageRetryStrategy.getUniformStorageRetryStrategy`, under which it also retries uploads without preconditions, unlike with the client's default strategy.
 
 ## Encryption
 

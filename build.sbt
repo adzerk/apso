@@ -106,7 +106,8 @@ lazy val gcp = module(project, "gcp")
       ScalaLogging,
       GoogleCloudStorage,
       ScalaLogging,
-      TypesafeConfig
+      TypesafeConfig,
+      Specs2_4Core % Test
     )
   )
 
