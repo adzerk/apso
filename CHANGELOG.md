@@ -18,6 +18,39 @@ Use the following schema when setting up the Changelog for a new release. Remove
 ### Security
 -->
 
+## [0.29.0] - 2026-10-23
+
+This release drops Scala 2 support, adds preloading and conditional rewrites to nullary caches and makes `GCSBucket` uploads retry on failure, matching the S3 implementation.
+
+### Added
+
+- Add preload mechanism for nullary caches ([#1197](https://github.com/adzerk/apso/pull/1197)).
+- Allow skipping nullary cache rewrites with a predicate ([#1200](https://github.com/adzerk/apso/pull/1200)).
+
+### Changed
+
+- Test against JVM 25 ([#1201](https://github.com/adzerk/apso/pull/1201)).
+- Update google-cloud-storage to 2.75.0 ([#1203](https://github.com/adzerk/apso/pull/1203)).
+- Update joda-time to 2.15.0 ([#1204](https://github.com/adzerk/apso/pull/1204)).
+- Update pekko-actor, ... to 1.7.1 ([#1206](https://github.com/adzerk/apso/pull/1206)).
+- Update circe-core, circe-generic, ... to 0.14.17 ([#1210](https://github.com/adzerk/apso/pull/1210)).
+- Update sshj to 0.41.2 ([#1213](https://github.com/adzerk/apso/pull/1213)).
+- Update commons-codec to 1.23.0 ([#1214](https://github.com/adzerk/apso/pull/1214)).
+- Update pekko-http, pekko-http-core, ... to 1.4.2 ([#1215](https://github.com/adzerk/apso/pull/1215)).
+- Update unirest-java-core to 4.10.2 ([#1218](https://github.com/adzerk/apso/pull/1218)).
+- Update sbt to 2.0.11 ([#1220](https://github.com/adzerk/apso/pull/1220)).
+- Update aws-crt to 0.49.0 ([#1221](https://github.com/adzerk/apso/pull/1221)).
+- Update scala3-compiler, tasty-core to 3.9.0 ([#1223](https://github.com/adzerk/apso/pull/1223)).
+- Update specs2-core, specs2-junit, ... to 5.9.1 ([#1224](https://github.com/adzerk/apso/pull/1224)).
+- Update s3, s3-transfer-manager to 2.57.2 ([#1226](https://github.com/adzerk/apso/pull/1226)).
+- Enable retries for `GCSBucket` push ([#1228](https://github.com/adzerk/apso/pull/1228)).
+
+### Removed
+
+- Drop Scala 2 support ([#1222](https://github.com/adzerk/apso/pull/1222)).
+
+[0.29.0]: https://github.com/adzerk/apso/compare/v0.28.0...v0.29.0
+
 ## [0.28.0] - 2026-09-30
 
 This release bumps the minimum required Java version to 17, adds new caching capabilities and makes the implementation of `FileDescriptor`'s `move` more resilient.
