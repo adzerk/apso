@@ -13,7 +13,7 @@ object Dependencies {
     val Circe          = "0.14.17"
     val CommonsCodec   = "1.23.0"
     val FastMd5        = "2.7.1"
-    val Gcp            = "2.75.0"
+    val Gcp            = "2.76.0"
     val JUnit          = "4.13.2"
     val JodaTime       = "2.15.0"
     val ScalaCheck     = "1.20.0"
