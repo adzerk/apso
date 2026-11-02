@@ -16,7 +16,7 @@ class SftpFileDescriptorSpec extends Specification {
         "localhost/tmp/file",
         Credentials.Sftp(default = Some(Credentials.Sftp.Entry.Basic(username = "user123", password = "pass456")))
       )
-      file.uri ==== new URI("sftp://user123@localhost/tmp/file")
+      file.uri === new URI("sftp://user123@localhost/tmp/file")
     }
 
     "resolve a PublicKey config to an identity rooted at ~/.ssh/" in {
@@ -26,7 +26,7 @@ class SftpFileDescriptorSpec extends Specification {
           Some(Credentials.Sftp.Entry.PublicKey(username = "u", keypairFile = "id_rsa", passphrase = Some("phrase")))
         )
       )
-      file.identity ==== Some(
+      file.identity === Some(
         SftpFileDescriptor.Identity(Right(new File(Properties.userHome + "/.ssh/id_rsa")), Some("phrase"))
       )
     }
@@ -42,7 +42,7 @@ class SftpFileDescriptorSpec extends Specification {
           Some(Credentials.Sftp.Entry.PublicKeyContent(username = "u", privateKey = pem, passphrase = None))
         )
       )
-      file.identity ==== Some(SftpFileDescriptor.Identity(Left(pem), None))
+      file.identity === Some(SftpFileDescriptor.Identity(Left(pem), None))
     }
   }
 }

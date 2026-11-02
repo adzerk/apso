@@ -18,14 +18,14 @@ class ImplicitsSpec extends Specification {
         val res =
           fromFullPaths(List("a.b.c" -> 1.asJson, "a.b.d.e" -> 3.asJson, "a.f" -> 5.asJson, "g" -> 4.asJson))
 
-        res mustEqual expectedJson
+        res === expectedJson
       }
 
       "create a JSON object from complete paths (with a custom separator)" in {
         val res =
           fromFullPaths(List("a-b-c" -> 1.asJson, "a-b-d-e" -> 3.asJson, "a-f" -> 5.asJson, "g" -> 4.asJson), "-")
 
-        res mustEqual expectedJson
+        res === expectedJson
       }
 
       "not throw a StackOverflowError for large lists of paths" in {
@@ -35,10 +35,10 @@ class ImplicitsSpec extends Specification {
 
       "giving precedence to the last path value if duplicate paths exist" in {
         val json1 = fromFullPaths(List("a" -> 1.asJson, "a" -> 2.asJson, "a" -> 3.asJson))
-        json1 mustEqual json"""{"a": 3}"""
+        json1 === json"""{"a": 3}"""
 
         val json2 = fromFullPaths(List("a.b.c" -> 1.asJson, "a.b" -> 2.asJson, "a" -> 3.asJson))
-        json2 mustEqual json"""{"a": 3}"""
+        json2 === json"""{"a": 3}"""
       }
     }
 
@@ -86,13 +86,13 @@ class ImplicitsSpec extends Specification {
       "which removes null values" in {
         val encoderWithouNulls = deriveEncoder[Foo].withoutNulls
 
-        Foo(1, None).asJson(using encoderWithouNulls) mustEqual json"""{ "a": 1 }"""
+        Foo(1, None).asJson(using encoderWithouNulls) === json"""{ "a": 1 }"""
       }
 
       "which add fields" in {
         val encoderWithExtraField = deriveEncoder[Foo].withExtraField("c", 2.asJson)
 
-        Foo(1, Some("x")).asJson(using encoderWithExtraField) mustEqual json"""{ "a": 1, "b": "x", "c": 2 }"""
+        Foo(1, Some("x")).asJson(using encoderWithExtraField) === json"""{ "a": 1, "b": "x", "c": 2 }"""
       }
     }
   }

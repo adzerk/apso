@@ -11,14 +11,14 @@ import org.apache.pekko.http.scaladsl.model.*
 import org.apache.pekko.http.scaladsl.model.RemoteAddress.IP
 import org.apache.pekko.http.scaladsl.model.StatusCodes.*
 import org.apache.pekko.http.scaladsl.model.headers.*
-import org.apache.pekko.http.scaladsl.server.Directives.*
+import org.apache.pekko.http.scaladsl.server.Directives.{post as httpPost, *}
 import org.apache.pekko.http.scaladsl.server.RouteResult
 import org.apache.pekko.http.scaladsl.server.RouteResult.Complete
 import org.apache.pekko.http.scaladsl.testkit.{RouteTestTimeout, Specs2RouteTest}
 import org.apache.pekko.stream.scaladsl.Flow
 import org.specs2.concurrent.ExecutionEnv
+import org.specs2.execute.Scope
 import org.specs2.mutable.Specification
-import org.specs2.specification.Scope
 
 import com.kevel.apso.NetUtils.*
 
@@ -44,7 +44,8 @@ class ProxySupportSpec(implicit ee: ExecutionEnv) extends Specification with Spe
 
     val routes = {
       // format: OFF
-      (get | post) {
+      // specs2 5 exposes a post method through Specification, so we're renaming Pekko HTTP's post to httpPost here.
+      (get | httpPost) {
         path("get-path") {
           complete("get-reply")
         } ~

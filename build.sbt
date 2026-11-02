@@ -95,7 +95,7 @@ lazy val aws = module(project, "aws")
       AwsSdkS3Transfer,
       ScalaLogging,
       TypesafeConfig,
-      Specs2_4Core % Test
+      Specs2Core % Test
     )
   )
 
@@ -107,7 +107,7 @@ lazy val gcp = module(project, "gcp")
       GoogleCloudStorage,
       ScalaLogging,
       TypesafeConfig,
-      Specs2_4Core % Test
+      Specs2Core % Test
     )
   )
 
@@ -116,7 +116,7 @@ lazy val caching = module(project, "caching")
   .settings(
     libraryDependencies ++= Seq(
       Scaffeine,
-      Specs2_4Core % Test
+      Specs2Core % Test
     ),
     // Workaround for duplicate sbt-boilerplate generation under sbt2+; revisit upon updates
     Compile / packageSrc / mappings ~= (xs => xs.distinct)
@@ -133,17 +133,16 @@ lazy val circe = module(project, "circe")
       Squants        % Provided,
       TypesafeConfig % Provided,
       CirceLiteral   % Test,
-      Specs2_4Core   % Test,
-      Specs2_4JUnit  % Test
+      Specs2Core     % Test
     )
   )
 
 lazy val collections = module(project, "collections")
   .settings(
     libraryDependencies ++= Seq(
-      ScalaCheck         % Test,
-      Specs2_4Core       % Test,
-      Specs2_4ScalaCheck % Test
+      ScalaCheck       % Test,
+      Specs2Core       % Test,
+      Specs2ScalaCheck % Test
     )
   )
 
@@ -152,13 +151,11 @@ lazy val core = module(project, "core")
     libraryDependencies ++= Seq(
       CirceCore,
       ScalaLogging,
-      TypesafeConfig     % Provided,
+      TypesafeConfig   % Provided,
       UnirestJava,
-      JUnit              % Test,
-      ScalaCheck         % Test,
-      Specs2_4Core       % Test,
-      Specs2_4JUnit      % Test,
-      Specs2_4ScalaCheck % Test
+      ScalaCheck       % Test,
+      Specs2Core       % Test,
+      Specs2ScalaCheck % Test
     )
   )
 
@@ -182,7 +179,7 @@ lazy val io = module(project, "io")
       ScalaPool,
       SshJ,
       TypesafeConfig,
-      Specs2_4Core % Test
+      Specs2Core % Test
     )
   )
 
@@ -202,7 +199,7 @@ lazy val pekkoHttp = module(project, "pekko-http")
       TypesafeConfig,
       PekkoActorTestkitTyped % Test,
       PekkoHttpTestkit       % Test,
-      Specs2_4Core           % Test
+      Specs2Core             % Test
     )
   )
 
@@ -210,7 +207,7 @@ lazy val profiling = module(project, "profiling")
   .settings(libraryDependencies ++= Seq(ScalaLogging, SimpleJmx))
 
 lazy val time = module(project, "time")
-  .settings(libraryDependencies ++= Seq(JodaTime, Specs2_4Core % Test))
+  .settings(libraryDependencies ++= Seq(JodaTime, Specs2Core % Test))
 
 lazy val docs = (project in file("apso-docs"))
   .dependsOn(aws, caching, circe, collections, core, encryption, gcp, hashing, io, pekko, pekkoHttp, profiling, time)

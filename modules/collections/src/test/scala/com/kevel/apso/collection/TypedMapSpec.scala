@@ -86,8 +86,8 @@ class TypedMapSpec extends Specification {
       val m3 = m1 + Dog("Sherlock")
 
       m1.equals("string") must beFalse
-      m1 !=== m2
-      m1.hashCode !=== m2.hashCode
+      m1 !== m2
+      m1.hashCode !== m2.hashCode
       m2 === m3
       m2.hashCode === m3.hashCode
     }

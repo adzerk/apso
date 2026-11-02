@@ -1,11 +1,11 @@
 package com.kevel.apso.collection
 
-import org.specs2.matcher.MatchResult
+import org.specs2.execute.Result
 import org.specs2.mutable.*
 
 class TrieSpec extends Specification {
   "A Trie" should {
-    def checkTree[A, B](input: Seq[A], v: B, trie: Trie[A, B]): MatchResult[?] = {
+    def checkTree[A, B](input: Seq[A], v: B, trie: Trie[A, B]): Result = {
       input match {
         case Seq(h, t*) =>
           trie.nodes.get(h) must beLike { case Some(trie) =>

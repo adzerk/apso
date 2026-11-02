@@ -22,7 +22,7 @@ class ExtraJsonProtocolSpec extends Specification {
       val duration = 10.seconds
       val durationJson = json"""{"milliseconds":10000}"""
 
-      duration.asJson mustEqual durationJson
+      duration.asJson === durationJson
       durationJson.as[FiniteDuration] must beRight(duration)
 
       decode[FiniteDuration]("""{"seconds": 2}""") must beRight(2.seconds)
@@ -45,15 +45,15 @@ class ExtraJsonProtocolSpec extends Specification {
       val interval = new Interval(1000, 2000)
       val intervalJson = json"""{"startMillis":1000,"endMillis":2000}"""
 
-      interval.asJson mustEqual intervalJson
+      interval.asJson === intervalJson
       intervalJson.as[Interval] must beRight(interval)
     }
 
     "provide an Encoder and Decoder for Period" in {
       val pStrings = Seq("P1D", "P1M2D", "P1M2DT10H30M")
-      pStrings.forall { s =>
+      forall(pStrings) { s =>
         val period = new Period(s)
-        period.asJson.printWith(Printer.noSpaces) mustEqual s""""$s""""
+        period.asJson.printWith(Printer.noSpaces) === s""""$s""""
         decode[Period](s""""$s"""") must beRight(period)
       }
 
@@ -65,7 +65,7 @@ class ExtraJsonProtocolSpec extends Specification {
       val uri = new URI("http://example.com")
       val uriJsonString = json""""http://example.com""""
 
-      uri.asJson mustEqual uriJsonString
+      uri.asJson === uriJsonString
       uriJsonString.as[URI] must beRight(uri)
       decode[URI]("true") must beLeft
       json""""{invalidUri}"""".as[URI] must beLeft
@@ -81,7 +81,7 @@ class ExtraJsonProtocolSpec extends Specification {
                                              """.stripMargin)
       val configJsonString = json"""{"a":123,"b":{"x":"1d","y":"string"}}"""
 
-      config.asJson mustEqual configJsonString
+      config.asJson === configJsonString
       configJsonString.as[Config] must beRight(config)
       decode[Config]("true") must beLeft
     }
@@ -90,7 +90,7 @@ class ExtraJsonProtocolSpec extends Specification {
       val dateTime = DateTime.parse("2016-01-01T00:00:00.000Z")
       val dateTimeJsonString = json""""2016-01-01T00:00:00.000Z""""
 
-      dateTime.asJson mustEqual dateTimeJsonString
+      dateTime.asJson === dateTimeJsonString
       dateTimeJsonString.as[DateTime] must beRight(dateTime)
       decode[DateTime]("true") must beLeft
     }
@@ -99,7 +99,7 @@ class ExtraJsonProtocolSpec extends Specification {
       val localDate = new LocalDate("2016-01-01")
       val localDateJsonString = """"2016-01-01""""
 
-      localDate.asJson.printWith(Printer.noSpaces) mustEqual localDateJsonString
+      localDate.asJson.printWith(Printer.noSpaces) === localDateJsonString
       decode[LocalDate](localDateJsonString) must beRight(localDate)
       decode[LocalDate]("true") must beLeft
     }
@@ -108,7 +108,7 @@ class ExtraJsonProtocolSpec extends Specification {
       implicit val moneyContext: MoneyContext = MoneyContext(EUR, defaultCurrencySet, Nil)
       val usd: Currency = USD
 
-      usd.asJson.noSpaces mustEqual "\"USD\""
+      usd.asJson.noSpaces === "\"USD\""
       decode[Currency]("\"USD\"") must beRight(usd)
       decode[Currency]("\"usd\"") must beRight(usd)
       decode[Currency]("\"EU\"") must beLeft
@@ -121,7 +121,7 @@ class ExtraJsonProtocolSpec extends Specification {
       val map = Map(None -> "none", Some(1) -> "one", Some(2) -> "two")
       val mapJson = json"""[{"key":null,"value":"none"},{"key":1,"value":"one"},{"key":2,"value":"two"}]"""
 
-      map.asJson mustEqual mapJson
+      map.asJson === mapJson
       mapJson.as[Map[Option[Int], String]] must beRight(map)
       json"""{"key":1,"value":"one"}""".as[Map[Option[Int], String]] must beLeft
       json"""[{"invalid":1,"value":"one"}]""".as[Map[Option[Int], String]] must beLeft
