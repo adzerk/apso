@@ -27,13 +27,13 @@ class FileDescriptorSpec extends Specification {
     )
 
     "correctly be initialized given a URI with protocol" in {
-      FileDescriptor("file:///tmp/folder") mustEqual LocalFileDescriptor("/tmp/folder")
-      FileDescriptor("s3://tmp/path") mustEqual S3FileDescriptor("tmp/path")
-      FileDescriptor("sftp://localhost/tmp/path", fdConfig) mustEqual SftpFileDescriptor(
+      FileDescriptor("file:///tmp/folder") === LocalFileDescriptor("/tmp/folder")
+      FileDescriptor("s3://tmp/path") === S3FileDescriptor("tmp/path")
+      FileDescriptor("sftp://localhost/tmp/path", fdConfig) === SftpFileDescriptor(
         "localhost/tmp/path",
         fdConfig.sftp
       )
-      FileDescriptor("sftp://valid-host.com/tmp/path", fdConfig) mustEqual SftpFileDescriptor(
+      FileDescriptor("sftp://valid-host.com/tmp/path", fdConfig) === SftpFileDescriptor(
         "valid-host.com/tmp/path",
         fdConfig.sftp
       )

@@ -49,15 +49,15 @@ class ExtraMiscDirectivesSpec extends Specification with Specs2RouteTest {
         }
 
       Get("/") ~> optRefRoute ~> check {
-        responseAs[String] mustEqual None.toString
+        responseAs[String] === None.toString
       }
 
       Get("/") ~> addHeader(RawHeader("Referer", "http://example.com")) ~> optRefRoute ~> check {
-        responseAs[String] mustEqual Some("example.com").toString
+        responseAs[String] === Some("example.com").toString
       }
 
       Get("/") ~> addHeader(RawHeader("Referer", "invalidhost :(")) ~> optRefRoute ~> check {
-        responseAs[String] mustEqual None.toString
+        responseAs[String] === None.toString
       }
     }
   }

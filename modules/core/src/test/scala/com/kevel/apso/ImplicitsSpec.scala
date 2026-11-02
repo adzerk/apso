@@ -143,7 +143,8 @@ class ImplicitsSpec extends Specification with ScalaCheck {
       val stream = rand.increasingUniformStream(runs).toList
 
       "the results must be ordered" in {
-        stream.sorted === stream
+        // Avoid constructing specs2 equality diagnostics for a million-element collection.
+        (stream.sorted == stream) must beTrue
       }
 
       "the average must be close to 0.5" in {

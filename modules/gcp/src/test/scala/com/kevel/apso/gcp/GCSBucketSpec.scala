@@ -52,13 +52,13 @@ class GCSBucketSpec extends Specification {
         val storage = new TimingOutStorage
         storage.bucket.push("key", tmpFile("content")) must beFalse
         // The first attempt plus the 2 retries set in the test configuration.
-        storage.attempts.map(_._2) ==== List.fill(3)("content")
+        storage.attempts.map(_._2).toList === List.fill(3)("content")
       }
 
       "closing the file after every attempt" in {
         val storage = new TimingOutStorage
         storage.bucket.push("key", tmpFile("content")) must beFalse
-        storage.attempts.map { case (in, _) => Try(in.read()).isFailure } ==== List.fill(3)(true)
+        storage.attempts.map { case (in, _) => Try(in.read()).isFailure }.toList === List.fill(3)(true)
       }
     }
 
@@ -66,7 +66,7 @@ class GCSBucketSpec extends Specification {
       val storage = new TimingOutStorage
       val in = new ByteArrayInputStream("content".getBytes(StandardCharsets.UTF_8))
       storage.bucket.push("key", in, None) must beFalse
-      storage.attempts.map(_._2) ==== List("content")
+      storage.attempts.map(_._2).toList === List("content")
     }
   }
 }
