@@ -2,22 +2,19 @@ package com.kevel.apso.encryption
 
 import java.io.InputStream
 import java.security.*
+import javax.crypto.spec.SecretKeySpec
 
 import org.apache.commons.codec.binary.Base64
-import org.bouncycastle.jce.provider.BouncyCastleProvider
 
-object BouncyCastleInitializer {
-  private val provider = new BouncyCastleProvider()
-  Security.addProvider(provider)
-
-  def apply() = provider
-}
-
-/** Loads and provide a `BouncyCastleProvider` and provides utility methods to encode in base64, load keystores and
-  * create keys from raw password input.
+/** Provides utility methods to encode in base64, load keystores and create keys from raw password input.
   */
 trait EncryptionUtils extends EncryptionErrorHandling {
-  val provider = BouncyCastleInitializer()
+
+  /** Builds a `SecretKeySpec` for the given transformation, using its algorithm part (e.g. `AES` for
+    * `AES/ECB/PKCS5Padding`) as the key algorithm.
+    */
+  protected def secretKeySpec(key: Array[Byte], transformation: String): SecretKeySpec =
+    new SecretKeySpec(key, transformation.takeWhile(_ != '/'))
 
   def pad(b64: String): String =
     if (b64.trim.isEmpty) b64
