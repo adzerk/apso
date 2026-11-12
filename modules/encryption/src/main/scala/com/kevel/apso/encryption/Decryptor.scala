@@ -3,7 +3,6 @@ package com.kevel.apso.encryption
 import java.io.InputStream
 import java.security.{Key, MessageDigest}
 import javax.crypto.Cipher
-import javax.crypto.spec.SecretKeySpec
 
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.commons.codec.binary.Base64
@@ -34,7 +33,7 @@ object Decryptor extends EncryptionUtils with LazyLogging {
   private def loadDecryptionCipher(transformation: String, key: Key): Option[Cipher] = handle(
     {
       logger.debug(s"Building Decryptor using Transformation '$transformation' and Key Algorithm '${key.getAlgorithm}'")
-      val cipher = Cipher.getInstance(transformation, provider)
+      val cipher = Cipher.getInstance(transformation)
       cipher.init(Cipher.DECRYPT_MODE, key)
       cipher
     },
@@ -46,12 +45,12 @@ object Decryptor extends EncryptionUtils with LazyLogging {
   )
 
   def apply(transformation: String, key: Array[Byte]): Option[Decryptor] =
-    loadDecryptionCipher(transformation, new SecretKeySpec(key, transformation)).map(new Decryptor(_))
+    loadDecryptionCipher(transformation, secretKeySpec(key, transformation)).map(new Decryptor(_))
 
   def apply(transformation: String, key: String): Option[Decryptor] = {
     val md = MessageDigest.getInstance("SHA-256")
 
-    loadDecryptionCipher(transformation, new SecretKeySpec(md.digest(key.getBytes("UTF-8")), transformation))
+    loadDecryptionCipher(transformation, secretKeySpec(md.digest(key.getBytes("UTF-8")), transformation))
       .map(new Decryptor(_))
   }
 

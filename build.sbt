@@ -160,7 +160,7 @@ lazy val core = module(project, "core")
   )
 
 lazy val encryption = module(project, "encryption")
-  .settings(libraryDependencies ++= Seq(BouncyCastlePkix % Runtime, BouncyCastleProvider, CommonsCodec, ScalaLogging))
+  .settings(libraryDependencies ++= Seq(CommonsCodec, ScalaLogging, Specs2Core % Test))
 
 lazy val hashing = module(project, "hashing")
   .settings(libraryDependencies ++= Seq(FastMd5))
@@ -170,10 +170,6 @@ lazy val io = module(project, "io")
   .dependsOn(gcp)
   .settings(
     libraryDependencies ++= Seq(
-      // FIX: Explicitly override transient bouncy castle versions from `sshj`: https://security.snyk.io/vuln/SNYK-JAVA-ORGBOUNCYCASTLE-6612984
-      // Remove once com.hierynomus:sshj releases a version with https://github.com/hierynomus/sshj/pull/938
-      BouncyCastlePkix,
-      BouncyCastleProvider,
       GoogleCloudStorage,
       ScalaLogging,
       ScalaPool,

@@ -8,7 +8,6 @@ object Dependencies {
     val PekkoHttp      = "1.4.2"
     val Aws            = "2.57.13"
     val AwsCrt         = "0.50.0"
-    val BouncyCastle   = "1.86"
     val Cats           = "2.13.0"
     val Circe          = "0.14.17"
     val CommonsCodec   = "1.23.0"
@@ -31,8 +30,6 @@ object Dependencies {
   val AwsSdkS3Transfer       = "software.amazon.awssdk"      % "s3-transfer-manager"       % Versions.Aws
   val AwsSdkS3               = "software.amazon.awssdk"      % "s3"                        % Versions.Aws
   val AwsSdkCrt              = "software.amazon.awssdk.crt"  % "aws-crt"                   % Versions.AwsCrt
-  val BouncyCastlePkix       = "org.bouncycastle"            % "bcpkix-jdk18on"            % Versions.BouncyCastle
-  val BouncyCastleProvider   = "org.bouncycastle"            % "bcprov-jdk18on"            % Versions.BouncyCastle
   val CatsCore               = "org.typelevel"              %% "cats-core"                 % Versions.Cats
   val CirceCore              = "io.circe"                   %% "circe-core"                % Versions.Circe
   val CirceGeneric           = "io.circe"                   %% "circe-generic"             % Versions.Circe
