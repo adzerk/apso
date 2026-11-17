@@ -40,7 +40,7 @@ object Encryptor extends EncryptionUtils with LazyLogging {
   private def loadEncryptionCipher(transformation: String, key: Key): Option[Cipher] = handle(
     {
       logger.debug(s"Building Encryptor using Transformation '$transformation' and Key Algorithm '${key.getAlgorithm}'")
-      val cipher = Cipher.getInstance(transformation, provider)
+      val cipher = Cipher.getInstance(transformation)
       cipher.init(Cipher.ENCRYPT_MODE, key)
       cipher
     },
@@ -55,12 +55,12 @@ object Encryptor extends EncryptionUtils with LazyLogging {
     loadEncryptionCipher(transformation, secretKeySpec).map(new Encryptor(_))
 
   def apply(transformation: String, key: Array[Byte]): Option[Encryptor] =
-    apply(transformation, new SecretKeySpec(key, transformation))
+    apply(transformation, secretKeySpec(key, transformation))
 
   def apply(transformation: String, key: String): Option[Encryptor] = {
     val md = MessageDigest.getInstance("SHA-256")
 
-    apply(transformation, new SecretKeySpec(md.digest(key.getBytes("UTF-8")), transformation))
+    apply(transformation, secretKeySpec(md.digest(key.getBytes("UTF-8")), transformation))
   }
 
   def apply(
