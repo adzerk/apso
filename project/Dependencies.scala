@@ -6,7 +6,7 @@ object Dependencies {
 
     val Pekko          = "1.7.1"
     val PekkoHttp      = "1.4.2"
-    val Aws            = "2.59.7"
+    val Aws            = "2.59.10"
     val AwsCrt         = "0.50.2"
     val Cats           = "2.13.0"
     val Circe          = "0.14.17"
@@ -23,7 +23,7 @@ object Dependencies {
     val Squants        = "1.8.3"
     val SshJ           = "0.41.2"
     val TypesafeConfig = "1.4.10"
-    val UnirestJava    = "4.11.11"
+    val UnirestJava    = "4.12.4"
   }
 
   // scalafmt: { maxColumn = 200 }
