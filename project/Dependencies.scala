@@ -5,7 +5,7 @@ object Dependencies {
     val Scala = "3.9.0"
 
     val Pekko          = "1.7.1"
-    val PekkoHttp      = "1.4.2"
+    val PekkoHttp      = "2.0.1"
     val Aws            = "2.59.7"
     val AwsCrt         = "0.50.0"
     val Cats           = "2.13.0"
